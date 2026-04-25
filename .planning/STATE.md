@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-04-25T14:59:45.859Z"
-last_activity: 2026-04-24 — Roadmap created from research convergence (35/35 v1 requirements mapped across 7 phases)
+status: executing
+stopped_at: Completed 01-01-project-config-PLAN.md
+last_updated: "2026-04-25T17:30:17.498Z"
+last_activity: 2026-04-25
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 8
+  completed_plans: 1
+  percent: 13
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 1 (Foundation)
+**Current focus:** Phase 01 — foundation
 
 ## Current Position
 
-Phase: 1 of 7 (Foundation)
-Plan: — of — in current phase (no plans yet)
-Status: Ready to plan
-Last activity: 2026-04-24 — Roadmap created from research convergence (35/35 v1 requirements mapped across 7 phases)
+Phase: 01 (foundation) — EXECUTING
+Plan: 2 of 8
+Status: Ready to execute
+Last activity: 2026-04-25
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 13%
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: — (no execution history yet)
 
 *Updated after each plan completion*
+| Phase 01 P01 | 190 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,10 @@ Recent decisions affecting current work:
 - **Project (2026-04-24):** MVP = Minesweeper only; second-game work deferred until Mines is shipping clean.
 - **Project (2026-04-24):** SwiftData with CloudKit-compatible schema from day 1 even though CloudKit only turns on at Phase 6.
 - **Project (2026-04-24):** Sign in with Apple + CloudKit private DB (optional, never gates gameplay) is the only auth/sync surface — no third-party backend.
+- Deployment target fixed from 26.2 (template typo) to 17.0 per CLAUDE.md §1
+- Bundle ID com.lauterstar.gamekit contractually frozen as of P1-01 commit 3e8c43a
+- SWIFT_STRICT_CONCURRENCY = complete enabled across all 6 build configs
+- CloudKit container ID iCloud.com.lauterstar.gamekit pinned in PROJECT.md; capability deferred to P6 per D-10
 
 ### Pending Todos
 
@@ -84,8 +89,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 1 context gathered
-Resume file: --resume-file
+Last session: 2026-04-25T17:30:17.494Z
+Stopped at: Completed 01-01-project-config-PLAN.md
+Resume file: None
 
 **Planned Phase:** 01 (foundation) — 8 plans — 2026-04-25T14:59:45.856Z

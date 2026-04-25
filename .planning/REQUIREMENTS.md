@@ -12,7 +12,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 - [ ] **FOUND-01**: App launches to Home in <1s on cold start (recent device)
 - [ ] **FOUND-02**: DesignKit consumed as local SPM dependency from `../DesignKit`
 - [ ] **FOUND-03**: Global `ThemeManager` injected via `@EnvironmentObject`; every visible pixel reads a theme token (no hardcoded colors / radii / spacing)
-- [ ] **FOUND-04**: Bundle identifier is `com.lauterstar.gamekit`; iOS 17+ deployment target; Swift 6 strict concurrency ON
+- [x] **FOUND-04
+**: Bundle identifier is `com.lauterstar.gamekit`; iOS 17+ deployment target; Swift 6 strict concurrency ON
 - [ ] **FOUND-05**: All user-facing strings use `String(localized:)` with an `xcstrings` catalog (EN-only at v1, future locales mechanical)
 - [ ] **FOUND-06**: Placeholder app icon shipped (DesignKit colors); user replaces with real icon before App Store
 - [ ] **FOUND-07**: Pre-commit hooks reject hardcoded `Color(...)`, `cornerRadius: <int>`, `padding(<int>)` in `Games/` and `Screens/`, plus Finder-dupe `* 2.swift` files
