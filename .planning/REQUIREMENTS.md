@@ -133,51 +133,57 @@ Explicit exclusions. Documented to prevent scope creep.
 
 ## Traceability
 
-Empty until roadmap creation populates it. Each requirement maps to exactly one phase.
+Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-24 by the roadmapper.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | — | Pending |
-| FOUND-02 | — | Pending |
-| FOUND-03 | — | Pending |
-| FOUND-04 | — | Pending |
-| FOUND-05 | — | Pending |
-| FOUND-06 | — | Pending |
-| FOUND-07 | — | Pending |
-| SHELL-01 | — | Pending |
-| SHELL-02 | — | Pending |
-| SHELL-03 | — | Pending |
-| SHELL-04 | — | Pending |
-| MINES-01 | — | Pending |
-| MINES-02 | — | Pending |
-| MINES-03 | — | Pending |
-| MINES-04 | — | Pending |
-| MINES-05 | — | Pending |
-| MINES-06 | — | Pending |
-| MINES-07 | — | Pending |
-| MINES-08 | — | Pending |
-| MINES-09 | — | Pending |
-| MINES-10 | — | Pending |
-| MINES-11 | — | Pending |
-| PERSIST-01 | — | Pending |
-| PERSIST-02 | — | Pending |
-| PERSIST-03 | — | Pending |
-| PERSIST-04 | — | Pending |
-| PERSIST-05 | — | Pending |
-| PERSIST-06 | — | Pending |
-| THEME-01 | — | Pending |
-| THEME-02 | — | Pending |
-| THEME-03 | — | Pending |
-| A11Y-01 | — | Pending |
-| A11Y-02 | — | Pending |
-| A11Y-03 | — | Pending |
-| A11Y-04 | — | Pending |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Pending |
+| FOUND-06 | Phase 1 | Pending |
+| FOUND-07 | Phase 1 | Pending |
+| SHELL-01 | Phase 1 | Pending |
+| SHELL-02 | Phase 5 | Pending |
+| SHELL-03 | Phase 4 | Pending |
+| SHELL-04 | Phase 5 | Pending |
+| MINES-01 | Phase 2 | Pending |
+| MINES-02 | Phase 3 | Pending |
+| MINES-03 | Phase 2 | Pending |
+| MINES-04 | Phase 2 | Pending |
+| MINES-05 | Phase 3 | Pending |
+| MINES-06 | Phase 3 | Pending |
+| MINES-07 | Phase 3 | Pending |
+| MINES-08 | Phase 5 | Pending |
+| MINES-09 | Phase 5 | Pending |
+| MINES-10 | Phase 5 | Pending |
+| MINES-11 | Phase 3 | Pending |
+| PERSIST-01 | Phase 4 | Pending |
+| PERSIST-02 | Phase 4 | Pending |
+| PERSIST-03 | Phase 4 | Pending |
+| PERSIST-04 | Phase 6 | Pending |
+| PERSIST-05 | Phase 6 | Pending |
+| PERSIST-06 | Phase 6 | Pending |
+| THEME-01 | Phase 5 | Pending |
+| THEME-02 | Phase 3 | Pending |
+| THEME-03 | Phase 5 | Pending |
+| A11Y-01 | Phase 5 | Pending |
+| A11Y-02 | Phase 5 | Pending |
+| A11Y-03 | Phase 5 | Pending |
+| A11Y-04 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 35 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 35 ⚠️ (will be resolved by roadmap step)
+- Mapped to phases: 35 ✓
+- Unmapped: 0
+
+**Notes on placement:**
+- **A11Y-02 (VoiceOver labels) is mapped to Phase 5** but cell-level `accessibilityLabel` is *baked in* at Phase 3 per PITFALLS Pitfall 13 (cheaper to bake in with the cell view than retrofit). Phase 5 polishes the labels on buttons, overlays, and the full VoiceOver navigation pass — Phase 3 ensures cells aren't retrofit.
+- **MINES-03 / MINES-04 / MINES-07 (engine-side) at Phase 2; MINES-07 (UI-side overlay) at Phase 3** — engine detection of win/loss lands at P2 in WinDetector tests; the actual user-visible overlay using `theme.colors.{success,danger}` lands at P3.
+- **THEME-02 at Phase 3** because the new `theme.colors.gameNumber(_:)` token must be added to DesignKit and consumed by Mines cells in Phase 3 (no hardcoded greys from day 1). The full 6-category legibility audit is Phase 5 (THEME-01).
+- **SHELL-01 at Phase 1** ships the skeletal Home with Minesweeper as the only enabled card; SHELL-02 / SHELL-04 (Settings spine, intro flow) ship with the polish pass at Phase 5 alongside the haptics/SFX toggles they configure.
 
 ---
 *Requirements defined: 2026-04-24*
-*Last updated: 2026-04-24 after initial definition*
+*Traceability populated: 2026-04-24 — all 35 v1 requirements mapped*
