@@ -16,7 +16,7 @@ GameKit ships **Minesweeper-only** to TestFlight, then App Store. The journey is
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - App shell, DesignKit wiring, ThemeManager, bundle ID lock, capabilities, lint hooks
+- [x] **Phase 1: Foundation** - App shell, DesignKit wiring, ThemeManager, bundle ID lock, capabilities, lint hooks
 - [ ] **Phase 2: Mines Engines** - Pure value-type board / reveal / win-detect with deterministic Swift Testing coverage
 - [ ] **Phase 3: Mines UI** - Playable theme-token-pure board, gestures, timer, restart, win/loss overlays, baked-in a11y labels
 - [ ] **Phase 4: Stats & Persistence** - SwiftData stats with CloudKit-compatible schema, Stats screen, Export/Import JSON
@@ -130,7 +130,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/8 | Not started | - |
+| 1. Foundation | 8/8 | Complete | 2026-04-25 |
 | 2. Mines Engines | 0/TBD | Not started | - |
 | 3. Mines UI | 0/TBD | Not started | - |
 | 4. Stats & Persistence | 0/TBD | Not started | - |

@@ -17,7 +17,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 **: Global `ThemeManager` injected via `@EnvironmentObject`; every visible pixel reads a theme token (no hardcoded colors / radii / spacing)
 - [x] **FOUND-04
 **: Bundle identifier is `com.lauterstar.gamekit`; iOS 17+ deployment target; Swift 6 strict concurrency ON
-- [ ] **FOUND-05**: All user-facing strings use `String(localized:)` with an `xcstrings` catalog (EN-only at v1, future locales mechanical)
+- [x] **FOUND-05
+**: All user-facing strings use `String(localized:)` with an `xcstrings` catalog (EN-only at v1, future locales mechanical)
 - [x] **FOUND-06
 **: Placeholder app icon shipped (DesignKit colors); user replaces with real icon before App Store
 - [x] **FOUND-07
