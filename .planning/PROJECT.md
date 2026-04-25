@@ -138,6 +138,7 @@ everything else fails, this differentiator must not.
 | Subtle SFX off by default | Calm-by-default product posture; opt-in respects coffee-shop play | — Pending |
 | 3-step intro on first launch | Surfaces themes + stats + optional sign-in once, then never again | — Pending |
 | Bundle ID `com.lauterstar.gamekit` | Matches existing FitnessTracker namespace; ecosystem-consistent | — Pending |
+| CloudKit container ID `iCloud.com.lauterstar.gamekit` | Pinned at P1 per D-10 / Pitfall 3 to prevent stranded-TestFlight-data drift; capability provisioning deferred to P6 alongside Sign in with Apple | — Pending |
 
 ## Evolution
 
