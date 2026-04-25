@@ -137,7 +137,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 8/8 | Complete | 2026-04-25 |
-| 2. Mines Engines | 0/TBD | Not started | - |
+| 2. Mines Engines | 1/6 | In progress | - |
 | 3. Mines UI | 0/TBD | Not started | - |
 | 4. Stats & Persistence | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |

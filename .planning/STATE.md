@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 2 context gathered
-last_updated: "2026-04-25T18:54:40.491Z"
-last_activity: 2026-04-25
+status: executing
+stopped_at: Completed 02-01-PLAN.md (model layer)
+last_updated: "2026-04-25T21:48:30.000Z"
+last_activity: 2026-04-25 -- Completed Phase 02 Plan 01 (Minesweeper model layer)
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_plans: 14
+  completed_plans: 9
+  percent: 64
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 01 — foundation
+**Current focus:** Phase 02 — mines-engines
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-25
+Phase: 02 (mines-engines) — EXECUTING
+Plan: 2 of 6
+Status: Executing Phase 02 (Wave 1 of 3 complete: 02-01 model layer landed)
+Last activity: 2026-04-25 -- Completed Phase 02 Plan 01 (Minesweeper model layer)
 
 Progress: [██████████] 100%
 
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -45,6 +45,7 @@ Progress: [██████████] 100%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 8 | - | - |
+| 02 | 1 | 3 min | 3 min |
 
 **Recent Trend:**
 
@@ -60,6 +61,7 @@ Progress: [██████████] 100%
 | Phase 01-foundation P06 | 2 | 1 tasks | 4 files |
 | Phase 01-foundation P07 | 120 | 3 tasks | 6 files |
 | Phase 01-foundation P08 | 15 | 2 tasks | 1 files |
+| Phase 02-mines-engines P01 | 3 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -89,6 +91,12 @@ Recent decisions affecting current work:
 - ComingSoonOverlay uses radii.chip + sparkles SF Symbol per D-06; 1.8s auto-dismiss via Task.sleep
 - GameCard model stays local to HomeView.swift — single-use, DesignKit promotion threshold (2+ games) not met
 - Localizable.xcstrings authored with 25 EN keys (extractionState:manual) to capture all P1 String(localized:) call sites; plurals deferred to P4; xcstrings in Resources/ auto-extracts future keys via SWIFT_EMIT_LOC_STRINGS=YES
+- 02-01: MinesweeperDifficulty raw values lowercase 'easy'/'medium'/'hard' — locked stable serialization key for P4 (D-02); renaming = data break
+- 02-01: MinesweeperDifficulty has no displayName/String(localized:)/description — engine layer carries no localized names per D-03; P3/P5 view layer owns mapping
+- 02-01: MinesweeperGameState.lost carries mineIdx: MinesweeperIndex so P3 renders mineHit overlay without diffing; intentionally NOT Codable (P4 persists outcome via GameRecord, not live state)
+- 02-01: MinesweeperBoard uses flat [Cell] indexed row*cols+col (Swift-idiomatic for fixed-size grids, simpler flood-fill); zero mutating funcs — engines compose replacingCell(at:with:) / replacingCells(_:) per D-10
+- 02-01: MinesweeperCell.State is a single enum (hidden/revealed/flagged/mineHit); adjacency lives on Cell as `let adjacentMineCount` (precomputed at generation, read 100s of times per game)
+- 02-01: Models layer ships with default internal visibility — @testable import gamekit reaches everything; no public surface needed
 
 ### Pending Todos
 
@@ -108,8 +116,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 2 context gathered
-Resume file: --resume-file
+Last session: 2026-04-25T21:48:30Z
+Stopped at: Completed 02-01-PLAN.md (Minesweeper model layer — 5 files, 320 lines, Foundation-only)
+Resume file: .planning/phases/02-mines-engines/02-02-PLAN.md (next: SeededGenerator SplitMix64 test helper)
 
-**Planned Phase:** 01 (foundation) — 8 plans — 2026-04-25T14:59:45.856Z
+**Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z

@@ -34,7 +34,7 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 
 ### Minesweeper
 
-- [ ] **MINES-01**: Three difficulties — Easy 9×9/10 mines, Medium 16×16/40, Hard 16×30/99
+- [x] **MINES-01**: Three difficulties — Easy 9×9/10 mines, Medium 16×16/40, Hard 16×30/99 (Phase 02 Plan 01: locked in MinesweeperDifficulty enum)
 - [ ] **MINES-02**: Tap to reveal, long-press to flag (composed `LongPressGesture(0.25s).exclusively(before: TapGesture())`)
 - [ ] **MINES-03**: First tap is always safe — mines placed *after* first tap, excluding tapped cell + its 8 bounds-clamped neighbors
 - [ ] **MINES-04**: Iterative flood-fill reveal for empty cells to the next numbered border (no recursion)
@@ -156,7 +156,7 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | SHELL-02 | Phase 5 | Pending |
 | SHELL-03 | Phase 4 | Pending |
 | SHELL-04 | Phase 5 | Pending |
-| MINES-01 | Phase 2 | Pending |
+| MINES-01 | Phase 2 | Complete (02-01) |
 | MINES-02 | Phase 3 | Pending |
 | MINES-03 | Phase 2 | Pending |
 | MINES-04 | Phase 2 | Pending |
