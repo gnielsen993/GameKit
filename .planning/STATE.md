@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-06-app-scene-PLAN.md
-last_updated: "2026-04-25T18:19:07.234Z"
+stopped_at: Completed 01-07-shell-screens-PLAN.md
+last_updated: "2026-04-25T18:27:11.306Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 6
-  percent: 75
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Status: Ready to execute
 Last activity: 2026-04-25
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [████████░░] 75%
 | Phase 01-foundation P03 | 180 | 2 tasks | 4 files |
 | Phase 01-foundation P05 | 14 | 2 tasks | 1 files |
 | Phase 01-foundation P06 | 2 | 1 tasks | 4 files |
+| Phase 01-foundation P07 | 120 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - D-08: No version pin for DesignKit — local-path (../../DesignKit) tracks disk; breaking changes ripple immediately (accepted ecosystem risk per D-08)
 - Used theme(using: colorScheme) from DesignKit public API — avoided theme(for:) shim per PATTERNS Note A
 - RootTabView stub uses Rectangle().fill(theme.colors.background) — cleaner token consumption, avoids pre-commit hook edge cases
+- NavigationStack owned by each tab root (HomeView/StatsView/SettingsView), not RootTabView — per ARCHITECTURE.md Anti-Pattern 3
+- ComingSoonOverlay uses radii.chip + sparkles SF Symbol per D-06; 1.8s auto-dismiss via Task.sleep
+- GameCard model stays local to HomeView.swift — single-use, DesignKit promotion threshold (2+ games) not met
 
 ### Pending Todos
 
@@ -102,8 +106,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-25T18:19:07.230Z
-Stopped at: Completed 01-06-app-scene-PLAN.md
+Last session: 2026-04-25T18:27:11.302Z
+Stopped at: Completed 01-07-shell-screens-PLAN.md
 Resume file: None
 
 **Planned Phase:** 01 (foundation) — 8 plans — 2026-04-25T14:59:45.856Z
