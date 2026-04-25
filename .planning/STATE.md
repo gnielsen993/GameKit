@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-05-designkit-link-PLAN.md
-last_updated: "2026-04-25T18:14:44.394Z"
+stopped_at: Completed 01-06-app-scene-PLAN.md
+last_updated: "2026-04-25T18:19:07.234Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 5
-  percent: 63
+  completed_plans: 6
+  percent: 75
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 6 of 8
+Plan: 7 of 8
 Status: Ready to execute
 Last activity: 2026-04-25
 
-Progress: [██████░░░░] 63%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [██████░░░░] 63%
 | Phase 01-foundation P04 | 2 | 1 tasks | 1 files |
 | Phase 01-foundation P03 | 180 | 2 tasks | 4 files |
 | Phase 01-foundation P05 | 14 | 2 tasks | 1 files |
+| Phase 01-foundation P06 | 2 | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Recent decisions affecting current work:
 - Colors baked into AppIcon PNGs at design time; icons are NOT theme-responsive (static bundle assets resolved at install time per CONTEXT D-06)
 - D-07: DesignKit linked via Xcode UI (Add Local Package) — not hand-patched pbxproj; avoids malformed sync-root-group hooks in Xcode 16 objectVersion=77
 - D-08: No version pin for DesignKit — local-path (../../DesignKit) tracks disk; breaking changes ripple immediately (accepted ecosystem risk per D-08)
+- Used theme(using: colorScheme) from DesignKit public API — avoided theme(for:) shim per PATTERNS Note A
+- RootTabView stub uses Rectangle().fill(theme.colors.background) — cleaner token consumption, avoids pre-commit hook edge cases
 
 ### Pending Todos
 
@@ -99,8 +102,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-25T18:14:44.390Z
-Stopped at: Completed 01-05-designkit-link-PLAN.md
+Last session: 2026-04-25T18:19:07.230Z
+Stopped at: Completed 01-06-app-scene-PLAN.md
 Resume file: None
 
 **Planned Phase:** 01 (foundation) — 8 plans — 2026-04-25T14:59:45.856Z
