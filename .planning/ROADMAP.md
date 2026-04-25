@@ -36,7 +36,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Bundle identifier is `com.lauterstar.gamekit`, deployment target is iOS 17+, Swift 6 strict concurrency is ON, and the project builds without warnings.
   4. A pre-commit hook rejects `Color(...)` literals, hardcoded `cornerRadius:`/`padding(` integers in `Games/` and `Screens/`, and any `*\ 2.swift` Finder-dupe files.
   5. All user-facing strings reach the UI via `String(localized:)` with an `xcstrings` catalog populated; the catalog has zero stale entries flagged by Xcode.
-**Plans**: TBD
+**Plans**: 8 plans
+- [ ] 01-PLAN-project-config.md — Lock pbxproj invariants (bundle ID com.lauterstar.gamekit, iOS 17.0, Swift 6 with strict concurrency complete) + pin CloudKit container ID in PROJECT.md per D-10
+- [ ] 01-PLAN-precommit-hooks.md — Install scripts/install-hooks.sh + .githooks/pre-commit rejecting Color literals, numeric cornerRadius/padding in Games+Screens, and Finder-dupe "* 2.swift" files
+- [ ] 01-PLAN-app-icon-placeholder.md — Generate three 1024x1024 placeholder PNGs (universal/dark/tinted) and update AppIcon Contents.json
+- [ ] 01-PLAN-derived-data-doc.md — Document derived-data + simulator-store hygiene rituals per D-09
+- [ ] 01-PLAN-designkit-link.md — Add DesignKit as local SPM dep at ../DesignKit via Xcode UI per D-07/D-08
+- [ ] 01-PLAN-app-scene.md — Replace Xcode template with App/GameKitApp.swift owning ThemeManager @StateObject; create Screens/RootTabView.swift stub; delete legacy gamekitApp.swift + ContentView.swift
+- [ ] 01-PLAN-shell-screens.md — Build RootTabView 3-tab root + HomeView (1 enabled Mines + 8 disabled placeholders + ComingSoonOverlay) + SettingsView/StatsView themed-scaffold stubs
+- [ ] 01-PLAN-localization-catalog.md — Author Resources/Localizable.xcstrings with all P1 String(localized:) keys; verify zero stale entries
 **UI hint**: yes
 
 ### Phase 2: Mines Engines
@@ -122,7 +130,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/8 | Not started | - |
 | 2. Mines Engines | 0/TBD | Not started | - |
 | 3. Mines UI | 0/TBD | Not started | - |
 | 4. Stats & Persistence | 0/TBD | Not started | - |
