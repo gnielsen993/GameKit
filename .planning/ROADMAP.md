@@ -58,8 +58,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Win/loss detection is deterministic: a 16×30/99 board with 380 non-mine cells revealed reads as ongoing; with 381 revealed reads as won; revealing any mine reads as lost.
   5. Engines import only `Foundation` — no `SwiftUI`, no `SwiftData`, no `ModelContext` imports — verified by build target separation.
 **Plans**: 6 plans
-- [ ] 02-01-PLAN.md — Models layer (Difficulty/Index/Cell/Board/GameState) — immutable Foundation-only value types per D-01..D-05, D-09, D-10
-- [ ] 02-02-PLAN.md — SeededGenerator (SplitMix64) test helper in `gamekitTests/Helpers/` per D-12
+- [x] 02-01-PLAN.md — Models layer (Difficulty/Index/Cell/Board/GameState) — immutable Foundation-only value types per D-01..D-05, D-09, D-10
+- [x] 02-02-PLAN.md — SeededGenerator (SplitMix64) test helper in `gamekitTests/Helpers/` per D-12
 - [ ] 02-03-PLAN.md — BoardGenerator engine + tests: single-shot first-tap-safe placement (Pitfall 1), adjacency precompute, perf bench (D-08, D-11, D-13–D-18)
 - [ ] 02-04-PLAN.md — RevealEngine engine + tests: iterative BFS flood-fill (no recursion), idempotence, flag protection, mine-hit transition (D-06, D-07, D-19)
 - [ ] 02-05-PLAN.md — WinDetector engine + tests: isWon/isLost predicates + mutual-exclusion fuzz (D-07, D-19)

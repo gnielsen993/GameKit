@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md (model layer)
-last_updated: "2026-04-25T21:48:30.000Z"
-last_activity: 2026-04-25 -- Completed Phase 02 Plan 01 (Minesweeper model layer)
+stopped_at: Completed 02-02-PLAN.md (SeededGenerator SplitMix64 test PRNG)
+last_updated: "2026-04-25T21:57:44.173Z"
+last_activity: 2026-04-25
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 14
-  completed_plans: 9
-  percent: 64
+  completed_plans: 10
+  percent: 71
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 02 (mines-engines) — EXECUTING
-Plan: 2 of 6
-Status: Executing Phase 02 (Wave 1 of 3 complete: 02-01 model layer landed)
-Last activity: 2026-04-25 -- Completed Phase 02 Plan 01 (Minesweeper model layer)
+Plan: 3 of 6
+Status: Ready to execute
+Last activity: 2026-04-25
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100%
 | Phase 01-foundation P07 | 120 | 3 tasks | 6 files |
 | Phase 01-foundation P08 | 15 | 2 tasks | 1 files |
 | Phase 02-mines-engines P01 | 3 | 2 tasks | 5 files |
+| Phase 02-mines-engines P02 | 144 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,7 @@ Recent decisions affecting current work:
 - 02-01: MinesweeperBoard uses flat [Cell] indexed row*cols+col (Swift-idiomatic for fixed-size grids, simpler flood-fill); zero mutating funcs — engines compose replacingCell(at:with:) / replacingCells(_:) per D-10
 - 02-01: MinesweeperCell.State is a single enum (hidden/revealed/flagged/mineHit); adjacency lives on Cell as `let adjacentMineCount` (precomputed at generation, read 100s of times per game)
 - 02-01: Models layer ships with default internal visibility — @testable import gamekit reaches everything; no public surface needed
+- 02-02: SeededGenerator (SplitMix64) test PRNG ships in test target only — production engines stay Foundation-only per D-12; nested test-folder auto-registered by Xcode 16 PBXFileSystemSynchronizedRootGroup with no pbxproj edits (CLAUDE.md §8.8 empirically validated for nested folders)
 
 ### Pending Todos
 
@@ -116,8 +118,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-25T21:48:30Z
-Stopped at: Completed 02-01-PLAN.md (Minesweeper model layer — 5 files, 320 lines, Foundation-only)
-Resume file: .planning/phases/02-mines-engines/02-02-PLAN.md (next: SeededGenerator SplitMix64 test helper)
+Last session: 2026-04-25T21:57:44.169Z
+Stopped at: Completed 02-02-PLAN.md (SeededGenerator SplitMix64 test PRNG)
+Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z
