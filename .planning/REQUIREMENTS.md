@@ -16,7 +16,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 **: Bundle identifier is `com.lauterstar.gamekit`; iOS 17+ deployment target; Swift 6 strict concurrency ON
 - [ ] **FOUND-05**: All user-facing strings use `String(localized:)` with an `xcstrings` catalog (EN-only at v1, future locales mechanical)
 - [ ] **FOUND-06**: Placeholder app icon shipped (DesignKit colors); user replaces with real icon before App Store
-- [ ] **FOUND-07**: Pre-commit hooks reject hardcoded `Color(...)`, `cornerRadius: <int>`, `padding(<int>)` in `Games/` and `Screens/`, plus Finder-dupe `* 2.swift` files
+- [x] **FOUND-07
+**: Pre-commit hooks reject hardcoded `Color(...)`, `cornerRadius: <int>`, `padding(<int>)` in `Games/` and `Screens/`, plus Finder-dupe `* 2.swift` files
 
 ### App Shell
 
