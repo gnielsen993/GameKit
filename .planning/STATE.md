@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md (BoardGenerator engine + Swift Testing fuzz suite)
-last_updated: "2026-04-25T22:11:25.388Z"
+stopped_at: Completed 02-04-PLAN.md (RevealEngine + iterative BFS flood-fill tests)
+last_updated: "2026-04-25T22:27:50.413Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 14
-  completed_plans: 11
-  percent: 79
+  completed_plans: 12
+  percent: 86
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 02 (mines-engines) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-04-25
 
-Progress: [████████░░] 79%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [████████░░] 79%
 | Phase 02-mines-engines P01 | 3 | 2 tasks | 5 files |
 | Phase 02-mines-engines P02 | 144 | 1 tasks | 1 files |
 | Phase 02-mines-engines P03 | 591 | 2 tasks | 7 files |
+| Phase 02-mines-engines P04 | 618 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,10 @@ Recent decisions affecting current work:
 - 02-01: MinesweeperCell.State is a single enum (hidden/revealed/flagged/mineHit); adjacency lives on Cell as `let adjacentMineCount` (precomputed at generation, read 100s of times per game)
 - 02-01: Models layer ships with default internal visibility — @testable import gamekit reaches everything; no public surface needed
 - 02-02: SeededGenerator (SplitMix64) test PRNG ships in test target only — production engines stay Foundation-only per D-12; nested test-folder auto-registered by Xcode 16 PBXFileSystemSynchronizedRootGroup with no pbxproj edits (CLAUDE.md §8.8 empirically validated for nested folders)
+- 02-04: RevealEngine uses iterative BFS via Array<Index> queue + head pointer (Claude's Discretion per CONTEXT) — layer-by-layer reveal order maps cleanly to P3 MINES-08 cascade animation; visited set bounds work to O(rows*cols)
+- 02-04: RevealEngine flag-protection (Pitfall 7) and idempotence (.revealed/.mineHit) share a single early-return path that returns (board, []) — pure no-op without entering the BFS algorithm
+- 02-04: Plan 03 nonisolated lesson applied proactively — both 'nonisolated enum RevealEngine' and 'nonisolated struct RevealEngineTests' declared upfront so no Rule 3 deviation needed; this is now the standard pattern for Plan 02 engine + test pairs (Plan 05 should follow)
+- 02-04: cornerClusteredHardBoard test hand-builds the 99-mine fixture inline (not via BoardGenerator) — keeps SC3 proof self-contained and reproducible regardless of BoardGenerator RNG order; 99 mines fit exactly in top-left 11x9, far-corner tap from (15,29) reveals >200 cells without stack growth
 
 ### Pending Todos
 
@@ -119,8 +124,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-25T22:11:25.384Z
-Stopped at: Completed 02-03-PLAN.md (BoardGenerator engine + Swift Testing fuzz suite)
+Last session: 2026-04-25T22:27:50.409Z
+Stopped at: Completed 02-04-PLAN.md (RevealEngine + iterative BFS flood-fill tests)
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z

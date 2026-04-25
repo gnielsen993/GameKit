@@ -61,7 +61,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 02-01-PLAN.md — Models layer (Difficulty/Index/Cell/Board/GameState) — immutable Foundation-only value types per D-01..D-05, D-09, D-10
 - [x] 02-02-PLAN.md — SeededGenerator (SplitMix64) test helper in `gamekitTests/Helpers/` per D-12
 - [x] 02-03-PLAN.md — BoardGenerator engine + tests: single-shot first-tap-safe placement (Pitfall 1), adjacency precompute, perf bench (D-08, D-11, D-13–D-18)
-- [ ] 02-04-PLAN.md — RevealEngine engine + tests: iterative BFS flood-fill (no recursion), idempotence, flag protection, mine-hit transition (D-06, D-07, D-19)
+- [x] 02-04-PLAN.md — RevealEngine engine + tests: iterative BFS flood-fill (no recursion), idempotence, flag protection, mine-hit transition (D-06, D-07, D-19)
 - [ ] 02-05-PLAN.md — WinDetector engine + tests: isWon/isLost predicates + mutual-exclusion fuzz (D-07, D-19)
 - [ ] 02-06-PLAN.md — Wave-3 cleanup: integrated engine purity grep (SC5), full test suite green, delete Xcode template stub
 
@@ -137,7 +137,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 8/8 | Complete | 2026-04-25 |
-| 2. Mines Engines | 1/6 | In progress | - |
+| 2. Mines Engines | 4/6 | In progress | - |
 | 3. Mines UI | 0/TBD | Not started | - |
 | 4. Stats & Persistence | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |

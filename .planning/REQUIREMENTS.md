@@ -37,7 +37,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 - [x] **MINES-01**: Three difficulties — Easy 9×9/10 mines, Medium 16×16/40, Hard 16×30/99 (Phase 02 Plan 01: locked in MinesweeperDifficulty enum)
 - [ ] **MINES-02**: Tap to reveal, long-press to flag (composed `LongPressGesture(0.25s).exclusively(before: TapGesture())`)
 - [ ] **MINES-03**: First tap is always safe — mines placed *after* first tap, excluding tapped cell + its 8 bounds-clamped neighbors
-- [ ] **MINES-04**: Iterative flood-fill reveal for empty cells to the next numbered border (no recursion)
+- [x] **MINES-04
+**: Iterative flood-fill reveal for empty cells to the next numbered border (no recursion)
 - [ ] **MINES-05**: Mine counter (mines remaining = total − flagged) and elapsed wall-clock timer always visible; timer pauses on scene-phase background
 - [ ] **MINES-06**: Restart button on the game screen
 - [ ] **MINES-07**: Win = all non-mine cells revealed; Loss = mine revealed; both surface a clear end-state overlay using `theme.colors.{success,danger}`
