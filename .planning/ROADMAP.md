@@ -17,7 +17,7 @@ GameKit ships **Minesweeper-only** to TestFlight, then App Store. The journey is
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - App shell, DesignKit wiring, ThemeManager, bundle ID lock, capabilities, lint hooks
-- [ ] **Phase 2: Mines Engines** - Pure value-type board / reveal / win-detect with deterministic Swift Testing coverage
+- [x] **Phase 2: Mines Engines** - Pure value-type board / reveal / win-detect with deterministic Swift Testing coverage
 - [ ] **Phase 3: Mines UI** - Playable theme-token-pure board, gestures, timer, restart, win/loss overlays, baked-in a11y labels
 - [ ] **Phase 4: Stats & Persistence** - SwiftData stats with CloudKit-compatible schema, Stats screen, Export/Import JSON
 - [ ] **Phase 5: Polish** - Animation pass, haptics, SFX, theme legibility audit, full accessibility, 3-step intro, Settings spine
@@ -63,7 +63,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 02-03-PLAN.md — BoardGenerator engine + tests: single-shot first-tap-safe placement (Pitfall 1), adjacency precompute, perf bench (D-08, D-11, D-13–D-18)
 - [x] 02-04-PLAN.md — RevealEngine engine + tests: iterative BFS flood-fill (no recursion), idempotence, flag protection, mine-hit transition (D-06, D-07, D-19)
 - [x] 02-05-PLAN.md — WinDetector engine + tests: isWon/isLost predicates + mutual-exclusion fuzz (D-07, D-19)
-- [ ] 02-06-PLAN.md — Wave-3 cleanup: integrated engine purity grep (SC5), full test suite green, delete Xcode template stub
+- [x] 02-06-PLAN.md — Wave-3 cleanup: integrated engine purity grep (SC5), full test suite green, delete Xcode template stub
 
 ### Phase 3: Mines UI
 **Goal**: The game is playable end-to-end on real hardware with theme-token-pure rendering, correct gesture composition, and accessibility labels baked in.
@@ -137,7 +137,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 8/8 | Complete | 2026-04-25 |
-| 2. Mines Engines | 5/6 | In progress | - |
+| 2. Mines Engines | 6/6 | Complete | 2026-04-25 |
 | 3. Mines UI | 0/TBD | Not started | - |
 | 4. Stats & Persistence | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
