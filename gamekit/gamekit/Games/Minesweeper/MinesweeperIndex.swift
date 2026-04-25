@@ -19,7 +19,7 @@ import Foundation
 /// A grid coordinate. Hashable so engine code can use Set-based exclusion
 /// (Set(allCells) - {tapped} - tapped.neighbors8) per D-09 / PITFALLS.md Pitfall 1.
 /// Foundation-only — ROADMAP P2 SC5.
-struct MinesweeperIndex: Hashable, Codable, Sendable {
+nonisolated struct MinesweeperIndex: Hashable, Codable, Sendable {
     let row: Int
     let col: Int
 

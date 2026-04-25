@@ -27,7 +27,7 @@ import Foundation
 /// produce NEW boards; this type has no mutating methods.
 /// Storage: flat [Cell] of length rows*cols, indexed by `row * cols + col`.
 /// Foundation-only — ROADMAP P2 SC5.
-struct MinesweeperBoard: Equatable, Hashable, Codable, Sendable {
+nonisolated struct MinesweeperBoard: Equatable, Hashable, Codable, Sendable {
     let difficulty: MinesweeperDifficulty
     let rows: Int
     let cols: Int

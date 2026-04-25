@@ -19,7 +19,7 @@ import Foundation
 /// Three locked difficulties for v1 (D-04). Raw values are the stable
 /// serialization key for P4 stats and JSON export (D-02) — renaming = data break.
 /// Foundation-only — ROADMAP P2 SC5.
-enum MinesweeperDifficulty: String, CaseIterable, Codable, Sendable {
+nonisolated enum MinesweeperDifficulty: String, CaseIterable, Codable, Sendable {
     case easy
     case medium
     case hard

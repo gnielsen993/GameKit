@@ -20,7 +20,7 @@ import Foundation
 /// Pure-function namespace producing a populated MinesweeperBoard from
 /// `(difficulty, firstTap, rng)`. Stateless; uninhabited (`enum`).
 /// Foundation-only — ROADMAP P2 SC5.
-enum BoardGenerator {
+nonisolated enum BoardGenerator {
 
     /// Generate a populated board with mines placed everywhere EXCEPT
     /// `firstTap` and its bounds-clamped 8-neighbors. Adjacency precomputed.

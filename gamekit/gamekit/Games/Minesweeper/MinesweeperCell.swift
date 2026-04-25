@@ -27,7 +27,7 @@ import Foundation
 /// A single cell on a Minesweeper board. Value type; engines mutate
 /// by returning a new Board carrying a new [Cell] (D-10 immutable Board).
 /// Foundation-only — ROADMAP P2 SC5.
-struct MinesweeperCell: Equatable, Hashable, Codable, Sendable {
+nonisolated struct MinesweeperCell: Equatable, Hashable, Codable, Sendable {
     /// Whether this cell holds a mine. Set at board generation (Plan 03), never changes after.
     let isMine: Bool
 

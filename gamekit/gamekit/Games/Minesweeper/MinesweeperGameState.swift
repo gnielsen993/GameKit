@@ -23,7 +23,7 @@ import Foundation
 /// Lifecycle of a Minesweeper session, owned by the P3 ViewModel.
 /// Foundation-only — ROADMAP P2 SC5. Engine ships this; P3/P5
 /// MinesweeperPhase (animation orchestration) is a view-layer concern (CONTEXT.md deferred).
-enum MinesweeperGameState: Equatable, Hashable, Sendable {
+nonisolated enum MinesweeperGameState: Equatable, Hashable, Sendable {
     /// Pre-first-tap. Board is unpopulated.
     case idle
     /// First tap fired; mines placed; reveals in flight.
