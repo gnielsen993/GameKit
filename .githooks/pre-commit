@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Reject Finder-dupe files (CLAUDE.md §8.7 / Pitfall 14)
+dupes=$(git diff --cached --name-only --diff-filter=A | grep -E ' 2\.swift$' || true)
+if [ -n "$dupes" ]; then
+  echo "ERROR: Finder-dupe files detected (will break the build via PBXFileSystemSynchronizedRootGroup):"
+  echo "$dupes"
+  exit 1
+fi
+
+# Reject hardcoded colors / radii / padding integers under Games/ and Screens/ (CLAUDE.md §1, Pitfall 8)
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^gamekit/gamekit/(Games|Screens)/.*\.swift$' || true)
+if [ -n "$staged" ]; then
+  bad=""
+  for f in $staged; do
+    # Color literals (Color(red:..) / Color(hex:..) / Color.gray etc.)
+    if git diff --cached "$f" | grep -E '^\+' | grep -E 'Color\(\s*(red:|hex:|white:)|Color\.(red|blue|green|gray|orange|yellow|pink|purple|black|white)' > /dev/null; then
+      bad="${bad}${f}: hardcoded Color literal\n"
+    fi
+    # cornerRadius: <int>
+    if git diff --cached "$f" | grep -E '^\+' | grep -E 'cornerRadius:\s*[0-9]+' > /dev/null; then
+      bad="${bad}${f}: numeric cornerRadius literal (use theme.radii.{card,button,chip,sheet})\n"
+    fi
+    # padding(<int>)
+    if git diff --cached "$f" | grep -E '^\+' | grep -E '\.padding\(\s*[0-9]+(\.[0-9]+)?\s*\)' > /dev/null; then
+      bad="${bad}${f}: numeric padding literal (use theme.spacing.{xs,s,m,l,xl,xxl})\n"
+    fi
+  done
+  if [ -n "$bad" ]; then
+    echo -e "ERROR: token-discipline violations under Games/ or Screens/:\n${bad}"
+    exit 1
+  fi
+fi
+
+exit 0
