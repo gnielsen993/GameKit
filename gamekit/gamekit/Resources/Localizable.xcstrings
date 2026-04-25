@@ -1,0 +1,286 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ coming soon" : {
+      "comment" : "Disabled-card overlay caption with game name interpolated",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ coming soon"
+          }
+        }
+      }
+    },
+    "ABOUT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ABOUT"
+          }
+        }
+      }
+    },
+    "APPEARANCE" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APPEARANCE"
+          }
+        }
+      }
+    },
+    "BEST TIMES" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEST TIMES"
+          }
+        }
+      }
+    },
+    "Chess Puzzles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chess Puzzles"
+          }
+        }
+      }
+    },
+    "Coming soon" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coming soon"
+          }
+        }
+      }
+    },
+    "Flow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flow"
+          }
+        }
+      }
+    },
+    "GameKit" : {
+      "comment" : "App / Home navigation title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GameKit"
+          }
+        }
+      }
+    },
+    "GameKit · v1.0" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GameKit · v1.0"
+          }
+        }
+      }
+    },
+    "HISTORY" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HISTORY"
+          }
+        }
+      }
+    },
+    "Home" : {
+      "comment" : "Home tab label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        }
+      }
+    },
+    "Merge" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge"
+          }
+        }
+      }
+    },
+    "Minesweeper" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minesweeper"
+          }
+        }
+      }
+    },
+    "Minesweeper coming in Phase 3" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minesweeper coming in Phase 3"
+          }
+        }
+      }
+    },
+    "Nonogram" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nonogram"
+          }
+        }
+      }
+    },
+    "Pattern Memory" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pattern Memory"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "comment" : "Settings tab + nav title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "Solitaire" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solitaire"
+          }
+        }
+      }
+    },
+    "Stats" : {
+      "comment" : "Stats tab + nav title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stats"
+          }
+        }
+      }
+    },
+    "Sudoku" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sudoku"
+          }
+        }
+      }
+    },
+    "The board, gestures, and timer arrive next." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The board, gestures, and timer arrive next."
+          }
+        }
+      }
+    },
+    "Theme controls coming in a future update." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme controls coming in a future update."
+          }
+        }
+      }
+    },
+    "Word Grid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word Grid"
+          }
+        }
+      }
+    },
+    "Your best times will appear here." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your best times will appear here."
+          }
+        }
+      }
+    },
+    "Your stats will appear here." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your stats will appear here."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
