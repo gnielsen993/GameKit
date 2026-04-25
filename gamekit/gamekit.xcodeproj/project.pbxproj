@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5F7F353D2F9D3B3800BA99BA /* DesignKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5F7F353C2F9D3B3800BA99BA /* DesignKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		5F7F31A52F9C707B00BA99BA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F7F353D2F9D3B3800BA99BA /* DesignKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = gamekit;
 			packageProductDependencies = (
+				5F7F353C2F9D3B3800BA99BA /* DesignKit */,
 			);
 			productName = gamekit;
 			productReference = 5F7F31972F9C707900BA99BA /* gamekit.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 5F7F318E2F9C707900BA99BA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5F7F353B2F9D3B3800BA99BA /* XCLocalSwiftPackageReference "../../DesignKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5F7F31982F9C707900BA99BA /* Products */;
 			projectDirPath = "";
@@ -584,6 +593,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		5F7F353B2F9D3B3800BA99BA /* XCLocalSwiftPackageReference "../../DesignKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../DesignKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5F7F353C2F9D3B3800BA99BA /* DesignKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5F7F318F2F9C707900BA99BA /* Project object */;
 }
