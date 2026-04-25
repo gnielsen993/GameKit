@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-04-PLAN.md (RevealEngine + iterative BFS flood-fill tests)
-last_updated: "2026-04-25T22:27:50.413Z"
+stopped_at: Completed 02-05-PLAN.md (WinDetector predicates + mutual-exclusion fuzz)
+last_updated: "2026-04-25T22:35:40.540Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 14
-  completed_plans: 12
-  percent: 86
+  completed_plans: 13
+  percent: 93
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 02 (mines-engines) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-04-25
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [█████████░] 86%
 | Phase 02-mines-engines P02 | 144 | 1 tasks | 1 files |
 | Phase 02-mines-engines P03 | 591 | 2 tasks | 7 files |
 | Phase 02-mines-engines P04 | 618 | 2 tasks | 2 files |
+| Phase 02-mines-engines P05 | 222 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,9 @@ Recent decisions affecting current work:
 - 02-04: RevealEngine flag-protection (Pitfall 7) and idempotence (.revealed/.mineHit) share a single early-return path that returns (board, []) — pure no-op without entering the BFS algorithm
 - 02-04: Plan 03 nonisolated lesson applied proactively — both 'nonisolated enum RevealEngine' and 'nonisolated struct RevealEngineTests' declared upfront so no Rule 3 deviation needed; this is now the standard pattern for Plan 02 engine + test pairs (Plan 05 should follow)
 - 02-04: cornerClusteredHardBoard test hand-builds the 99-mine fixture inline (not via BoardGenerator) — keeps SC3 proof self-contained and reproducible regardless of BoardGenerator RNG order; 99 mines fit exactly in top-left 11x9, far-corner tap from (15,29) reveals >200 cells without stack growth
+- 02-05: WinDetector finalizes ROADMAP P2 SC5 (engine purity) across all 3 engines (BoardGenerator + RevealEngine + WinDetector all Foundation-only); SC4 verbatim spec proven by 3 single-shot boundary tests + 30-seed mutualExclusionFuzz
+- 02-05: isWon short-circuits via 'if isLost(board) { return false }' — mutual exclusion enforced at the function-body level, not just by test convention; D-17 invariant becomes a structural property of the implementation
+- 02-05: Tests hand-craft won/lost/mixed boards via board.replacingCell / replacingCells (no RevealEngine dependency) — proves WinDetector correctness in isolation regardless of how a Board reached its state, simplifies bisection if RevealEngine ever regresses
 
 ### Pending Todos
 
@@ -124,8 +128,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-25T22:27:50.409Z
-Stopped at: Completed 02-04-PLAN.md (RevealEngine + iterative BFS flood-fill tests)
+Last session: 2026-04-25T22:35:31.818Z
+Stopped at: Completed 02-05-PLAN.md (WinDetector predicates + mutual-exclusion fuzz)
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z
