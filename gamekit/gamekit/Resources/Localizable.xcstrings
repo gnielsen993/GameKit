@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "%@ coming soon" : {
       "comment" : "Disabled-card overlay caption with game name interpolated",
       "extractionState" : "manual",
@@ -9,6 +12,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ coming soon"
+          }
+        }
+      }
+    },
+    "%@: %lld games, %lld wins, %@, best time %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld games, %3$lld wins, %4$@, best time %5$@"
           }
         }
       }
@@ -96,6 +109,17 @@
         }
       }
     },
+    "APPEARANCE" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APPEARANCE"
+          }
+        }
+      }
+    },
     "Abandon" : {
       "comment" : "Destructive button in mid-game difficulty-change alert (D-10)",
       "extractionState" : "automatic",
@@ -120,13 +144,13 @@
         }
       }
     },
-    "APPEARANCE" : {
+    "BEST TIMES" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "APPEARANCE"
+            "value" : "BEST TIMES"
           }
         }
       }
@@ -167,16 +191,8 @@
         }
       }
     },
-    "BEST TIMES" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "BEST TIMES"
-          }
-        }
-      }
+    "Best" : {
+
     },
     "Cancel" : {
       "comment" : "Cancel button in mid-game difficulty-change alert (D-10)",
@@ -224,6 +240,12 @@
         }
       }
     },
+    "Couldn't import stats" : {
+
+    },
+    "DATA" : {
+
+    },
     "Difficulty" : {
       "comment" : "Toolbar Menu a11y label",
       "extractionState" : "automatic",
@@ -247,6 +269,9 @@
           }
         }
       }
+    },
+    "Export stats" : {
+
     },
     "Flagged, row %lld column %lld" : {
       "comment" : "Cell a11y label — flagged state (D-19, 1-indexed)",
@@ -294,17 +319,8 @@
         }
       }
     },
-    "Hard" : {
-      "comment" : "Difficulty option — 16x30 / 99 mines",
-      "extractionState" : "automatic",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hard"
-          }
-        }
-      }
+    "Games" : {
+
     },
     "HISTORY" : {
       "extractionState" : "manual",
@@ -313,6 +329,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "HISTORY"
+          }
+        }
+      }
+    },
+    "Hard" : {
+      "comment" : "Difficulty option — 16x30 / 99 mines",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hard"
           }
         }
       }
@@ -328,6 +356,12 @@
           }
         }
       }
+    },
+    "Import stats" : {
+
+    },
+    "MINESWEEPER" : {
+
     },
     "Medium" : {
       "comment" : "Difficulty option — 16x16 / 40 mines",
@@ -375,6 +409,9 @@
         }
       }
     },
+    "No games played yet." : {
+
+    },
     "Nonogram" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -386,6 +423,9 @@
         }
       }
     },
+    "OK" : {
+
+    },
     "Pattern Memory" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -396,6 +436,15 @@
           }
         }
       }
+    },
+    "Reset all stats" : {
+
+    },
+    "Reset all stats?" : {
+
+    },
+    "Reset stats" : {
+
     },
     "Restart" : {
       "comment" : "End-state card primary action — fresh idle, same difficulty",
@@ -491,6 +540,9 @@
         }
       }
     },
+    "The file couldn't be read. Check that it's a GameKit stats export and try again." : {
+
+    },
     "Theme controls coming in a future update." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -501,6 +553,12 @@
           }
         }
       }
+    },
+    "This deletes all your Minesweeper games and best times. This can't be undone." : {
+
+    },
+    "This file was exported from a newer GameKit. Update the app and try again." : {
+
     },
     "Time elapsed" : {
       "comment" : "HeaderBar timer chip a11y label",
@@ -525,6 +583,12 @@
           }
         }
       }
+    },
+    "Win %" : {
+
+    },
+    "Wins" : {
+
     },
     "Word Grid" : {
       "extractionState" : "manual",
