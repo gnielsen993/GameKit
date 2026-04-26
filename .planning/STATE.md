@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-04-26T15:51:07.048Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-04-26T16:07:11.603Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 24
-  completed_plans: 20
-  percent: 83
+  completed_plans: 21
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 04 (stats-persistence) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [████████░░] 83%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Progress: [████████░░] 83%
 | Phase 03-mines-ui PP03 | 6 | 4 tasks tasks | 4 files files |
 | Phase 04-stats-persistence P01 | 4 | 2 tasks | 6 files |
 | Phase 04-stats-persistence P02 | 8 | 1 tasks | 2 files |
+| Phase 04-stats-persistence P03 | 10 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -143,6 +144,14 @@ Recent decisions affecting current work:
 - 04-02: Capture-let predicate pattern locked (let kindRaw = gameKind.rawValue before #Predicate) — RESEARCH Pattern 4 footnote: KeyPath cannot capture self; future P4 service patterns inherit this idiom
 - 04-02: TDD plan-level RED→GREEN gate sequence honored — test commit ed5cce6 (build error: 'Cannot find type GameStats in scope') landed BEFORE feat commit f3974bd; verifiable in git log --oneline
 - 04-02: os.Logger first-use in GameKit at subsystem 'com.lauterstar.gamekit', category 'persistence' (RESEARCH §Standard Stack); error interpolation uses privacy: .public for diagnostic logs (non-PII fetch error names) — locked as standard for all future P4 services
+- 04-03: StatsExporter is @MainActor enum (D-16) — codec namespace pattern matches P2 engines; ModelContext non-Sendable still requires actor isolation even for static surface
+- 04-03: Codec layer split into 4 files (envelope/error/document/exporter) instead of inlining — each has a single responsibility; document is the only file requiring SwiftUI/UniformTypeIdentifiers, isolating the SwiftUI dependency to the FileDocument bridge alone
+- 04-03: Encoder configuration [.prettyPrinted, .sortedKeys] + .iso8601 is non-negotiable for SC4 byte-for-byte determinism (RESEARCH Pitfall 7); .sortedKeys grepped in CI verify and tested by encoderDeterministic
+- 04-03: importing(...) runs decode -> validate schemaVersion == 1 -> transaction { delete x2; insert } -> save (RESEARCH Pitfall 6) — schemaVersion guard sits BEFORE destructive transaction; future-schema files cannot destroy data; proven by schemaVersionMismatchThrows test
+- 04-03: roundTripFifty asserts SEMANTIC payload byte-equality (decode both, sort by id, re-encode (gameRecords, bestTimes) under same encoder) instead of raw two-export Data equality — exportedAt = .now makes raw byte-equality structurally impossible across two export() calls; SC4 intent (records survive identically) preserved
+- 04-03: UUID + per-row schemaVersion preserved across round-trip via post-init assignment (rec.id = r.id; rec.schemaVersion = r.schemaVersion) — default id: UUID = UUID() would emit fresh UUIDs and break SC4; init param list stays minimal for the GameStats.record(...) call site
+- 04-03: TDD plan-level RED -> GREEN gate sequence honored — test commit 453e6ee (Cannot find type StatsExporter in scope) precedes feat commit a9384c8 in git log; identical pattern to Plan 04-02; locked as standard for P4 codec layers
+- 04-03: P4 Wave-0 COMPLETE — 4/4 required test artifacts (smoke + GameStats + StatsExporter + InMemoryStatsContainer) shipped before any production wiring; downstream Plans 04-04/05/06 author against locked APIs without risk of cascading fixes back into Wave-0 files
 
 ### Pending Todos
 
@@ -162,8 +171,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T15:51:07.043Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-04-26T16:06:49.408Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z
