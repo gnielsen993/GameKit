@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-04-26T16:07:11.603Z"
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-04-26T16:15:28.531Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 24
-  completed_plans: 21
-  percent: 88
+  completed_plans: 22
+  percent: 92
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 04 (stats-persistence) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Progress: [█████████░] 88%
 | Phase 04-stats-persistence P01 | 4 | 2 tasks | 6 files |
 | Phase 04-stats-persistence P02 | 8 | 1 tasks | 2 files |
 | Phase 04-stats-persistence P03 | 10 | 2 tasks | 5 files |
+| Phase 04-stats-persistence P04 | 3 | 2 tasks tasks | 2 files files |
 
 ## Accumulated Context
 
@@ -152,6 +153,11 @@ Recent decisions affecting current work:
 - 04-03: UUID + per-row schemaVersion preserved across round-trip via post-init assignment (rec.id = r.id; rec.schemaVersion = r.schemaVersion) — default id: UUID = UUID() would emit fresh UUIDs and break SC4; init param list stays minimal for the GameStats.record(...) call site
 - 04-03: TDD plan-level RED -> GREEN gate sequence honored — test commit 453e6ee (Cannot find type StatsExporter in scope) precedes feat commit a9384c8 in git log; identical pattern to Plan 04-02; locked as standard for P4 codec layers
 - 04-03: P4 Wave-0 COMPLETE — 4/4 required test artifacts (smoke + GameStats + StatsExporter + InMemoryStatsContainer) shipped before any production wiring; downstream Plans 04-04/05/06 author against locked APIs without risk of cascading fixes back into Wave-0 files
+- 04-04: SettingsStore is @Observable @MainActor final class over UserDefaults.standard with cloudSyncEnabled: Bool surface (D-28); didSet writes / init reads at construction (D-29); Foundation+SwiftUI imports only — no SwiftData at the settings layer
+- 04-04: Custom EnvironmentKey + EnvironmentValues.settingsStore extension is the iOS-17-canonical injection path for @Observable types — @EnvironmentObject requires ObservableObject and is incompatible with @Observable (P3 RESEARCH Pitfall 1 inheritance). @MainActor static let defaultValue satisfies Swift 6 strict concurrency
+- 04-04: Existing @StateObject themeManager seam in GameKitApp.swift preserved VERBATIM — only additive changes per 04-PATTERNS.md line 9 critical correction; @State + _ivar = State(initialValue:) rebinding pattern in App.init() locked for @Observable values that need to be read BEFORE other init
+- 04-04: Three-place lock for iCloud.com.lauterstar.gamekit honored end-to-end — PROJECT.md:141 + GameKitApp.swift:52 (production literal in cloudKitDatabase ternary) + ModelContainerSmokeTests.swift:52 (Plan 04-01 smoke test). T-04-16 forcing function: rename in one place trips smoke test on PR
+- 04-04: do/catch fatalError on ModelContainer init failure (RESEARCH §Code Examples 1) — silent persistence loss would break PERSIST-02; Plan 04-01 smoke test gates schema regressions at PR time so production fatalError indicates OS-level disk/sandbox issue. P4 Wave-2 COMPLETE (3/3 plans: GameStats + StatsExporter + App composition)
 
 ### Pending Todos
 
@@ -171,8 +177,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T16:06:49.408Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-04-26T16:15:28.527Z
+Stopped at: Completed 04-04-PLAN.md
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z
