@@ -1247,7 +1247,7 @@ Typical 2026-04 SwiftData + CloudKit patterns vs older approaches that should be
 
 **If `[ASSUMED]` claims fail in practice:** A2 is the highest-risk item. If the SC3 smoke test cannot run `.private(...)` without iCloud account, fall back to running it locally on dev machines only and skipping in CI — still catches schema violations at PR review time.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **VM injection ergonomics: `init(gameStats:)` vs `setGameStats(_:)`.**
    - What we know: D-14 specifies init injection. `MinesweeperGameView` constructs `GameStats` from `@Environment(\.modelContext)`.
