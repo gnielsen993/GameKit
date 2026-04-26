@@ -86,9 +86,53 @@ struct StatsExporterTests {
         #expect(restoredRecords.count == 50)
         #expect(restoredBests.count == 3)
 
-        // Re-export and assert byte equality (SC4 — RESEARCH Pitfall 7).
+        // Re-export and assert semantic byte-equality (SC4 — RESEARCH Pitfall 7).
+        // `exportedAt` is generated fresh on each export() call (`.now`), so
+        // raw Data byte-equality is structurally impossible across two
+        // separate export() invocations. The SC4 / Pitfall 7 intent is that
+        // encoded gameRecords + bestTimes arrays survive the round-trip
+        // byte-for-byte (encoder is deterministic, sortedKeys is wired, all
+        // field values preserved verbatim). We prove that by decoding both
+        // envelopes and re-encoding their (gameRecords, bestTimes) tuple
+        // under the same encoder — the resulting Data MUST be byte-equal.
         let reExported = try StatsExporter.export(modelContext: ctx)
-        #expect(exported == reExported, "byte-for-byte round-trip must hold (SC4)")
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let envOriginal = try decoder.decode(StatsExportEnvelope.self, from: exported)
+        let envRestored = try decoder.decode(StatsExportEnvelope.self, from: reExported)
+
+        // schemaVersion + envelope shape preserved.
+        #expect(envOriginal.schemaVersion == envRestored.schemaVersion)
+        #expect(envOriginal.schemaVersion == 1, "SC4 — schemaVersion survives the round-trip")
+        #expect(envOriginal.gameRecords.count == envRestored.gameRecords.count)
+        #expect(envOriginal.bestTimes.count == envRestored.bestTimes.count)
+
+        // Encode the gameRecords + bestTimes (excluding the timestamp-bearing
+        // exportedAt field) through the same deterministic encoder and assert
+        // byte-equality — proves the records themselves survive byte-for-byte.
+        struct Payload: Codable {
+            let gameRecords: [StatsExportEnvelope.Record]
+            let bestTimes: [StatsExportEnvelope.Best]
+        }
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+        // Sort by id so set-equality of the record payload doesn't depend on
+        // SwiftData's fetch order (no @Query sort applied in this test).
+        let originalPayload = Payload(
+            gameRecords: envOriginal.gameRecords.sorted { $0.id.uuidString < $1.id.uuidString },
+            bestTimes: envOriginal.bestTimes.sorted { $0.id.uuidString < $1.id.uuidString }
+        )
+        let restoredPayload = Payload(
+            gameRecords: envRestored.gameRecords.sorted { $0.id.uuidString < $1.id.uuidString },
+            bestTimes: envRestored.bestTimes.sorted { $0.id.uuidString < $1.id.uuidString }
+        )
+        let originalBytes = try encoder.encode(originalPayload)
+        let restoredBytes = try encoder.encode(restoredPayload)
+        #expect(originalBytes == restoredBytes,
+                "byte-for-byte SC4 — gameRecords + bestTimes survive the round-trip identically")
     }
 
     // MARK: - Schema-mismatch — RESEARCH Pitfall 6 forcing function
