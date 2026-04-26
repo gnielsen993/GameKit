@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 05-01-PLAN.md (Wave 1 foundations: MinesweeperPhase + SettingsStore flags)"
-last_updated: "2026-04-26T22:14:41.216Z"
+stopped_at: "Completed 05-03-PLAN.md (Wave 2 services: Haptics + SFXPlayer + GameKitApp wiring)"
+last_updated: "2026-04-26T22:36:50.796Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 31
-  completed_plans: 25
-  percent: 81
+  completed_plans: 27
+  percent: 87
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 05 (polish) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [████████░░] 81%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Progress: [████████░░] 81%
 | Phase 04-stats-persistence P04 | 3 | 2 tasks tasks | 2 files files |
 | Phase 04-stats-persistence P05 | 21 | 5 tasks tasks | 5 files files |
 | Phase 05-polish P01 | 18 | 2 tasks | 3 files |
+| Phase 05-polish P03 | 12 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -172,6 +173,14 @@ Recent decisions affecting current work:
 - 05-01: hapticsEnabled init uses (object(forKey:) as? Bool) ?? true pattern — bool(forKey:) returns false for unset keys per Apple docs, and a default-true flag must survive fresh installs without .register(defaults:) (intentionally avoided per existing P4 invariant SettingsStore.swift:25-26)
 - 05-01: TDD plan-level RED→GREEN gate honored — test commit 64dc5be (build error: 'no member hapticsEnabledKey/sfxEnabledKey/hasSeenIntroKey' x 14) precedes feat commit 19c4f32 in git log; same TDD pattern locked across P4-02/P4-03/P5-01
 - 05-01: isLossShake helper (var isLossShake: Bool) added to MinesweeperPhase per RESEARCH §Pattern 2 — keyframe-trigger reads a Bool value-change rather than payload-bearing case match, so a fresh .lossShake(mineIdx:) doesn't replay against the same payload pointer in .keyframeAnimator
+- 05-03: Haptics is @MainActor enum (NOT class) per CONTEXT D-11 — static methods only, no env-key injection; call sites use Haptics.playAHAP(...) directly
+- 05-03: SFXPlayer is @MainActor final class injected via custom EnvironmentKey mirroring SettingsStore D-29 pattern; @State sfxPlayer construction in GameKitApp.init() AFTER SettingsStore (D-12)
+- 05-03: Both services gate at the source — hapticsEnabled / sfxEnabled is the FIRST guard inside the service method; call sites pass settingsStore.{flag} explicitly so services have NO SettingsStore coupling (D-10)
+- 05-03: SFXPlayer init non-throwing under all conditions including missing CAFs — players become nil, play(...) is no-op via optional-chain; critical because Plan 05-02 Task 3 (CAF binaries) deferred and SFXPlayer must construct cleanly so GameKitApp.init() does not crash
+- 05-03: Swift Testing .disabled(if: Bundle.main.url(...) == nil, 'TODO(05-02-CAF)...') gates the file-presence assertion — auto un-skips when CAF files land; cleaner than try #require which would fail the test
+- 05-03: AVAudioSession.setCategory(.ambient) called ONCE in SFXPlayer.init() — adversarial grep verifies only 1 actual call site in entire gamekit/gamekit/ codebase; threat T-05-07 (audio session drift) mitigated by construction
+- 05-03: Test-seam dual pattern locked — lastInvocationAttempt set BEFORE the gate (records every call) + lastPlayedEvent set ONLY AFTER the gate passes; distinguishes 'method called with disabled' from 'method never called', proves D-10 contract directly. All seams #if DEBUG-gated.
+- 05-03: TDD plan-level RED→GREEN gate honored for both services — bf38819 precedes 695f753 (Haptics); a7fa1ec precedes a2116a6 (SFXPlayer); 4 commits in TDD order visible in git log --oneline
 
 ### Pending Todos
 
@@ -191,8 +200,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T22:14:41.211Z
-Stopped at: Completed 05-01-PLAN.md (Wave 1 foundations: MinesweeperPhase + SettingsStore flags)
+Last session: 2026-04-26T22:36:50.791Z
+Stopped at: Completed 05-03-PLAN.md (Wave 2 services: Haptics + SFXPlayer + GameKitApp wiring)
 Resume file: None
 
 **Planned Phase:** 05 (polish) — 7 plans — 2026-04-26T21:46:30.040Z
