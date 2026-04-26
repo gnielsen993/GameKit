@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-mines-ui-02-PLAN.md
-last_updated: "2026-04-26T01:30:12.145Z"
+stopped_at: Completed 03-mines-ui-03-PLAN.md
+last_updated: "2026-04-26T01:38:37.695Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 18
-  completed_plans: 16
-  percent: 89
+  completed_plans: 17
+  percent: 94
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 03 (mines-ui) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [█████████░] 89%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Progress: [█████████░] 89%
 | Phase 02-mines-engines P06 | 428 | 1 tasks | 1 files |
 | Phase 03-mines-ui P01 | 8 | 2 tasks | 9 files |
 | Phase 03-mines-ui PP02 | 12 | 3 tasks | 3 files |
+| Phase 03-mines-ui PP03 | 6 | 4 tasks tasks | 4 files files |
 
 ## Accumulated Context
 
@@ -124,6 +125,12 @@ Recent decisions affecting current work:
 - 03-02: 'var rng: any RandomNumberGenerator' stored existentially — Swift 5.7+ implicit existential opening lets &rng flow into BoardGenerator.generate's 'inout some RandomNumberGenerator' parameter cleanly (verified by build)
 - 03-02: Tests use firstHiddenNonMine(on:) helper instead of hardcoded (8,8) target — seed-1 cascade reaches (8,8), making the literal coordinate brittle; helper guarantees the toggleFlag transition is exercised regardless of cascade reach
 - 03-02: Wave-0 GameKit tests complete (5/5 across DesignKit + GameKit); Plan 03-03/03-04 view tier can author against locked VM contract — views never import engines directly
+- 03-03: 4 leaf views ship props-only — receive theme: Theme as let parameter, never read @EnvironmentObject themeManager directly (RESEARCH Anti-Pattern 'Re-fetching theme tokens inside cell views'). MinesweeperGameView in Plan 04 hoists theme once and threads it down.
+- 03-03: SC1 long-press constants locked in source — LongPressGesture(minimumDuration: 0.25).exclusively(before: TapGesture()). The 0.25s threshold and .exclusively (NOT .simultaneously) are the load-bearing patterns for SC1's 50-tap iPhone SE manual gate (scheduled in Plan 04 verification).
+- 03-03: HeaderBar timer fallback uses .distantPast (not .now) when timerAnchor is nil — TimelineView stops firing entirely; display math returns pausedElapsed regardless of context.date. Practically equivalent but avoids wasted ticks (planner-noted choice).
+- 03-03: ToolbarMenu trigger uses theme.typography.headline (17pt semibold) over .title (22pt) — fits Easy/Medium/Hard inside iPhone SE toolbar width; documented planner deviation from UI-SPEC's .title suggestion.
+- 03-03: EndStateCard secondary 'Change difficulty' button calls onChangeDifficulty closure which Plan 04 will wire to viewModel.restart() per refined D-03 (W-02). Sheet-presented difficulty picker deferred to P5.
+- 03-03: formatElapsed(_:) intentionally duplicated between HeaderBar and EndStateCard — 2 call sites in one game is below the DesignKit-promotion bar (CLAUDE.md §4); P5 may extract MinesweeperTimeFormat.swift if duplication grows.
 
 ### Pending Todos
 
@@ -143,8 +150,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T01:30:12.140Z
-Stopped at: Completed 03-mines-ui-02-PLAN.md
+Last session: 2026-04-26T01:38:21.414Z
+Stopped at: Completed 03-mines-ui-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z

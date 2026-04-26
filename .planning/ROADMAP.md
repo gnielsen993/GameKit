@@ -79,7 +79,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 - [x] 03-01-PLAN.md — DesignKit `theme.gameNumber(_:)` token + per-preset 8-color palettes (forest/bubblegum/barbie/cream/dracula/voltage) + Wong-audit XCTest infrastructure (D-13/D-14/D-15/D-16; A11Y-04)
 - [x] 03-02-PLAN.md — `MinesweeperViewModel` (@Observable @MainActor, Foundation-only) + Swift Testing suite covering MINES-02/05/06/07/11 + UserDefaults difficulty persistence (D-05..D-12)
-- [ ] 03-03-PLAN.md — Four leaf views: `MinesweeperHeaderBar` + `MinesweeperCellView` + `MinesweeperToolbarMenu` + `MinesweeperEndStateCard` — props-only, gesture composition, theme-token-pure (D-01..D-04, D-09, D-17, D-19)
+- [x] 03-03-PLAN.md — Four leaf views: `MinesweeperHeaderBar` + `MinesweeperCellView` + `MinesweeperToolbarMenu` + `MinesweeperEndStateCard` — props-only, gesture composition, theme-token-pure (D-01..D-04, D-09, D-17, D-19)
 - [ ] 03-04-PLAN.md — Composition: `MinesweeperBoardView` + `MinesweeperGameView` + HomeView wiring + xcstrings sweep + manual SC1/SC2/SC4/SC6 verification checkpoint (50-tap test + 6-preset theme matrix + VoiceOver sweep)
 **UI hint**: yes
 
@@ -142,7 +142,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Foundation | 8/8 | Complete | 2026-04-25 |
 | 2. Mines Engines | 6/6 | Complete | 2026-04-25 |
-| 3. Mines UI | 0/TBD | Not started | - |
+| 3. Mines UI | 3/4 | In progress | - |
 | 4. Stats & Persistence | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
 | 6. CloudKit + Sign in with Apple | 0/TBD | Not started | - |

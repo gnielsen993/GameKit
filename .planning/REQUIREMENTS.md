@@ -71,7 +71,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 ### Accessibility
 
 - [ ] **A11Y-01**: Dynamic Type respected on all non-grid text
-- [ ] **A11Y-02**: VoiceOver labels on cells (state + position + adjacency), buttons, and overlays — baked in at view creation, not retrofit
+- [x] **A11Y-02
+**: VoiceOver labels on cells (state + position + adjacency), buttons, and overlays — baked in at view creation, not retrofit
 - [ ] **A11Y-03**: Reduce-motion preference dampens the animation pass
 - [x] **A11Y-04
 **: Default number palette (the `theme.colors.gameNumber(_:)` token in DesignKit) is color-blind-safe by default — verified against Wong-palette principles for protanopia / deuteranopia / tritanopia
