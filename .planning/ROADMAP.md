@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - App shell, DesignKit wiring, ThemeManager, bundle ID lock, capabilities, lint hooks
 - [x] **Phase 2: Mines Engines** - Pure value-type board / reveal / win-detect with deterministic Swift Testing coverage
 - [x] **Phase 3: Mines UI** - Playable theme-token-pure board, gestures, timer, restart, win/loss overlays, baked-in a11y labels
-- [ ] **Phase 4: Stats & Persistence** - SwiftData stats with CloudKit-compatible schema, Stats screen, Export/Import JSON
+- [x] **Phase 4: Stats & Persistence** - SwiftData stats with CloudKit-compatible schema, Stats screen, Export/Import JSON
 - [ ] **Phase 5: Polish** - Animation pass, haptics, SFX, theme legibility audit, full accessibility, 3-step intro, Settings spine
 - [ ] **Phase 6: CloudKit + Sign in with Apple** - Optional cross-device sync, sign-in lifecycle, anonymous→signed-in promotion
 - [ ] **Phase 7: Release** - Real app icon, schema promoted to Production, privacy nutrition label, TestFlight, App Store
@@ -99,7 +99,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 04-03-PLAN.md — StatsExporter + envelope/error/document types + Swift Testing (round-trip-50 byte-equal SC4 + schema-mismatch + replace-on-import)
 - [x] 04-04-PLAN.md — SettingsStore (@Observable UserDefaults wrapper + EnvironmentKey) + GameKitApp.swift edit (shared ModelContainer construction reading cloudSyncEnabled per D-08)
 - [x] 04-05-PLAN.md — UI integration (VM 5th seam + GameView .task injection + StatsView rewrite + SettingsView Export/Import/Reset + xcstrings sweep)
-- [ ] 04-06-PLAN.md — Manual verification checkpoint (force-quit/crash/reboot survival + 6-preset matrix + real-device fileExporter round-trip + schema-mismatch alert + VoiceOver partial)
+- [x] 04-06-PLAN.md — Manual verification checkpoint (force-quit/crash/reboot survival + 6-preset matrix + real-device fileExporter round-trip + schema-mismatch alert + VoiceOver partial)
 
 ### Phase 5: Polish (animation + haptics + SFX + accessibility + theme matrix)
 **Goal**: The differentiator-defining "premium feel" surface lands — animations, haptics, SFX, accessibility, theme legibility, intro flow, full Settings spine.
