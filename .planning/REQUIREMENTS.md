@@ -28,10 +28,12 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 
 - [x] **SHELL-01
 **: Home screen lists Minesweeper as the only active game card; future-game placeholders are visually present but disabled
-- [ ] **SHELL-02**: Settings screen with theme picker (5 Classic swatches inline + "More themes & custom colors" link to full `DKThemePicker`), haptics toggle, SFX toggle, reset stats, about
+- [x] **SHELL-02
+**: Settings screen with theme picker (5 Classic swatches inline + "More themes & custom colors" link to full `DKThemePicker`), haptics toggle, SFX toggle, reset stats, about
 - [x] **SHELL-03
 **: Stats screen shows per-difficulty: games played · wins · win % · best time
-- [ ] **SHELL-04**: 3-step intro on first launch (themes → stats → optional sign-in card with Skip), dismissable, never shown again
+- [x] **SHELL-04
+**: 3-step intro on first launch (themes → stats → optional sign-in card with Skip), dismissable, never shown again
 
 ### Minesweeper
 
@@ -47,9 +49,12 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 **: Restart button on the game screen
 - [x] **MINES-07
 **: Win = all non-mine cells revealed; Loss = mine revealed; both surface a clear end-state overlay using `theme.colors.{success,danger}`
-- [ ] **MINES-08**: Polished animation pass — reveal cascade, flag spring, win-board sweep, loss-shake — all timed via `theme.motion.{fast,normal,slow}`
-- [ ] **MINES-09**: DesignKit haptics on flag, reveal, win, loss; respects Settings haptics toggle
-- [ ] **MINES-10**: Subtle SFX on tap / win / loss, **off by default**, toggle in Settings; uses `AVAudioSession.ambient` (does not duck user music)
+- [x] **MINES-08
+**: Polished animation pass — reveal cascade, flag spring, win-board sweep, loss-shake — all timed via `theme.motion.{fast,normal,slow}`
+- [x] **MINES-09
+**: DesignKit haptics on flag, reveal, win, loss; respects Settings haptics toggle
+- [x] **MINES-10
+**: Subtle SFX on tap / win / loss, **off by default**, toggle in Settings; uses `AVAudioSession.ambient` (does not duck user music)
 - [x] **MINES-11
 **: On loss, all mines reveal and incorrectly-flagged cells are marked with an X indicator (industry standard)
 

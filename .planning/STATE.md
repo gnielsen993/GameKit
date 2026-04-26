@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-05-PLAN.md
-last_updated: "2026-04-26T16:44:21.860Z"
+stopped_at: "Completed 05-01-PLAN.md (Wave 1 foundations: MinesweeperPhase + SettingsStore flags)"
+last_updated: "2026-04-26T22:14:41.216Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
-  completed_phases: 3
-  total_plans: 24
-  completed_plans: 23
-  percent: 96
+  completed_phases: 4
+  total_plans: 31
+  completed_plans: 25
+  percent: 81
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 04 — stats-persistence
+**Current focus:** Phase 05 — polish
 
 ## Current Position
 
-Phase: 04 (stats-persistence) — EXECUTING
-Plan: 6 of 6
+Phase: 05 (polish) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [██████████] 96%
+Progress: [████████░░] 81%
 
 ## Performance Metrics
 
@@ -75,6 +75,7 @@ Progress: [██████████] 96%
 | Phase 04-stats-persistence P03 | 10 | 2 tasks | 5 files |
 | Phase 04-stats-persistence P04 | 3 | 2 tasks tasks | 2 files files |
 | Phase 04-stats-persistence P05 | 21 | 5 tasks tasks | 5 files files |
+| Phase 05-polish P01 | 18 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -166,6 +167,11 @@ Recent decisions affecting current work:
 - 04-05: StatsView two @Query declarations + file-private MinesStatsCard/MinesDifficultyStatsRow receive props — CLAUDE.md §8.2 data-driven-not-data-fetching pattern; @Query lives once in parent
 - 04-05: SettingsView .fileImporter security-scoped URL bookends LOAD-BEARING for real-device imports — defer-guarded release; if didStart guards against double-release (RESEARCH Pitfall 5)
 - 04-05: xcstringstool sync (not Xcode catalog editor) — deterministic command-line catalog population from build-time .stringsdata; default behavior removes orphaned automatic entries while preserving manual ones
+- 05-01: MinesweeperPhase enum (5 cases per CONTEXT D-06) declared Equatable + Sendable only — NOT Hashable (would force [MinesweeperIndex] payload Hashable, no consumer needs it), NOT Codable (transient view-layer enum, never persisted, matches MinesweeperGameState precedent)
+- 05-01: SettingsStore extended additively — 3 new flags hapticsEnabled (default true) / sfxEnabled (default false) / hasSeenIntro (default false) under keys gamekit.{hapticsEnabled,sfxEnabled,hasSeenIntro}; cloudSyncEnabled + EnvironmentKey injection preserved verbatim
+- 05-01: hapticsEnabled init uses (object(forKey:) as? Bool) ?? true pattern — bool(forKey:) returns false for unset keys per Apple docs, and a default-true flag must survive fresh installs without .register(defaults:) (intentionally avoided per existing P4 invariant SettingsStore.swift:25-26)
+- 05-01: TDD plan-level RED→GREEN gate honored — test commit 64dc5be (build error: 'no member hapticsEnabledKey/sfxEnabledKey/hasSeenIntroKey' x 14) precedes feat commit 19c4f32 in git log; same TDD pattern locked across P4-02/P4-03/P5-01
+- 05-01: isLossShake helper (var isLossShake: Bool) added to MinesweeperPhase per RESEARCH §Pattern 2 — keyframe-trigger reads a Bool value-change rather than payload-bearing case match, so a fresh .lossShake(mineIdx:) doesn't replay against the same payload pointer in .keyframeAnimator
 
 ### Pending Todos
 
@@ -185,8 +191,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T16:44:02.966Z
-Stopped at: Completed 04-05-PLAN.md
+Last session: 2026-04-26T22:14:41.211Z
+Stopped at: Completed 05-01-PLAN.md (Wave 1 foundations: MinesweeperPhase + SettingsStore flags)
 Resume file: None
 
-**Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z
+**Planned Phase:** 05 (polish) — 7 plans — 2026-04-26T21:46:30.040Z
