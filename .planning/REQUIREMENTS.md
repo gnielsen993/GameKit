@@ -29,7 +29,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 - [x] **SHELL-01
 **: Home screen lists Minesweeper as the only active game card; future-game placeholders are visually present but disabled
 - [ ] **SHELL-02**: Settings screen with theme picker (5 Classic swatches inline + "More themes & custom colors" link to full `DKThemePicker`), haptics toggle, SFX toggle, reset stats, about
-- [ ] **SHELL-03**: Stats screen shows per-difficulty: games played · wins · win % · best time
+- [x] **SHELL-03
+**: Stats screen shows per-difficulty: games played · wins · win % · best time
 - [ ] **SHELL-04**: 3-step intro on first launch (themes → stats → optional sign-in card with Skip), dismissable, never shown again
 
 ### Minesweeper

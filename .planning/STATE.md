@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-04-26T16:15:28.531Z"
+stopped_at: Completed 04-05-PLAN.md
+last_updated: "2026-04-26T16:44:21.860Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 24
-  completed_plans: 22
-  percent: 92
+  completed_plans: 23
+  percent: 96
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 04 (stats-persistence) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [█████████░] 92%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -74,6 +74,7 @@ Progress: [█████████░] 92%
 | Phase 04-stats-persistence P02 | 8 | 1 tasks | 2 files |
 | Phase 04-stats-persistence P03 | 10 | 2 tasks | 5 files |
 | Phase 04-stats-persistence P04 | 3 | 2 tasks tasks | 2 files files |
+| Phase 04-stats-persistence P05 | 21 | 5 tasks tasks | 5 files files |
 
 ## Accumulated Context
 
@@ -158,6 +159,13 @@ Recent decisions affecting current work:
 - 04-04: Existing @StateObject themeManager seam in GameKitApp.swift preserved VERBATIM — only additive changes per 04-PATTERNS.md line 9 critical correction; @State + _ivar = State(initialValue:) rebinding pattern in App.init() locked for @Observable values that need to be read BEFORE other init
 - 04-04: Three-place lock for iCloud.com.lauterstar.gamekit honored end-to-end — PROJECT.md:141 + GameKitApp.swift:52 (production literal in cloudKitDatabase ternary) + ModelContainerSmokeTests.swift:52 (Plan 04-01 smoke test). T-04-16 forcing function: rename in one place trips smoke test on PR
 - 04-04: do/catch fatalError on ModelContainer init failure (RESEARCH §Code Examples 1) — silent persistence loss would break PERSIST-02; Plan 04-01 smoke test gates schema regressions at PR time so production fatalError indicates OS-level disk/sandbox issue. P4 Wave-2 COMPLETE (3/3 plans: GameStats + StatsExporter + App composition)
+- 04-05: VM 5th seam APPENDED at tail-of-init (D-14 + 04-PATTERNS line 11) — preserves the existing 4 seams verbatim, default nil keeps Plan 03-02 tests green
+- 04-05: recordTerminalState ordering enforced at call site — gameState→freezeTimer→recordTerminalState; inverting freeze/record silently records durationSeconds:0 because frozenElapsed reads pausedElapsed (RESEARCH Pitfall 3)
+- 04-05: GameStats injection via .task modifier + @State didInjectStats one-shot guard — RESEARCH Pitfall 8 mitigation; never construct GameStats inside body
+- 04-05: VM stays Foundation-only — GameStats? forward-resolved within gamekit module per RESEARCH Code Examples 4 line 1131; ARCHITECTURE Anti-Pattern 1 enforced by vmSourceFile_importsOnlyFoundation grep gate
+- 04-05: StatsView two @Query declarations + file-private MinesStatsCard/MinesDifficultyStatsRow receive props — CLAUDE.md §8.2 data-driven-not-data-fetching pattern; @Query lives once in parent
+- 04-05: SettingsView .fileImporter security-scoped URL bookends LOAD-BEARING for real-device imports — defer-guarded release; if didStart guards against double-release (RESEARCH Pitfall 5)
+- 04-05: xcstringstool sync (not Xcode catalog editor) — deterministic command-line catalog population from build-time .stringsdata; default behavior removes orphaned automatic entries while preserving manual ones
 
 ### Pending Todos
 
@@ -177,8 +185,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T16:15:28.527Z
-Stopped at: Completed 04-04-PLAN.md
+Last session: 2026-04-26T16:44:02.966Z
+Stopped at: Completed 04-05-PLAN.md
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z

@@ -98,7 +98,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 04-02-PLAN.md — GameStats service (sync save per RESEARCH Pitfall 10) + Swift Testing coverage (~8 tests covering record/resetAll/BestTime-only-on-faster)
 - [x] 04-03-PLAN.md — StatsExporter + envelope/error/document types + Swift Testing (round-trip-50 byte-equal SC4 + schema-mismatch + replace-on-import)
 - [x] 04-04-PLAN.md — SettingsStore (@Observable UserDefaults wrapper + EnvironmentKey) + GameKitApp.swift edit (shared ModelContainer construction reading cloudSyncEnabled per D-08)
-- [ ] 04-05-PLAN.md — UI integration (VM 5th seam + GameView .task injection + StatsView rewrite + SettingsView Export/Import/Reset + xcstrings sweep)
+- [x] 04-05-PLAN.md — UI integration (VM 5th seam + GameView .task injection + StatsView rewrite + SettingsView Export/Import/Reset + xcstrings sweep)
 - [ ] 04-06-PLAN.md — Manual verification checkpoint (force-quit/crash/reboot survival + 6-preset matrix + real-device fileExporter round-trip + schema-mismatch alert + VoiceOver partial)
 
 ### Phase 5: Polish (animation + haptics + SFX + accessibility + theme matrix)
