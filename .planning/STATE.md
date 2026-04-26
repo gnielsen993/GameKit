@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-26T15:38:26.943Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-26T15:51:07.048Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 24
-  completed_plans: 19
-  percent: 79
+  completed_plans: 20
+  percent: 83
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 04 (stats-persistence) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [████████░░] 79%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [████████░░] 79%
 | Phase 03-mines-ui PP02 | 12 | 3 tasks | 3 files |
 | Phase 03-mines-ui PP03 | 6 | 4 tasks tasks | 4 files files |
 | Phase 04-stats-persistence P01 | 4 | 2 tasks | 6 files |
+| Phase 04-stats-persistence P02 | 8 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -137,6 +138,11 @@ Recent decisions affecting current work:
 - 04-01: Container ID 'iCloud.com.lauterstar.gamekit' is now a load-bearing literal in test source (D-09 forcing-function lock) — any rename anywhere trips the smoke test deliberately on PR
 - 04-01: P4 Core tests use @MainActor struct (NOT P2's nonisolated struct) — ModelContext is not Sendable per RESEARCH Pattern 6; locked as standard for ALL P4 Core tests
 - 04-01: Comment text rewords 'no @Attribute(.unique)' as 'no SwiftData unique-attribute decorator' so source negative-greps for the literal token stay clean while preserving the documentation intent
+- 04-02: GameStats is @MainActor final class with single private let modelContext: ModelContext + os.Logger; record(...) wraps evaluateBestTime in do/catch so flaky predicate cannot block GameRecord persistence (Discretion lock); resetAll uses modelContext.transaction { delete(model:) × 2 } for atomic batch-delete (D-13)
+- 04-02: BestTime mutation uses strictly-less-than guard — equal-seconds is no-op on both seconds and achievedAt; matches PROJECT.md calmer-fewer-writes tone and avoids unnecessary CloudKit sync-token consumption when sync flips on in P6
+- 04-02: Capture-let predicate pattern locked (let kindRaw = gameKind.rawValue before #Predicate) — RESEARCH Pattern 4 footnote: KeyPath cannot capture self; future P4 service patterns inherit this idiom
+- 04-02: TDD plan-level RED→GREEN gate sequence honored — test commit ed5cce6 (build error: 'Cannot find type GameStats in scope') landed BEFORE feat commit f3974bd; verifiable in git log --oneline
+- 04-02: os.Logger first-use in GameKit at subsystem 'com.lauterstar.gamekit', category 'persistence' (RESEARCH §Standard Stack); error interpolation uses privacy: .public for diagnostic logs (non-PII fetch error names) — locked as standard for all future P4 services
 
 ### Pending Todos
 
@@ -156,8 +162,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T15:38:26.939Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-26T15:51:07.043Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z

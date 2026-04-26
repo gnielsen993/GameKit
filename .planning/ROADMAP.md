@@ -94,8 +94,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Export to JSON via `fileExporter` and re-import via `fileImporter` produces a byte-for-byte round-trip including `schemaVersion` — exporting a 50-game stats set, resetting stats, re-importing produces the original counts and best times.
   5. Stats persist across app force-quit, crash, and device reboot — verified by all three scenarios in a manual QA pass.
 **Plans**: 6 plans
-- [ ] 04-01-PLAN.md — Schema foundation (GameKind/Outcome enums + GameRecord/BestTime @Model classes) + InMemoryStatsContainer test helper + ModelContainerSmokeTests (SC3 dual-config)
-- [ ] 04-02-PLAN.md — GameStats service (sync save per RESEARCH Pitfall 10) + Swift Testing coverage (~8 tests covering record/resetAll/BestTime-only-on-faster)
+- [x] 04-01-PLAN.md — Schema foundation (GameKind/Outcome enums + GameRecord/BestTime @Model classes) + InMemoryStatsContainer test helper + ModelContainerSmokeTests (SC3 dual-config)
+- [x] 04-02-PLAN.md — GameStats service (sync save per RESEARCH Pitfall 10) + Swift Testing coverage (~8 tests covering record/resetAll/BestTime-only-on-faster)
 - [ ] 04-03-PLAN.md — StatsExporter + envelope/error/document types + Swift Testing (round-trip-50 byte-equal SC4 + schema-mismatch + replace-on-import)
 - [ ] 04-04-PLAN.md — SettingsStore (@Observable UserDefaults wrapper + EnvironmentKey) + GameKitApp.swift edit (shared ModelContainer construction reading cloudSyncEnabled per D-08)
 - [ ] 04-05-PLAN.md — UI integration (VM 5th seam + GameView .task injection + StatsView rewrite + SettingsView Export/Import/Reset + xcstrings sweep)

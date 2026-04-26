@@ -56,7 +56,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 
 - [x] **PERSIST-01
 **: Stats backed by **SwiftData** with CloudKit-compatible schema from day 1 (all properties optional or defaulted, no `@Attribute(.unique)`, all relationships optional, `schemaVersion: Int = 1`)
-- [ ] **PERSIST-02**: Stats survive app force-quit, crash, and device reboot — explicit `try modelContext.save()` on terminal-state detection
+- [x] **PERSIST-02
+**: Stats survive app force-quit, crash, and device reboot — explicit `try modelContext.save()` on terminal-state detection
 - [ ] **PERSIST-03**: Export/Import JSON of stats with `schemaVersion`; round-trips cleanly via `fileExporter`/`fileImporter`
 - [ ] **PERSIST-04**: Optional **Sign in with Apple + CloudKit private DB** for cross-device persistence; full feature parity without sign-in
 - [ ] **PERSIST-05**: Sign-in surfaced once in 3-step intro and again in Settings; never gates gameplay; never nags
