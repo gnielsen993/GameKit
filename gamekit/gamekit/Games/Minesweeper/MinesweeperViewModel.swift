@@ -60,6 +60,13 @@ final class MinesweeperViewModel {
     private let clock: () -> Date          // injectable for deterministic tests of timer math
     private var rng: any RandomNumberGenerator
 
+    /// Persistence boundary — VM does NOT import SwiftData. GameStats is
+    /// forward-resolved within the gamekit module (RESEARCH §Code Examples 4
+    /// line 1131; ARCHITECTURE Anti-Pattern 1). Constructed in
+    /// MinesweeperGameView.body via .task using @Environment(\.modelContext);
+    /// attached via attachGameStats(_:) one-shot per scene (RESEARCH Pitfall 8).
+    private(set) var gameStats: GameStats?
+
     // MARK: - Derived presentations (no caching — recomputed per access)
 
     var minesRemaining: Int {
@@ -93,17 +100,31 @@ final class MinesweeperViewModel {
         difficulty: MinesweeperDifficulty? = nil,
         userDefaults: UserDefaults = .standard,
         clock: @escaping () -> Date = { Date.now },
-        rng: any RandomNumberGenerator = SystemRandomNumberGenerator()
+        rng: any RandomNumberGenerator = SystemRandomNumberGenerator(),
+        gameStats: GameStats? = nil                  // NEW (D-14, RESEARCH §Code Examples 4)
     ) {
         self.userDefaults = userDefaults
         self.clock = clock
         self.rng = rng
+        self.gameStats = gameStats
 
         let resolved: MinesweeperDifficulty = difficulty
             ?? MinesweeperDifficulty(rawValue: userDefaults.string(forKey: Self.lastDifficultyKey) ?? "")
             ?? .easy
         self.difficulty = resolved
         self.board = Self.idleBoard(for: resolved)
+    }
+
+    // MARK: - Persistence injection (Plan 04-05 D-14, RESEARCH Pitfall 8)
+
+    /// One-shot setter called from MinesweeperGameView.body's `.task` modifier
+    /// (RESEARCH Pitfall 8 — `GameStats(modelContext:)` MUST NOT live inside
+    /// `body` because that constructs a new instance on every render). Second
+    /// call is benign no-op — production fires this exactly once per scene
+    /// lifecycle.
+    func attachGameStats(_ stats: GameStats) {
+        guard self.gameStats == nil else { return }
+        self.gameStats = stats
     }
 
     // MARK: - Public API consumed by views
@@ -138,9 +159,11 @@ final class MinesweeperViewModel {
                 lossContext = computeLossContext()
             }
             freezeTimer()
+            recordTerminalState(outcome: .loss)         // NEW (D-15)
         } else if WinDetector.isWon(board) {
             gameState = .won
             freezeTimer()
+            recordTerminalState(outcome: .win)          // NEW (D-15)
         }
     }
 
@@ -238,6 +261,21 @@ final class MinesweeperViewModel {
     }
 
     // MARK: - Private helpers
+
+    /// Writes a GameRecord (and updates BestTime on win-and-faster) at terminal
+    /// state. Wraps `try? gameStats?.record(...)` — failure is logged inside
+    /// GameStats via os.Logger and gameplay UI continues to render the terminal
+    /// state (D-15 — persistence failure must NOT block the user from seeing
+    /// the win/loss overlay). MUST be called AFTER `freezeTimer()` so
+    /// `frozenElapsed` holds the correct elapsed value (RESEARCH Pitfall 3).
+    private func recordTerminalState(outcome: GameOutcome) {
+        try? gameStats?.record(
+            gameKind: .minesweeper,
+            difficulty: difficulty.rawValue,        // P2 D-02 / P4 D-05 canonical key
+            outcome: outcome == .win ? .win : .loss,
+            durationSeconds: frozenElapsed
+        )
+    }
 
     private func freezeTimer() {
         if let anchor = timerAnchor {
