@@ -1,0 +1,26 @@
+{
+  "Version": 1.0,
+  "Metadata": {
+    "Project": "GameKit",
+    "Created": "2026-04-26",
+    "Description": "Loss rumble (P5 D-07): 0.5s continuous decay + 2 sharp transients @ 100/250ms"
+  },
+  "Pattern": [
+    { "Event": { "Time": 0.0, "EventType": "HapticContinuous", "EventDuration": 0.5, "EventParameters": [
+        {"ParameterID": "HapticIntensity", "ParameterValue": 1.0},
+        {"ParameterID": "HapticSharpness", "ParameterValue": 0.5}
+    ]}},
+    { "ParameterCurve": { "ParameterID": "HapticIntensityControl", "Time": 0.0, "ParameterCurveControlPoints": [
+        {"Time": 0.0, "ParameterValue": 0.0},
+        {"Time": 0.5, "ParameterValue": -0.8}
+    ]}},
+    { "Event": { "Time": 0.1, "EventType": "HapticTransient", "EventParameters": [
+        {"ParameterID": "HapticIntensity", "ParameterValue": 0.9},
+        {"ParameterID": "HapticSharpness", "ParameterValue": 0.9}
+    ]}},
+    { "Event": { "Time": 0.25, "EventType": "HapticTransient", "EventParameters": [
+        {"ParameterID": "HapticIntensity", "ParameterValue": 0.7},
+        {"ParameterID": "HapticSharpness", "ParameterValue": 0.8}
+    ]}}
+  ]
+}
