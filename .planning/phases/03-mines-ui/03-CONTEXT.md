@@ -47,7 +47,7 @@ P3 delivers the **playable Minesweeper UI** on top of P2's locked engine API. Th
   1. Outcome title ("You won!" / "Bad luck") localized via `String(localized:)` per FOUND-04.
   2. Final elapsed time (e.g. "2:14") prominently displayed.
   3. **(Loss only)** "X mines hit / Y remaining" line for context — educational rather than scolding (matches non-pushy UX bar in PROJECT.md).
-  4. Two buttons: **Restart** (primary, same difficulty) and **Change difficulty** (secondary — opens the same toolbar Menu component used in `Games/Minesweeper/MinesweeperToolbarMenu.swift`, see D-05).
+  4. Two buttons: **Restart** (primary, same difficulty) and **Change difficulty** (secondary). **Refined 2026-04-25 per W-02:** The secondary button calls `viewModel.restart()` (resets to a fresh idle board at the same difficulty); the user changes difficulty by tapping the toolbar Menu (D-09) themselves. A proper sheet-presented picker is deferred to P5 polish — keeps P3 surface lean and avoids a second copy of the picker UI.
 - **D-04:** Card uses `theme.radii.card`, `theme.spacing.l` for outer padding, and outcome-tinted accent (`success` / `danger`) on the title only — body text stays on `theme.colors.textPrimary` so the overlay reads the same way under every preset (Classic / Sweet / Bright / Soft / Moody / Loud), not just the high-contrast ones (CLAUDE.md §1 + §8.12).
 
 ### Timer architecture (SC2)
