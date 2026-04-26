@@ -20,12 +20,22 @@
 //    - NavigationStack is owned by HomeView (per ARCHITECTURE Anti-Pattern 3 — no nested);
 //      this view is pushed via NavigationLink from HomeView (Plan 04 Task 3)
 //
+//  Phase 4 invariants (per D-14, D-15, RESEARCH Pitfall 8):
+//    - GameStats injected lazily via .task (NOT inside body — Pitfall 8
+//      forbids per-render allocation of GameStats + its os.Logger)
+//    - Once-per-scene guard via @State didInjectStats
+//    - VM is the SwiftData firewall — view imports SwiftData only for
+//      @Environment(\.modelContext); GameStats(modelContext:) construction
+//      and viewModel.attachGameStats(stats) call site live in this view's
+//      .task — VM never sees the modelContext directly
+//
 //  iOS 17.0/17.1 @State-with-reference-type leak acknowledged (RESEARCH Pitfall 1):
 //  one VM instance (~few KB) leaks per game-screen dismiss; not worth a
 //  @StateObject shim that fights @Observable. Fixed in iOS 17.2+.
 //
 
 import SwiftUI
+import SwiftData
 import DesignKit
 
 struct MinesweeperGameView: View {
@@ -33,6 +43,8 @@ struct MinesweeperGameView: View {
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.modelContext) private var modelContext
+    @State private var didInjectStats = false           // one-shot guard (RESEARCH Pitfall 8)
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
@@ -111,6 +123,15 @@ struct MinesweeperGameView: View {
             @unknown default:
                 break
             }
+        }
+        .task {
+            // Plan 04-05 Task 2 — one-shot GameStats injection (RESEARCH Pitfall 8).
+            // GameStats(modelContext:) MUST NOT live inside body — that would
+            // construct a new instance + new os.Logger on every render.
+            guard !didInjectStats else { return }
+            didInjectStats = true
+            let stats = GameStats(modelContext: modelContext)
+            viewModel.attachGameStats(stats)
         }
     }
 
