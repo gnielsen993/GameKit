@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-mines-ui-03-PLAN.md
-last_updated: "2026-04-26T01:38:37.695Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-04-26T15:38:26.943Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
-  completed_phases: 2
-  total_plans: 18
-  completed_plans: 17
-  percent: 94
+  completed_phases: 3
+  total_plans: 24
+  completed_plans: 19
+  percent: 79
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 03 — mines-ui
+**Current focus:** Phase 04 — stats-persistence
 
 ## Current Position
 
-Phase: 03 (mines-ui) — EXECUTING
-Plan: 4 of 4
+Phase: 04 (stats-persistence) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [█████████░] 94%
+Progress: [████████░░] 79%
 
 ## Performance Metrics
 
@@ -70,6 +70,7 @@ Progress: [█████████░] 94%
 | Phase 03-mines-ui P01 | 8 | 2 tasks | 9 files |
 | Phase 03-mines-ui PP02 | 12 | 3 tasks | 3 files |
 | Phase 03-mines-ui PP03 | 6 | 4 tasks tasks | 4 files files |
+| Phase 04-stats-persistence P01 | 4 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,11 @@ Recent decisions affecting current work:
 - 03-03: ToolbarMenu trigger uses theme.typography.headline (17pt semibold) over .title (22pt) — fits Easy/Medium/Hard inside iPhone SE toolbar width; documented planner deviation from UI-SPEC's .title suggestion.
 - 03-03: EndStateCard secondary 'Change difficulty' button calls onChangeDifficulty closure which Plan 04 will wire to viewModel.restart() per refined D-03 (W-02). Sheet-presented difficulty picker deferred to P5.
 - 03-03: formatElapsed(_:) intentionally duplicated between HeaderBar and EndStateCard — 2 call sites in one game is below the DesignKit-promotion bar (CLAUDE.md §4); P5 may extract MinesweeperTimeFormat.swift if duplication grows.
+- 04-01: @Model Date defaults use Date() (not .now) — @Model macro substitution rejects .now shorthand at expansion time; semantically identical because Date() == .now
+- 04-01: SwiftData CloudKit-compat constraints validated by Wave-0 SC3 smoke test from day 1 — both .none and .private('iCloud.com.lauterstar.gamekit') configurations pass with isStoredInMemoryOnly: true (Assumption A2 confirmed: CloudKit handshake skipped when in-memory)
+- 04-01: Container ID 'iCloud.com.lauterstar.gamekit' is now a load-bearing literal in test source (D-09 forcing-function lock) — any rename anywhere trips the smoke test deliberately on PR
+- 04-01: P4 Core tests use @MainActor struct (NOT P2's nonisolated struct) — ModelContext is not Sendable per RESEARCH Pattern 6; locked as standard for ALL P4 Core tests
+- 04-01: Comment text rewords 'no @Attribute(.unique)' as 'no SwiftData unique-attribute decorator' so source negative-greps for the literal token stay clean while preserving the documentation intent
 
 ### Pending Todos
 
@@ -150,8 +156,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T01:38:21.414Z
-Stopped at: Completed 03-mines-ui-03-PLAN.md
+Last session: 2026-04-26T15:38:26.939Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z

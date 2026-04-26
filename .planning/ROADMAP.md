@@ -149,7 +149,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Foundation | 8/8 | Complete | 2026-04-25 |
 | 2. Mines Engines | 6/6 | Complete | 2026-04-25 |
 | 3. Mines UI | 3/4 | In progress | - |
-| 4. Stats & Persistence | 0/6 | Not started | - |
+| 4. Stats & Persistence | 1/6 | In progress | - |
 | 5. Polish | 0/TBD | Not started | - |
 | 6. CloudKit + Sign in with Apple | 0/TBD | Not started | - |
 | 7. Release | 0/TBD | Not started | - |
