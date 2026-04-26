@@ -40,7 +40,7 @@ struct HomeView: View {
             .background(theme.colors.background.ignoresSafeArea())
             .navigationTitle(String(localized: "GameKit"))
             .navigationDestination(isPresented: $navigateToMines) {
-                minesweeperPlaceholder
+                MinesweeperGameView()
             }
             .overlay(alignment: .bottom) {
                 if let card = showingComingSoon {
@@ -102,25 +102,6 @@ struct HomeView: View {
         }
     }
 
-    @ViewBuilder
-    private var minesweeperPlaceholder: some View {
-        VStack(spacing: theme.spacing.m) {
-            Image(systemName: "square.grid.4x3.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(theme.colors.accentPrimary)
-            Text(String(localized: "Minesweeper coming in Phase 3"))
-                .font(theme.typography.headline)
-                .foregroundStyle(theme.colors.textPrimary)
-            Text(String(localized: "The board, gestures, and timer arrive next."))
-                .font(theme.typography.caption)
-                .foregroundStyle(theme.colors.textSecondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding(theme.spacing.xl)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(theme.colors.background.ignoresSafeArea())
-        .navigationTitle(String(localized: "Minesweeper"))
-    }
 }
 
 // MARK: - GameCard model + data
