@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 02-06-PLAN.md (cleanup + integrated phase-completion gate) — Phase 2 SHIPPABLE
-last_updated: "2026-04-25T22:44:46.293Z"
-last_activity: 2026-04-25
+status: executing
+stopped_at: Completed 03-mines-ui-01-PLAN.md
+last_updated: "2026-04-26T01:16:09.100Z"
+last_activity: 2026-04-26
 progress:
   total_phases: 7
   completed_phases: 2
-  total_plans: 14
-  completed_plans: 14
-  percent: 100
+  total_plans: 18
+  completed_plans: 15
+  percent: 83
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 02 — mines-engines
+**Current focus:** Phase 03 — mines-ui
 
 ## Current Position
 
-Phase: 02 (mines-engines) — EXECUTING
-Plan: 6 of 6
-Status: Phase complete — ready for verification
-Last activity: 2026-04-25
+Phase: 03 (mines-ui) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-04-26
 
-Progress: [██████████] 100%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [██████████] 100%
 | Phase 02-mines-engines P04 | 618 | 2 tasks | 2 files |
 | Phase 02-mines-engines P05 | 222 | 2 tasks | 2 files |
 | Phase 02-mines-engines P06 | 428 | 1 tasks | 1 files |
+| Phase 03-mines-ui P01 | 8 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,11 @@ Recent decisions affecting current work:
 - 02-05: Tests hand-craft won/lost/mixed boards via board.replacingCell / replacingCells (no RevealEngine dependency) — proves WinDetector correctness in isolation regardless of how a Board reached its state, simplifies bisection if RevealEngine ever regresses
 - 02-06: Phase 2 ships — engine purity (SC5) proven by integrated grep across all 8 production files; full test suite green; Xcode template stub deleted per PATTERNS.md (D-15 finalized — Swift Testing replaces template scaffold)
 - 02-06: CLAUDE.md §8.8 fully validated across all of Phase 2 — zero pbxproj hand-patching needed for new top-level folders, new test-target subfolders, same-folder file additions, OR file deletion under PBXFileSystemSynchronizedRootGroup (Xcode 16 objectVersion=77)
+- 03-01: theme.gameNumber(_:) extension on Theme clamps n to 1...8 and reads gameNumberPaletteWongSafe ?? gameNumberPalette (D-13); 6 audit-set presets ship distinct length-8 palettes; 28 non-declared presets fall back to Classic via ColorDerivation.fallbackGameNumberPalette
+- 03-01: Classic palette entry 5 retuned from purple #7B1FA2 to deep orange #E65100 (and entry 7 #FFC107 to #F9A825) to satisfy Wong audit ΔE2000 ≥ 10 under all three CVD simulations — purple/cyan adjacent pair collapsed under protanopia (ΔE 4.33). Classic IS the canonical safe palette per D-15 so the entries themselves were tuned rather than adding an override; threshold was NOT lowered
+- 03-01: Loud presets (bubblegum, barbie, dracula, voltage) ship aesthetic gameNumberPalette defaults plus gameNumberPaletteWongSafe: classicGameNumberPalette override; resolver path always emits a Wong-safe palette via theme.colors.gameNumberPaletteWongSafe ?? theme.colors.gameNumberPalette (D-15)
+- 03-01: PresetTheme.swift palette constants extracted to sibling extension PresetTheme+GameNumberPalettes.swift to keep palette-data growth scoped (CLAUDE.md §8.5); pre-existing ~791-line baseline of PresetTheme.swift kept out of scope per executor scope-boundary rule
+- 03-01: DesignKitTests target uses XCTest (not Swift Testing) — PATTERNS critical correction held through implementation; ColorVisionSimulator helper is pure Foundation/SwiftUI, no third-party dep, ~240 lines including Brettel/Machado matrices + CIE ΔE2000 + sRGB↔Lab pipeline
 
 ### Pending Todos
 
@@ -131,8 +137,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-25T22:44:46.289Z
-Stopped at: Completed 02-06-PLAN.md (cleanup + integrated phase-completion gate) — Phase 2 SHIPPABLE
+Last session: 2026-04-26T01:16:09.096Z
+Stopped at: Completed 03-mines-ui-01-PLAN.md
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z

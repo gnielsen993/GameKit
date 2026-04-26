@@ -59,7 +59,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 ### Theming Responsiveness
 
 - [ ] **THEME-01**: Minesweeper UI verified legible on at least one preset from each DesignKit category — Classic, Sweet, Bright, Soft, Moody, Loud — for both play state AND loss state, before TestFlight
-- [ ] **THEME-02**: Revealed-vs-unrevealed cells, mines, flags, and adjacency numbers all read from semantic tokens; new `theme.colors.gameNumber(_:)` token (1–8) added to DesignKit for the informational number palette
+- [x] **THEME-02
+**: Revealed-vs-unrevealed cells, mines, flags, and adjacency numbers all read from semantic tokens; new `theme.colors.gameNumber(_:)` token (1–8) added to DesignKit for the informational number palette
 - [ ] **THEME-03**: Custom-palette overrides via `ThemeManager.overrides` work end-to-end through the Mines grid
 
 ### Accessibility
@@ -67,7 +68,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 - [ ] **A11Y-01**: Dynamic Type respected on all non-grid text
 - [ ] **A11Y-02**: VoiceOver labels on cells (state + position + adjacency), buttons, and overlays — baked in at view creation, not retrofit
 - [ ] **A11Y-03**: Reduce-motion preference dampens the animation pass
-- [ ] **A11Y-04**: Default number palette (the `theme.colors.gameNumber(_:)` token in DesignKit) is color-blind-safe by default — verified against Wong-palette principles for protanopia / deuteranopia / tritanopia
+- [x] **A11Y-04
+**: Default number palette (the `theme.colors.gameNumber(_:)` token in DesignKit) is color-blind-safe by default — verified against Wong-palette principles for protanopia / deuteranopia / tritanopia
 
 ## v2 Requirements
 
