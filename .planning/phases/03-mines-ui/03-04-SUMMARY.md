@@ -2,8 +2,9 @@
 phase: 03-mines-ui
 plan: 04
 subsystem: minesweeper-ui-composition
-status: awaiting-checkpoint
-completed: pending-task-6
+status: complete
+completed: 2026-04-25
+manual_verification: passed (50-tap gesture + 6-preset matrix + VoiceOver sweep + scenePhase)
 duration_minutes: 12
 tags:
   - swift

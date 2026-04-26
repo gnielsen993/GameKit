@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - App shell, DesignKit wiring, ThemeManager, bundle ID lock, capabilities, lint hooks
 - [x] **Phase 2: Mines Engines** - Pure value-type board / reveal / win-detect with deterministic Swift Testing coverage
-- [ ] **Phase 3: Mines UI** - Playable theme-token-pure board, gestures, timer, restart, win/loss overlays, baked-in a11y labels
+- [x] **Phase 3: Mines UI** - Playable theme-token-pure board, gestures, timer, restart, win/loss overlays, baked-in a11y labels
 - [ ] **Phase 4: Stats & Persistence** - SwiftData stats with CloudKit-compatible schema, Stats screen, Export/Import JSON
 - [ ] **Phase 5: Polish** - Animation pass, haptics, SFX, theme legibility audit, full accessibility, 3-step intro, Settings spine
 - [ ] **Phase 6: CloudKit + Sign in with Apple** - Optional cross-device sync, sign-in lifecycle, anonymous→signed-in promotion
@@ -80,7 +80,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 03-01-PLAN.md — DesignKit `theme.gameNumber(_:)` token + per-preset 8-color palettes (forest/bubblegum/barbie/cream/dracula/voltage) + Wong-audit XCTest infrastructure (D-13/D-14/D-15/D-16; A11Y-04)
 - [x] 03-02-PLAN.md — `MinesweeperViewModel` (@Observable @MainActor, Foundation-only) + Swift Testing suite covering MINES-02/05/06/07/11 + UserDefaults difficulty persistence (D-05..D-12)
 - [x] 03-03-PLAN.md — Four leaf views: `MinesweeperHeaderBar` + `MinesweeperCellView` + `MinesweeperToolbarMenu` + `MinesweeperEndStateCard` — props-only, gesture composition, theme-token-pure (D-01..D-04, D-09, D-17, D-19)
-- [ ] 03-04-PLAN.md — Composition: `MinesweeperBoardView` + `MinesweeperGameView` + HomeView wiring + xcstrings sweep + manual SC1/SC2/SC4/SC6 verification checkpoint (50-tap test + 6-preset theme matrix + VoiceOver sweep)
+- [x] 03-04-PLAN.md — Composition: `MinesweeperBoardView` + `MinesweeperGameView` + HomeView wiring + xcstrings sweep + manual SC1/SC2/SC4/SC6 verification checkpoint (50-tap test + 6-preset theme matrix + VoiceOver sweep)
 **UI hint**: yes
 
 ### Phase 4: Stats & Persistence
