@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-mines-ui-01-PLAN.md
-last_updated: "2026-04-26T01:16:09.100Z"
+stopped_at: Completed 03-mines-ui-02-PLAN.md
+last_updated: "2026-04-26T01:30:12.145Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 18
-  completed_plans: 15
-  percent: 83
+  completed_plans: 16
+  percent: 89
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 03 (mines-ui) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-26
 
-Progress: [████████░░] 83%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [████████░░] 83%
 | Phase 02-mines-engines P05 | 222 | 2 tasks | 2 files |
 | Phase 02-mines-engines P06 | 428 | 1 tasks | 1 files |
 | Phase 03-mines-ui P01 | 8 | 2 tasks | 9 files |
+| Phase 03-mines-ui PP02 | 12 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,11 @@ Recent decisions affecting current work:
 - 03-01: Loud presets (bubblegum, barbie, dracula, voltage) ship aesthetic gameNumberPalette defaults plus gameNumberPaletteWongSafe: classicGameNumberPalette override; resolver path always emits a Wong-safe palette via theme.colors.gameNumberPaletteWongSafe ?? theme.colors.gameNumberPalette (D-15)
 - 03-01: PresetTheme.swift palette constants extracted to sibling extension PresetTheme+GameNumberPalettes.swift to keep palette-data growth scoped (CLAUDE.md §8.5); pre-existing ~791-line baseline of PresetTheme.swift kept out of scope per executor scope-boundary rule
 - 03-01: DesignKitTests target uses XCTest (not Swift Testing) — PATTERNS critical correction held through implementation; ColorVisionSimulator helper is pure Foundation/SwiftUI, no third-party dep, ~240 lines including Brettel/Machado matrices + CIE ΔE2000 + sRGB↔Lab pipeline
+- 03-02: MinesweeperViewModel — @Observable @MainActor final class with injection seams (clock, rng, userDefaults); first-tap firewall enforces exactly ONE BoardGenerator.generate call site (.idle branch in reveal); Foundation-only purity verified by grep + structural Swift Testing case
+- 03-02: LossContext modeled as Equatable Sendable struct (not inline tuple from RESEARCH §Code Examples 1) — tuples not Equatable in Swift; struct ships at file scope alongside GameOutcome enum
+- 03-02: 'var rng: any RandomNumberGenerator' stored existentially — Swift 5.7+ implicit existential opening lets &rng flow into BoardGenerator.generate's 'inout some RandomNumberGenerator' parameter cleanly (verified by build)
+- 03-02: Tests use firstHiddenNonMine(on:) helper instead of hardcoded (8,8) target — seed-1 cascade reaches (8,8), making the literal coordinate brittle; helper guarantees the toggleFlag transition is exercised regardless of cascade reach
+- 03-02: Wave-0 GameKit tests complete (5/5 across DesignKit + GameKit); Plan 03-03/03-04 view tier can author against locked VM contract — views never import engines directly
 
 ### Pending Todos
 
@@ -137,8 +143,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T01:16:09.096Z
-Stopped at: Completed 03-mines-ui-01-PLAN.md
+Last session: 2026-04-26T01:30:12.140Z
+Stopped at: Completed 03-mines-ui-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 02 (mines-engines) — 6 plans — 2026-04-25T19:36:36.537Z

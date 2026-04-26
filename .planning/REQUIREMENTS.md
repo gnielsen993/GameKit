@@ -35,17 +35,22 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 ### Minesweeper
 
 - [x] **MINES-01**: Three difficulties — Easy 9×9/10 mines, Medium 16×16/40, Hard 16×30/99 (Phase 02 Plan 01: locked in MinesweeperDifficulty enum)
-- [ ] **MINES-02**: Tap to reveal, long-press to flag (composed `LongPressGesture(0.25s).exclusively(before: TapGesture())`)
+- [x] **MINES-02
+**: Tap to reveal, long-press to flag (composed `LongPressGesture(0.25s).exclusively(before: TapGesture())`)
 - [ ] **MINES-03**: First tap is always safe — mines placed *after* first tap, excluding tapped cell + its 8 bounds-clamped neighbors
 - [x] **MINES-04
 **: Iterative flood-fill reveal for empty cells to the next numbered border (no recursion)
-- [ ] **MINES-05**: Mine counter (mines remaining = total − flagged) and elapsed wall-clock timer always visible; timer pauses on scene-phase background
-- [ ] **MINES-06**: Restart button on the game screen
-- [ ] **MINES-07**: Win = all non-mine cells revealed; Loss = mine revealed; both surface a clear end-state overlay using `theme.colors.{success,danger}`
+- [x] **MINES-05
+**: Mine counter (mines remaining = total − flagged) and elapsed wall-clock timer always visible; timer pauses on scene-phase background
+- [x] **MINES-06
+**: Restart button on the game screen
+- [x] **MINES-07
+**: Win = all non-mine cells revealed; Loss = mine revealed; both surface a clear end-state overlay using `theme.colors.{success,danger}`
 - [ ] **MINES-08**: Polished animation pass — reveal cascade, flag spring, win-board sweep, loss-shake — all timed via `theme.motion.{fast,normal,slow}`
 - [ ] **MINES-09**: DesignKit haptics on flag, reveal, win, loss; respects Settings haptics toggle
 - [ ] **MINES-10**: Subtle SFX on tap / win / loss, **off by default**, toggle in Settings; uses `AVAudioSession.ambient` (does not duck user music)
-- [ ] **MINES-11**: On loss, all mines reveal and incorrectly-flagged cells are marked with an X indicator (industry standard)
+- [x] **MINES-11
+**: On loss, all mines reveal and incorrectly-flagged cells are marked with an X indicator (industry standard)
 
 ### Persistence & Sync
 
