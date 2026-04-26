@@ -37,6 +37,7 @@ import DesignKit
 struct GameKitApp: App {
     @StateObject private var themeManager = ThemeManager()
     @State private var settingsStore: SettingsStore
+    @State private var sfxPlayer: SFXPlayer
     let sharedContainer: ModelContainer
 
     init() {
@@ -44,6 +45,13 @@ struct GameKitApp: App {
         // cloudSyncEnabled is available for ModelConfiguration (D-08).
         let store = SettingsStore()
         _settingsStore = State(initialValue: store)
+
+        // P5 (D-12): SFXPlayer constructed AFTER SettingsStore so a
+        // future cross-flag dependency could be added without re-ordering.
+        // Init is non-throwing — missing CAF files fall through to a
+        // no-op `play(...)` per Core/SFXPlayer.swift D-11 invariant.
+        let sfx = SFXPlayer()
+        _sfxPlayer = State(initialValue: sfx)
 
         let schema = Schema([GameRecord.self, BestTime.self])
         let config = ModelConfiguration(
@@ -68,6 +76,7 @@ struct GameKitApp: App {
             RootTabView()
                 .environmentObject(themeManager)
                 .environment(\.settingsStore, settingsStore)
+                .environment(\.sfxPlayer, sfxPlayer)
                 .preferredColorScheme(preferredScheme)
                 .modelContainer(sharedContainer)
         }
