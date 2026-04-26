@@ -25,6 +25,8 @@
 //    - `userDefaults.bool(forKey:)` returns `false` for unset keys per
 //      Apple docs — no explicit `register(defaults:)` needed for v1.
 //
+//  P5 (D-10/D-23): hapticsEnabled / sfxEnabled / hasSeenIntro added; cloudSyncEnabled preserved unchanged.
+//
 
 import Foundation
 import SwiftUI
@@ -46,6 +48,40 @@ final class SettingsStore {
         }
     }
 
+    /// Whether `Haptics.playAHAP(...)` and the cell-level `.sensoryFeedback`
+    /// modifiers fire (CONTEXT D-10 default `true` — premium feel).
+    /// Gated at the source per CONTEXT D-10 — Plan 05-03 `Core/Haptics.swift`
+    /// reads this flag once per playback call and silently no-ops when false.
+    /// No view-layer plumbing of the toggle.
+    var hapticsEnabled: Bool {
+        didSet {
+            userDefaults.set(hapticsEnabled, forKey: Self.hapticsEnabledKey)
+        }
+    }
+
+    /// Whether `SFXPlayer.play(_:)` fires (CONTEXT D-10 default `false` per
+    /// ROADMAP SC2 verbatim — sound is opt-in and never surprises a user
+    /// playing in a coffee shop). Gated at the source per CONTEXT D-10 —
+    /// Plan 05-03 `Core/SFXPlayer.swift` reads this flag once per playback
+    /// call and silently no-ops when false. No view-layer plumbing.
+    var sfxEnabled: Bool {
+        didSet {
+            userDefaults.set(sfxEnabled, forKey: Self.sfxEnabledKey)
+        }
+    }
+
+    /// Whether the 3-step `IntroFlowView` `.fullScreenCover` has been
+    /// dismissed at least once (CONTEXT D-23 default `false`). Set to
+    /// `true` by Plan 05-05's `IntroFlowView` on Skip or Done. Read by
+    /// `RootTabView` to gate `.fullScreenCover(isPresented: !hasSeenIntro)`.
+    /// Tampering yields no privilege escalation per threat-model T-05-01 —
+    /// the flag is a UX hint, not a guard.
+    var hasSeenIntro: Bool {
+        didSet {
+            userDefaults.set(hasSeenIntro, forKey: Self.hasSeenIntroKey)
+        }
+    }
+
     // MARK: - Private
 
     private let userDefaults: UserDefaults
@@ -56,11 +92,32 @@ final class SettingsStore {
     /// Renaming = preference loss for any user who already toggled the flag.
     static let cloudSyncEnabledKey = "gamekit.cloudSyncEnabled"
 
+    /// UserDefaults key for the haptics-enabled flag (P5 D-10).
+    /// Renaming = preference loss; locked.
+    static let hapticsEnabledKey = "gamekit.hapticsEnabled"
+
+    /// UserDefaults key for the SFX-enabled flag (P5 D-10).
+    /// Renaming = preference loss; locked.
+    static let sfxEnabledKey = "gamekit.sfxEnabled"
+
+    /// UserDefaults key for the intro-seen flag (P5 D-23).
+    /// Renaming would re-show the 3-step intro to existing users; locked.
+    static let hasSeenIntroKey = "gamekit.hasSeenIntro"
+
     // MARK: - Init
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         self.cloudSyncEnabled = userDefaults.bool(forKey: Self.cloudSyncEnabledKey)
+        // D-10 default-true caveat: bool(forKey:) returns false for unset
+        // keys (see lines 25-26), so we use the conventional optional-cast
+        // fallback to honor the default-true contract on fresh installs.
+        self.hapticsEnabled = (userDefaults.object(forKey: Self.hapticsEnabledKey) as? Bool) ?? true
+        // D-10 default-false: bool(forKey:) returns false for unset keys,
+        // which is exactly what we want — no fallback needed.
+        self.sfxEnabled = userDefaults.bool(forKey: Self.sfxEnabledKey)
+        // D-23 default-false: same — bool(forKey:) returns false for unset.
+        self.hasSeenIntro = userDefaults.bool(forKey: Self.hasSeenIntroKey)
     }
 }
 
