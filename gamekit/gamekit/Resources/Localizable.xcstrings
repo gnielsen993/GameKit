@@ -13,6 +13,78 @@
         }
       }
     },
+    "%lld" : {
+      "comment" : "Adjacency-number cell glyph (1-8)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
+    },
+    "%lld hours" : {
+      "comment" : "VoiceOver spoken time component — hours portion of elapsed",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld hours"
+          }
+        }
+      }
+    },
+    "%lld mines hit / %lld safe cells left" : {
+      "comment" : "End-state loss context line (D-03 part 3)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld mines hit / %lld safe cells left"
+          }
+        }
+      }
+    },
+    "%lld mines remaining" : {
+      "comment" : "HeaderBar counter chip a11y label",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld mines remaining"
+          }
+        }
+      }
+    },
+    "%lld minutes" : {
+      "comment" : "VoiceOver spoken time component — minutes portion of elapsed",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld minutes"
+          }
+        }
+      }
+    },
+    "%lld seconds" : {
+      "comment" : "VoiceOver spoken time component — seconds portion of elapsed",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld seconds"
+          }
+        }
+      }
+    },
     "ABOUT" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -20,6 +92,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ABOUT"
+          }
+        }
+      }
+    },
+    "Abandon" : {
+      "comment" : "Destructive button in mid-game difficulty-change alert (D-10)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandon"
+          }
+        }
+      }
+    },
+    "Abandon current game?" : {
+      "comment" : "Title of mid-game difficulty-change alert (D-10)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandon current game?"
           }
         }
       }
@@ -35,6 +131,42 @@
         }
       }
     },
+    "Bad luck" : {
+      "comment" : "End-state card title — loss outcome (D-03 part 1)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bad luck"
+          }
+        }
+      }
+    },
+    "Bad luck." : {
+      "comment" : "End-state overlay a11y label fallback when lossContext is nil",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bad luck."
+          }
+        }
+      }
+    },
+    "Bad luck. %lld mines hit, %lld safe cells left." : {
+      "comment" : "End-state overlay a11y label — loss outcome with context",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bad luck. %lld mines hit, %lld safe cells left."
+          }
+        }
+      }
+    },
     "BEST TIMES" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -42,6 +174,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "BEST TIMES"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Cancel button in mid-game difficulty-change alert (D-10)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "Change difficulty" : {
+      "comment" : "End-state card secondary action (D-03 W-02 — calls restart in P3)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change difficulty"
           }
         }
       }
@@ -64,6 +220,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coming soon"
+          }
+        }
+      }
+    },
+    "Difficulty" : {
+      "comment" : "Toolbar Menu a11y label",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difficulty"
+          }
+        }
+      }
+    },
+    "Easy" : {
+      "comment" : "Difficulty option — 9x9 / 10 mines",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Easy"
+          }
+        }
+      }
+    },
+    "Flagged, row %lld column %lld" : {
+      "comment" : "Cell a11y label — flagged state (D-19, 1-indexed)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flagged, row %lld column %lld"
           }
         }
       }
@@ -102,6 +294,18 @@
         }
       }
     },
+    "Hard" : {
+      "comment" : "Difficulty option — 16x30 / 99 mines",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hard"
+          }
+        }
+      }
+    },
     "HISTORY" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -125,6 +329,18 @@
         }
       }
     },
+    "Medium" : {
+      "comment" : "Difficulty option — 16x16 / 40 mines",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium"
+          }
+        }
+      }
+    },
     "Merge" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -136,6 +352,18 @@
         }
       }
     },
+    "Mine, row %lld column %lld" : {
+      "comment" : "Cell a11y label — trip-mine state after loss (D-19, 1-indexed)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mine, row %lld column %lld"
+          }
+        }
+      }
+    },
     "Minesweeper" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -143,17 +371,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Minesweeper"
-          }
-        }
-      }
-    },
-    "Minesweeper coming in Phase 3" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minesweeper coming in Phase 3"
           }
         }
       }
@@ -176,6 +393,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pattern Memory"
+          }
+        }
+      }
+    },
+    "Restart" : {
+      "comment" : "End-state card primary action — fresh idle, same difficulty",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart"
+          }
+        }
+      }
+    },
+    "Restart game" : {
+      "comment" : "Toolbar leading button a11y label (D-20)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart game"
+          }
+        }
+      }
+    },
+    "Revealed, %lld mines adjacent, row %lld column %lld" : {
+      "comment" : "Cell a11y label — revealed numbered state (D-19, 1-indexed)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revealed, %lld mines adjacent, row %lld column %lld"
+          }
+        }
+      }
+    },
+    "Revealed, 0 mines adjacent, row %lld column %lld" : {
+      "comment" : "Cell a11y label — revealed empty state (D-19, 1-indexed)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revealed, 0 mines adjacent, row %lld column %lld"
           }
         }
       }
@@ -226,17 +491,6 @@
         }
       }
     },
-    "The board, gestures, and timer arrive next." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The board, gestures, and timer arrive next."
-          }
-        }
-      }
-    },
     "Theme controls coming in a future update." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -244,6 +498,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Theme controls coming in a future update."
+          }
+        }
+      }
+    },
+    "Time elapsed" : {
+      "comment" : "HeaderBar timer chip a11y label",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time elapsed"
+          }
+        }
+      }
+    },
+    "Unrevealed, row %lld column %lld" : {
+      "comment" : "Cell a11y label — hidden state (D-19, 1-indexed)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unrevealed, row %lld column %lld"
           }
         }
       }
@@ -259,6 +537,30 @@
         }
       }
     },
+    "You won!" : {
+      "comment" : "End-state card title — win outcome (D-03 part 1)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You won!"
+          }
+        }
+      }
+    },
+    "You won! Time: %@" : {
+      "comment" : "End-state overlay a11y label — win outcome",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You won! Time: %@"
+          }
+        }
+      }
+    },
     "Your best times will appear here." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -266,6 +568,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your best times will appear here."
+          }
+        }
+      }
+    },
+    "Your in-progress game will be lost." : {
+      "comment" : "Body of mid-game difficulty-change alert (D-10)",
+      "extractionState" : "automatic",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your in-progress game will be lost."
           }
         }
       }
