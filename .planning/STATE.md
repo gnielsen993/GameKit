@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02 (RED-gate)
-last_updated: "2026-04-27T16:10:44Z"
+stopped_at: 06-03 checkpoint reached — Tasks 1+2 committed; awaiting user verification of Xcode capabilities + CloudKit Dashboard schema (Task 3)
+last_updated: "2026-04-27T16:17:41Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 6
-Plan: 02 complete (RED-gate SyncStatus enum + CloudSyncStatusObserverTests skeleton)
-Status: Ready for plan 03
+Plan: 03 — Tasks 1+2 committed (b1f2956, b0b1ed0); Task 3 = checkpoint:human-verify awaiting user action (Xcode capability sweep + lldb schema deploy + CloudKit Dashboard verification)
+Status: Plan 03 checkpoint reached — paused
 Last activity: 2026-04-27
 
 Progress: [████████░░] 82%
@@ -84,6 +84,7 @@ Progress: [████████░░] 82%
 | Phase 05-polish P07 | 5 | 2 tasks | 2 files |
 | Phase 06-cloudkit-siwa P01 | 5 | 3 tasks tasks | 3 files files |
 | Phase 06-cloudkit-siwa P02 | 3 | 2 tasks | 2 files |
+| Phase 06-cloudkit-siwa P03 (Tasks 1+2 of 3 — Task 3 checkpoint pending) | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -208,14 +209,15 @@ Recent decisions affecting current work:
 - 06-02: SyncStatus.swift (63 lines, Foundation-only) ships the D-10 4-state contract verbatim (.syncing / .syncedAt(Date) / .notSignedIn / .unavailable(lastSynced: Date?)) as Equatable + Sendable; label(at now: Date) -> String pure function takes `now` explicitly (TimelineView 06-07 + tests drive determinism — no internal Date.now). Verbatim labels locked: 'Syncing…' / 'Synced just now' / 'Synced %@' (RelativeDateTimeFormatter .named .full) / 'Not signed in' / 'iCloud unavailable'. T-06-state-drift mitigation by construction: 5th case = compile error in exhaustive switch.
 - 06-02: CloudSyncStatusObserverTests.swift (157 lines) ships @MainActor @Suite skeleton with 9 @Test methods (5 state-machine + 4 label tests); applyEvent_forTesting(type: NSPersistentCloudKitContainer.EventType, endDate: Date?, succeeded: Bool, error: Error?) seam locks Plan 06-05 observer API surface BEFORE the production type exists. RED-gate verbatim: 'cannot find CloudSyncStatusObserver in scope' (line 55:24). Single atomic commit per CLAUDE.md §8.10 (test(06-02): a0d4364) — both tasks shipped together because the test file references SyncStatus symbols introduced in Task 1, so a Task-1-only commit would be intermediate dead code.
 - 06-02: Sibling-enum-file pattern locked across the codebase — Outcome.swift / GameKind.swift / SyncStatus.swift all small (≤80 lines) Foundation-only Sendable enums in their own file. Sendable conformer is a pure value type (enum), so no @MainActor crossing protocol isolation — the strict-concurrency error class that bit Plan 06-01 (`@MainActor` on Sendable-protocol conformer requiring `@unchecked Sendable` + non-MainActor class) is structurally avoided here.
+- 06-03: Wave-0 capabilities preflight Tasks 1+2 shipped (b1f2956 entitlements doc-comment lock + b0b1ed0 DEBUG-only CloudKitSchemaInitializer + GameKitApp._runtimeDeployCloudKitSchema lldb entry point). Container literal `iCloud.com.lauterstar.gamekit` is now anchored at a 4th canonical site. ENTIRE Core/CloudKitSchemaInitializer.swift gated by single `#if DEBUG ... #endif`; Release build succeeds → production binary contains zero schema-deploy symbols (T-06-schema-prod-leak structurally mitigated). GameKitApp init() body byte-identical to pre-plan; helper appended after preferredScheme. Task 3 = checkpoint:human-verify (Xcode capability sweep + lldb schema deploy + CloudKit Dashboard verification of CD_GameRecord + CD_BestTime in Development env) — BLOCKING for Plan 06-09 SC3, paused awaiting user resume signal.
 
 ### Pending Todos
 
-None yet.
+- **06-03 Task 3 (checkpoint:human-verify) — BLOCKING for Plan 06-09 SC3**: User must (a) verify in Xcode → gamekit target → Signing & Capabilities that all 4 P6 capabilities are registered (Sign in with Apple, iCloud + CloudKit + container iCloud.com.lauterstar.gamekit, iCloud CloudKit Documents, Background Modes → Remote notifications), and (b) launch a Debug build, run `expr try? GameKitApp._runtimeDeployCloudKitSchema()` in lldb, then verify in CloudKit Dashboard Development that CD_GameRecord + CD_BestTime record types appear. See `.planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md` §CHECKPOINT for exact steps + resume-signal options.
 
 ### Blockers/Concerns
 
-None yet.
+- **Plan 06-03 paused at Task 3 checkpoint** — orchestrator must resolve before plan can be marked fully complete and counter advances to 04.
 
 ## Deferred Items
 
@@ -227,8 +229,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27T16:10:44Z
-Stopped at: Completed 06-02 (RED-gate)
-Resume file: None
+Last session: 2026-04-27T16:17:41Z
+Stopped at: 06-03 Task 3 checkpoint (human-verify) — Xcode capability sweep + lldb schema deploy + CloudKit Dashboard verification
+Resume file: .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3)
 
 **Planned Phase:** 6 (cloudkit-siwa) — 9 plans — 2026-04-27T15:40:19.917Z
