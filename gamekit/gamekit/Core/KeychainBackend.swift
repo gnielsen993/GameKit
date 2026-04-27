@@ -70,8 +70,19 @@ enum KeychainError: Error {
 /// calls from `Security.framework`. Verbatim attribute set per
 /// CONTEXT line 202 + SC2 lock — do NOT modify any of the literal
 /// `kSec*` values without a phase-level decision.
-@MainActor
-final class SystemKeychainBackend: KeychainBackend {
+///
+/// NOT `@MainActor`: Apple `SecItem*` APIs are thread-safe, and the
+/// `KeychainBackend` protocol is `Sendable`. Annotating with
+/// `@MainActor` would force the conformance to cross actor isolation
+/// (Swift 6 strict-concurrency error: "Conformance crosses into main
+/// actor-isolated code"). AuthStore (Plan 06-04) is `@MainActor` and
+/// holds a `let backend: KeychainBackend` reference — calling Sendable
+/// non-isolated methods from a MainActor context is allowed.
+final class SystemKeychainBackend: KeychainBackend, @unchecked Sendable {
+    // @unchecked Sendable: this class has no instance stored properties
+    // (only `static let serviceName`), and Apple's SecItem* APIs are
+    // thread-safe per Apple Security framework docs. The "@unchecked"
+    // marker tells the compiler we've manually verified safety.
 
     /// Hardcoded Keychain service name (T-06-06 lock). Renaming breaks
     /// lookup; smoke-tested in Plan 06-04 round-trip.
