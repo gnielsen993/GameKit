@@ -2,29 +2,17 @@
 //  IntroFlowView.swift
 //  gamekit
 //
-//  P5 (D-18..D-24, SHELL-04, A11Y-01, A11Y-02): 3-step first-launch intro presented
-//  via .fullScreenCover from RootTabView. TabView(.page) swipeable; Skip top-trailing
-//  every step; Continue (steps 1+2) / Done (step 3) bottom-trailing. Both Skip and
-//  Done write settingsStore.hasSeenIntro = true and dismiss the cover.
+//  P5 (D-18..D-24, SHELL-04, A11Y-01, A11Y-02): 3-step first-launch intro
+//  presented via .fullScreenCover from RootTabView. TabView(.page) swipeable;
+//  Skip top-trailing every step; Continue (steps 1+2) / Done (step 3)
+//  bottom-trailing. Skip + Done + P6 SIWA-success all call dismissIntro()
+//  which writes hasSeenIntro = true and dismisses (single source of truth).
 //
-//  Layout per 05-CONTEXT D-18..D-24:
-//    - Step 1 "Make it yours" — read-only DKThemePicker(catalog: .core) preview (D-19)
-//    - Step 2 "Track your progress" — hand-coded sample stats card (D-20)
-//    - Step 3 "Sync across devices" — SignInWithAppleButton + Skip in a DKCard (D-21)
+//  Steps: 1 "Make it yours" (D-19) → 2 "Track your progress" (D-20) →
+//  3 "Sync across devices" (D-21).
 //
-//  Phase 5 invariants:
-//    - No NavigationStack inside the cover (D-18) — Skip/Continue/Done overlays only
-//    - .tabViewStyle(.page(indexDisplayMode: .always)) + .indexViewStyle(...) per D-18
-//    - SignInWithAppleButton renders but onCompletion is a no-op in P5 — P6 PERSIST-04
-//      wires the actual auth flow. The capability MUST be present in
-//      gamekit.entitlements (com.apple.developer.applesignin = [Default]) for the
-//      button to render at all and for the P6 wiring to not throw
-//      ASAuthorizationErrorUnknown — added in this same plan
-//    - Both Skip and Done call dismissIntro() which writes hasSeenIntro = true
-//      then dismisses (single source of truth for the dismissal contract)
-//    - Every step gates .dynamicTypeSize(...accessibility5) and uses
-//      .accessibilityElement(children: .combine) (steps 1+2) or .contain (step 3)
-//      per D-24 — SIWA owns its own a11y label so step 3 uses .contain
+//  P6 (PERSIST-04): Step 3 SIWA onCompletion wires real auth — Plan 06-08
+//  replaces the P5 D-21 no-op. Mirrors SettingsSyncSection handler shape.
 //
 
 import SwiftUI
@@ -36,6 +24,7 @@ struct IntroFlowView: View {
     @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.settingsStore) private var settingsStore
+    @Environment(\.authStore) private var authStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var currentStep: Int = 0
@@ -59,7 +48,8 @@ struct IntroFlowView: View {
                     theme: theme,
                     colorScheme: colorScheme,
                     onSkip: dismissIntro,
-                    onSignIn: signInTapped
+                    onSIWARequest: handleSIWARequest,
+                    onSIWACompletion: handleSIWACompletion
                 )
                 .tag(2)
             }
@@ -109,20 +99,46 @@ struct IntroFlowView: View {
         }
     }
 
-    /// Single dismissal path used by Skip + Done (PATTERNS line 451 — single
-    /// source of truth). Writes hasSeenIntro = true then dismisses; the
-    /// SettingsStore.didSet persists synchronously to UserDefaults so a
-    /// cold-relaunch never re-presents the cover (CONTEXT D-23).
+    /// Single dismissal path used by Skip + Done + P6 SIWA-success
+    /// (PATTERNS line 451 — single source of truth). SettingsStore.didSet
+    /// persists synchronously so a cold-relaunch never re-presents (D-23).
     private func dismissIntro() {
         settingsStore.hasSeenIntro = true
         dismiss()
     }
 
-    /// SIWA tap closure — P6 PERSIST-04 wires actual auth. Logs only in P5
-    /// per CONTEXT D-21. The button visually responds (system handling) but
-    /// no auth flow is initiated.
-    private func signInTapped() {
-        Self.logger.info("SIWA tapped during intro (P6 wires actual auth via PERSIST-04 — D-21)")
+    // MARK: - SIWA handlers (P6 PERSIST-04 — replaces P5 D-21 no-op)
+
+    /// T-06-04 lock: requestedScopes = [] LITERAL (SC2 verbatim).
+    private func handleSIWARequest(_ request: ASAuthorizationAppleIDRequest) {
+        request.requestedScopes = []   // SC2 verbatim — userID only
+        Self.logger.info("SIWA request initiated from intro Step 3")
+    }
+
+    /// Plan 06-07 mirror. Success: Keychain → flip cloudSyncEnabled (D-02) →
+    /// flip Restart-prompt flag (D-03) → dismiss. Failure: silent log only.
+    private func handleSIWACompletion(_ result: Result<ASAuthorization, Error>) {
+        Task { @MainActor in
+            switch result {
+            case .success(let authorization):
+                guard let credential = authorization.credential
+                        as? ASAuthorizationAppleIDCredential else {
+                    Self.logger.error("SIWA returned non-Apple-ID credential")
+                    return
+                }
+                // T-06-03: extract ONLY credential.user; never the one-shot JWT.
+                do {
+                    try authStore.signIn(userID: credential.user)
+                    settingsStore.cloudSyncEnabled = true        // D-02
+                    authStore.shouldShowRestartPrompt = true     // D-03
+                    dismissIntro()                                // STATE 05-05 SoT
+                } catch {
+                    Self.logger.error("SIWA Keychain write failed: \(error.localizedDescription, privacy: .public)")
+                }
+            case .failure(let error):
+                Self.logger.error("SIWA failed: \(error.localizedDescription, privacy: .public)")
+            }
+        }
     }
 }
 
@@ -228,7 +244,8 @@ private struct IntroStep3SignInView: View {
     let theme: Theme
     let colorScheme: ColorScheme
     let onSkip: () -> Void
-    let onSignIn: () -> Void
+    let onSIWARequest: (ASAuthorizationAppleIDRequest) -> Void
+    let onSIWACompletion: (Result<ASAuthorization, Error>) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: theme.spacing.l) {
@@ -244,10 +261,8 @@ private struct IntroStep3SignInView: View {
                 VStack(spacing: theme.spacing.s) {
                     SignInWithAppleButton(
                         .signIn,
-                        onRequest: { _ in onSignIn() },
-                        onCompletion: { _ in
-                            // P6 PERSIST-04 wires this — no-op in P5 (D-21).
-                        }
+                        onRequest: { request in onSIWARequest(request) },
+                        onCompletion: { result in onSIWACompletion(result) }
                     )
                     .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
                     .frame(height: 44)
