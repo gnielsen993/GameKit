@@ -85,8 +85,17 @@ None — Plan 05-07 explicitly handed Task 2 sign-off to the user; this executor
 
 None introduced by this plan.
 
+## Commits
+
+| Order | Hash | Message |
+|-------|------|---------|
+| 1 | `efdf02e` | docs(05-07): mark 05-VERIFICATION.md user-shipped 2026-04-26 with G-1 deferred |
+| 2 | `1aaa6ec` | docs(05-07): summarize verification verdict — PASS with G-1 deferred |
+| 3 | `274efb6` | chore(05-07): finalize plan-level state — STATE/ROADMAP/REQUIREMENTS |
+
 ## Self-Check: PASSED
 
-- 05-VERIFICATION.md updated with frontmatter + sign-off + gap-log closures (verified at HEAD `efdf02e`)
-- 05-07-SUMMARY.md created (this file)
-- Commits to follow: SUMMARY commit + state-update commit (per plan executor protocol)
+- FOUND: `.planning/phases/05-polish/05-VERIFICATION.md` (updated with frontmatter + sign-off + gap-log closures at `efdf02e`)
+- FOUND: `.planning/phases/05-polish/05-07-SUMMARY.md` (this file, committed at `1aaa6ec`)
+- FOUND commits: `efdf02e`, `1aaa6ec`, `274efb6` all present in `git log --oneline --all`
+- STATE.md `completed_phases` correctly held at 4 (orchestrator promotes Phase 5 to complete via `gsd-sdk query phase.complete 05` after this executor returns)
