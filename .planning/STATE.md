@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 6 context gathered
-last_updated: "2026-04-27T15:40:19.921Z"
+status: executing
+stopped_at: Completed 06-01 (RED-gate)
+last_updated: "2026-04-27T16:03:26.301Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 40
-  completed_plans: 31
-  percent: 78
+  completed_plans: 32
+  percent: 80
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 05 — polish
+**Current focus:** Phase 06 — cloudkit-siwa
 
 ## Current Position
 
 Phase: 6
-Plan: Not started
-Status: Ready to plan
+Plan: 01 complete (RED-gate Keychain backend + AuthStoreTests skeleton)
+Status: Ready for plan 02
 Last activity: 2026-04-27
 
-Progress: [██████████] 100%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -82,6 +82,7 @@ Progress: [██████████] 100%
 | Phase 05-polish P05 | 12 | 2 tasks tasks | 5 files files |
 | Phase 05-polish P06 | 18 | 2 tasks tasks | 5 files files |
 | Phase 05-polish P07 | 5 | 2 tasks | 2 files |
+| Phase 06-cloudkit-siwa P01 | 5 | 3 tasks tasks | 3 files files |
 
 ## Accumulated Context
 
@@ -202,6 +203,7 @@ Recent decisions affecting current work:
 - 05-06: Win-wash Rectangle z-ordered ABOVE board, BELOW end-state DKCard; .allowsHitTesting(false) double-enforces non-blocking; Reduce Motion → phases [0.0] (no fade)
 - 05-06: Reduce Motion gates per surface independently (D-04) — BoardView .identity transition; CellView .symbolEffect value=0; GameView .keyframeAnimator trigger=false + .phaseAnimator phases=[0.0]; VM stays Foundation-only (D-05)
 - 05-06: TDD plan-level RED→GREEN gate honored — test commit 6b31869 (12 compile errors before any phase property defined) precedes feat commit 421cfcc; same TDD pattern as 04-02/04-03/05-01/05-03
+- 06-01: Wave-0 TDD RED-gate shipped — KeychainBackend.swift (126 lines, prod) + InMemoryKeychainBackend.swift (30 lines, tests-only) + AuthStoreTests.swift (190 lines, RED skeleton). Verbatim SC2 attribute set locked: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly + kSecClassGenericPassword + service 'com.lauterstar.gamekit.auth'. Test target compile-fails 9× ('cannot find AuthStore/CredentialStateProvider in scope') — Plan 06-04 feat commit will flip GREEN. Single atomic commit per CLAUDE.md §8.10 (test(06-01): a18a186).
 
 ### Pending Todos
 
@@ -221,8 +223,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 6 context gathered
-Resume file: --resume-file
+Last session: 2026-04-27T16:03:03.637Z
+Stopped at: Completed 06-01 (RED-gate)
+Resume file: None
 
 **Planned Phase:** 6 (cloudkit-siwa) — 9 plans — 2026-04-27T15:40:19.917Z
