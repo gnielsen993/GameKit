@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: 06-05 complete (Wave-1 GREEN gate fully landed); 06-03 Task 3 checkpoint still pending; Wave 2 (06-06/07/08) next
-last_updated: "2026-04-27T16:55:35.637Z"
+stopped_at: 06-06 complete (Wave-2 integration #1 — AuthStore + observer + scenePhase + Restart alert wired); 06-03 Task 3 checkpoint still pending; Wave 2 (06-07 / 06-08) next
+last_updated: "2026-04-27T18:05:00.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 40
-  completed_plans: 36
-  percent: 90
+  completed_plans: 37
+  percent: 92
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 6
-Plan: 05 — COMPLETE (a7d10db); Wave-1 GREEN gate fully landed (9/9 CloudSyncStatusObserverTests + 7/7 AuthStoreTests pass). Plan 03 Task 3 checkpoint still pending (parallel — touches different files; 06-09 SC3 dependency only, not a blocker for 06-04/06-05 which used test stubs).
-Status: 06-05 complete (Wave-1 done); 06-03 Task 3 checkpoint still pending (awaiting user)
+Plan: 06 — COMPLETE (19f693b); Wave-2 integration #1 landed — GameKitApp constructs + injects AuthStore + CloudSyncStatusObserver via Environment; RootTabView observes scenePhase → validateOnSceneActive() and authStore.isSignedIn true→false → flips cloudSyncEnabled=false; root .alert with verbatim D-04 Restart prompt copy bound to Bindable(authStore).shouldShowRestartPrompt; T-06-05 dismiss-only Quit button locked (zero exit/suspend/abort matches); T-06-06 container ID literal byte-identical preserved at line 79; xcstringstool sync added 8 P6 strings (4 Restart alert + 4 SyncStatus labels carried forward from 06-02 source). Plan 03 Task 3 checkpoint still pending (parallel — touches different files; 06-09 SC3 dependency only).
+Status: 06-06 complete (Wave-2 #1 done); 06-03 Task 3 checkpoint still pending (awaiting user); 06-07 / 06-08 next
 Last activity: 2026-04-27
 
-Progress: [█████████░] 90%
+Progress: [█████████▒] 92%
 
 ## Performance Metrics
 
@@ -87,6 +87,7 @@ Progress: [█████████░] 90%
 | Phase 06-cloudkit-siwa P03 (Tasks 1+2 of 3 — Task 3 checkpoint pending) | 3 | 2 tasks | 3 files |
 | Phase 06-cloudkit-siwa P04 | 5 | 1 task | 2 files |
 | Phase 06-cloudkit-siwa P05 | 13 | 1 tasks | 2 files |
+| Phase 06-cloudkit-siwa P06 | 6 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -218,6 +219,11 @@ Recent decisions affecting current work:
 - 06-05: Background-then-hop pattern (Task { @MainActor [weak self] in ... }) chosen over MainActor.assumeIsolated — RESEARCH §Q4 RESOLVED locks Apple's eventChangedNotification as background-queue delivery (queue:nil registration), so assumeIsolated would crash on isolation mismatch. Differs deliberately from AuthStore which uses assumeIsolated because credentialRevokedNotification has CONTRACTUAL main-thread delivery (Apple docs). Both shapes are correct in their context — locks the rule that observer-pattern actor-hop choice depends on the notification's posting-thread contract, not on a one-size-fits-all preference.
 - 06-05: Event snapshot extracted OFF main before the actor hop — read-only access to Apple value-type-like Event properties (type/endDate/succeeded/error) is thread-safe; only Sendable scalars cross the boundary into Task { @MainActor [weak self] in ... }. Avoids capturing the full Event reference into the Task closure (would require Event: Sendable, which Apple does not declare). Pattern locked for future CloudKit/CoreData notification observers.
 - 06-05: Plan 06-04 Rule 3 deviation (#if SKIP_OBSERVER_TESTS gate) cleanly REVERSED — both #if and matching #endif lines deleted from gamekitTests/Core/CloudSyncStatusObserverTests.swift. The 9-test suite now exercises the production CloudSyncStatusObserver type directly. Pattern validated end-to-end: a Rule 3 source-level guard wrapping a TDD RED skeleton is the correct mechanism to keep an upstream test target compiling while a downstream production type ships in a parallel plan — and the next plan in the chain MUST mechanically remove the guard as part of its acceptance criteria.
+- 06-06: Wave-2 integration #1 shipped (19f693b) — single atomic commit `feat(06-06): wire AuthStore + observer + scenePhase + Restart alert at app root` (3 files / 95 insertions / 0 deletions, purely additive). GameKitApp.init() construction order is now SettingsStore → SFXPlayer → AuthStore → CloudSyncStatusObserver → schema → ModelContainer; observer initialStatus reads `store.cloudSyncEnabled ? .syncing : .notSignedIn` so a fresh-install/cloudSync-OFF user sees the SettingsView SYNC row at "Not signed in" by Plan 06-07 paint-time without a state-machine flip. Body chain extends `.environmentObject(themeManager)` → `.environment(\\.settingsStore, …)` → `.environment(\\.sfxPlayer, …)` → `.environment(\\.authStore, …)` → `.environment(\\.cloudSyncStatusObserver, …)` → `.preferredColorScheme(…)` → `.modelContainer(…)`. T-06-06 container ID literal `iCloud.com.lauterstar.gamekit` BYTE-IDENTICAL preserved at line 79.
+- 06-06: RootTabView consumes only `\\.scenePhase` + `\\.authStore` (NOT `\\.cloudSyncStatusObserver` — observer is read by SettingsView only per CONTEXT D-11). scenePhase observer hops to a Task before awaiting `authStore.validateOnSceneActive()`; revocation→cloudSync flip is a pure RootTabView concern (`onChange(of: authStore.isSignedIn)` / `if wasSignedIn && !isNowSignedIn { settingsStore.cloudSyncEnabled = false }`) which keeps AuthStore single-responsibility (Q2 RESOLVED in 06-04 Summary — AuthStore does NOT inject SettingsStore). Same-store-path D-08 lock means the next cold start reconfigs `cloudKitDatabase: .none` while preserving local rows; cloud rows preserved server-side per Pitfall 4.
+- 06-06: Root-level `.alert(isPresented: Bindable(authStore).shouldShowRestartPrompt)` — Bindable constructed in-place at the alert call site (no @Bindable property needed; @Observable + Bindable inits cheaply). Verbatim D-04 copy: title "Restart to enable iCloud sync", body "Your stats will sync to all devices signed in to this iCloud account. Quit GameKit and reopen to finish setup.", Cancel button uses `role: .cancel`, Quit GameKit button uses default role (NOT .destructive — quitting is non-destructive). Both buttons are dismiss-only — empty Button bodies. T-06-05 / D-05 LOCK proven by the negative-grep gate `! grep -E "exit\\(0\\)|UIApplication\\.shared\\.suspend|abort\\(\\)" gamekit/gamekit/Screens/RootTabView.swift gamekit/gamekit/App/GameKitApp.swift` returning zero matches.
+- 06-06: Source-comment self-discipline — the Quit GameKit button comment was reworded to remove literal substrings `exit(0)`, `UIApplication.shared.suspend`, `abort()` from prose so the negative-grep gate stays clean even when the comment narrates the prohibition. Same pattern as P4 04-01 "no SwiftData unique-attribute decorator" comment rewording. Locked as standard for any future hard-grep gate that has prose-explanation alongside code-prohibition: rephrase prose to NOT name the literal API tokens.
+- 06-06: xcstringstool sync (deterministic CLI per STATE.md 04-05 / 05-04 precedent) added 8 P6 strings — 4 Restart alert (Restart to enable iCloud sync / Quit GameKit / Cancel pre-existing / "Your stats will sync to all devices signed in to this iCloud account. Quit GameKit and reopen to finish setup.") + 4 SyncStatus labels carried forward from Plan 06-02 source (Syncing… / Synced just now / Synced %@ / iCloud unavailable / Not signed in). 24 insertions, 0 deletions, JSON validity preserved. Empty `{ }` entry shape (no localizations) matches existing pre-Cancel auto-extracted entries (e.g. "Reset all stats?", "Privacy") — resolves to development-language source string at runtime; no warning, no broken behavior. Plan 06-07 will rerun sync after SettingsView SYNC section adds remaining strings.
 
 ### Pending Todos
 
@@ -238,8 +244,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27T16:54:58.519Z
-Stopped at: 06-05 complete (Wave-1 GREEN gate fully landed)
-Resume file: .planning/phases/06-cloudkit-siwa/06-05-SUMMARY.md (just shipped) + .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3 still open). Wave 2 next: Plans 06-06 (RootTabView scenePhase wiring), 06-07 (SettingsView SIWA + SYNC row), 06-08 (IntroFlowView SIWA).
+Last session: 2026-04-27T18:05:00.000Z
+Stopped at: 06-06 complete (Wave-2 integration #1 — AuthStore + observer + scenePhase + Restart alert wired at app root)
+Resume file: .planning/phases/06-cloudkit-siwa/06-06-SUMMARY.md (just shipped) + .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3 still open). Wave 2 next: Plans 06-07 (SettingsView SYNC row + SIWA), 06-08 (IntroFlowView SIWA).
 
 **Planned Phase:** 6 (cloudkit-siwa) — 9 plans — 2026-04-27T15:40:19.917Z
