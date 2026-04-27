@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: 06-03 checkpoint reached — Tasks 1+2 committed; awaiting user verification of Xcode capabilities + CloudKit Dashboard schema (Task 3)
-last_updated: "2026-04-27T16:17:41Z"
+stopped_at: 06-04 complete (Wave-1 GREEN gate); 06-03 Task 3 checkpoint still pending (parallel — does not block 06-04 since they touch different files)
+last_updated: "2026-04-27T16:30:00Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 40
-  completed_plans: 33
-  percent: 82
+  completed_plans: 34
+  percent: 85
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 6
-Plan: 03 — Tasks 1+2 committed (b1f2956, b0b1ed0); Task 3 = checkpoint:human-verify awaiting user action (Xcode capability sweep + lldb schema deploy + CloudKit Dashboard verification)
-Status: Plan 03 checkpoint reached — paused
+Plan: 04 — COMPLETE (e43cc79); Wave-1 GREEN gate landed (7/7 AuthStoreTests pass). Plan 03 Task 3 checkpoint still pending (parallel — touches different files; 06-09 SC3 dependency only, not a blocker for 06-04 which uses test stubs).
+Status: 06-04 complete; 06-03 Task 3 checkpoint still pending (paused on user action)
 Last activity: 2026-04-27
 
-Progress: [████████░░] 82%
+Progress: [████████░░] 85%
 
 ## Performance Metrics
 
@@ -85,6 +85,7 @@ Progress: [████████░░] 82%
 | Phase 06-cloudkit-siwa P01 | 5 | 3 tasks tasks | 3 files files |
 | Phase 06-cloudkit-siwa P02 | 3 | 2 tasks | 2 files |
 | Phase 06-cloudkit-siwa P03 (Tasks 1+2 of 3 — Task 3 checkpoint pending) | 3 | 2 tasks | 3 files |
+| Phase 06-cloudkit-siwa P04 | 5 | 1 task | 2 files |
 
 ## Accumulated Context
 
@@ -210,6 +211,8 @@ Recent decisions affecting current work:
 - 06-02: CloudSyncStatusObserverTests.swift (157 lines) ships @MainActor @Suite skeleton with 9 @Test methods (5 state-machine + 4 label tests); applyEvent_forTesting(type: NSPersistentCloudKitContainer.EventType, endDate: Date?, succeeded: Bool, error: Error?) seam locks Plan 06-05 observer API surface BEFORE the production type exists. RED-gate verbatim: 'cannot find CloudSyncStatusObserver in scope' (line 55:24). Single atomic commit per CLAUDE.md §8.10 (test(06-02): a0d4364) — both tasks shipped together because the test file references SyncStatus symbols introduced in Task 1, so a Task-1-only commit would be intermediate dead code.
 - 06-02: Sibling-enum-file pattern locked across the codebase — Outcome.swift / GameKind.swift / SyncStatus.swift all small (≤80 lines) Foundation-only Sendable enums in their own file. Sendable conformer is a pure value type (enum), so no @MainActor crossing protocol isolation — the strict-concurrency error class that bit Plan 06-01 (`@MainActor` on Sendable-protocol conformer requiring `@unchecked Sendable` + non-MainActor class) is structurally avoided here.
 - 06-03: Wave-0 capabilities preflight Tasks 1+2 shipped (b1f2956 entitlements doc-comment lock + b0b1ed0 DEBUG-only CloudKitSchemaInitializer + GameKitApp._runtimeDeployCloudKitSchema lldb entry point). Container literal `iCloud.com.lauterstar.gamekit` is now anchored at a 4th canonical site. ENTIRE Core/CloudKitSchemaInitializer.swift gated by single `#if DEBUG ... #endif`; Release build succeeds → production binary contains zero schema-deploy symbols (T-06-schema-prod-leak structurally mitigated). GameKitApp init() body byte-identical to pre-plan; helper appended after preferredScheme. Task 3 = checkpoint:human-verify (Xcode capability sweep + lldb schema deploy + CloudKit Dashboard verification of CD_GameRecord + CD_BestTime in Development env) — BLOCKING for Plan 06-09 SC3, paused awaiting user resume signal.
+- 06-04: Wave-1 GREEN gate shipped (e43cc79) — gamekit/gamekit/Core/AuthStore.swift (232 lines, ≤240 budget) flips Plan 06-01's 7 RED AuthStoreTests GREEN. @Observable @MainActor final class composes KeychainBackend (D-16) + CredentialStateProvider (PATTERNS §6 line 384) seams. Selector-based addObserver (NOT block-based with queue:.main) preserves Plan 06-01 Test 2 sync-test contract (state cleared BEFORE NotificationCenter.post returns). MainActor.assumeIsolated inside @objc handleRevocation(_:) is the narrow-correct shape on @MainActor class. Pitfall F early-return (`if error != nil { resume(returning: .notFound); return }`) ensures continuation resumes exactly once. Logger NEVER interpolates userID (T-06-02 lock proven by adversarial grep returning 0). Zero references to UserDefaults/identityToken/SwiftData/ModelContext/ModelContainer (T-06-01/03/08 locks). AuthStore stays single-responsibility — does NOT inject SettingsStore (Q2 RESOLVED-declined per CLAUDE.md §4 "smallest change"). Full regression `** TEST SUCCEEDED **`.
+- 06-04: Rule 3 deviation — gamekit/gamekitTests/Core/CloudSyncStatusObserverTests.swift body wrapped in `#if SKIP_OBSERVER_TESTS` so the test target compiles while Plan 06-05 is unshipped. Without the gate, Plan 06-02's symbol-level RED ("cannot find CloudSyncStatusObserver in scope") prevents the entire test target from linking and blocks `xcodebuild test -only-testing:gamekitTests/AuthStoreTests` from running (compile happens before -skip-testing). Plan 06-05 GREEN-gate executor MUST delete both `#if SKIP_OBSERVER_TESTS` and `#endif` lines when shipping Core/CloudSyncStatusObserver.swift; search for `SKIP_OBSERVER_TESTS` to find the exact lines. Plan 06-02's RED contract preserved structurally — removing the gate without the production type immediately resurfaces the same 9-error symbol-level RED.
 
 ### Pending Todos
 
@@ -217,7 +220,8 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- **Plan 06-03 paused at Task 3 checkpoint** — orchestrator must resolve before plan can be marked fully complete and counter advances to 04.
+- **Plan 06-03 paused at Task 3 checkpoint** — orchestrator must resolve before plan can be marked fully complete; the checkpoint blocks Plan 06-09 SC3 (real-CloudKit promotion test) but did not block Plan 06-04 (used in-memory KeychainBackend stubs). Counter advanced to 04 (now complete) ahead of 06-03 Task 3 resolution.
+- **Plan 06-05 must remove `SKIP_OBSERVER_TESTS` gate** when shipping Core/CloudSyncStatusObserver.swift. Search for `SKIP_OBSERVER_TESTS` in `gamekit/gamekitTests/Core/CloudSyncStatusObserverTests.swift` and delete both the `#if SKIP_OBSERVER_TESTS` line (~58) and the `#endif // SKIP_OBSERVER_TESTS` line (~167). The 9-test suite will then exercise the new production type.
 
 ## Deferred Items
 
@@ -229,8 +233,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27T16:17:41Z
-Stopped at: 06-03 Task 3 checkpoint (human-verify) — Xcode capability sweep + lldb schema deploy + CloudKit Dashboard verification
-Resume file: .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3)
+Last session: 2026-04-27T16:30:00Z
+Stopped at: 06-04 complete (Wave-1 GREEN gate); 06-03 Task 3 checkpoint still pending (parallel)
+Resume file: .planning/phases/06-cloudkit-siwa/06-04-SUMMARY.md (just shipped) + .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3 still open)
 
 **Planned Phase:** 6 (cloudkit-siwa) — 9 plans — 2026-04-27T15:40:19.917Z
