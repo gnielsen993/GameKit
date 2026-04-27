@@ -118,7 +118,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 05-04-PLAN.md — Settings spine rebuild (APPEARANCE/AUDIO/DATA verbatim/ABOUT) + FullThemePickerView + xcstrings sync
 - [x] 05-05-PLAN.md — IntroFlowView (3-step .fullScreenCover with TabView(.page)) + RootTabView wiring + SIWA entitlement + xcstrings sync
 - [ ] 05-06-PLAN.md — Mines animation pass (VM phase + BoardView cascade + CellView .sensoryFeedback + GameView .phaseAnimator/.keyframeAnimator/.onChange Haptics+SFX) + MinesweeperPhaseTransitionTests
-- [ ] 05-07-PLAN.md — Manual SC1-SC5 verification checkpoint (theme matrix, custom palette, full a11y sweep, gap log)
+- [x] 05-07-PLAN.md — Manual SC1-SC5 verification checkpoint (theme matrix, custom palette, full a11y sweep, gap log)
 **UI hint**: yes
 
 ### Phase 6: CloudKit + Sign in with Apple
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Mines Engines | 6/6 | Complete | 2026-04-25 |
 | 3. Mines UI | 3/4 | In progress | - |
 | 4. Stats & Persistence | 1/6 | In progress | - |
-| 5. Polish | 1/7 | In progress | - |
+| 5. Polish | 7/7 | In progress | - |
 | 6. CloudKit + Sign in with Apple | 0/TBD | Not started | - |
 | 7. Release | 0/TBD | Not started | - |
 

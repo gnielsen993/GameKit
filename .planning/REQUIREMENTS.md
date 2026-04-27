@@ -72,7 +72,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 
 ### Theming Responsiveness
 
-- [ ] **THEME-01**: Minesweeper UI verified legible on at least one preset from each DesignKit category — Classic, Sweet, Bright, Soft, Moody, Loud — for both play state AND loss state, before TestFlight
+- [x] **THEME-01
+**: Minesweeper UI verified legible on at least one preset from each DesignKit category — Classic, Sweet, Bright, Soft, Moody, Loud — for both play state AND loss state, before TestFlight
 - [x] **THEME-02
 **: Revealed-vs-unrevealed cells, mines, flags, and adjacency numbers all read from semantic tokens; new `theme.colors.gameNumber(_:)` token (1–8) added to DesignKit for the informational number palette
 - [x] **THEME-03
