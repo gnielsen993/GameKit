@@ -24,6 +24,16 @@ struct MinesweeperBoardView: View {
     let theme: Theme
     let board: MinesweeperBoard
     let gameState: MinesweeperGameState
+
+    // P5 (D-01/D-04/D-07) — animation orchestration props (props-only,
+    // CLAUDE.md §8.2). MinesweeperGameView hoists these from the VM /
+    // environment and passes through; child cells receive the same.
+    let phase: MinesweeperPhase
+    let hapticsEnabled: Bool
+    let reduceMotion: Bool
+    let revealCount: Int
+    let flagToggleCount: Int
+
     let onTap: (MinesweeperIndex) -> Void
     let onLongPress: (MinesweeperIndex) -> Void
 
@@ -48,17 +58,46 @@ struct MinesweeperBoardView: View {
     }
 
     var body: some View {
+        // P5 D-01: extract the engine-ordered reveal list once per render so
+        // the per-cell delay lookup is O(n) instead of O(n²).
+        let revealingCells: [MinesweeperIndex] = {
+            if case .revealing(let cells) = phase { return cells }
+            return []
+        }()
+        let cascadeCount = max(revealingCells.count, 1)
+
         ScrollView(scrollAxis(for: board.difficulty), showsIndicators: false) {
             LazyVGrid(columns: columns, spacing: theme.spacing.xs) {
                 ForEach(board.allIndices(), id: \.self) { index in
+                    let perCellDelay: Double = {
+                        // D-04: Reduce Motion → no stagger; cascade collapses
+                        // to simultaneous reveal.
+                        guard !reduceMotion,
+                              let order = revealingCells.firstIndex(of: index)
+                        else { return 0 }
+                        // D-01 budget: per-cell delay = min(8ms × index,
+                        // theme.motion.normal / count). Hard flood-fill of
+                        // 100+ cells stays inside theme.motion.normal cap.
+                        return min(0.008 * Double(order), theme.motion.normal / Double(cascadeCount))
+                    }()
+
                     MinesweeperCellView(
                         cell: board.cell(at: index),
                         index: index,
                         cellSize: cellSize,
                         theme: theme,
                         gameState: gameState,
+                        hapticsEnabled: hapticsEnabled,
+                        reduceMotion: reduceMotion,
+                        revealCount: revealCount,
+                        flagToggleCount: flagToggleCount,
                         onTap: onTap,
                         onLongPress: onLongPress
+                    )
+                    .transition(
+                        reduceMotion
+                        ? .identity
+                        : .opacity.animation(.easeOut(duration: theme.motion.fast).delay(perCellDelay))
                     )
                 }
             }

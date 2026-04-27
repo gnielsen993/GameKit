@@ -32,6 +32,18 @@ struct MinesweeperCellView: View {
     let cellSize: CGFloat
     let theme: Theme
     let gameState: MinesweeperGameState
+
+    // P5 (D-04/D-07) — animation/haptic orchestration props (props-only).
+    // Gating-at-source: when `hapticsEnabled` is false, the trigger value
+    // is constant 0 so `.sensoryFeedback` never fires (the modifier is
+    // value-driven, not event-driven). When `reduceMotion` is true the
+    // `.symbolEffect(.bounce)` value is 0 so the symbol does not animate
+    // (defensive belt-and-suspenders to system-level handling per D-04).
+    let hapticsEnabled: Bool
+    let reduceMotion: Bool
+    let revealCount: Int
+    let flagToggleCount: Int
+
     let onTap: (MinesweeperIndex) -> Void
     let onLongPress: (MinesweeperIndex) -> Void
 
@@ -53,6 +65,11 @@ struct MinesweeperCellView: View {
                         }
                     }
             )
+            // P5 D-07: cell-level haptics. Trigger gating-at-source —
+            // hapticsEnabled=false collapses the trigger to constant 0
+            // so .sensoryFeedback never fires.
+            .sensoryFeedback(.selection, trigger: hapticsEnabled ? revealCount : 0)
+            .sensoryFeedback(.impact(weight: .light), trigger: hapticsEnabled ? flagToggleCount : 0)
             .accessibilityElement(children: .ignore)  // RESEARCH Pitfall 5
             .accessibilityLabel(accessibilityLabelKey)
             .accessibilityAddTraits(.isButton)
@@ -122,6 +139,10 @@ struct MinesweeperCellView: View {
                 .resizable().scaledToFit()
                 .frame(width: cellSize * 0.55, height: cellSize * 0.55)
                 .foregroundStyle(theme.colors.danger)
+                // P5 D-04 + D-07: flag spring on commitment. Reduce Motion
+                // belt-and-suspenders — value=0 prevents replay even though
+                // .symbolEffect honors the system flag automatically.
+                .symbolEffect(.bounce, value: reduceMotion ? 0 : flagToggleCount)
 
         // 5. Revealed numbered cell — adjacency 1...8 from theme.gameNumber(_:).
         case (.revealed, _, _) where cell.adjacentMineCount > 0:

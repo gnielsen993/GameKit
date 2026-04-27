@@ -46,6 +46,15 @@ struct MinesweeperGameView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var didInjectStats = false           // one-shot guard (RESEARCH Pitfall 8)
 
+    // P5 (D-04/D-07/D-08) — animation/haptics/SFX environment reads.
+    // accessibilityReduceMotion gates ALL animation surfaces per D-04.
+    // settingsStore + sfxPlayer flow into the locked Plan 05-03
+    // call-site contract: Haptics.playAHAP(named:hapticsEnabled:) +
+    // sfxPlayer.play(_:sfxEnabled:) on .onChange(of: viewModel.phase).
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.settingsStore) private var settingsStore
+    @Environment(\.sfxPlayer) private var sfxPlayer
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     init() {
@@ -69,10 +78,50 @@ struct MinesweeperGameView: View {
                     theme: theme,
                     board: viewModel.board,
                     gameState: viewModel.gameState,
+                    phase: viewModel.phase,
+                    hapticsEnabled: settingsStore.hapticsEnabled,
+                    reduceMotion: reduceMotion,
+                    revealCount: viewModel.revealCount,
+                    flagToggleCount: viewModel.flagToggleCount,
                     onTap: { viewModel.reveal(at: $0) },
                     onLongPress: { viewModel.toggleFlag(at: $0) }
                 )
+                // P5 D-03: 4-keyframe horizontal loss shake. Magnitude 8pt
+                // locked by CONTEXT D-03 (animation amplitude, not layout
+                // — exempt from FOUND-07 spacing-token rule). Reduce Motion
+                // → trigger `false` so keyframes never fire.
+                .keyframeAnimator(
+                    initialValue: 0.0,
+                    trigger: reduceMotion ? false : viewModel.phase.isLossShake
+                ) { content, value in
+                    content.offset(x: value)
+                } keyframes: { _ in
+                    LinearKeyframe(0.0, duration: 0.0)
+                    LinearKeyframe(8.0, duration: 0.1)
+                    LinearKeyframe(-8.0, duration: 0.1)
+                    LinearKeyframe(4.0, duration: 0.1)
+                    LinearKeyframe(0.0, duration: 0.1)
+                }
             }
+
+            // P5 D-02: full-board win sweep — success-tint wash via
+            // .phaseAnimator. Sits ABOVE the board cells but BELOW the
+            // end-state DKCard so the user can interact with Restart
+            // without the wash blocking taps (.allowsHitTesting(false)
+            // also enforces this). Reduce Motion → single phase [0.0]
+            // emits no fade.
+            Rectangle()
+                .fill(theme.colors.success)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+                .phaseAnimator(
+                    reduceMotion ? [0.0] : [0.0, 0.25, 0.0],
+                    trigger: viewModel.phase == .winSweep
+                ) { content, alpha in
+                    content.opacity(alpha)
+                } animation: { _ in
+                    .easeInOut(duration: theme.motion.slow)
+                }
 
             // End-state overlay — terminal state only (D-02 + D-18: no animation in P3)
             if let outcome = viewModel.terminalOutcome {
@@ -121,6 +170,32 @@ struct MinesweeperGameView: View {
             case .inactive:
                 break                                   // RESEARCH Pitfall 2 — no-op
             @unknown default:
+                break
+            }
+        }
+        // P5 D-07/D-08 — Haptics + SFX orchestration on the locked Plan
+        // 05-03 call-site contract. BOTH services gate at the source on
+        // the SettingsStore flag passed explicitly — view ships no
+        // conditional branching of its own.
+        // - .winSweep / .lossShake → AHAP via Haptics.playAHAP + SFX
+        // - .revealing → tap SFX only (cell haptic fires via
+        //   .sensoryFeedback(.selection) on CellView per D-07; no
+        //   duplicate haptic call here)
+        // - .idle / .flagging → no AHAP / SFX cue (flag haptic fires
+        //   via .sensoryFeedback(.impact(.light)) on CellView)
+        // Side-effect contract: this handler MUST NOT mutate VM state —
+        // a phase change inside the handler would loop (T-05-19 mitigation).
+        .onChange(of: viewModel.phase) { _, newPhase in
+            switch newPhase {
+            case .winSweep:
+                Haptics.playAHAP(named: "win", hapticsEnabled: settingsStore.hapticsEnabled)
+                sfxPlayer.play(.win, sfxEnabled: settingsStore.sfxEnabled)
+            case .lossShake:
+                Haptics.playAHAP(named: "loss", hapticsEnabled: settingsStore.hapticsEnabled)
+                sfxPlayer.play(.loss, sfxEnabled: settingsStore.sfxEnabled)
+            case .revealing:
+                sfxPlayer.play(.tap, sfxEnabled: settingsStore.sfxEnabled)
+            case .idle, .flagging:
                 break
             }
         }
