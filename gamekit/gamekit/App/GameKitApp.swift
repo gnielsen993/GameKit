@@ -89,4 +89,20 @@ struct GameKitApp: App {
         case .dark:   .dark
         }
     }
+
+    // MARK: - DEBUG schema deploy entry point (Plan 06-03 Task 2 — Pitfall D mitigation)
+    //
+    // BLOCKING for Plan 06-09 SC3. Run ONCE in a debug build:
+    //   1. Launch app in Xcode debug
+    //   2. Pause execution; in lldb console:
+    //        expr try? GameKitApp._runtimeDeployCloudKitSchema()
+    //   3. Verify in CloudKit Dashboard → Development → record types CD_GameRecord + CD_BestTime exist
+    //   4. Remove invocation before TestFlight.
+    //
+    #if DEBUG
+    @MainActor
+    static func _runtimeDeployCloudKitSchema() throws {
+        try CloudKitSchemaInitializer.deployDevelopmentSchema()
+    }
+    #endif
 }
