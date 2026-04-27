@@ -203,6 +203,9 @@
     "Best" : {
 
     },
+    "Best times and win streaks save automatically. No accounts. No leaderboards. Just your numbers." : {
+
+    },
     "Cancel" : {
       "comment" : "Cancel button in mid-game difficulty-change alert (D-10)",
       "extractionState" : "automatic",
@@ -249,6 +252,12 @@
         }
       }
     },
+    "Continue" : {
+
+    },
+    "Continue to next step" : {
+
+    },
     "Couldn't import stats" : {
 
     },
@@ -270,6 +279,9 @@
         }
       }
     },
+    "Done" : {
+
+    },
     "Easy" : {
       "comment" : "Difficulty option — 9x9 / 10 mines",
       "extractionState" : "automatic",
@@ -283,6 +295,9 @@
       }
     },
     "Export stats" : {
+
+    },
+    "Finish intro" : {
 
     },
     "Flagged, row %lld column %lld" : {
@@ -381,6 +396,9 @@
     "MINESWEEPER" : {
 
     },
+    "Make it yours" : {
+
+    },
     "Medium" : {
       "comment" : "Difficulty option — 16x16 / 40 mines",
       "extractionState" : "automatic",
@@ -461,6 +479,9 @@
         }
       }
     },
+    "Pick a theme that fits your mood. Five Classic palettes here, dozens more in Settings." : {
+
+    },
     "Privacy" : {
 
     },
@@ -536,6 +557,15 @@
         }
       }
     },
+    "Sign in with Apple to sync your stats across iPhone, iPad, and Mac. Optional — the app works fully without it." : {
+
+    },
+    "Skip" : {
+
+    },
+    "Skip intro" : {
+
+    },
     "Solitaire" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -562,6 +592,12 @@
         }
       }
     },
+    "Step 1 of 3. Make it yours. Pick a theme that fits your mood. Five Classic palettes here, dozens more in Settings." : {
+
+    },
+    "Step 2 of 3. Track your progress. Best times and win streaks save automatically. No accounts. No leaderboards. Just your numbers." : {
+
+    },
     "Sudoku" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -572,6 +608,9 @@
           }
         }
       }
+    },
+    "Sync across devices" : {
+
     },
     "The file couldn't be read. Check that it's a GameKit stats export and try again." : {
 
@@ -604,6 +643,9 @@
           }
         }
       }
+    },
+    "Track your progress" : {
+
     },
     "Unrevealed, row %lld column %lld" : {
       "comment" : "Cell a11y label — hidden state (D-19, 1-indexed)",
