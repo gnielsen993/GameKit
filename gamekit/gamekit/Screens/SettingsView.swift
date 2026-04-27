@@ -2,18 +2,32 @@
 //  SettingsView.swift
 //  gamekit
 //
-//  Phase 4 (PERSIST-02 + PERSIST-03 supporting): adds DATA section with
-//  Export / Import / Reset stats rows + alerts + .fileExporter / .fileImporter.
+//  Phase 5 (SHELL-02 + THEME-03 entry point + A11Y-02): rebuilt Settings spine.
+//  Phase 4 DATA section preserved verbatim (D-16).
 //
-//  Layout per 04-UI-SPEC §Component Inventory + §Layout & Sizing:
-//    - APPEARANCE card (P1 stub — preserved unchanged; SHELL-02 polish at P5)
-//    - DATA card (NEW) — three SettingsActionRow tap-targets:
-//      * Export stats (square.and.arrow.up) — opens .fileExporter
-//      * Import stats (square.and.arrow.down) — opens .fileImporter
-//      * Reset stats (trash, theme.colors.danger) — opens .alert(role: .destructive)
-//    - ABOUT card (P1 stub — preserved unchanged)
+//  Layout per 05-UI-SPEC + 05-CONTEXT D-13 (section order):
+//    - APPEARANCE card — 5 Classic preset swatches (DKThemePicker(catalog: .core,
+//      grouped: false)) + 1pt divider + "More themes & custom colors" NavigationLink
+//      to FullThemePickerView (D-14, CLAUDE.md §2 theme picker UX convention)
+//    - AUDIO card (NEW P5) — 2 SettingsToggleRow rows bound to settingsStore:
+//      * Haptics (iphone.radiowaves.left.and.right) → settingsStore.hapticsEnabled (default true)
+//      * Sound effects (speaker.wave.2.fill) → settingsStore.sfxEnabled (default false)
+//    - DATA card (P4 verbatim per D-16) — Export / Import / Reset stats rows
+//    - ABOUT card (NEW P5) — Version (mono digits) / Privacy (inline disclosure)
+//      / Acknowledgments (NavigationLink to AcknowledgmentsView)
 //
-//  Phase 4 invariants:
+//  Phase 5 invariants (additive — preserves all P4 invariants below):
+//    - SettingsToggleRow uses the Toggle(label, isOn:) initializer (NOT the
+//      empty-string label initializer) so VoiceOver reads "Haptics, switch
+//      button, on/off" per UI-SPEC line 174-175
+//      (A11Y-02 + threat T-05-17 lock); .labelsHidden() hides the duplicate
+//      visible label (the leading Text(label) already shows it sighted-side)
+//    - Version row reads Bundle.main.infoDictionary defensively with fallbacks
+//      (T-05-12 mitigation against malformed Info.plist)
+//    - AcknowledgmentsView extracted to sibling file per CLAUDE.md §8.1 to keep
+//      this file under the ~400-line soft cap
+//
+//  Phase 4 invariants (preserved verbatim per D-16):
 //    - GameStats lazily resolved via @Environment(\.modelContext) inside
 //      tap closures (not body — Pitfall 8 same as GameView)
 //    - .fileImporter onCompletion wraps Data(contentsOf: url) with
@@ -45,6 +59,9 @@ struct SettingsView: View {
     @State private var isImportErrorAlertPresented = false
     @State private var importErrorMessage: String = ""
     @State private var exportDocument: StatsExportDocument?
+    @State private var isPrivacyExpanded: Bool = false
+
+    @Environment(\.settingsStore) private var settingsStore
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
     private static let logger = Logger(
@@ -58,6 +75,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: theme.spacing.l) {
 
                     appearanceSection
+                    audioSection
                     dataSection
                     aboutSection
                 }
@@ -112,13 +130,57 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var appearanceSection: some View {
-        // P1 stub — UNCHANGED. SHELL-02 polish at P5.
+        // P5 (D-14, SHELL-02 + CLAUDE.md §2 theme picker UX convention):
+        // 5 Classic preset swatches inline + NavigationLink to FullThemePickerView.
         settingsSectionHeader(theme: theme, String(localized: "APPEARANCE"))
         DKCard(theme: theme) {
-            Text(String(localized: "Theme controls coming in a future update."))
-                .font(theme.typography.caption)
-                .foregroundStyle(theme.colors.textTertiary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: theme.spacing.l) {
+                DKThemePicker(
+                    themeManager: themeManager,
+                    theme: theme,
+                    scheme: colorScheme,
+                    catalog: PresetCatalog.core,
+                    maxGridHeight: nil,
+                    grouped: false
+                )
+                Rectangle()
+                    .fill(theme.colors.border)
+                    .frame(height: 1)
+                NavigationLink(destination: FullThemePickerView()) {
+                    settingsNavRow(
+                        theme: theme,
+                        title: String(localized: "More themes & custom colors")
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var audioSection: some View {
+        // P5 (D-15): two SettingsToggleRow rows bound to settingsStore.
+        // Haptics defaults true (D-10 premium feel); SFX defaults false
+        // (D-10 / ROADMAP SC2 — sound is opt-in).
+        settingsSectionHeader(theme: theme, String(localized: "AUDIO"))
+        DKCard(theme: theme) {
+            VStack(spacing: 0) {
+                SettingsToggleRow(
+                    theme: theme,
+                    glyph: "iphone.radiowaves.left.and.right",
+                    label: String(localized: "Haptics"),
+                    isOn: Bindable(settingsStore).hapticsEnabled
+                )
+                Rectangle()
+                    .fill(theme.colors.border)
+                    .frame(height: 1)
+                SettingsToggleRow(
+                    theme: theme,
+                    glyph: "speaker.wave.2.fill",
+                    label: String(localized: "Sound effects"),
+                    isOn: Bindable(settingsStore).sfxEnabled
+                )
+            }
         }
     }
 
@@ -163,14 +225,83 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var aboutSection: some View {
-        // P1 stub — UNCHANGED.
+        // P5 (D-17): Version (mono) / Privacy (inline disclosure) /
+        // Acknowledgments (NavigationLink). Three rows separated by 1pt
+        // theme.colors.border dividers per UI-SPEC §Layout.
         settingsSectionHeader(theme: theme, String(localized: "ABOUT"))
         DKCard(theme: theme) {
-            Text(String(localized: "GameKit · v1.0"))
-                .font(theme.typography.body)
-                .foregroundStyle(theme.colors.textSecondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(spacing: 0) {
+                // Version row (mono digits per UI-SPEC §Typography).
+                HStack {
+                    Text(String(localized: "Version"))
+                        .font(theme.typography.body)
+                        .foregroundStyle(theme.colors.textPrimary)
+                    Spacer()
+                    Text(versionDisplay)
+                        .font(theme.typography.monoNumber)
+                        .monospacedDigit()
+                        .foregroundStyle(theme.colors.textSecondary)
+                }
+                .frame(minHeight: 44)
+
+                Rectangle()
+                    .fill(theme.colors.border)
+                    .frame(height: 1)
+
+                // Privacy row (inline disclosure per UI-SPEC option A).
+                Button {
+                    withAnimation(.easeInOut(duration: theme.motion.fast)) {
+                        isPrivacyExpanded.toggle()
+                    }
+                } label: {
+                    HStack {
+                        Text(String(localized: "Privacy"))
+                            .font(theme.typography.body)
+                            .foregroundStyle(theme.colors.textPrimary)
+                        Spacer()
+                        Image(systemName: isPrivacyExpanded ? "chevron.up" : "chevron.down")
+                            .font(.caption)
+                            .foregroundStyle(theme.colors.textTertiary)
+                    }
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                if isPrivacyExpanded {
+                    Text(String(localized: "All data stored locally. CloudKit sync optional. No analytics. No tracking."))
+                        .font(theme.typography.body)
+                        .foregroundStyle(theme.colors.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, theme.spacing.s)
+                }
+
+                Rectangle()
+                    .fill(theme.colors.border)
+                    .frame(height: 1)
+
+                // Acknowledgments row (NavigationLink to file-private destination).
+                NavigationLink(destination: AcknowledgmentsView()) {
+                    settingsNavRow(
+                        theme: theme,
+                        title: String(localized: "Acknowledgments")
+                    )
+                }
+                .buttonStyle(.plain)
+            }
         }
+    }
+
+    // MARK: - Computed (D-17)
+
+    /// Reads CFBundleShortVersionString + CFBundleVersion from Info.plist
+    /// and renders as "1.0 (42)". Defensive fallbacks prevent crash on
+    /// malformed bundle metadata (T-05-12 mitigation).
+    private var versionDisplay: String {
+        let info = Bundle.main.infoDictionary
+        let version = (info?["CFBundleShortVersionString"] as? String) ?? "1.0"
+        let build = (info?["CFBundleVersion"] as? String) ?? "1"
+        return "\(version) (\(build))"
     }
 
     // MARK: - Actions
@@ -237,3 +368,43 @@ private struct SettingsActionRow: View {
         .buttonStyle(.plain)
     }
 }
+
+// MARK: - File-private SettingsToggleRow (UI-SPEC §Component Inventory + A11Y-02)
+
+/// AUDIO toggle row: SF Symbol leading + label + system Toggle trailing.
+/// Mirrors `SettingsActionRow` shape; differs by carrying a Toggle binding.
+///
+/// **A11Y-02 lock (UI-SPEC line 174-175 + threat T-05-17):**
+/// `Toggle(label, isOn: $isOn)` — NOT the empty-string label initializer.
+/// The label parameter is what `.labelsHidden()` HIDES VISUALLY but is what
+/// VoiceOver READS. Passing `label` produces "Haptics, switch button, on" /
+/// "Sound effects, switch button, on" matching UI-SPEC §A11y rows 174-175
+/// verbatim. The leading visible `Text(label)` already shows the label
+/// sighted-side, so `.labelsHidden()` keeps the system Toggle from
+/// rendering its own duplicate label — no visual change vs. an empty label,
+/// only the a11y string differs.
+private struct SettingsToggleRow: View {
+    let theme: Theme
+    let glyph: String
+    let label: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        HStack(spacing: theme.spacing.s) {
+            Image(systemName: glyph)
+                .foregroundStyle(theme.colors.textTertiary)
+            Text(label)
+                .font(theme.typography.body)
+                .foregroundStyle(theme.colors.textPrimary)
+            Spacer()
+            Toggle(label, isOn: $isOn)
+                .labelsHidden()
+                .tint(theme.colors.accentPrimary)
+        }
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+    }
+}
+
+// AcknowledgmentsView lives in `Screens/AcknowledgmentsView.swift` (extracted
+// per CLAUDE.md §8.1 to keep this file under the ~400-line soft cap).

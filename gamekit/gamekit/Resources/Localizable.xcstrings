@@ -120,6 +120,9 @@
         }
       }
     },
+    "AUDIO" : {
+
+    },
     "Abandon" : {
       "comment" : "Destructive button in mid-game difficulty-change alert (D-10)",
       "extractionState" : "automatic",
@@ -143,6 +146,12 @@
           }
         }
       }
+    },
+    "Acknowledgments" : {
+
+    },
+    "All data stored locally. CloudKit sync optional. No analytics. No tracking." : {
+
     },
     "BEST TIMES" : {
       "extractionState" : "manual",
@@ -246,6 +255,9 @@
     "DATA" : {
 
     },
+    "DesignKit · own work" : {
+
+    },
     "Difficulty" : {
       "comment" : "Toolbar Menu a11y label",
       "extractionState" : "automatic",
@@ -308,6 +320,9 @@
         }
       }
     },
+    "GameKit is built with care, by hand, with no telemetry, no ads, and no third-party dependencies beyond the above." : {
+
+    },
     "GameKit · v1.0" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -332,6 +347,9 @@
           }
         }
       }
+    },
+    "Haptics" : {
+
     },
     "Hard" : {
       "comment" : "Difficulty option — 16x30 / 99 mines",
@@ -409,6 +427,12 @@
         }
       }
     },
+    "More themes" : {
+
+    },
+    "More themes & custom colors" : {
+
+    },
     "No games played yet." : {
 
     },
@@ -436,6 +460,9 @@
           }
         }
       }
+    },
+    "Privacy" : {
+
     },
     "Reset all stats" : {
 
@@ -494,6 +521,9 @@
         }
       }
     },
+    "SF Symbols · Apple Inc." : {
+
+    },
     "Settings" : {
       "comment" : "Settings tab + nav title",
       "extractionState" : "manual",
@@ -516,6 +546,9 @@
           }
         }
       }
+    },
+    "Sound effects" : {
+
     },
     "Stats" : {
       "comment" : "Stats tab + nav title",
@@ -583,6 +616,9 @@
           }
         }
       }
+    },
+    "Version" : {
+
     },
     "Win %" : {
 
