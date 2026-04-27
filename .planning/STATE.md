@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: 06-06 complete (Wave-2 integration #1 — AuthStore + observer + scenePhase + Restart alert wired); 06-03 Task 3 checkpoint still pending; Wave 2 (06-07 / 06-08) next
-last_updated: "2026-04-27T18:05:00.000Z"
+stopped_at: 06-07 complete (Wave-2 integration #2 — Settings SYNC section + SettingsSyncSection.swift extracted + xcstrings sync); 06-03 Task 3 checkpoint still pending; 06-08 next (IntroFlow Step 3 SIWA wiring)
+last_updated: "2026-04-27T17:33:46.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 40
-  completed_plans: 37
-  percent: 92
+  completed_plans: 38
+  percent: 95
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 6
-Plan: 06 — COMPLETE (19f693b); Wave-2 integration #1 landed — GameKitApp constructs + injects AuthStore + CloudSyncStatusObserver via Environment; RootTabView observes scenePhase → validateOnSceneActive() and authStore.isSignedIn true→false → flips cloudSyncEnabled=false; root .alert with verbatim D-04 Restart prompt copy bound to Bindable(authStore).shouldShowRestartPrompt; T-06-05 dismiss-only Quit button locked (zero exit/suspend/abort matches); T-06-06 container ID literal byte-identical preserved at line 79; xcstringstool sync added 8 P6 strings (4 Restart alert + 4 SyncStatus labels carried forward from 06-02 source). Plan 03 Task 3 checkpoint still pending (parallel — touches different files; 06-09 SC3 dependency only).
-Status: 06-06 complete (Wave-2 #1 done); 06-03 Task 3 checkpoint still pending (awaiting user); 06-07 / 06-08 next
+Plan: 07 — COMPLETE (9974f92); Wave-2 integration #2 landed — Settings SYNC section between AUDIO and DATA in D-09 order; SettingsSyncSection.swift (215 lines) extracted to a sibling file per CLAUDE.md §8.1 (mirrors P5 05-04 AcknowledgmentsView precedent); SignInWithAppleButton with `requestedScopes = []` SC2 verbatim (T-06-04); SIWA onCompletion wired to D-02 sequence `try authStore.signIn(userID: credential.user)` → `cloudSyncEnabled = true` → `shouldShowRestartPrompt = true` (surfaces Plan 06-06's root-level Restart prompt); TimelineView(.periodic(by: 60)) wraps SyncStatus.label(at:) so "Synced X ago" auto-ticks per minute (D-12); signed-in row has zero Buttons (T-06-row-noSignOut by construction); failure path silent os.Logger only (T-06-PERSIST05); existing dataSection BYTE-IDENTICAL preserved (P4 D-16 lock — diff = 0); SettingsView.swift 410→411 lines (within ≤411 budget); xcstringstool sync added 3 new P6 strings (SYNC / Signed in to iCloud / Last synced %@) — catalog now carries all 12 P6 strings; full test suite green (AuthStoreTests 7/7 + CloudSyncStatusObserverTests 9/9 + all P2-P5 suites). Plan 06-08 will ship the second SIWA-success site (IntroFlowView Step 3) — both sites flip the same shouldShowRestartPrompt flag.
+Status: 06-07 complete (Wave-2 #2 done); 06-03 Task 3 checkpoint still pending (awaiting user); 06-08 next (IntroFlow Step 3 SIWA wiring)
 Last activity: 2026-04-27
 
-Progress: [█████████▒] 92%
+Progress: [█████████▌] 95%
 
 ## Performance Metrics
 
@@ -88,6 +88,7 @@ Progress: [█████████▒] 92%
 | Phase 06-cloudkit-siwa P04 | 5 | 1 task | 2 files |
 | Phase 06-cloudkit-siwa P05 | 13 | 1 tasks | 2 files |
 | Phase 06-cloudkit-siwa P06 | 6 | 3 tasks | 3 files |
+| Phase 06-cloudkit-siwa P07 | 25 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -224,6 +225,13 @@ Recent decisions affecting current work:
 - 06-06: Root-level `.alert(isPresented: Bindable(authStore).shouldShowRestartPrompt)` — Bindable constructed in-place at the alert call site (no @Bindable property needed; @Observable + Bindable inits cheaply). Verbatim D-04 copy: title "Restart to enable iCloud sync", body "Your stats will sync to all devices signed in to this iCloud account. Quit GameKit and reopen to finish setup.", Cancel button uses `role: .cancel`, Quit GameKit button uses default role (NOT .destructive — quitting is non-destructive). Both buttons are dismiss-only — empty Button bodies. T-06-05 / D-05 LOCK proven by the negative-grep gate `! grep -E "exit\\(0\\)|UIApplication\\.shared\\.suspend|abort\\(\\)" gamekit/gamekit/Screens/RootTabView.swift gamekit/gamekit/App/GameKitApp.swift` returning zero matches.
 - 06-06: Source-comment self-discipline — the Quit GameKit button comment was reworded to remove literal substrings `exit(0)`, `UIApplication.shared.suspend`, `abort()` from prose so the negative-grep gate stays clean even when the comment narrates the prohibition. Same pattern as P4 04-01 "no SwiftData unique-attribute decorator" comment rewording. Locked as standard for any future hard-grep gate that has prose-explanation alongside code-prohibition: rephrase prose to NOT name the literal API tokens.
 - 06-06: xcstringstool sync (deterministic CLI per STATE.md 04-05 / 05-04 precedent) added 8 P6 strings — 4 Restart alert (Restart to enable iCloud sync / Quit GameKit / Cancel pre-existing / "Your stats will sync to all devices signed in to this iCloud account. Quit GameKit and reopen to finish setup.") + 4 SyncStatus labels carried forward from Plan 06-02 source (Syncing… / Synced just now / Synced %@ / iCloud unavailable / Not signed in). 24 insertions, 0 deletions, JSON validity preserved. Empty `{ }` entry shape (no localizations) matches existing pre-Cancel auto-extracted entries (e.g. "Reset all stats?", "Privacy") — resolves to development-language source string at runtime; no warning, no broken behavior. Plan 06-07 will rerun sync after SettingsView SYNC section adds remaining strings.
+- 06-07: Wave-2 integration #2 shipped (9974f92) — single atomic commit `feat(06-07): settings SYNC section + extracted SettingsSyncSection.swift + xcstrings sync` (3 files / 225 insertions / 0 deletions). New file `Screens/SettingsSyncSection.swift` (215 lines, ≤220 budget) declares `struct SettingsSyncSection: View` consumed by SettingsView body — extraction precedent from P5 05-04 (AcknowledgmentsView) reapplied because adding ~50 lines inline would have pushed SettingsView from 410 to ~460 (well over CLAUDE.md §8.1 ~400 soft cap). SettingsView body change is exactly +1 line (`SettingsSyncSection(theme: theme)`); existing dataSection BYTE-IDENTICAL preserved (P4 D-16 lock proven by zero-line `git show HEAD~ vs HEAD` diff).
+- 06-07: D-09 section order locked verbatim in SettingsView body lines 77-81: appearanceSection → audioSection → SettingsSyncSection → dataSection → aboutSection. SYNC inserts strictly between AUDIO and DATA. Forcing function: any future Settings touch that adds another section MUST first extract one of the existing inline sections (appearanceSection / audioSection / aboutSection — dataSection is locked byte-identical) into a sibling file before adding new content; the host file remains exactly at its 411-line cap.
+- 06-07: SIWA onCompletion handler shape locked across the codebase (Plan 06-08 IntroFlow Step 3 will mirror): `Task { @MainActor in switch result { case .success(let auth): guard let credential = auth.credential as? ASAuthorizationAppleIDCredential else { logger.error(...); return }; do { try authStore.signIn(userID: credential.user); settingsStore.cloudSyncEnabled = true; authStore.shouldShowRestartPrompt = true } catch { logger.error(...) } case .failure(let error): logger.error(...) } }`. Five threat mitigations enforced structurally: T-06-04 (`request.requestedScopes = []` SC2 verbatim), T-06-03 (only `credential.user` String crosses into AuthStore — never the one-shot JWT), T-06-row-noSignOut (signed-in row body has zero `Button(` declarations — ARCHITECTURE §line 423 + Pitfall 5), T-06-PERSIST05 (no `.alert(...)` modifier anywhere in this file — failure path is silent `os.Logger` only per PERSIST-05 "never nag"), and the `Task { @MainActor in ... }` wrap satisfies Swift 6 strict concurrency for the cross-actor `try authStore.signIn(...)` call.
+- 06-07: Source-comment self-discipline rule extended (P6 06-06 precedent) — comments referencing prohibited tokens were rephrased so the negative-grep acceptance gates pass even when the comment narrates the prohibition. Specifically: literal `identityToken` replaced by `one-shot Apple-issued JWT` and literal `.alert(` replaced by `root-level prompt`. Both rephrasings preserve the documentation intent without producing a grep hit. Locks the rule for the third time across the project (P4 04-01 "no SwiftData unique-attribute decorator" + P6 06-06 Quit-button + P6 06-07 SIWA-handler comments).
+- 06-07: D-12 sync-status row implementation — `TimelineView(.periodic(from: .now, by: 60))` wraps a `VStack(alignment: .leading, spacing: 2)` containing the primary status `Text` and an OPTIONAL "Last synced X" subline `Text` returned from `unavailableSubline(at: context.date)` (returns `nil` for non-`.unavailable` cases, so `if let subline = ...` cleanly drops the line). The `.periodic(by: 60)` cadence fires once per minute regardless of observer state — Apple's TimelineView+@Observable interaction means a CloudKit event mid-tick still triggers an immediate re-render via the `private(set) var status` read. Two refresh paths compose orthogonally; no observer churn from the timer.
+- 06-07: SettingsSyncSection takes `let theme: Theme` as a positional prop (NOT @EnvironmentObject themeManager) — parent SettingsView owns the `themeManager.theme(using: colorScheme)` calculation and passes the result down. CLAUDE.md §8.2 (data-driven, not data-fetching) reapplied for sibling-view extractions. Pattern locked: any extracted Settings/section view receives `theme: Theme` as a prop; only @Environment-injects @Observable singletons (settingsStore / authStore / cloudSyncStatusObserver) plus `\.colorScheme` (needed for SignInWithAppleButton style choice).
+- 06-07: xcstringstool sync (rerun per Plan 06-06 closing note) added 3 net-new SYNC-section strings — `SYNC` (section header), `Signed in to iCloud` (D-10 row label), `Last synced %@` (D-10 sub-line for `.unavailable(lastSynced: Date?)`). Combined with the 5 SyncStatus strings (extracted by Plan 06-06 sync from Plan 06-02 SyncStatus.swift source) and the 4 Restart-alert strings, the catalog now carries all 12 P6 strings. JSON valid; zero localization warnings on build. Empty `{ }` entries (no `localizations` block) match existing auto-extracted shape — resolves to development-language source at runtime.
 
 ### Pending Todos
 
@@ -244,8 +252,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27T18:05:00.000Z
-Stopped at: 06-06 complete (Wave-2 integration #1 — AuthStore + observer + scenePhase + Restart alert wired at app root)
-Resume file: .planning/phases/06-cloudkit-siwa/06-06-SUMMARY.md (just shipped) + .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3 still open). Wave 2 next: Plans 06-07 (SettingsView SYNC row + SIWA), 06-08 (IntroFlowView SIWA).
+Last session: 2026-04-27T17:33:46.000Z
+Stopped at: 06-07 complete (Wave-2 integration #2 — Settings SYNC section + SettingsSyncSection.swift extracted + xcstrings sync)
+Resume file: .planning/phases/06-cloudkit-siwa/06-07-SUMMARY.md (just shipped) + .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3 still open). Wave 2 remaining: Plan 06-08 (IntroFlowView Step 3 SIWA wiring — second SIWA-success site, mirrors the 06-07 handler shape). Then Plan 06-09 (release-readiness verification).
 
 **Planned Phase:** 6 (cloudkit-siwa) — 9 plans — 2026-04-27T15:40:19.917Z

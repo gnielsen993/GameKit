@@ -137,8 +137,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [~] 06-03-PLAN.md — Wave-0 BLOCKING — entitlements verify (T-06-09) + DEBUG schema deploy preflight (Pitfall D — required before SC3) [Tasks 1+2 done; Task 3 checkpoint:human-verify still pending]
 - [x] 06-04-PLAN.md — Wave-1 GREEN — AuthStore production source (Keychain + revocation observer + scene-active validator) → 7/7 RED tests GREEN
 - [x] 06-05-PLAN.md — Wave-1 GREEN — CloudSyncStatusObserver production source (eventChangedNotification translator) → 9/9 RED tests GREEN
-- [ ] 06-06-PLAN.md — Wave-2 — GameKitApp + RootTabView wiring (Environment injection + scenePhase observer + root Restart prompt alert D-04 verbatim)
-- [ ] 06-07-PLAN.md — Wave-2 — SettingsView SYNC section between AUDIO and DATA (extracted to SettingsSyncSection.swift) + xcstrings sync
+- [x] 06-06-PLAN.md — Wave-2 — GameKitApp + RootTabView wiring (Environment injection + scenePhase observer + root Restart prompt alert D-04 verbatim)
+- [x] 06-07-PLAN.md — Wave-2 — SettingsView SYNC section between AUDIO and DATA (extracted to SettingsSyncSection.swift) + xcstrings sync
 - [ ] 06-08-PLAN.md — Wave-2 — IntroFlowView Step 3 SIWA wire-up (replaces P5 D-21 no-op) + dismissIntro byte-identical preserved
 - [ ] 06-09-PLAN.md — Wave-3 — manual SC1-SC5 verification checkpoint (06-VERIFICATION.md template + sign-off)
 **UI hint**: yes
