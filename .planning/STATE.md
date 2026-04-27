@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-05-PLAN.md (3-step intro flow + SIWA entitlement)
-last_updated: "2026-04-27T02:06:31.253Z"
+stopped_at: Completed 05-06-PLAN.md (Mines animation pass — phase cascade + win wash + loss shake + Haptics/SFX)
+last_updated: "2026-04-27T02:26:40.145Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 31
-  completed_plans: 29
-  percent: 94
+  completed_plans: 30
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 05 (polish) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-04-27
 
-Progress: [█████████░] 94%
+Progress: [██████████] 97%
 
 ## Performance Metrics
 
@@ -79,6 +79,7 @@ Progress: [█████████░] 94%
 | Phase 05-polish P03 | 12 | 2 tasks | 5 files |
 | Phase 05-polish PP04 | 12 | 2 tasks | 4 files |
 | Phase 05-polish P05 | 12 | 2 tasks tasks | 5 files files |
+| Phase 05-polish P06 | 18 | 2 tasks tasks | 5 files files |
 
 ## Accumulated Context
 
@@ -192,6 +193,13 @@ Recent decisions affecting current work:
 - 05-05: Sample stats in Step 2 are hand-coded literals (Easy 12/8/67%/1:42, Medium 5/2/40%/4:15, Hard —/—/—/—) — onboarding never shows the empty state per CLAUDE.md §8.3
 - 05-05: SIWA capability registered in P5 (not P6) per RESEARCH §Standard Stack lines 213-214 + 1058 — entitlement key com.apple.developer.applesignin = [Default] in gamekit.entitlements, CODE_SIGN_ENTITLEMENTS set on Debug + Release of gamekit app target only (not test targets). Build proof: codesign now invoked with --entitlements <derived>.xcent (post-Task-2)
 - 05-05: pbxproj edit is the legitimate CLAUDE.md §8.8 capability exception (target-config change, not new source file registration); synchronized root group untouched — gamekit.entitlements is a non-source build resource referenced via CODE_SIGN_ENTITLEMENTS only
+- 05-06: VM additively publishes phase + revealCount + flagToggleCount; Foundation-only invariant intact (single import Foundation); P3 ViewModelTests still 31/31 green
+- 05-06: revealCount idempotency contract — bumps only when RevealEngine returns ≥1 cell (engine D-19 returns (board,[]) for already-revealed); .sensoryFeedback(.selection) does NOT fire on rejected reveals (calmer haptic profile)
+- 05-06: Phase set BEFORE freezeTimer in win/loss branches — gameState→phase→freezeTimer→recordTerminalState; preserves P4 04-05 ordering lock and prevents SwiftData failure logging from intercepting the phase change
+- 05-06: Loss shake .keyframeAnimator trigger uses viewModel.phase.isLossShake Bool (not payload-bearing case match) — fresh .lossShake(mineIdx:) doesn't replay against same payload pointer (RESEARCH §Pattern 2)
+- 05-06: Win-wash Rectangle z-ordered ABOVE board, BELOW end-state DKCard; .allowsHitTesting(false) double-enforces non-blocking; Reduce Motion → phases [0.0] (no fade)
+- 05-06: Reduce Motion gates per surface independently (D-04) — BoardView .identity transition; CellView .symbolEffect value=0; GameView .keyframeAnimator trigger=false + .phaseAnimator phases=[0.0]; VM stays Foundation-only (D-05)
+- 05-06: TDD plan-level RED→GREEN gate honored — test commit 6b31869 (12 compile errors before any phase property defined) precedes feat commit 421cfcc; same TDD pattern as 04-02/04-03/05-01/05-03
 
 ### Pending Todos
 
@@ -211,8 +219,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27T02:06:31.248Z
-Stopped at: Completed 05-05-PLAN.md (3-step intro flow + SIWA entitlement)
+Last session: 2026-04-27T02:26:21.592Z
+Stopped at: Completed 05-06-PLAN.md (Mines animation pass — phase cascade + win wash + loss shake + Haptics/SFX)
 Resume file: None
 
 **Planned Phase:** 05 (polish) — 7 plans — 2026-04-26T21:46:30.040Z
