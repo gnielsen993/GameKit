@@ -55,8 +55,6 @@ import CoreData
 @Suite("CloudSyncStatusObserver")
 struct CloudSyncStatusObserverTests {
 
-#if SKIP_OBSERVER_TESTS // Plan 06-05 will delete this gate.
-
     // MARK: - State-machine tests (5)
 
     @Test("Initial status defaults to .notSignedIn when no argument is passed")
@@ -164,5 +162,4 @@ struct CloudSyncStatusObserverTests {
         #expect(label == "iCloud unavailable")
     }
 
-#endif // SKIP_OBSERVER_TESTS — Plan 06-05 deletes this `#endif` and the `#if` above.
 }
