@@ -116,7 +116,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] 05-02-PLAN.md — Resources/Audio/{tap,win,loss}.caf + Resources/Haptics/{win,loss}.ahap + LICENSE.md (checkpoint:human-action for CAF placement)
 - [x] 05-03-PLAN.md — Core/Haptics.swift + Core/SFXPlayer.swift + GameKitApp wiring + HapticsTests + SFXPlayerTests
 - [x] 05-04-PLAN.md — Settings spine rebuild (APPEARANCE/AUDIO/DATA verbatim/ABOUT) + FullThemePickerView + xcstrings sync
-- [ ] 05-05-PLAN.md — IntroFlowView (3-step .fullScreenCover with TabView(.page)) + RootTabView wiring + xcstrings sync
+- [x] 05-05-PLAN.md — IntroFlowView (3-step .fullScreenCover with TabView(.page)) + RootTabView wiring + SIWA entitlement + xcstrings sync
 - [ ] 05-06-PLAN.md — Mines animation pass (VM phase + BoardView cascade + CellView .sensoryFeedback + GameView .phaseAnimator/.keyframeAnimator/.onChange Haptics+SFX) + MinesweeperPhaseTransitionTests
 - [ ] 05-07-PLAN.md — Manual SC1-SC5 verification checkpoint (theme matrix, custom palette, full a11y sweep, gap log)
 **UI hint**: yes

@@ -175,7 +175,7 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | SHELL-01 | Phase 1 | Pending |
 | SHELL-02 | Phase 5 | Pending |
 | SHELL-03 | Phase 4 | Pending |
-| SHELL-04 | Phase 5 | Pending |
+| SHELL-04 | Phase 5 | Complete (05-05) |
 | MINES-01 | Phase 2 | Complete (02-01) |
 | MINES-02 | Phase 3 | Pending |
 | MINES-03 | Phase 2 | Pending |
@@ -196,8 +196,8 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | THEME-01 | Phase 5 | Pending |
 | THEME-02 | Phase 3 | Pending |
 | THEME-03 | Phase 5 | Pending |
-| A11Y-01 | Phase 5 | Pending |
-| A11Y-02 | Phase 5 | Pending |
+| A11Y-01 | Phase 5 | Complete (05-05) |
+| A11Y-02 | Phase 5 | Complete (05-05) |
 | A11Y-03 | Phase 5 | Pending |
 | A11Y-04 | Phase 5 | Pending |
 

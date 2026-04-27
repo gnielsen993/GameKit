@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-04-PLAN.md (Settings spine rebuild + FullThemePickerView + xcstrings sync)
-last_updated: "2026-04-27T01:53:42.881Z"
+stopped_at: Completed 05-05-PLAN.md (3-step intro flow + SIWA entitlement)
+last_updated: "2026-04-27T02:06:31.253Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 31
-  completed_plans: 28
-  percent: 90
+  completed_plans: 29
+  percent: 94
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 05 (polish) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Ready to execute
 Last activity: 2026-04-27
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Progress: [█████████░] 90%
 | Phase 05-polish P01 | 18 | 2 tasks | 3 files |
 | Phase 05-polish P03 | 12 | 2 tasks | 5 files |
 | Phase 05-polish PP04 | 12 | 2 tasks | 4 files |
+| Phase 05-polish P05 | 12 | 2 tasks tasks | 5 files files |
 
 ## Accumulated Context
 
@@ -186,6 +187,11 @@ Recent decisions affecting current work:
 - 05-04: AcknowledgmentsView extracted to sibling Screens/AcknowledgmentsView.swift instead of file-private inside SettingsView.swift — keeps SettingsView under CLAUDE.md §8.1 ~400-line soft cap (final: 410 lines incl. expanded P5 doc-header). Planner-anticipated fallback per Plan §STEP 9 + UI-SPEC §Component Inventory line 232
 - 05-04: P4 DATA section preserved BYTE-IDENTICAL per CONTEXT D-16 — verified via diff of git show HEAD:... lines 125-162 vs current SettingsView.swift lines 187-224; exit code 0. Locked invariant for future Settings touches
 - 05-04: Navigation graph for Plan 05/06 LOCKED — RootTabView → SettingsView (NavigationStack owner) → FullThemePickerView (NavigationLink) AND RootTabView → SettingsView → AcknowledgmentsView (NavigationLink). Both destinations DO NOT own their own NavigationStack (CLAUDE.md / ARCHITECTURE Anti-Pattern 3)
+- 05-05: Both Skip and Done call dismissIntro() — single source of truth for hasSeenIntro=true + dismiss (PATTERNS line 451). RootTabView.onAppear reads the flag ONCE; cold-relaunch reads persisted true from UserDefaults via SettingsStore.init
+- 05-05: Step 3 uses .accessibilityElement(.contain) not .combine — SIWA owns its own a11y label (Apple HIG forbids tint/label override); .contain lets VoiceOver navigate the SIWA button as its own element while still reading title/body in order
+- 05-05: Sample stats in Step 2 are hand-coded literals (Easy 12/8/67%/1:42, Medium 5/2/40%/4:15, Hard —/—/—/—) — onboarding never shows the empty state per CLAUDE.md §8.3
+- 05-05: SIWA capability registered in P5 (not P6) per RESEARCH §Standard Stack lines 213-214 + 1058 — entitlement key com.apple.developer.applesignin = [Default] in gamekit.entitlements, CODE_SIGN_ENTITLEMENTS set on Debug + Release of gamekit app target only (not test targets). Build proof: codesign now invoked with --entitlements <derived>.xcent (post-Task-2)
+- 05-05: pbxproj edit is the legitimate CLAUDE.md §8.8 capability exception (target-config change, not new source file registration); synchronized root group untouched — gamekit.entitlements is a non-source build resource referenced via CODE_SIGN_ENTITLEMENTS only
 
 ### Pending Todos
 
@@ -205,8 +211,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27T01:53:28.506Z
-Stopped at: Completed 05-04-PLAN.md (Settings spine rebuild + FullThemePickerView + xcstrings sync)
+Last session: 2026-04-27T02:06:31.248Z
+Stopped at: Completed 05-05-PLAN.md (3-step intro flow + SIWA entitlement)
 Resume file: None
 
 **Planned Phase:** 05 (polish) — 7 plans — 2026-04-26T21:46:30.040Z
