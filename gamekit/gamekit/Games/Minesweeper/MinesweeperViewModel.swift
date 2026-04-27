@@ -47,6 +47,40 @@ final class MinesweeperViewModel {
     private(set) var pausedElapsed: TimeInterval = 0  // accumulator (D-06)
     private(set) var lossContext: LossContext?
 
+    // MARK: - P5 animation orchestration (CONTEXT D-05/D-06)
+    //
+    // Animation orchestration state — drives BoardView/CellView/GameView
+    // animation modifiers. VM owns NO `Animation` types and NO
+    // `withAnimation` calls (D-05 invariant). Transitions are set
+    // ATOMICALLY alongside `gameState` mutations in reveal / toggleFlag /
+    // restart so the view tier observes a single coherent (gameState,
+    // phase) tuple change per `.onChange(of: vm.phase)` cycle.
+    //
+    // Foundation-only — `MinesweeperPhase` is itself Foundation-only per
+    // Plan 05-01 SUMMARY; extending the VM with these properties does not
+    // introduce SwiftUI/Combine/SwiftData (verified by P3
+    // `vmSourceFile_importsOnlyFoundation` structural test).
+
+    /// Animation phase published to the view tier (CONTEXT D-05/D-06).
+    /// View consumers: `MinesweeperBoardView` (`.transition` cascade),
+    /// `MinesweeperGameView` (`.phaseAnimator` win wash + `.keyframeAnimator`
+    /// loss shake + `.onChange(of: vm.phase)` Haptics/SFX orchestration).
+    private(set) var phase: MinesweeperPhase = .idle
+
+    /// Trigger counter for `.sensoryFeedback(.selection)` on cell reveal
+    /// (CONTEXT D-07). Bumped after each successful reveal that mutates the
+    /// board (RevealEngine returns at least one revealed cell). Idempotent
+    /// reveal of an already-revealed cell does NOT bump — gating is on the
+    /// meaningful state transition, not the call (Plan 05-06 Test 6).
+    private(set) var revealCount: Int = 0
+
+    /// Trigger counter for `.sensoryFeedback(.impact(.light))` on flag
+    /// toggle (CONTEXT D-07) AND `.symbolEffect(.bounce, value:)` flag
+    /// spring (CONTEXT D-04). Bumped on every successful flag state
+    /// transition (`.hidden ↔ .flagged`). Toggle attempts on `.revealed`
+    /// or `.mineHit` cells are no-ops and do NOT bump (P3 D-19 preserved).
+    private(set) var flagToggleCount: Int = 0
+
     // MARK: - Difficulty-switch confirmation flow (D-10, RESEARCH Pitfall 4)
 
     /// Bound to `.alert(isPresented:)` in MinesweeperGameView.
@@ -152,16 +186,31 @@ final class MinesweeperViewModel {
         let result = RevealEngine.reveal(at: index, on: board)
         board = result.board
 
+        // P5 D-05/D-06: publish the engine-ordered reveal list as the
+        // animation phase. Idempotent reveal (engine returns []) does not
+        // bump the trigger counter — gating is on meaningful transitions
+        // per Plan 05-06 Test 6.
+        if !result.revealed.isEmpty {
+            phase = .revealing(cells: result.revealed)
+            revealCount += 1
+        }
+
         // Engines are mutually exclusive (P2 verified — WinDetector.swift:42).
+        // Ordering lock: gameState → phase → freezeTimer → recordTerminalState.
+        // The phase set lives BETWEEN gameState and freezeTimer so SwiftData
+        // failure logging in recordTerminalState cannot intercept the phase
+        // change (Plan 05-06 PATTERNS line 106).
         if WinDetector.isLost(board) {
             if let mineIdx = board.allIndices().first(where: { board.cell(at: $0).state == .mineHit }) {
                 gameState = .lost(mineIdx: mineIdx)
                 lossContext = computeLossContext()
+                phase = .lossShake(mineIdx: mineIdx)     // P5 D-06
             }
             freezeTimer()
             recordTerminalState(outcome: .loss)         // NEW (D-15)
         } else if WinDetector.isWon(board) {
             gameState = .won
+            phase = .winSweep                            // P5 D-06
             freezeTimer()
             recordTerminalState(outcome: .win)          // NEW (D-15)
         }
@@ -183,6 +232,12 @@ final class MinesweeperViewModel {
                 )
             )
             flaggedCount += 1
+            // P5 D-06: publish flag spring phase + bump trigger counter.
+            // Both directions (.hidden→.flagged AND .flagged→.hidden) bump
+            // because the .symbolEffect(.bounce) flag spring fires on every
+            // user-initiated flag commitment per CONTEXT D-07.
+            phase = .flagging(idx: index)
+            flagToggleCount += 1
         case .flagged:
             board = board.replacingCell(
                 at: index,
@@ -193,7 +248,11 @@ final class MinesweeperViewModel {
                 )
             )
             flaggedCount -= 1
+            phase = .flagging(idx: index)                // P5 D-06
+            flagToggleCount += 1                         // P5 D-07
         case .revealed, .mineHit:
+            // P3 D-19 preserved — rejected toggle does NOT mutate phase or
+            // bump flagToggleCount (Plan 05-06 Test "toggleFlag_onRevealedCell").
             return
         }
     }
@@ -206,6 +265,12 @@ final class MinesweeperViewModel {
         timerAnchor = nil
         pausedElapsed = 0
         lossContext = nil
+        // P5 D-06 — animation orchestration reset alongside game-state reset.
+        // Triggers (revealCount / flagToggleCount) reset to 0 so the next
+        // session's .sensoryFeedback / .symbolEffect counters start clean.
+        phase = .idle
+        revealCount = 0
+        flagToggleCount = 0
     }
 
     /// Direct setter — internal callers (confirmDifficultyChange, init paths) use this.
