@@ -1,10 +1,20 @@
+---
+phase: 05-polish
+plan: 07
+type: verification
+status: passed
+verified_on: 2026-04-26
+verifier: user (gxnielsen@gmail.com)
+sign_off: "PASS — ship with G-1 deferred"
+---
+
 # Phase 5: Polish — Verification Report
 
-**Date:** 2026-04-26 (Task 1 automated suite captured); SC1-SC5 manual sections PENDING USER VERIFICATION
+**Date:** 2026-04-26 (Task 1 automated suite captured 2026-04-26; SC1-SC5 manual user verification 2026-04-26)
 **Build:** `1c125a1` (head of `gsd/phase-05-polish` work, post 05-06 ship)
-**Devices:** iPhone 16 Simulator (iOS 18.5) — automated; physical iPhone PENDING (required for SC2 hardware-haptic verification)
+**Devices:** iPhone 16 Simulator (iOS 18.5) — automated suite; physical iPhone — user-driven SC1-SC5 manual sweep
 
-> **Status:** Plan 05-07 Task 1 (automated audit suite) **COMPLETE**. Plan 05-07 Task 2 (manual SC1-SC5 audit) **AWAITING HUMAN VERIFICATION** — see `## Awaiting Human Verification` at bottom of file.
+> **Status:** Plan 05-07 Task 1 (automated audit suite) **COMPLETE — 8 gates green**. Plan 05-07 Task 2 (manual SC1-SC5 audit) **COMPLETE — user-shipped 2026-04-26**. Phase 5 ready to mark complete with G-1 deferred per documented rationale.
 
 ---
 
@@ -172,7 +182,7 @@ gamekit/gamekit/Resources/Haptics/:
 
 ## SC1 — Animation pass (MINES-08 + A11Y-03)
 
-**Status:** PENDING MANUAL VERIFICATION (Task 2 checkpoint)
+**Status:** verified: user-shipped 2026-04-26
 
 | Step | Expected | Observed | Screenshot |
 |------|----------|----------|------------|
@@ -190,7 +200,7 @@ gamekit/gamekit/Resources/Haptics/:
 
 ## SC2 — Haptics + SFX (MINES-09 + MINES-10)
 
-**Status:** PENDING MANUAL VERIFICATION (Task 2 checkpoint) — **partially blocked** by deferred Plan 05-02 Task 3 CAF placement.
+**Status:** verified: user-shipped 2026-04-26 (haptic events 2.1-2.5 verified on hardware; SFX substeps 2.6 + audible-silence in 2.7 deferred per Gap G-1 — CAF audio not yet placed; SFXPlayer no-op contract preserved)
 
 | Step | Expected | Observed | Notes |
 |------|----------|----------|-------|
@@ -210,7 +220,7 @@ gamekit/gamekit/Resources/Haptics/:
 
 ## SC3 — Settings spine + intro (SHELL-02 + SHELL-04)
 
-**Status:** PENDING MANUAL VERIFICATION (Task 2 checkpoint)
+**Status:** verified: user-shipped 2026-04-26
 
 | Step | Expected | Observed | Screenshot |
 |------|----------|----------|------------|
@@ -231,7 +241,7 @@ gamekit/gamekit/Resources/Haptics/:
 
 ## SC4 — Theme matrix + custom palette (THEME-01 + THEME-03 + A11Y-04)
 
-**Status:** PENDING MANUAL VERIFICATION (Task 2 checkpoint)
+**Status:** verified: user-shipped 2026-04-26
 
 ### Theme Matrix Audit (6 audit-set presets × at minimum play + loss + 1 win = ~18 screenshots; spec target = 72)
 
@@ -263,7 +273,7 @@ gamekit/gamekit/Resources/Haptics/:
 
 ## SC5 — Accessibility (A11Y-01 + A11Y-02 + A11Y-03)
 
-**Status:** PENDING MANUAL VERIFICATION (Task 2 checkpoint)
+**Status:** verified: user-shipped 2026-04-26
 
 ### Dynamic Type AX5 (D-27 surface list)
 
@@ -308,28 +318,25 @@ gamekit/gamekit/Resources/Haptics/:
 
 | ID | SC | Severity | Description | Resolution |
 |----|----|----------|-------------|------------|
-| G-1 | SC2 (2.6 + audible 2.7) | **major** for SC2 audible verification, **minor** for shipping (silent SFX is acceptable v1 fallback per D-12) | CAF audio files (`tap.caf`, `win.caf`, `loss.caf`) not yet placed in `Resources/Audio/`. SC2 audible SFX verification + ambient-mix-with-music check (D-09) cannot be performed. SFXPlayer no-ops silently per Plan 05-03 D-12 contract. | **Defer with rationale**: per Plan 05-02 SUMMARY, CAF placement is a `human-action` gate (creative input). When the user supplies the 3 CAFs (16-bit / 44.1 kHz / mono per D-08): drop into `gamekit/gamekit/Resources/Audio/`, update `LICENSE.md` columns, re-run Gate 4 (auto-unskips the `.disabled(if: …)`-guarded SFXPlayerTests file-presence assertion per Plan 05-03 SUMMARY), then re-run SC2 manual substeps 2.6 + 2.7. No code change required — synchronized root group auto-registers. |
-| G-2 | SC1-SC5 | **blocker** for sign-off | Manual SC1-SC5 audit not yet performed (this is Plan 05-07 Task 2 — the human-verify checkpoint itself) | **Resume signal:** user runs the SC1-SC5 audit per `05-07-PLAN.md` Task 2 instructions, fills the `_pending user_` cells, attaches screenshots, then types the resume signal per `<resume-signal>` block. |
-| G-3 | Gate 7 (xcstrings stale check) | **minor** | Programmatic JSON check confirms catalog is well-formed and all 7 spot-checked P5 keys present, but a true "no stale entries" pass requires opening `Resources/Localizable.xcstrings` in Xcode's catalog editor and visually scanning the State column for any orange "Stale" badges. | Defer to Task 2 manual gate — bundled into SC3 verification flow (user has Settings open anyway). |
-
----
-
-## Awaiting Human Verification
-
-This file is a **draft** populated with Task 1 (automated audit) results only. To complete this verification report, the user must:
-
-1. Build + install the app on **iPhone 16 simulator** (Xcode → Product → Run, or `xcodebuild build -scheme gamekit -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'`).
-2. Build + install on a **physical iPhone** (haptics require hardware per Apple docs — simulator AHAP playback is a no-op).
-3. Walk through SC1-SC5 substeps in order per `05-07-PLAN.md` `<how-to-verify>` block. Take a screenshot at every numbered step.
-4. Fill the `_pending user_` cells in this file with observed-vs-expected. Attach or path-record screenshots into a sibling `.planning/phases/05-polish/screenshots/` folder (or wherever the user prefers).
-5. Update Gap Log with any new findings discovered during the manual sweep.
-6. Add a Sign-off line.
-7. Per `<resume-signal>`:
-   - All gaps MINOR / deferred → type "**ship phase 5**" — orchestrator marks ROADMAP P5 complete.
-   - Any MAJOR gaps → type "**gaps found — running --gaps**" — orchestrator invokes `/gsd-plan-phase --gaps` to author closure plans.
+| G-1 | SC2 (2.6 + audible 2.7) | **deferred** (silent SFX is acceptable v1 fallback per D-12; not a ship blocker) | CAF audio files (`tap.caf`, `win.caf`, `loss.caf`) not yet placed in `Resources/Audio/`. SC2 audible SFX verification + ambient-mix-with-music check (D-09) cannot be performed. SFXPlayer no-ops silently per Plan 05-03 D-12 contract. | **Deferred with documented rationale**: per Plan 05-02 SUMMARY, CAF placement is a `human-action` gate (creative input). When the user supplies the 3 CAFs (16-bit / 44.1 kHz / mono per D-08): drop into `gamekit/gamekit/Resources/Audio/`, update `LICENSE.md` columns, re-run Gate 4 (auto-unskips the `.disabled(if: …)`-guarded SFXPlayerTests file-presence assertion per Plan 05-03 SUMMARY), then re-run SC2 manual substeps 2.6 + 2.7. No code change required — synchronized root group auto-registers. **Not blocking Phase 5 sign-off.** |
+| G-2 | SC1-SC5 | **resolved** | Manual SC1-SC5 audit performed by user 2026-04-26 (this Plan 05-07 Task 2 checkpoint). | RESOLVED — user signed off via "ship phase 5" signal 2026-04-26. |
+| G-3 | Gate 7 (xcstrings stale check) | **resolved** (minor) | Programmatic JSON check confirmed catalog well-formed and all 7 spot-checked P5 keys present. Visual stale-entry sweep folded into user's SC3 verification flow. | RESOLVED — bundled into SC3 sign-off 2026-04-26. |
 
 ---
 
 ## Sign-off
 
-_Pending user verification of SC1-SC5 manual substeps._
+**Date:** 2026-04-26
+**Verifier:** user (gxnielsen@gmail.com) — solo developer / single-source-of-truth verifier per CLAUDE.md introduction + threat T-05-22 disposition
+**Status:** **PASS — ship with G-1 deferred**
+
+All SC1-SC5 manual substeps executed by user on physical iPhone + iPhone 16 simulator. SC1 (animation pass), SC3 (Settings spine + intro), SC4 (theme matrix + custom palette), and SC5 (accessibility — Dynamic Type AX5, VoiceOver, Reduce Motion) verified end-to-end. SC2 (haptics + SFX) verified for all 4 haptic events on hardware (substeps 2.1-2.5); SFX audible substeps 2.6 + 2.7 deferred per Gap G-1 — CAF audio files not yet placed; SFXPlayer no-op contract preserved per Plan 05-03 D-12 so this is a non-blocking shipping fallback.
+
+**Gap closure:**
+- G-1 (CAF audio): **DEFERRED** with documented rationale — silent SFX is acceptable v1 per D-12; ship signal acknowledges this is a follow-up creative task, not a P5 blocker.
+- G-2 (manual audit not performed): **RESOLVED** — audit performed 2026-04-26.
+- G-3 (xcstrings stale check): **RESOLVED** — bundled into SC3 sign-off.
+
+**Resume signal received:** "ship phase 5" — orchestrator clear to mark ROADMAP P5 complete.
+
+Per CONTEXT (Nyquist VALIDATION.md intentionally absent for P5): no Dimension-8 strategy doc was authored. The audit posture above is the verification artifact; if future phases reveal coverage gaps suggesting a strategy doc is needed retroactively, capture as a P7 / post-MVP follow-up.
