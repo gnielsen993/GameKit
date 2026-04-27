@@ -131,8 +131,17 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Anonymous→signed-in promotion: a user with 50 local games signs in, sees a "Restart to enable iCloud sync" dialog, restarts, and on relaunch all 50 games are present and begin mirroring to CloudKit — verified by checking the same iCloud account on a second simulator and seeing the rows appear.
   4. Settings shows a sync-status row that reports state ("Synced just now" / "Syncing…" / "Not signed in" / "iCloud unavailable — last synced [date]") subscribed to `NSPersistentCloudKitContainer.eventChangedNotification`.
   5. Sign-in is surfaced once in the 3-step intro (with Skip) and once in Settings; never modal, never push, never re-prompted after dismissal. Cold-start time remains <1s after enabling CloudKit (FOUND-01 not regressed).
-**Plans**: TBD
-**Research**: YES — `/gsd-research-phase` recommended. Open questions: (a) launch-only vs always-on `.private(...)` vs hot-swap `ModelConfiguration` reconfiguration on sign-in (research stream conflict, MEDIUM confidence on hot-swap, HIGH on launch-only with Restart prompt); (b) exact `ModelContainer` teardown/recreate sequence; (c) test matrix for sign-in / revocation / reinstall combinations; (d) CloudKit Dashboard schema deployment workflow.
+**Plans**: 9 plans
+- [ ] 06-01-PLAN.md — Wave-0 TDD RED — KeychainBackend + InMemoryKeychainBackend + AuthStoreTests skeleton (locks SC2 verbatim Keychain attrs; T-06-01)
+- [ ] 06-02-PLAN.md — Wave-0 TDD RED — SyncStatus enum + label(at:) + CloudSyncStatusObserverTests skeleton (locks D-10 4-state contract)
+- [ ] 06-03-PLAN.md — Wave-0 BLOCKING — entitlements verify (T-06-09) + DEBUG schema deploy preflight (Pitfall D — required before SC3)
+- [ ] 06-04-PLAN.md — Wave-1 GREEN — AuthStore production source (Keychain + revocation observer + scene-active validator) → 7/7 RED tests GREEN
+- [ ] 06-05-PLAN.md — Wave-1 GREEN — CloudSyncStatusObserver production source (eventChangedNotification translator) → 9/9 RED tests GREEN
+- [ ] 06-06-PLAN.md — Wave-2 — GameKitApp + RootTabView wiring (Environment injection + scenePhase observer + root Restart prompt alert D-04 verbatim)
+- [ ] 06-07-PLAN.md — Wave-2 — SettingsView SYNC section between AUDIO and DATA (extracted to SettingsSyncSection.swift) + xcstrings sync
+- [ ] 06-08-PLAN.md — Wave-2 — IntroFlowView Step 3 SIWA wire-up (replaces P5 D-21 no-op) + dismissIntro byte-identical preserved
+- [ ] 06-09-PLAN.md — Wave-3 — manual SC1-SC5 verification checkpoint (06-VERIFICATION.md template + sign-off)
+**UI hint**: yes
 
 ### Phase 7: Release
 **Goal**: Pre-submission gating — the App Store / TestFlight failure modes are all checklist-preventable, and this is the checklist.
@@ -158,7 +167,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Mines UI | 3/4 | In progress | - |
 | 4. Stats & Persistence | 1/6 | In progress | - |
 | 5. Polish | 7/7 | In progress | - |
-| 6. CloudKit + Sign in with Apple | 0/TBD | Not started | - |
+| 6. CloudKit + Sign in with Apple | 0/9 | Planned | - |
 | 7. Release | 0/TBD | Not started | - |
 
 ## Research Flags
@@ -197,3 +206,4 @@ The following are PROJECT.md long-term vision and are **not** roadmap phases:
 ---
 *Roadmap created: 2026-04-24*
 *Phase sequencing: load-bearing convergence between research/ARCHITECTURE.md and research/PITFALLS.md*
+*Phase 6 planned: 2026-04-26 — 9 plans (3-wave + verification)*
