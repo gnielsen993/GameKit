@@ -393,6 +393,9 @@
     "Import stats" : {
 
     },
+    "Last synced %@" : {
+
+    },
     "MINESWEEPER" : {
 
     },
@@ -554,6 +557,9 @@
     "SF Symbols · Apple Inc." : {
 
     },
+    "SYNC" : {
+
+    },
     "Settings" : {
       "comment" : "Settings tab + nav title",
       "extractionState" : "manual",
@@ -567,6 +573,9 @@
       }
     },
     "Sign in with Apple to sync your stats across iPhone, iPad, and Mac. Optional — the app works fully without it." : {
+
+    },
+    "Signed in to iCloud" : {
 
     },
     "Skip" : {

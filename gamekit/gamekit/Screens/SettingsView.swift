@@ -76,6 +76,7 @@ struct SettingsView: View {
 
                     appearanceSection
                     audioSection
+                    SettingsSyncSection(theme: theme)
                     dataSection
                     aboutSection
                 }
