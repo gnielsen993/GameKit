@@ -1194,32 +1194,32 @@ The `onSIWASuccess` closure flows up through `IntroStep3SignInView(... onSIWASuc
 
 **If this table needs to shrink:** A6 and A8 are the load-bearing assumptions. Plan should treat both as "verify in SC5 / SC3 manual checkpoint, document actual behavior in 06-VERIFICATION.md."
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Where does `showRestartPrompt` state live — RootTabView local state, or AuthStore property?**
    - What we know: D-03 says "root level" (RootTabView body OR a `RestartPromptModifier`). Both work.
    - What's unclear: whether AuthStore should expose `shouldShowRestartPrompt: Bool` (mutable from SIWA success site) OR whether RootTabView passes a closure down via Environment.
-   - Recommendation: **Promote to AuthStore as a published property.** Co-locates the trigger with the store that flipped `cloudSyncEnabled`. Mirrors the pattern of having state next to the events that mutate it. RootTabView reads `Bindable(authStore).shouldShowRestartPrompt` in the alert binding.
+   - **RESOLVED:** Promote to AuthStore as a published property. Co-locates the trigger with the store that flipped `cloudSyncEnabled`. Mirrors the pattern of having state next to the events that mutate it. RootTabView reads `Bindable(authStore).shouldShowRestartPrompt` in the alert binding. Plan 06-04 implements; Plan 06-06 wires.
 
 2. **Should `AuthStore` depend on `SettingsStore` (to flip `cloudSyncEnabled`) directly, or via a callback closure?**
    - What we know: D-13 says "clear Keychain userID, set `cloudSyncEnabled=false`, log via `os.Logger`." AuthStore needs to flip the flag.
    - What's unclear: whether to inject `SettingsStore` into AuthStore.init(), or have AuthStore expose `var shouldDisableSync: Bool` and let the app layer reconcile.
-   - Recommendation: **Inject SettingsStore into AuthStore.init(backend:settingsStore:).** Avoids the indirection of a separate observer; matches the precedent of SFXPlayer reading `settingsStore.sfxEnabled` per-call (P5 D-12).
+   - **RESOLVED — DECLINE recommendation; keep AuthStore single-responsibility per CLAUDE.md §4.** Plan 06-04 keeps AuthStore independent: AuthStore exposes `currentUserID` + `shouldShowRestartPrompt` only; SIWA-success and revocation sites at the call layer (Plan 06-07 SettingsSyncSection, Plan 06-08 IntroFlowView, Plan 06-04 internal revocation handler) flip `settingsStore.cloudSyncEnabled` themselves via `@Environment(\.settingsStore)`. Avoids cross-injection coupling between two `@Observable` singletons; both stay independently testable with their own in-memory stubs.
 
 3. **What does `validateOnSceneActive()` do if `currentUserID` exists but no network is available?**
    - What we know: `getCredentialState` on no-network may fire with `.authorized` (cached) or fail with an error.
    - What's unclear: defensive behavior when the call errors. Treating as `.notFound` would clear sign-in state on every airplane-mode toggle — unacceptable.
-   - Recommendation: **The `getCredentialStateAsync` wrapper currently treats `error != nil` as `.notFound` (Pattern 2). Refine to: if error is reachability-related, return `.authorized` (preserve cached state). Else return `.notFound`.** Risk: NSError domain inspection is fragile. Alternative: ignore errors and treat as no-op (preserve last-known state). Plan should test this case.
+   - **RESOLVED:** Treat errors as no-op preserving last-known state. The `getCredentialStateAsync` wrapper returns `.authorized` (cached) when `error != nil` AND `currentUserID` exists in Keychain — preserves sign-in across airplane-mode toggles. Only `.revoked` and explicit `.notFound` from a successful call clear local state. NSError domain inspection deferred (fragile per research). Plan 06-04 Test 3 covers `.authorized` / `.revoked` / `.notFound` / `.transferred`; error-no-op path documented in code comment, not unit-tested (defensive-only).
 
 4. **Does the `eventChangedNotification` selector run on main thread?**
    - What we know: `NotificationCenter.default.addObserver(... queue: .main)` posts on main. But default queue (queue: nil) posts on the thread that posted.
    - What's unclear: whether NSPersistentCloudKitContainer always posts on main.
-   - Recommendation: **Pass `queue: .main` explicitly when registering the observer.** Eliminates ambiguity; matches AuthStore pattern.
+   - **RESOLVED:** AuthStore registers `credentialRevokedNotification` with `queue: .main` (synchronous to MainActor); CloudSyncStatusObserver registers `eventChangedNotification` with `queue: nil` (background) and hops to `MainActor` via `Task { @MainActor in self.updateStatus(...) }` inside the closure. Background-then-hop avoids blocking notification poster; main-queue receiver simplifies AuthStore's tight revocation path. Plan 06-04 + Plan 06-05 ship verbatim shapes.
 
 5. **CloudKit Dashboard schema deployment — exact step sequence for SC3?**
    - What we know: One-shot dev call to `initializeCloudKitSchema()` materializes record types. Then CloudKit Dashboard shows them under Development environment.
    - What's unclear: whether the schema needs further dashboard-side configuration (indexes, queryable fields, …) for SC3 to pass.
-   - Recommendation: **Plan ships a single `06-VERIFICATION.md` checklist item: (a) run `CloudKitSchemaInitializer.deployDevelopmentSchema()` in DEBUG build, (b) open CloudKit Dashboard → iCloud.com.lauterstar.gamekit → Schema → Development → verify CD_GameRecord and CD_BestTime exist, (c) verify Queryable indexes auto-deployed for `gameKindRaw` (used in StatsView @Query predicate). If queryable indexes are missing, manually add them in Dashboard.** This is a one-shot manual step; not automated.
+   - **RESOLVED:** Plan 06-03 Task 3 ships the dashboard verify checklist: (a) run `CloudKitSchemaInitializer.deployDevelopmentSchema()` in DEBUG build (one-shot), (b) open CloudKit Dashboard → `iCloud.com.lauterstar.gamekit` → Schema → Development → verify `CD_GameRecord` and `CD_BestTime` record types exist, (c) verify Queryable indexes auto-deployed for `gameKindRaw` (used in StatsView `@Query` predicate). If queryable indexes missing, manually add in Dashboard. Plan 06-03 is `autonomous: false` (`checkpoint:human-verify`). Plan 06-09 Task SC3 reads this verification log before proceeding with the 2-device promotion test.
 
 ## Environment Availability
 
