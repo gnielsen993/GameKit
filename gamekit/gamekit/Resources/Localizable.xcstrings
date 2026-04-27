@@ -465,6 +465,9 @@
         }
       }
     },
+    "Not signed in" : {
+
+    },
     "OK" : {
 
     },
@@ -483,6 +486,9 @@
 
     },
     "Privacy" : {
+
+    },
+    "Quit GameKit" : {
 
     },
     "Reset all stats" : {
@@ -517,6 +523,9 @@
           }
         }
       }
+    },
+    "Restart to enable iCloud sync" : {
+
     },
     "Revealed, %lld mines adjacent, row %lld column %lld" : {
       "comment" : "Cell a11y label — revealed numbered state (D-19, 1-indexed)",
@@ -610,6 +619,15 @@
       }
     },
     "Sync across devices" : {
+
+    },
+    "Synced %@" : {
+
+    },
+    "Synced just now" : {
+
+    },
+    "Syncing…" : {
 
     },
     "The file couldn't be read. Check that it's a GameKit stats export and try again." : {
@@ -736,6 +754,12 @@
           }
         }
       }
+    },
+    "Your stats will sync to all devices signed in to this iCloud account. Quit GameKit and reopen to finish setup." : {
+
+    },
+    "iCloud unavailable" : {
+
     }
   },
   "version" : "1.0"

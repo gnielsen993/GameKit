@@ -38,6 +38,8 @@ struct GameKitApp: App {
     @StateObject private var themeManager = ThemeManager()
     @State private var settingsStore: SettingsStore
     @State private var sfxPlayer: SFXPlayer
+    @State private var authStore: AuthStore
+    @State private var cloudSyncStatusObserver: CloudSyncStatusObserver
     let sharedContainer: ModelContainer
 
     init() {
@@ -52,6 +54,23 @@ struct GameKitApp: App {
         // no-op `play(...)` per Core/SFXPlayer.swift D-11 invariant.
         let sfx = SFXPlayer()
         _sfxPlayer = State(initialValue: sfx)
+
+        // P6 (D-13): AuthStore constructed AFTER SettingsStore + SFXPlayer.
+        // Registers credentialRevokedNotification observer in init.
+        // Default seams (SystemKeychainBackend + SystemCredentialStateProvider)
+        // are correct for production; tests inject in-memory stubs (Plan 06-01).
+        let auth = AuthStore()
+        _authStore = State(initialValue: auth)
+
+        // P6 (D-11): CloudSyncStatusObserver constructed AFTER AuthStore.
+        // Initial status: .syncing if cloudSyncEnabled (CloudKit setupEvent
+        // typically fires within 1-2s of launch; .syncing dampens the
+        // first-paint-of-status-row → it's already correct when SC4 ticks);
+        // .notSignedIn otherwise (CONTEXT Specifics line 204).
+        let observer = CloudSyncStatusObserver(
+            initialStatus: store.cloudSyncEnabled ? .syncing : .notSignedIn
+        )
+        _cloudSyncStatusObserver = State(initialValue: observer)
 
         let schema = Schema([GameRecord.self, BestTime.self])
         let config = ModelConfiguration(
@@ -77,6 +96,8 @@ struct GameKitApp: App {
                 .environmentObject(themeManager)
                 .environment(\.settingsStore, settingsStore)
                 .environment(\.sfxPlayer, sfxPlayer)
+                .environment(\.authStore, authStore)
+                .environment(\.cloudSyncStatusObserver, cloudSyncStatusObserver)
                 .preferredColorScheme(preferredScheme)
                 .modelContainer(sharedContainer)
         }
