@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: 06-08 complete (Wave-2 integration #3 — IntroFlowView Step 3 SIWA wiring); Wave 2 done; 06-03 Task 3 checkpoint still pending; 06-09 next (manual SC1-SC5 verification)
-last_updated: "2026-04-27T17:52:31.000Z"
+stopped_at: 06-09 Task 1 complete (06-VERIFICATION.md template shipped, commit 7f24223); Task 2 BLOCKING checkpoint reached — awaiting human SC1-SC5 verification. 06-03 Task 3 checkpoint also still pending and is a hard prerequisite for SC3.
+last_updated: "2026-04-27T18:30:00.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 6
-Plan: 08 — COMPLETE (a5bcfd9); Wave-2 integration #3 (FINAL integration plan) landed — IntroFlowView Step 3 SIWA `onCompletion` now invokes a real PERSIST-04 handler that mirrors Plan 06-07's SettingsSyncSection shape verbatim (D-02 sequence: `try authStore.signIn(userID: credential.user)` → `settingsStore.cloudSyncEnabled = true` → `authStore.shouldShowRestartPrompt = true` → `dismissIntro()`). PERSIST-04 is now end-to-end functional: BOTH SIWA-success sites (Settings SYNC from 06-07 + IntroFlow Step 3 from 06-08) flip the same `shouldShowRestartPrompt` flag, surfacing Plan 06-06's root-level Restart alert regardless of which site triggered. Five edits in IntroFlowView.swift: (A) `@Environment(\.authStore)` injection, (B) two new handler methods (`handleSIWARequest` sets `requestedScopes = []` SC2 verbatim T-06-04; `handleSIWACompletion` does the D-02/D-03 sequence with silent-log failure path T-06-PERSIST05), (C) `IntroStep3SignInView` signature replaces `onSignIn: () -> Void` with `onSIWARequest + onSIWACompletion` closure props, (D) `SignInWithAppleButton` rewires `onRequest`/`onCompletion` to the new closures, (E) call-site update. P5 `signInTapped()` no-op REMOVED (subsumed by handleSIWARequest). `dismissIntro()` body BYTE-IDENTICAL preserved (T-06-introdismiss `diff` = 0 lines); now serves THREE callers (Skip + Done + SIWA-success). File length 274→289 lines (within ≤290 hard cap). SIWA HIG styling preserved BYTE-IDENTICAL (`.signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)` + `.frame(height: 44)`). Zero new user-facing strings (logger-only paths; all 12 P6 strings + P5 intro strings preserved). Full test suite green (AuthStoreTests 7/7 + CloudSyncStatusObserverTests 9/9 + all P2-P5 suites). Wave 2 COMPLETE. Plan 06-09 (manual SC1-SC5 verification) is next.
-Status: 06-08 complete (Wave-2 #3 done — Wave 2 fully landed); 06-03 Task 3 checkpoint still pending (awaiting user); 06-09 next (manual SC1-SC5 verification)
+Plan: 09 — CHECKPOINT REACHED (Task 1 complete @ 7f24223; Task 2 BLOCKING awaiting human verification). Wave-3 closing plan: shipped `.planning/phases/06-cloudkit-siwa/06-VERIFICATION.md` (237 lines) — manual SC1-SC5 verification template with verbatim copy locks (Restart alert title/body/buttons, Keychain attrs `com.lauterstar.gamekit.auth` + `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, all 4 SyncStatus labels), Pitfall C 2-sim fallback documented via `fallback_used` frontmatter field, gap log (Critical/Major/Minor severity scale), 5-row sign-off table mapped to PERSIST-04/05/06, phase-close recipe (ROADMAP+STATE+atomic commit per CLAUDE.md §8.10). All 10 Task 1 acceptance criteria green. Task 2 cannot be agent-executed — requires real iCloud, real Apple ID flows, manual revocation through system Settings, Instruments App Launch traces on a real device. **Hard dependency:** SC3 cannot pass until 06-03 Task 3 cleared (capabilities verified in Xcode + `expr try? GameKitApp._runtimeDeployCloudKitSchema()` run from lldb + `CD_GameRecord` + `CD_BestTime` visible in CloudKit Dashboard Development). Plan 09 is NOT marked fully complete — current-plan counter remains at 09 with status `checkpoint reached, awaiting human verification`.
+Status: 06-09 Task 1 complete (template shipped, 7f24223); Task 2 BLOCKING checkpoint awaiting user SC1-SC5 sweep + sign-off; 06-03 Task 3 also still pending (SC3 prerequisite).
 Last activity: 2026-04-27
 
 Progress: [█████████▊] 97%
