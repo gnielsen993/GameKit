@@ -139,7 +139,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 06-05-PLAN.md — Wave-1 GREEN — CloudSyncStatusObserver production source (eventChangedNotification translator) → 9/9 RED tests GREEN
 - [x] 06-06-PLAN.md — Wave-2 — GameKitApp + RootTabView wiring (Environment injection + scenePhase observer + root Restart prompt alert D-04 verbatim)
 - [x] 06-07-PLAN.md — Wave-2 — SettingsView SYNC section between AUDIO and DATA (extracted to SettingsSyncSection.swift) + xcstrings sync
-- [ ] 06-08-PLAN.md — Wave-2 — IntroFlowView Step 3 SIWA wire-up (replaces P5 D-21 no-op) + dismissIntro byte-identical preserved
+- [x] 06-08-PLAN.md — Wave-2 — IntroFlowView Step 3 SIWA wire-up (replaces P5 D-21 no-op) + dismissIntro byte-identical preserved
 - [ ] 06-09-PLAN.md — Wave-3 — manual SC1-SC5 verification checkpoint (06-VERIFICATION.md template + sign-off)
 **UI hint**: yes
 
@@ -167,7 +167,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Mines UI | 3/4 | In progress | - |
 | 4. Stats & Persistence | 1/6 | In progress | - |
 | 5. Polish | 7/7 | In progress | - |
-| 6. CloudKit + Sign in with Apple | 0/9 | Planned | - |
+| 6. CloudKit + Sign in with Apple | 7/9 | In progress | - |
 | 7. Release | 0/TBD | Not started | - |
 
 ## Research Flags

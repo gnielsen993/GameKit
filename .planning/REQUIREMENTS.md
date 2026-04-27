@@ -66,8 +66,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 **: Stats survive app force-quit, crash, and device reboot — explicit `try modelContext.save()` on terminal-state detection
 - [x] **PERSIST-03
 **: Export/Import JSON of stats with `schemaVersion`; round-trips cleanly via `fileExporter`/`fileImporter`
-- [ ] **PERSIST-04**: Optional **Sign in with Apple + CloudKit private DB** for cross-device persistence; full feature parity without sign-in
-- [ ] **PERSIST-05**: Sign-in surfaced once in 3-step intro and again in Settings; never gates gameplay; never nags
+- [x] **PERSIST-04**: Optional **Sign in with Apple + CloudKit private DB** for cross-device persistence; full feature parity without sign-in
+- [x] **PERSIST-05**: Sign-in surfaced once in 3-step intro and again in Settings; never gates gameplay; never nags
 - [x] **PERSIST-06
 **: Anonymous local profile created on first launch; signing in promotes local data to cloud with no data loss; sync-status row in Settings reports state ("Synced just now" / "Syncing…" / "Not signed in" / "iCloud unavailable — last synced [date]")
 
@@ -193,8 +193,8 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | PERSIST-01 | Phase 4 | Complete |
 | PERSIST-02 | Phase 4 | Pending |
 | PERSIST-03 | Phase 4 | Pending |
-| PERSIST-04 | Phase 6 | Pending |
-| PERSIST-05 | Phase 6 | Pending |
+| PERSIST-04 | Phase 6 | Complete (06-08) |
+| PERSIST-05 | Phase 6 | Complete (06-08) |
 | PERSIST-06 | Phase 6 | Pending |
 | THEME-01 | Phase 5 | Pending |
 | THEME-02 | Phase 3 | Pending |

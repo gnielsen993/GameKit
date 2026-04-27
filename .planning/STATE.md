@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: 06-07 complete (Wave-2 integration #2 — Settings SYNC section + SettingsSyncSection.swift extracted + xcstrings sync); 06-03 Task 3 checkpoint still pending; 06-08 next (IntroFlow Step 3 SIWA wiring)
-last_updated: "2026-04-27T17:33:46.000Z"
+stopped_at: 06-08 complete (Wave-2 integration #3 — IntroFlowView Step 3 SIWA wiring); Wave 2 done; 06-03 Task 3 checkpoint still pending; 06-09 next (manual SC1-SC5 verification)
+last_updated: "2026-04-27T17:52:31.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 40
-  completed_plans: 38
-  percent: 95
+  completed_plans: 39
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 6
-Plan: 07 — COMPLETE (9974f92); Wave-2 integration #2 landed — Settings SYNC section between AUDIO and DATA in D-09 order; SettingsSyncSection.swift (215 lines) extracted to a sibling file per CLAUDE.md §8.1 (mirrors P5 05-04 AcknowledgmentsView precedent); SignInWithAppleButton with `requestedScopes = []` SC2 verbatim (T-06-04); SIWA onCompletion wired to D-02 sequence `try authStore.signIn(userID: credential.user)` → `cloudSyncEnabled = true` → `shouldShowRestartPrompt = true` (surfaces Plan 06-06's root-level Restart prompt); TimelineView(.periodic(by: 60)) wraps SyncStatus.label(at:) so "Synced X ago" auto-ticks per minute (D-12); signed-in row has zero Buttons (T-06-row-noSignOut by construction); failure path silent os.Logger only (T-06-PERSIST05); existing dataSection BYTE-IDENTICAL preserved (P4 D-16 lock — diff = 0); SettingsView.swift 410→411 lines (within ≤411 budget); xcstringstool sync added 3 new P6 strings (SYNC / Signed in to iCloud / Last synced %@) — catalog now carries all 12 P6 strings; full test suite green (AuthStoreTests 7/7 + CloudSyncStatusObserverTests 9/9 + all P2-P5 suites). Plan 06-08 will ship the second SIWA-success site (IntroFlowView Step 3) — both sites flip the same shouldShowRestartPrompt flag.
-Status: 06-07 complete (Wave-2 #2 done); 06-03 Task 3 checkpoint still pending (awaiting user); 06-08 next (IntroFlow Step 3 SIWA wiring)
+Plan: 08 — COMPLETE (a5bcfd9); Wave-2 integration #3 (FINAL integration plan) landed — IntroFlowView Step 3 SIWA `onCompletion` now invokes a real PERSIST-04 handler that mirrors Plan 06-07's SettingsSyncSection shape verbatim (D-02 sequence: `try authStore.signIn(userID: credential.user)` → `settingsStore.cloudSyncEnabled = true` → `authStore.shouldShowRestartPrompt = true` → `dismissIntro()`). PERSIST-04 is now end-to-end functional: BOTH SIWA-success sites (Settings SYNC from 06-07 + IntroFlow Step 3 from 06-08) flip the same `shouldShowRestartPrompt` flag, surfacing Plan 06-06's root-level Restart alert regardless of which site triggered. Five edits in IntroFlowView.swift: (A) `@Environment(\.authStore)` injection, (B) two new handler methods (`handleSIWARequest` sets `requestedScopes = []` SC2 verbatim T-06-04; `handleSIWACompletion` does the D-02/D-03 sequence with silent-log failure path T-06-PERSIST05), (C) `IntroStep3SignInView` signature replaces `onSignIn: () -> Void` with `onSIWARequest + onSIWACompletion` closure props, (D) `SignInWithAppleButton` rewires `onRequest`/`onCompletion` to the new closures, (E) call-site update. P5 `signInTapped()` no-op REMOVED (subsumed by handleSIWARequest). `dismissIntro()` body BYTE-IDENTICAL preserved (T-06-introdismiss `diff` = 0 lines); now serves THREE callers (Skip + Done + SIWA-success). File length 274→289 lines (within ≤290 hard cap). SIWA HIG styling preserved BYTE-IDENTICAL (`.signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)` + `.frame(height: 44)`). Zero new user-facing strings (logger-only paths; all 12 P6 strings + P5 intro strings preserved). Full test suite green (AuthStoreTests 7/7 + CloudSyncStatusObserverTests 9/9 + all P2-P5 suites). Wave 2 COMPLETE. Plan 06-09 (manual SC1-SC5 verification) is next.
+Status: 06-08 complete (Wave-2 #3 done — Wave 2 fully landed); 06-03 Task 3 checkpoint still pending (awaiting user); 06-09 next (manual SC1-SC5 verification)
 Last activity: 2026-04-27
 
-Progress: [█████████▌] 95%
+Progress: [█████████▊] 97%
 
 ## Performance Metrics
 
@@ -89,6 +89,7 @@ Progress: [█████████▌] 95%
 | Phase 06-cloudkit-siwa P05 | 13 | 1 tasks | 2 files |
 | Phase 06-cloudkit-siwa P06 | 6 | 3 tasks | 3 files |
 | Phase 06-cloudkit-siwa P07 | 25 | 3 tasks | 3 files |
+| Phase 06-cloudkit-siwa P08 | 13 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -232,6 +233,10 @@ Recent decisions affecting current work:
 - 06-07: D-12 sync-status row implementation — `TimelineView(.periodic(from: .now, by: 60))` wraps a `VStack(alignment: .leading, spacing: 2)` containing the primary status `Text` and an OPTIONAL "Last synced X" subline `Text` returned from `unavailableSubline(at: context.date)` (returns `nil` for non-`.unavailable` cases, so `if let subline = ...` cleanly drops the line). The `.periodic(by: 60)` cadence fires once per minute regardless of observer state — Apple's TimelineView+@Observable interaction means a CloudKit event mid-tick still triggers an immediate re-render via the `private(set) var status` read. Two refresh paths compose orthogonally; no observer churn from the timer.
 - 06-07: SettingsSyncSection takes `let theme: Theme` as a positional prop (NOT @EnvironmentObject themeManager) — parent SettingsView owns the `themeManager.theme(using: colorScheme)` calculation and passes the result down. CLAUDE.md §8.2 (data-driven, not data-fetching) reapplied for sibling-view extractions. Pattern locked: any extracted Settings/section view receives `theme: Theme` as a prop; only @Environment-injects @Observable singletons (settingsStore / authStore / cloudSyncStatusObserver) plus `\.colorScheme` (needed for SignInWithAppleButton style choice).
 - 06-07: xcstringstool sync (rerun per Plan 06-06 closing note) added 3 net-new SYNC-section strings — `SYNC` (section header), `Signed in to iCloud` (D-10 row label), `Last synced %@` (D-10 sub-line for `.unavailable(lastSynced: Date?)`). Combined with the 5 SyncStatus strings (extracted by Plan 06-06 sync from Plan 06-02 SyncStatus.swift source) and the 4 Restart-alert strings, the catalog now carries all 12 P6 strings. JSON valid; zero localization warnings on build. Empty `{ }` entries (no `localizations` block) match existing auto-extracted shape — resolves to development-language source at runtime.
+- 06-08: Wave-2 integration #3 (FINAL integration plan) shipped (a5bcfd9) — single atomic commit `feat(06-08): wire IntroFlowView Step 3 SIWA onCompletion (replaces P5 D-21 no-op)` (1 file / 51 insertions / 36 deletions). PERSIST-04 end-to-end functional: BOTH SIWA-success sites (Settings SYNC from 06-07 + IntroFlow Step 3 from 06-08) now flip the same `authStore.shouldShowRestartPrompt`. Handler shape mirrored from 06-07 verbatim — `Task { @MainActor in switch result { case .success: guard credential = ... as? ASAuthorizationAppleIDCredential else { logger; return }; do { try authStore.signIn(userID: credential.user); settingsStore.cloudSyncEnabled = true; authStore.shouldShowRestartPrompt = true; dismissIntro() } catch { logger.error } case .failure: logger.error } }`. Five threat-mitigation locks proven by acceptance grep: T-06-04 (`request.requestedScopes = []` literal in `handleSIWARequest` + zero `.email`/`.fullName` matches), T-06-03 (only `credential.user` extracted, zero `identityToken` matches), T-06-PERSIST05 (zero `.alert(` matches in IntroFlowView — failure path silent os.Logger only), T-06-introdismiss (`dismissIntro()` body byte-identical between HEAD~ and HEAD, `diff` returns 0 lines), CLAUDE.md §8.6 (zero `.foregroundColor(` matches). File length 274→289 (within ≤290 hard cap; required tightening doc-comments and 14 lines off the file header). P5 `signInTapped()` no-op REMOVED — subsumed by `handleSIWARequest`. Zero new user-facing strings added (logger-only paths). All 12 P6 strings + P5 intro strings preserved. Full test suite green: AuthStoreTests 7/7 + CloudSyncStatusObserverTests 9/9 + all P2-P5 suites — `** TEST SUCCEEDED **`.
+- 06-08: SIWA-success in intro is treated as Done — calls `dismissIntro()` so the `.fullScreenCover` dismisses (`hasSeenIntro = true` flips) and the user sees the Restart alert at the root level (RootTabView's `.alert(isPresented: Bindable(authStore).shouldShowRestartPrompt)` from Plan 06-06). The user is NOT trapped in the intro after a successful sign-in. Aligns with the spirit of P5 D-21/D-22/D-23 — every Step 3 exit path writes `hasSeenIntro = true` (Skip OR Done OR SIWA-success). Three-caller `dismissIntro()` pattern: P5 had 2 callers (Skip + Done); P6 06-08 adds the third (SIWA-success). Body BYTE-IDENTICAL to P5; only the doc-comment was updated to mention the new third caller.
+- 06-08: `IntroStep3SignInView` signature change — `let onSignIn: () -> Void` REMOVED; `let onSIWARequest: (ASAuthorizationAppleIDRequest) -> Void` + `let onSIWACompletion: (Result<ASAuthorization, Error>) -> Void` ADDED. The two new closure props let the parent `IntroFlowView` thread its `handleSIWARequest` and `handleSIWACompletion` instance methods down without the child view depending on `@Environment(\.authStore)` directly — preserves P5's "leaf views are props-only" pattern (CLAUDE.md §8.2). The parent owns environment reads; the child receives shaped closures.
+- 06-08: Mirrored handler shape from Plan 06-07 verbatim — both SIWA-success sites are now byte-similar at the call-site logic level. Eases future maintenance (e.g., adding rate-limiting, telemetry, retry on Keychain write failure — would update both sites identically). Locks the rule that any future SIWA-success site (e.g., a hypothetical "promote anonymous → signed-in" sheet from a Stats CTA) MUST follow the same `Task { @MainActor in switch result }` shape with the D-02/D-03 sequence. The handler is effectively a project-level pattern, not a per-screen one.
 
 ### Pending Todos
 
@@ -252,8 +257,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27T17:33:46.000Z
-Stopped at: 06-07 complete (Wave-2 integration #2 — Settings SYNC section + SettingsSyncSection.swift extracted + xcstrings sync)
-Resume file: .planning/phases/06-cloudkit-siwa/06-07-SUMMARY.md (just shipped) + .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3 still open). Wave 2 remaining: Plan 06-08 (IntroFlowView Step 3 SIWA wiring — second SIWA-success site, mirrors the 06-07 handler shape). Then Plan 06-09 (release-readiness verification).
+Last session: 2026-04-27T17:52:31.000Z
+Stopped at: 06-08 complete (Wave-2 integration #3 — IntroFlowView Step 3 SIWA wiring); Wave 2 fully landed
+Resume file: .planning/phases/06-cloudkit-siwa/06-08-SUMMARY.md (just shipped) + .planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md (§CHECKPOINT — Task 3 still open). Wave 2 COMPLETE. Wave 3 remaining: Plan 06-09 (manual SC1-SC5 verification per 06-VERIFICATION.md — feature-parity sweep, SIWA flow + Keychain + scene-active validation + revocation, 50-game two-simulator iCloud promotion, sync-status 4-state observability, cold-start <1s regression). Plan 06-09 SC3 is gated on Plan 06-03 Task 3 checkpoint resolution (CloudKit Dashboard schema deploy to Development env).
 
 **Planned Phase:** 6 (cloudkit-siwa) — 9 plans — 2026-04-27T15:40:19.917Z
