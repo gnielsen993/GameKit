@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-01 (RED-gate)
-last_updated: "2026-04-27T16:03:26.301Z"
+stopped_at: Completed 06-02 (RED-gate)
+last_updated: "2026-04-27T16:10:44Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 40
-  completed_plans: 32
-  percent: 80
+  completed_plans: 33
+  percent: 82
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 6
-Plan: 01 complete (RED-gate Keychain backend + AuthStoreTests skeleton)
-Status: Ready for plan 02
+Plan: 02 complete (RED-gate SyncStatus enum + CloudSyncStatusObserverTests skeleton)
+Status: Ready for plan 03
 Last activity: 2026-04-27
 
-Progress: [████████░░] 80%
+Progress: [████████░░] 82%
 
 ## Performance Metrics
 
@@ -83,6 +83,7 @@ Progress: [████████░░] 80%
 | Phase 05-polish P06 | 18 | 2 tasks tasks | 5 files files |
 | Phase 05-polish P07 | 5 | 2 tasks | 2 files |
 | Phase 06-cloudkit-siwa P01 | 5 | 3 tasks tasks | 3 files files |
+| Phase 06-cloudkit-siwa P02 | 3 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -204,6 +205,9 @@ Recent decisions affecting current work:
 - 05-06: Reduce Motion gates per surface independently (D-04) — BoardView .identity transition; CellView .symbolEffect value=0; GameView .keyframeAnimator trigger=false + .phaseAnimator phases=[0.0]; VM stays Foundation-only (D-05)
 - 05-06: TDD plan-level RED→GREEN gate honored — test commit 6b31869 (12 compile errors before any phase property defined) precedes feat commit 421cfcc; same TDD pattern as 04-02/04-03/05-01/05-03
 - 06-01: Wave-0 TDD RED-gate shipped — KeychainBackend.swift (126 lines, prod) + InMemoryKeychainBackend.swift (30 lines, tests-only) + AuthStoreTests.swift (190 lines, RED skeleton). Verbatim SC2 attribute set locked: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly + kSecClassGenericPassword + service 'com.lauterstar.gamekit.auth'. Test target compile-fails 9× ('cannot find AuthStore/CredentialStateProvider in scope') — Plan 06-04 feat commit will flip GREEN. Single atomic commit per CLAUDE.md §8.10 (test(06-01): a18a186).
+- 06-02: SyncStatus.swift (63 lines, Foundation-only) ships the D-10 4-state contract verbatim (.syncing / .syncedAt(Date) / .notSignedIn / .unavailable(lastSynced: Date?)) as Equatable + Sendable; label(at now: Date) -> String pure function takes `now` explicitly (TimelineView 06-07 + tests drive determinism — no internal Date.now). Verbatim labels locked: 'Syncing…' / 'Synced just now' / 'Synced %@' (RelativeDateTimeFormatter .named .full) / 'Not signed in' / 'iCloud unavailable'. T-06-state-drift mitigation by construction: 5th case = compile error in exhaustive switch.
+- 06-02: CloudSyncStatusObserverTests.swift (157 lines) ships @MainActor @Suite skeleton with 9 @Test methods (5 state-machine + 4 label tests); applyEvent_forTesting(type: NSPersistentCloudKitContainer.EventType, endDate: Date?, succeeded: Bool, error: Error?) seam locks Plan 06-05 observer API surface BEFORE the production type exists. RED-gate verbatim: 'cannot find CloudSyncStatusObserver in scope' (line 55:24). Single atomic commit per CLAUDE.md §8.10 (test(06-02): a0d4364) — both tasks shipped together because the test file references SyncStatus symbols introduced in Task 1, so a Task-1-only commit would be intermediate dead code.
+- 06-02: Sibling-enum-file pattern locked across the codebase — Outcome.swift / GameKind.swift / SyncStatus.swift all small (≤80 lines) Foundation-only Sendable enums in their own file. Sendable conformer is a pure value type (enum), so no @MainActor crossing protocol isolation — the strict-concurrency error class that bit Plan 06-01 (`@MainActor` on Sendable-protocol conformer requiring `@unchecked Sendable` + non-MainActor class) is structurally avoided here.
 
 ### Pending Todos
 
@@ -223,8 +227,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27T16:03:03.637Z
-Stopped at: Completed 06-01 (RED-gate)
+Last session: 2026-04-27T16:10:44Z
+Stopped at: Completed 06-02 (RED-gate)
 Resume file: None
 
 **Planned Phase:** 6 (cloudkit-siwa) — 9 plans — 2026-04-27T15:40:19.917Z
