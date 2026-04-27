@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 05-03-PLAN.md (Wave 2 services: Haptics + SFXPlayer + GameKitApp wiring)"
-last_updated: "2026-04-26T22:36:50.796Z"
-last_activity: 2026-04-26
+stopped_at: Completed 05-04-PLAN.md (Settings spine rebuild + FullThemePickerView + xcstrings sync)
+last_updated: "2026-04-27T01:53:42.881Z"
+last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 31
-  completed_plans: 27
-  percent: 87
+  completed_plans: 28
+  percent: 90
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 05 (polish) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
-Last activity: 2026-04-26
+Last activity: 2026-04-27
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Progress: [█████████░] 87%
 | Phase 04-stats-persistence P05 | 21 | 5 tasks tasks | 5 files files |
 | Phase 05-polish P01 | 18 | 2 tasks | 3 files |
 | Phase 05-polish P03 | 12 | 2 tasks | 5 files |
+| Phase 05-polish PP04 | 12 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -181,6 +182,10 @@ Recent decisions affecting current work:
 - 05-03: AVAudioSession.setCategory(.ambient) called ONCE in SFXPlayer.init() — adversarial grep verifies only 1 actual call site in entire gamekit/gamekit/ codebase; threat T-05-07 (audio session drift) mitigated by construction
 - 05-03: Test-seam dual pattern locked — lastInvocationAttempt set BEFORE the gate (records every call) + lastPlayedEvent set ONLY AFTER the gate passes; distinguishes 'method called with disabled' from 'method never called', proves D-10 contract directly. All seams #if DEBUG-gated.
 - 05-03: TDD plan-level RED→GREEN gate honored for both services — bf38819 precedes 695f753 (Haptics); a7fa1ec precedes a2116a6 (SFXPlayer); 4 commits in TDD order visible in git log --oneline
+- 05-04: SettingsToggleRow uses Toggle(label, isOn:) + .labelsHidden() to satisfy A11Y-02 — VoiceOver reads 'Haptics/Sound effects, switch button, on/off' per UI-SPEC line 174-175. Empty-string Toggle initializer NOT used anywhere; adversarial negative-grep gate locks the contract
+- 05-04: AcknowledgmentsView extracted to sibling Screens/AcknowledgmentsView.swift instead of file-private inside SettingsView.swift — keeps SettingsView under CLAUDE.md §8.1 ~400-line soft cap (final: 410 lines incl. expanded P5 doc-header). Planner-anticipated fallback per Plan §STEP 9 + UI-SPEC §Component Inventory line 232
+- 05-04: P4 DATA section preserved BYTE-IDENTICAL per CONTEXT D-16 — verified via diff of git show HEAD:... lines 125-162 vs current SettingsView.swift lines 187-224; exit code 0. Locked invariant for future Settings touches
+- 05-04: Navigation graph for Plan 05/06 LOCKED — RootTabView → SettingsView (NavigationStack owner) → FullThemePickerView (NavigationLink) AND RootTabView → SettingsView → AcknowledgmentsView (NavigationLink). Both destinations DO NOT own their own NavigationStack (CLAUDE.md / ARCHITECTURE Anti-Pattern 3)
 
 ### Pending Todos
 
@@ -200,8 +205,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26T22:36:50.791Z
-Stopped at: Completed 05-03-PLAN.md (Wave 2 services: Haptics + SFXPlayer + GameKitApp wiring)
+Last session: 2026-04-27T01:53:28.506Z
+Stopped at: Completed 05-04-PLAN.md (Settings spine rebuild + FullThemePickerView + xcstrings sync)
 Resume file: None
 
 **Planned Phase:** 05 (polish) — 7 plans — 2026-04-26T21:46:30.040Z
