@@ -68,7 +68,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 **: Export/Import JSON of stats with `schemaVersion`; round-trips cleanly via `fileExporter`/`fileImporter`
 - [ ] **PERSIST-04**: Optional **Sign in with Apple + CloudKit private DB** for cross-device persistence; full feature parity without sign-in
 - [ ] **PERSIST-05**: Sign-in surfaced once in 3-step intro and again in Settings; never gates gameplay; never nags
-- [ ] **PERSIST-06**: Anonymous local profile created on first launch; signing in promotes local data to cloud with no data loss; sync-status row in Settings reports state ("Synced just now" / "Syncing…" / "Not signed in" / "iCloud unavailable — last synced [date]")
+- [x] **PERSIST-06
+**: Anonymous local profile created on first launch; signing in promotes local data to cloud with no data loss; sync-status row in Settings reports state ("Synced just now" / "Syncing…" / "Not signed in" / "iCloud unavailable — last synced [date]")
 
 ### Theming Responsiveness
 
