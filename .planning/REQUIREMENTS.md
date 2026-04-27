@@ -40,7 +40,7 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 - [x] **MINES-01**: Three difficulties — Easy 9×9/10 mines, Medium 16×16/40, Hard 16×30/99 (Phase 02 Plan 01: locked in MinesweeperDifficulty enum)
 - [x] **MINES-02
 **: Tap to reveal, long-press to flag (composed `LongPressGesture(0.25s).exclusively(before: TapGesture())`)
-- [ ] **MINES-03**: First tap is always safe — mines placed *after* first tap, excluding tapped cell + its 8 bounds-clamped neighbors
+- [x] **MINES-03**: First tap is always safe — mines placed *after* first tap, excluding tapped cell + its 8 bounds-clamped neighbors
 - [x] **MINES-04
 **: Iterative flood-fill reveal for empty cells to the next numbered border (no recursion)
 - [x] **MINES-05
@@ -168,41 +168,41 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
-| FOUND-04 | Phase 1 | Pending |
-| FOUND-05 | Phase 1 | Pending |
-| FOUND-06 | Phase 1 | Pending |
-| FOUND-07 | Phase 1 | Pending |
-| SHELL-01 | Phase 1 | Pending |
-| SHELL-02 | Phase 5 | Pending |
-| SHELL-03 | Phase 4 | Pending |
+| FOUND-01 | Phase 1 | Complete (01) |
+| FOUND-02 | Phase 1 | Complete (01) |
+| FOUND-03 | Phase 1 | Complete (01) |
+| FOUND-04 | Phase 1 | Complete (01) |
+| FOUND-05 | Phase 1 | Complete (01) |
+| FOUND-06 | Phase 1 | Complete (01) |
+| FOUND-07 | Phase 1 | Complete (01) |
+| SHELL-01 | Phase 1 | Complete (01) |
+| SHELL-02 | Phase 5 | Complete (05-04) |
+| SHELL-03 | Phase 4 | Complete (04-05) |
 | SHELL-04 | Phase 5 | Complete (05-05) |
 | MINES-01 | Phase 2 | Complete (02-01) |
-| MINES-02 | Phase 3 | Pending |
-| MINES-03 | Phase 2 | Pending |
-| MINES-04 | Phase 2 | Pending |
-| MINES-05 | Phase 3 | Pending |
-| MINES-06 | Phase 3 | Pending |
-| MINES-07 | Phase 3 | Pending |
-| MINES-08 | Phase 5 | Pending |
-| MINES-09 | Phase 5 | Pending |
-| MINES-10 | Phase 5 | Pending |
-| MINES-11 | Phase 3 | Pending |
-| PERSIST-01 | Phase 4 | Complete |
-| PERSIST-02 | Phase 4 | Pending |
-| PERSIST-03 | Phase 4 | Pending |
+| MINES-02 | Phase 3 | Complete (03-04) |
+| MINES-03 | Phase 2 | Complete (02-03) |
+| MINES-04 | Phase 2 | Complete (02-04) |
+| MINES-05 | Phase 3 | Complete (03-03) |
+| MINES-06 | Phase 3 | Complete (03-04) |
+| MINES-07 | Phase 3 | Complete (03-03) |
+| MINES-08 | Phase 5 | Complete (05-06) |
+| MINES-09 | Phase 5 | Complete (05-03) |
+| MINES-10 | Phase 5 | Complete (05, G-1 deferred) |
+| MINES-11 | Phase 3 | Complete (03-03) |
+| PERSIST-01 | Phase 4 | Complete (04-01) |
+| PERSIST-02 | Phase 4 | Complete (04-06) |
+| PERSIST-03 | Phase 4 | Complete (04-03) |
 | PERSIST-04 | Phase 6 | Complete (06-08) |
 | PERSIST-05 | Phase 6 | Complete (06-08) |
-| PERSIST-06 | Phase 6 | Pending |
-| THEME-01 | Phase 5 | Pending |
-| THEME-02 | Phase 3 | Pending |
-| THEME-03 | Phase 5 | Pending |
+| PERSIST-06 | Phase 6 | Complete (06-08) |
+| THEME-01 | Phase 5 | Complete (05-07) |
+| THEME-02 | Phase 3 | Complete (03-01) |
+| THEME-03 | Phase 5 | Complete (05-07) |
 | A11Y-01 | Phase 5 | Complete (05-05) |
 | A11Y-02 | Phase 5 | Complete (05-05) |
-| A11Y-03 | Phase 5 | Pending |
-| A11Y-04 | Phase 5 | Pending |
+| A11Y-03 | Phase 5 | Complete (05-06) |
+| A11Y-04 | Phase 5 | Complete (05-07) |
 
 **Coverage:**
 - v1 requirements: 35 total

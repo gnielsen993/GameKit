@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 7 context gathered
-last_updated: "2026-04-27T20:08:45.448Z"
+stopped_at: P7 doc-drift cleanup landing
+last_updated: "2026-04-27T22:00:00.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 7
   completed_phases: 6
-  total_plans: 40
+  total_plans: 46
   completed_plans: 40
-  percent: 100
+  percent: 87
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 06 — cloudkit-siwa
+**Current focus:** Phase 07 — release
 
 ## Current Position
 
-Phase: 6
-Plan: 09 — CHECKPOINT REACHED (Task 1 complete @ 7f24223; Task 2 BLOCKING awaiting human verification). Wave-3 closing plan: shipped `.planning/phases/06-cloudkit-siwa/06-VERIFICATION.md` (237 lines) — manual SC1-SC5 verification template with verbatim copy locks (Restart alert title/body/buttons, Keychain attrs `com.lauterstar.gamekit.auth` + `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, all 4 SyncStatus labels), Pitfall C 2-sim fallback documented via `fallback_used` frontmatter field, gap log (Critical/Major/Minor severity scale), 5-row sign-off table mapped to PERSIST-04/05/06, phase-close recipe (ROADMAP+STATE+atomic commit per CLAUDE.md §8.10). All 10 Task 1 acceptance criteria green. Task 2 cannot be agent-executed — requires real iCloud, real Apple ID flows, manual revocation through system Settings, Instruments App Launch traces on a real device. **Hard dependency:** SC3 cannot pass until 06-03 Task 3 cleared (capabilities verified in Xcode + `expr try? GameKitApp._runtimeDeployCloudKitSchema()` run from lldb + `CD_GameRecord` + `CD_BestTime` visible in CloudKit Dashboard Development). Plan 09 is NOT marked fully complete — current-plan counter remains at 09 with status `checkpoint reached, awaiting human verification`.
-Status: 06-09 Task 1 complete (template shipped, 7f24223); Task 2 BLOCKING checkpoint awaiting user SC1-SC5 sweep + sign-off; 06-03 Task 3 also still pending (SC3 prerequisite).
+Phase: 7
+Plan: 01 — doc-drift cleanup (D-18) IN PROGRESS; remaining P7 plans 02-06 queued (icon, schema deploy, metadata+privacy+screenshots, checklist+verification template, TestFlight+SC1-SC5 sweep). Phase 6 closed 2026-04-27 per v1.0-MILESTONE-AUDIT.md (6/9 plans + UAT 6/6 SC pass; 06-VERIFICATION.md doc-drift resolved by this plan's Task 3).
+Status: P7 wave 1 in progress
 Last activity: 2026-04-27
 
-Progress: [█████████▊] 97%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -237,15 +237,15 @@ Recent decisions affecting current work:
 - 06-08: SIWA-success in intro is treated as Done — calls `dismissIntro()` so the `.fullScreenCover` dismisses (`hasSeenIntro = true` flips) and the user sees the Restart alert at the root level (RootTabView's `.alert(isPresented: Bindable(authStore).shouldShowRestartPrompt)` from Plan 06-06). The user is NOT trapped in the intro after a successful sign-in. Aligns with the spirit of P5 D-21/D-22/D-23 — every Step 3 exit path writes `hasSeenIntro = true` (Skip OR Done OR SIWA-success). Three-caller `dismissIntro()` pattern: P5 had 2 callers (Skip + Done); P6 06-08 adds the third (SIWA-success). Body BYTE-IDENTICAL to P5; only the doc-comment was updated to mention the new third caller.
 - 06-08: `IntroStep3SignInView` signature change — `let onSignIn: () -> Void` REMOVED; `let onSIWARequest: (ASAuthorizationAppleIDRequest) -> Void` + `let onSIWACompletion: (Result<ASAuthorization, Error>) -> Void` ADDED. The two new closure props let the parent `IntroFlowView` thread its `handleSIWARequest` and `handleSIWACompletion` instance methods down without the child view depending on `@Environment(\.authStore)` directly — preserves P5's "leaf views are props-only" pattern (CLAUDE.md §8.2). The parent owns environment reads; the child receives shaped closures.
 - 06-08: Mirrored handler shape from Plan 06-07 verbatim — both SIWA-success sites are now byte-similar at the call-site logic level. Eases future maintenance (e.g., adding rate-limiting, telemetry, retry on Keychain write failure — would update both sites identically). Locks the rule that any future SIWA-success site (e.g., a hypothetical "promote anonymous → signed-in" sheet from a Stats CTA) MUST follow the same `Task { @MainActor in switch result }` shape with the D-02/D-03 sequence. The handler is effectively a project-level pattern, not a per-screen one.
+- 07-01: P7 doc-drift cleanup — refreshed ROADMAP.md plan-completion counts (P3 4/4, P4 6/6, P5 7/7, P6 9/9), synced REQUIREMENTS.md traceability (35/35 Complete), flipped 06-VERIFICATION.md status pending → complete with sign-off rows pointing to 06-UAT.md as canonical evidence per v1.0-MILESTONE-AUDIT.md, advanced STATE.md current_position to Phase 7. Single docs-only commit per CLAUDE.md §8.10. ZERO code changes.
 
 ### Pending Todos
 
-- **06-03 Task 3 (checkpoint:human-verify) — BLOCKING for Plan 06-09 SC3**: User must (a) verify in Xcode → gamekit target → Signing & Capabilities that all 4 P6 capabilities are registered (Sign in with Apple, iCloud + CloudKit + container iCloud.com.lauterstar.gamekit, iCloud CloudKit Documents, Background Modes → Remote notifications), and (b) launch a Debug build, run `expr try? GameKitApp._runtimeDeployCloudKitSchema()` in lldb, then verify in CloudKit Dashboard Development that CD_GameRecord + CD_BestTime record types appear. See `.planning/phases/06-cloudkit-siwa/06-03-SUMMARY.md` §CHECKPOINT for exact steps + resume-signal options.
+- **P7 work queued**: Plans 07-02 (icon production), 07-03 (CloudKit Production schema deploy), 07-04 (App Store metadata + privacy policy + screenshots), 07-05 (release checklist + 07-VERIFICATION.md template), 07-06 (TestFlight upload + SC1-SC5 manual sweep + submit). See `.planning/phases/07-release/` for plan files.
 
 ### Blockers/Concerns
 
-- **Plan 06-03 paused at Task 3 checkpoint** — orchestrator must resolve before plan can be marked fully complete; the checkpoint blocks Plan 06-09 SC3 (real-CloudKit promotion test) but did not block Plan 06-04/06-05 (used in-memory KeychainBackend stubs + #if DEBUG applyEvent_forTesting seam). Counter advanced to 05 (now complete) ahead of 06-03 Task 3 resolution.
-- ~~**Plan 06-05 must remove `SKIP_OBSERVER_TESTS` gate**~~ — RESOLVED 2026-04-27 in commit a7d10db. Both `#if SKIP_OBSERVER_TESTS` (~line 58) and `#endif // SKIP_OBSERVER_TESTS` (~line 167) deleted from `gamekit/gamekitTests/Core/CloudSyncStatusObserverTests.swift`; 9-test suite now exercises the production CloudSyncStatusObserver type. Header doc-comment block in the test file retains the literal `SKIP_OBSERVER_TESTS` token in two prose references documenting the historical Rule 3 deviation — those are commentary only, no compile impact.
+- *(no active blockers — Phase 7 ready to execute. Earlier P6 06-03 Task 3 checkpoint and 06-09 BLOCKING checkpoint were resolved via the manual UAT recorded in 06-UAT.md and the doc-drift sweep in this plan.)*
 
 ## Deferred Items
 
@@ -258,7 +258,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: --stopped-at
-Stopped at: Phase 7 context gathered
+Stopped at: P7 doc-drift cleanup landing
 Resume file: --resume-file
 
-**Planned Phase:** 6 (cloudkit-siwa) — 9 plans — 2026-04-27T15:40:19.917Z
+**Planned Phase:** 7 (release) — 6 plans — 2026-04-27T22:00:00.000Z

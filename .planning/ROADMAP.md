@@ -134,13 +134,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 9 plans
 - [x] 06-01-PLAN.md — Wave-0 TDD RED — KeychainBackend + InMemoryKeychainBackend + AuthStoreTests skeleton (locks SC2 verbatim Keychain attrs; T-06-01)
 - [x] 06-02-PLAN.md — Wave-0 TDD RED — SyncStatus enum + label(at:) + CloudSyncStatusObserverTests skeleton (locks D-10 4-state contract)
-- [~] 06-03-PLAN.md — Wave-0 BLOCKING — entitlements verify (T-06-09) + DEBUG schema deploy preflight (Pitfall D — required before SC3) [Tasks 1+2 done; Task 3 checkpoint:human-verify still pending]
+- [x] 06-03-PLAN.md — Wave-0 BLOCKING — entitlements verify (T-06-09) + DEBUG schema deploy preflight (Pitfall D — required before SC3)
 - [x] 06-04-PLAN.md — Wave-1 GREEN — AuthStore production source (Keychain + revocation observer + scene-active validator) → 7/7 RED tests GREEN
 - [x] 06-05-PLAN.md — Wave-1 GREEN — CloudSyncStatusObserver production source (eventChangedNotification translator) → 9/9 RED tests GREEN
 - [x] 06-06-PLAN.md — Wave-2 — GameKitApp + RootTabView wiring (Environment injection + scenePhase observer + root Restart prompt alert D-04 verbatim)
 - [x] 06-07-PLAN.md — Wave-2 — SettingsView SYNC section between AUDIO and DATA (extracted to SettingsSyncSection.swift) + xcstrings sync
 - [x] 06-08-PLAN.md — Wave-2 — IntroFlowView Step 3 SIWA wire-up (replaces P5 D-21 no-op) + dismissIntro byte-identical preserved
-- [ ] 06-09-PLAN.md — Wave-3 — manual SC1-SC5 verification checkpoint (06-VERIFICATION.md template + sign-off)
+- [x] 06-09-PLAN.md — Wave-3 — manual SC1-SC5 verification checkpoint (06-VERIFICATION.md template + sign-off)
 **UI hint**: yes
 
 ### Phase 7: Release
@@ -153,7 +153,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Sign in with Apple is verified working in the **production** environment via TestFlight (not just dev sandbox); CloudKit sync is verified working in TestFlight by signing in on two TestFlight devices and watching stats sync.
   4. Final theme-matrix legibility audit passes: a Hard board sample renders correctly on at least one preset from each DesignKit category for play state AND loss state; flag color verified distinct from mine indicator on warm-accent presets (Forest / Ember / Voltage / Maroon).
   5. Release checklist documented in `.planning/Docs/` (or equivalent) covering every step: capabilities verified, entitlements diffed, schema promoted, container ID stable, label completed, SIWA tested in production. TestFlight build is uploaded, internal testers invited.
-**Plans**: TBD
+**Plans:** 6 plans
 
 ## Progress
 
@@ -164,11 +164,11 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Foundation | 8/8 | Complete | 2026-04-25 |
 | 2. Mines Engines | 6/6 | Complete | 2026-04-25 |
-| 3. Mines UI | 3/4 | In progress | - |
-| 4. Stats & Persistence | 1/6 | In progress | - |
-| 5. Polish | 7/7 | In progress | - |
-| 6. CloudKit + Sign in with Apple | 7/9 | In progress | - |
-| 7. Release | 0/TBD | Not started | - |
+| 3. Mines UI | 4/4 | Complete | 2026-04-25 |
+| 4. Stats & Persistence | 6/6 | Complete | 2026-04-26 |
+| 5. Polish | 7/7 | Complete | 2026-04-26 |
+| 6. CloudKit + Sign in with Apple | 9/9 | Complete | 2026-04-27 |
+| 7. Release | 0/6 | In progress | - |
 
 ## Research Flags
 

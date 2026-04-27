@@ -2,13 +2,22 @@
 phase: 06-cloudkit-siwa
 type: verification
 sc_count: 5
-status: pending  # pending | in_progress | complete | blocked
-signed_off_by: ""
-signed_off_date: ""
+status: complete  # signed off via UAT.md 2026-04-27
+signed_off_by: "User (UAT — see 06-UAT.md)"
+signed_off_date: "2026-04-27"
 fallback_used:    # set if 2-sim was used for SC3 (Pitfall C)
 ---
 
 # Phase 6 — Manual SC1-SC5 Verification Checklist
+
+> **Status note (added 2026-04-27 during P7 doc-drift cleanup per 07-01-PLAN):**
+> This template was authored by Plan 06-09 Task 1. The actual SC1-SC5 sweep was
+> performed against `06-UAT.md` (see that document for full evidence and 6/6 SC
+> pass details) and signed off in `06-VALIDATION.md` on 2026-04-27. Rather than
+> re-run the sweep against this template's evidence fields, the sign-off rows
+> below have been marked PASS with a pointer to 06-UAT.md as the canonical
+> evidence source. The unchecked checkboxes throughout the SC1-SC5 sections
+> remain unchecked because the canonical evidence lives in 06-UAT.md, not here.
 
 > Per CONTEXT D-18: Phase 6 ships against locked SC1-SC5 from ROADMAP.
 > Wave 0 / Wave 1 / Wave 2 ship the production code; THIS document
@@ -214,16 +223,16 @@ Severity scale:
 
 | Criterion | Verifier | Date | Status |
 |-----------|----------|------|--------|
-| SC1 — Sign-out parity (PERSIST-04) |          |      | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| SC2 — SIWA + Keychain + revocation (PERSIST-04 + PERSIST-05) |          |      | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| SC3 — 2-device promotion (PERSIST-06) |          |      | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| SC4 — 4-state sync-status (PERSIST-06) |          |      | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| SC5 — Cold-start <1s (PERSIST-04 SC5 + FOUND-01) |          |      | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
+| SC1 — Sign-out parity (PERSIST-04) | User (UAT) | 2026-04-27 | ✓ PASS (per 06-UAT.md) |
+| SC2 — SIWA + Keychain + revocation (PERSIST-04 + PERSIST-05) | User (UAT) | 2026-04-27 | ✓ PASS (per 06-UAT.md) |
+| SC3 — 2-device promotion (PERSIST-06) | User (UAT) | 2026-04-27 | ✓ PASS (per 06-UAT.md) |
+| SC4 — 4-state sync-status (PERSIST-06) | User (UAT) | 2026-04-27 | ✓ PASS (per 06-UAT.md) |
+| SC5 — Cold-start <1s (PERSIST-04 SC5 + FOUND-01) | User (UAT) | 2026-04-27 | ✓ PASS (per 06-UAT.md) |
 
 Phase 6 close criteria:
-- [ ] All 5 SCs PASS or DEFERRED-WITH-REASON-DOCUMENTED
-- [ ] No Critical gaps open
-- [ ] Major gaps converted to a P6 gap-closure plan via `/gsd-plan-phase 06 --gaps` OR explicitly accepted as P7 release-checklist items
+- [x] All 5 SCs PASS or DEFERRED-WITH-REASON-DOCUMENTED
+- [x] No Critical gaps open
+- [x] Major gaps converted to a P6 gap-closure plan via `/gsd-plan-phase 06 --gaps` OR explicitly accepted as P7 release-checklist items
 
 ---
 
@@ -231,7 +240,7 @@ Phase 6 close criteria:
 
 After ALL SCs PASS or DEFERRED:
 
-- [ ] Update `.planning/ROADMAP.md` — Phase 6 row: status `In progress` → `Complete`; date filled
-- [ ] Update `.planning/STATE.md` — `current_position` advances to Phase 7; `progress.completed_phases` increments to 6
+- [x] Update `.planning/ROADMAP.md` — Phase 6 row: status `In progress` → `Complete`; date filled
+- [x] Update `.planning/STATE.md` — `current_position` advances to Phase 7; `progress.completed_phases` increments to 6
 - [ ] Atomic commit `docs(06-09): SC1-SC5 verification checkpoint signed off — Phase 6 complete` per CLAUDE.md §8.10
-- [ ] Optional: update `.planning/REQUIREMENTS.md` traceability — flip PERSIST-04, PERSIST-05, PERSIST-06 from "Pending" → "Complete (06)"
+- [x] Optional: update `.planning/REQUIREMENTS.md` traceability — flip PERSIST-04, PERSIST-05, PERSIST-06 from "Pending" → "Complete (06)"
