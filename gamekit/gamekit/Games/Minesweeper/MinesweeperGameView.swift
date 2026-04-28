@@ -83,8 +83,8 @@ struct MinesweeperGameView: View {
                     reduceMotion: reduceMotion,
                     revealCount: viewModel.revealCount,
                     flagToggleCount: viewModel.flagToggleCount,
-                    onTap: { viewModel.reveal(at: $0) },
-                    onLongPress: { viewModel.toggleFlag(at: $0) }
+                    onTap: { viewModel.handleTap(at: $0) },
+                    onLongPress: { viewModel.handleLongPress(at: $0) }
                 )
                 // P5 D-03: 4-keyframe horizontal loss shake. Magnitude 8pt
                 // locked by CONTEXT D-03 (animation amplitude, not layout
@@ -102,6 +102,50 @@ struct MinesweeperGameView: View {
                     LinearKeyframe(4.0, duration: 0.1)
                     LinearKeyframe(0.0, duration: 0.1)
                 }
+
+                // P6.1 (MINES-12): Reveal/Flag mode toggle FAB.
+                // Sits below the BoardView in the VStack so layout reflows
+                // around the board's ScrollView naturally. Hidden post-
+                // terminal-state via .opacity(0) + .allowsHitTesting(false)
+                // (RESEARCH open question #2 — preserves layout while
+                // disabling the affordance once the game ends).
+                Button {
+                    viewModel.toggleInteractionMode()
+                } label: {
+                    Image(systemName: viewModel.interactionMode == .reveal
+                                      ? "cursorarrow.click"
+                                      : "flag.fill")
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(theme.colors.textPrimary)
+                        .frame(width: 64, height: 64)
+                        // CONTEXT Discretion #6: theme.colors.danger for the
+                        // flag-mode FAB is a non-error semantic use of the
+                        // token — flag mode is the "highlighted action" mode,
+                        // not a failure state. No new DesignKit token ships
+                        // in v1.0.x (CONTEXT D-19).
+                        .background(
+                            (viewModel.interactionMode == .reveal
+                             ? theme.colors.accentPrimary
+                             : theme.colors.danger)
+                            .clipShape(Circle())
+                        )
+                }
+                .buttonStyle(.plain)
+                .contentShape(Circle())
+                .padding(.top, theme.spacing.s)
+                .opacity(viewModel.terminalOutcome == nil ? 1 : 0)
+                .allowsHitTesting(viewModel.terminalOutcome == nil)
+                .accessibilityLabel(Text(viewModel.interactionMode == .reveal
+                    ? String(localized: "Reveal mode active. Double-tap to switch to Flag mode.")
+                    : String(localized: "Flag mode active. Double-tap to switch to Reveal mode.")))
+                // P6.1 (MINES-12): Light haptic on toggle. Gating-at-source
+                // pattern matches Plan 05-06 cell-level haptics —
+                // hapticsEnabled=false collapses the trigger to constant 0
+                // so .sensoryFeedback never fires.
+                .sensoryFeedback(
+                    .impact(weight: .light),
+                    trigger: settingsStore.hapticsEnabled ? viewModel.modeToggleCount : 0
+                )
             }
 
             // P5 D-02: full-board win sweep — success-tint wash via
