@@ -34,6 +34,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 **: Stats screen shows per-difficulty: games played · wins · win % · best time
 - [x] **SHELL-04
 **: 3-step intro on first launch (themes → stats → optional sign-in card with Skip), dismissable, never shown again
+- [x] **SHELL-05
+**: Home shows 2 game-tile cards in a 2-column square grid: Mines (enabled) + Upcoming (opens list of planned games)
 
 ### Minesweeper
 
@@ -180,6 +182,7 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | SHELL-02 | Phase 5 | Complete (05-04) |
 | SHELL-03 | Phase 4 | Complete (04-05) |
 | SHELL-04 | Phase 5 | Complete (05-05) |
+| SHELL-05 | Phase 6.1 | Complete (06.1-01) |
 | MINES-01 | Phase 2 | Complete (02-01) |
 | MINES-02 | Phase 3 | Complete (03-04) |
 | MINES-03 | Phase 2 | Complete (02-03) |
@@ -207,8 +210,8 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | A11Y-05 | Phase 6.1 | Complete (06.1-03) |
 
 **Coverage:**
-- v1 requirements: 36 total
-- Mapped to phases: 36 ✓
+- v1 requirements: 37 total
+- Mapped to phases: 37 ✓
 - Unmapped: 0
 
 **Notes on placement:**
