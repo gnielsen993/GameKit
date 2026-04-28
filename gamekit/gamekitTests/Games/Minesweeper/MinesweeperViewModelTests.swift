@@ -462,6 +462,133 @@ struct MinesweeperViewModelTests {
         }
     }
 
+    // MARK: - MINES-12 Phase 6.1 (InteractionModeTests)
+    //
+    // Reveal/Flag interaction-mode toggle. The view tier (CellView gesture
+    // closures threaded via BoardView from GameView) calls vm.handleTap and
+    // vm.handleLongPress — NEVER vm.reveal/vm.toggleFlag directly. Mode-routing
+    // logic lives in the VM (CONTEXT D-06 / D-11; CLAUDE.md §1 lightweight
+    // MVVM; ARCHITECTURE Anti-Pattern 1).
+    //
+    // RED gate (Plan 06.1-02 Task 1): all 7 tests below must FAIL TO COMPILE
+    // before Task 2 ships. Expected errors: cannot find 'interactionMode' /
+    // 'handleTap' / 'handleLongPress' / 'toggleInteractionMode' /
+    // 'modeToggleCount' in scope. TDD precedent locked across Plans 04-02 /
+    // 05-01 / 05-06 / 06-01 / 06-02 / 06.1-03.
+
+    @MainActor
+    @Suite("InteractionMode")
+    struct InteractionModeTests {
+
+        @Test
+        func tap_in_revealMode_revealsCell() {
+            let (vm, _) = MinesweeperViewModelTests.makeVM(difficulty: .easy)
+            #expect(vm.interactionMode == .reveal, "Default mode is .reveal (CONTEXT D-07)")
+            let firstTap = MinesweeperIndex(row: 0, col: 0)
+            vm.handleTap(at: firstTap)
+            #expect(vm.gameState == .playing, "First handleTap in .reveal mode bootstraps the board (D-07)")
+            #expect(vm.board.cell(at: firstTap).state == .revealed)
+            #expect(vm.flaggedCount == 0, "Tap in .reveal mode must NOT flag")
+        }
+
+        @Test
+        func tap_in_flagMode_togglesFlag() {
+            let (vm, _) = MinesweeperViewModelTests.makeVM(difficulty: .easy)
+            // Bootstrap board with an initial reveal in .reveal mode (the .idle
+            // -> .playing transition lives behind reveal(at:); flag in .idle is
+            // a no-op per existing toggleFlag guard).
+            vm.handleTap(at: MinesweeperIndex(row: 0, col: 0))
+            // Switch to flag mode — handleTap should now flag.
+            vm.toggleInteractionMode()
+            #expect(vm.interactionMode == .flag)
+            guard let target = MinesweeperViewModelTests.firstHiddenNonMine(on: vm.board) else {
+                Issue.record("Expected hidden non-mine cell after first reveal")
+                return
+            }
+            let countBefore = vm.flaggedCount
+            vm.handleTap(at: target)
+            #expect(vm.flaggedCount == countBefore + 1, "Tap in .flag mode toggles a flag (CONTEXT D-06)")
+            #expect(vm.board.cell(at: target).state == .flagged)
+        }
+
+        @Test
+        func longPress_in_revealMode_togglesFlag() {
+            let (vm, _) = MinesweeperViewModelTests.makeVM(difficulty: .easy)
+            vm.handleTap(at: MinesweeperIndex(row: 0, col: 0))
+            #expect(vm.interactionMode == .reveal)
+            guard let target = MinesweeperViewModelTests.firstHiddenNonMine(on: vm.board) else {
+                Issue.record("Expected hidden non-mine cell after first reveal")
+                return
+            }
+            let countBefore = vm.flaggedCount
+            vm.handleLongPress(at: target)
+            #expect(
+                vm.flaggedCount == countBefore + 1,
+                "Long-press in .reveal mode flags (current MINES-02 long-press semantic; CONTEXT D-06)"
+            )
+            #expect(vm.board.cell(at: target).state == .flagged)
+        }
+
+        @Test
+        func longPress_in_flagMode_revealsCell() {
+            let (vm, _) = MinesweeperViewModelTests.makeVM(difficulty: .easy)
+            vm.handleTap(at: MinesweeperIndex(row: 0, col: 0))
+            vm.toggleInteractionMode()
+            #expect(vm.interactionMode == .flag)
+            guard let target = MinesweeperViewModelTests.firstHiddenNonMine(on: vm.board) else {
+                Issue.record("Expected hidden non-mine cell after first reveal")
+                return
+            }
+            vm.handleLongPress(at: target)
+            #expect(
+                vm.board.cell(at: target).state == .revealed,
+                "Long-press in .flag mode reveals (inverted; CONTEXT D-06)"
+            )
+        }
+
+        @Test
+        func toggleInteractionMode_cycles() {
+            let (vm, _) = MinesweeperViewModelTests.makeVM(difficulty: .easy)
+            #expect(vm.interactionMode == .reveal)
+            vm.toggleInteractionMode()
+            #expect(vm.interactionMode == .flag)
+            vm.toggleInteractionMode()
+            #expect(vm.interactionMode == .reveal, "Two toggles return to default")
+        }
+
+        @Test
+        func restart_resets_interactionMode_and_modeToggleCount() {
+            let (vm, _) = MinesweeperViewModelTests.makeVM(difficulty: .easy)
+            vm.toggleInteractionMode()
+            vm.toggleInteractionMode()
+            vm.toggleInteractionMode()
+            #expect(vm.interactionMode == .flag, "Three toggles ends in .flag")
+            #expect(vm.modeToggleCount == 3, "modeToggleCount bumps once per toggle")
+
+            vm.restart()
+            #expect(
+                vm.interactionMode == .reveal,
+                "restart() resets mode to .reveal — no UserDefaults persistence (CONTEXT D-08)"
+            )
+            #expect(
+                vm.modeToggleCount == 0,
+                "restart() resets modeToggleCount for symmetry with revealCount/flagToggleCount (RESEARCH open question #3)"
+            )
+        }
+
+        @Test
+        func modeToggleCount_bumps_per_toggle() {
+            let (vm, _) = MinesweeperViewModelTests.makeVM(difficulty: .easy)
+            #expect(vm.modeToggleCount == 0)
+            vm.toggleInteractionMode()
+            #expect(vm.modeToggleCount == 1)
+            vm.toggleInteractionMode()
+            #expect(vm.modeToggleCount == 2)
+            vm.toggleInteractionMode()
+            #expect(vm.modeToggleCount == 3)
+        }
+    }
+
     // MARK: - ARCHITECTURE Anti-Pattern 1 — Foundation-only purity (structural belt-and-suspenders)
 
     @Test
