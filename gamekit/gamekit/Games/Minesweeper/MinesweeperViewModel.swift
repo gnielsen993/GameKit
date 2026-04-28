@@ -34,6 +34,21 @@ struct LossContext: Equatable, Sendable {
     let safeCellsRemaining: Int
 }
 
+/// Interaction-mode toggle for Minesweeper (CONTEXT D-06 / D-11 — Phase 6.1).
+///
+/// `.reveal` = MINES-02 default (tap reveals, long-press flags).
+/// `.flag`   = inverted (tap toggles flag, long-press reveals — long-press
+///             always escapes the current mode regardless of which one).
+///
+/// `Codable` conformance is forward-looking — D-08 declined the UserDefaults
+/// persistence option for v1.0.x, so the enum is never persisted today;
+/// adding `Codable` has zero runtime cost and lets a future v1.0.x plan
+/// flip on persistence without a source-level migration (RESEARCH §Pattern 5).
+enum MinesweeperInteractionMode: String, Sendable, Equatable, Codable {
+    case reveal
+    case flag
+}
+
 @Observable @MainActor
 final class MinesweeperViewModel {
 
@@ -46,6 +61,14 @@ final class MinesweeperViewModel {
     private(set) var timerAnchor: Date?               // nil = paused/idle/terminal (D-05)
     private(set) var pausedElapsed: TimeInterval = 0  // accumulator (D-06)
     private(set) var lossContext: LossContext?
+
+    /// Interaction-mode toggle (CONTEXT D-06 / D-11 — Phase 6.1).
+    /// Defaults to `.reveal` and is reset to `.reveal` by every `restart()`
+    /// (D-08 — no UserDefaults persistence). View-tier mode-routing logic
+    /// lives in `handleTap(at:)` / `handleLongPress(at:)`; the cell view
+    /// never branches on mode itself (CLAUDE.md §1 lightweight MVVM,
+    /// ARCHITECTURE Anti-Pattern 1).
+    private(set) var interactionMode: MinesweeperInteractionMode = .reveal
 
     // MARK: - P5 animation orchestration (CONTEXT D-05/D-06)
     //
@@ -80,6 +103,15 @@ final class MinesweeperViewModel {
     /// transition (`.hidden ↔ .flagged`). Toggle attempts on `.revealed`
     /// or `.mineHit` cells are no-ops and do NOT bump (P3 D-19 preserved).
     private(set) var flagToggleCount: Int = 0
+
+    /// Trigger counter for `.sensoryFeedback(.impact(.light))` on the
+    /// mode-toggle FAB (CONTEXT D-09 — Phase 6.1). Bumped on every
+    /// `toggleInteractionMode()` call. Reset on `restart()` for symmetry
+    /// with `revealCount` and `flagToggleCount` (RESEARCH open question #3 —
+    /// `.sensoryFeedback` is value-change-driven, so resetting to 0 still
+    /// fires the haptic on the first post-restart toggle when the value
+    /// flips 0 → 1).
+    private(set) var modeToggleCount: Int = 0
 
     // MARK: - Difficulty-switch confirmation flow (D-10, RESEARCH Pitfall 4)
 
@@ -271,6 +303,11 @@ final class MinesweeperViewModel {
         phase = .idle
         revealCount = 0
         flagToggleCount = 0
+        // CONTEXT D-08 — Phase 6.1: mode resets to .reveal on every restart.
+        // No UserDefaults persistence (D-08 declined the persistence option);
+        // modeToggleCount resets for symmetry with the other trigger counters.
+        interactionMode = .reveal
+        modeToggleCount = 0
     }
 
     /// Direct setter — internal callers (confirmDifficultyChange, init paths) use this.
@@ -323,6 +360,49 @@ final class MinesweeperViewModel {
     func resume() {
         guard case .playing = gameState, timerAnchor == nil else { return }
         timerAnchor = clock()
+    }
+
+    // MARK: - Phase 6.1 (MINES-12) — Interaction-mode toggle + tap routing
+
+    /// Toggle between `.reveal` and `.flag` modes. Bumps `modeToggleCount`
+    /// for the FAB-level `.sensoryFeedback(.impact(.light))` haptic
+    /// (CONTEXT D-09). Terminal states (.won / .lost) are a structural
+    /// no-op — the FAB hides post-terminal per CONTEXT D-09 / RESEARCH
+    /// open question #2, but this guard ensures any future call site
+    /// also can't change mode after the game ends.
+    func toggleInteractionMode() {
+        if case .won = gameState { return }
+        if case .lost = gameState { return }
+        switch interactionMode {
+        case .reveal: interactionMode = .flag
+        case .flag:   interactionMode = .reveal
+        }
+        modeToggleCount += 1
+    }
+
+    /// View-tier entry point for tap gesture. Branches on `interactionMode`
+    /// (CONTEXT D-06 / D-11). View NEVER calls `reveal(at:)` /
+    /// `toggleFlag(at:)` directly after Phase 6.1 — mode-routing logic
+    /// lives in the VM (CLAUDE.md §1 lightweight MVVM, ARCHITECTURE
+    /// Anti-Pattern 1).
+    func handleTap(at index: MinesweeperIndex) {
+        switch interactionMode {
+        case .reveal: reveal(at: index)
+        case .flag:   toggleFlag(at: index)
+        }
+    }
+
+    /// View-tier entry point for long-press gesture. Long-press is ALWAYS
+    /// the OPPOSITE of the current mode's tap action — provides a
+    /// quick-action escape regardless of which mode is active (CONTEXT
+    /// D-06). The 0.25s threshold + `.exclusively(before:)` gesture
+    /// composition are owned by `MinesweeperCellView` and are NOT touched
+    /// by Phase 6.1 (ROADMAP P3 SC1 lock + Plan 03-03 invariant).
+    func handleLongPress(at index: MinesweeperIndex) {
+        switch interactionMode {
+        case .reveal: toggleFlag(at: index)   // current MINES-02 long-press semantic
+        case .flag:   reveal(at: index)       // inverted — long-press reveals in flag mode
+        }
     }
 
     // MARK: - Private helpers
