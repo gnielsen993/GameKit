@@ -90,6 +90,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 **: Reduce-motion preference dampens the animation pass
 - [x] **A11Y-04
 **: Default number palette (the `theme.colors.gameNumber(_:)` token in DesignKit) is color-blind-safe by default — verified against Wong-palette principles for protanopia / deuteranopia / tritanopia
+- [x] **A11Y-05
+**: Pinch-to-zoom on Mines board (any difficulty); scale range 0.8x-2.0x; persists across restart within session (graduates A11Y-V2-02)
 
 ## v2 Requirements
 
@@ -120,7 +122,6 @@ Deferred to a post-MVP milestone. Tracked but not in the current roadmap.
 
 - **THEME-V2-01**: Color-blind named DesignKit preset(s) (Wong / IBM palettes)
 - **A11Y-V2-01**: VoiceOver-playable Mines as a deliberate feature (full play, not just labels)
-- **A11Y-V2-02**: Pinch-to-zoom on Hard board
 
 ### Suite Expansion (separate milestones each)
 
@@ -203,10 +204,11 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | A11Y-02 | Phase 5 | Complete (05-05) |
 | A11Y-03 | Phase 5 | Complete (05-06) |
 | A11Y-04 | Phase 5 | Complete (05-07) |
+| A11Y-05 | Phase 6.1 | Complete (06.1-03) |
 
 **Coverage:**
-- v1 requirements: 35 total
-- Mapped to phases: 35 ✓
+- v1 requirements: 36 total
+- Mapped to phases: 36 ✓
 - Unmapped: 0
 
 **Notes on placement:**
@@ -214,6 +216,7 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 - **MINES-03 / MINES-04 / MINES-07 (engine-side) at Phase 2; MINES-07 (UI-side overlay) at Phase 3** — engine detection of win/loss lands at P2 in WinDetector tests; the actual user-visible overlay using `theme.colors.{success,danger}` lands at P3.
 - **THEME-02 at Phase 3** because the new `theme.colors.gameNumber(_:)` token must be added to DesignKit and consumed by Mines cells in Phase 3 (no hardcoded greys from day 1). The full 6-category legibility audit is Phase 5 (THEME-01).
 - **SHELL-01 at Phase 1** ships the skeletal Home with Minesweeper as the only enabled card; SHELL-02 / SHELL-04 (Settings spine, intro flow) ship with the polish pass at Phase 5 alongside the haptics/SFX toggles they configure.
+- **A11Y-05 graduated from A11Y-V2-02** at Phase 6.1 — pinch-zoom delivered as part of the pre-release polish pass alongside the auto-scale cellSize formula that eliminates Hard horizontal scroll on standard iPhone widths.
 
 ---
 *Requirements defined: 2026-04-24*
