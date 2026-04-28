@@ -59,6 +59,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 **: Subtle SFX on tap / win / loss, **off by default**, toggle in Settings; uses `AVAudioSession.ambient` (does not duck user music)
 - [x] **MINES-11
 **: On loss, all mines reveal and incorrectly-flagged cells are marked with an X indicator (industry standard)
+- [x] **MINES-12
+**: Reveal/Flag interaction mode toggle. Tap action depends on current mode (.reveal: tap reveals, long-press flags; .flag: tap toggles flag, long-press reveals). Default = .reveal; resets per-game on restart()
 
 ### Persistence & Sync
 
@@ -194,6 +196,7 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | MINES-09 | Phase 5 | Complete (05-03) |
 | MINES-10 | Phase 5 | Complete (05, G-1 deferred) |
 | MINES-11 | Phase 3 | Complete (03-03) |
+| MINES-12 | Phase 6.1 | Complete (06.1-02) |
 | PERSIST-01 | Phase 4 | Complete (04-01) |
 | PERSIST-02 | Phase 4 | Complete (04-06) |
 | PERSIST-03 | Phase 4 | Complete (04-03) |
@@ -210,8 +213,8 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 | A11Y-05 | Phase 6.1 | Complete (06.1-03) |
 
 **Coverage:**
-- v1 requirements: 37 total
-- Mapped to phases: 37 ✓
+- v1 requirements: 38 total
+- Mapped to phases: 38 ✓
 - Unmapped: 0
 
 **Notes on placement:**

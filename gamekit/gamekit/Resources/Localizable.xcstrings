@@ -303,6 +303,9 @@
     "Finish intro" : {
 
     },
+    "Flag mode active. Double-tap to switch to Reveal mode." : {
+
+    },
     "Flagged, row %lld column %lld" : {
       "comment" : "Cell a11y label — flagged state (D-19, 1-indexed)",
       "extractionState" : "automatic",
@@ -531,6 +534,9 @@
       }
     },
     "Restart to enable iCloud sync" : {
+
+    },
+    "Reveal mode active. Double-tap to switch to Flag mode." : {
 
     },
     "Revealed, %lld mines adjacent, row %lld column %lld" : {
