@@ -151,7 +151,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
-- [ ] 06.1-01-PLAN.md — Home 2-col grid (Mines + Upcoming sheet) + UpcomingGamesView sibling — SHELL-05
+- [x] 06.1-01-PLAN.md — Home 2-col grid (Mines + Upcoming sheet) + UpcomingGamesView sibling — SHELL-05
 - [ ] 06.1-02-PLAN.md — Minesweeper Reveal/Flag interaction-mode toggle (VM + FAB) — MINES-12
 - [x] 06.1-03-PLAN.md — Mines board auto-scale + pinch-zoom (MagnifyGesture + onGeometryChange) — A11Y-05 (graduates A11Y-V2-02)
 

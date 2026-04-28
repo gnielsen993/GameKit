@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06.1-03 — Mines auto-scale + pinch-zoom (A11Y-05); manual recipes pending human execution
-last_updated: "2026-04-28T02:39:32.833Z"
+stopped_at: Completed 06.1-01 — Home 2-col grid + Upcoming sheet (SHELL-05); manual recipes pending human execution
+last_updated: "2026-04-28T02:50:44.505Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 49
-  completed_plans: 44
-  percent: 90
+  completed_plans: 45
+  percent: 92
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 ## Current Position
 
 Phase: 06.1 (pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-28
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -91,6 +91,7 @@ Progress: [█████████░] 90%
 | Phase 06-cloudkit-siwa P07 | 25 | 3 tasks | 3 files |
 | Phase 06-cloudkit-siwa P08 | 13 | 2 tasks | 1 files |
 | Phase 06.1 P03 | 25 | 4 tasks | 3 files |
+| Phase 06.1 P01 | 5 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -249,6 +250,12 @@ Recent decisions affecting current work:
 - 06.1-03: MagnifyGesture default minimumScaleDelta accepted (Plan §Pitfall 5 mentioned 0.05 as defensive lock); RESEARCH HIGH confidence on .simultaneousGesture parent/child decoupling means manual SC1 50-tap recipe is the empirical gate; bumped only if SC1 surfaces misfires
 - 06.1-03: Source-comment self-discipline rule reapplied for the 4th time — rephrased GeometryReader and MagnificationGesture prohibition comments to keep negative-greps clean even where prose narrates the prohibition (precedents P4 04-01 / P6 06-06 / P6 06-07)
 - 06.1-03: Four-commit shape (test/feat/feat/docs) honors TDD RED -> GREEN gate (project precedent across Plans 04-02/05-01/05-06/06-01/06-02 locked) AND CLAUDE.md §8.10 atomic-per-coherent-feature; each commit independently bisectable; supersedes plan §Success Criteria's single-commit suggestion
+- 06.1-01: Sheet over NavigationLink push (CONTEXT Discretion #2) — preserves HomeView NavigationStack for Mines push and reads as 'directory of placeholder games' modal vs 'going somewhere new' navigation push
+- 06.1-01: Single shared tileCard(symbol:iconColor:title:caption:) helper renders both Mines and Upcoming tiles with one .aspectRatio(1, contentMode: .fit) call site — satisfies plan acceptance OR clause without duplicating the modifier per tile
+- 06.1-01: GameCard struct KEPT in HomeView.swift (per plan instruction) and consumed by UpcomingGamesView via module-level visibility — DesignKit promotion threshold (2+ games / 3+ call sites) not met
+- 06.1-01: xcstringstool sync invocation requires --stringsdata pointing to compiler-generated .stringsdata under DerivedData (NOT --positional-arguments + .swift files); the -print0 | xargs -0 form is load-bearing because shell word-splitting of $(find ...) was being interpreted as a single argument
+- 06.1-01: Source-comment self-discipline reapplied for the FIFTH time — UpcomingGamesView header rephrases 'modelContext' prohibition as 'SwiftData context-environment' to keep negative-greps clean (precedents P4 04-01 / P6 06-06 / P6 06-07 / P6.1 06-03)
+- 06.1-01: Two-commit shape (feat for code + docs for REQUIREMENTS) over plan's suggested single feat commit — matches CLAUDE.md §8.10 'one feature OR one grouped batch per commit' and 06.1-03 four-commit precedent; both commits independently bisectable
 
 ### Pending Todos
 
@@ -268,8 +275,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-28T02:39:32.828Z
-Stopped at: Completed 06.1-03 — Mines auto-scale + pinch-zoom (A11Y-05); manual recipes pending human execution
+Last session: 2026-04-28T02:50:44.499Z
+Stopped at: Completed 06.1-01 — Home 2-col grid + Upcoming sheet (SHELL-05); manual recipes pending human execution
 Resume file: None
 
 **Planned Phase:** 7 (release) — 6 plans — 2026-04-27T22:00:00.000Z
