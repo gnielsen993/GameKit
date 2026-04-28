@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: P7 doc-drift cleanup landing
-last_updated: "2026-04-27T22:00:00.000Z"
-last_activity: 2026-04-27
+status: executing
+stopped_at: Completed 06.1-03 — Mines auto-scale + pinch-zoom (A11Y-05); manual recipes pending human execution
+last_updated: "2026-04-28T02:39:32.833Z"
+last_activity: 2026-04-28
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 6
-  total_plans: 46
-  completed_plans: 40
-  percent: 87
+  total_plans: 49
+  completed_plans: 44
+  percent: 90
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 07 — release
+**Current focus:** Phase 06.1 — pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode
 
 ## Current Position
 
-Phase: 7
-Plan: 01 — doc-drift cleanup (D-18) IN PROGRESS; remaining P7 plans 02-06 queued (icon, schema deploy, metadata+privacy+screenshots, checklist+verification template, TestFlight+SC1-SC5 sweep). Phase 6 closed 2026-04-27 per v1.0-MILESTONE-AUDIT.md (6/9 plans + UAT 6/6 SC pass; 06-VERIFICATION.md doc-drift resolved by this plan's Task 3).
-Status: P7 wave 1 in progress
-Last activity: 2026-04-27
+Phase: 06.1 (pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-28
 
-Progress: [██████████] 100%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -90,6 +90,7 @@ Progress: [██████████] 100%
 | Phase 06-cloudkit-siwa P06 | 6 | 3 tasks | 3 files |
 | Phase 06-cloudkit-siwa P07 | 25 | 3 tasks | 3 files |
 | Phase 06-cloudkit-siwa P08 | 13 | 2 tasks | 1 files |
+| Phase 06.1 P03 | 25 | 4 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -242,6 +243,12 @@ Recent decisions affecting current work:
 - 06-08: `IntroStep3SignInView` signature change — `let onSignIn: () -> Void` REMOVED; `let onSIWARequest: (ASAuthorizationAppleIDRequest) -> Void` + `let onSIWACompletion: (Result<ASAuthorization, Error>) -> Void` ADDED. The two new closure props let the parent `IntroFlowView` thread its `handleSIWARequest` and `handleSIWACompletion` instance methods down without the child view depending on `@Environment(\.authStore)` directly — preserves P5's "leaf views are props-only" pattern (CLAUDE.md §8.2). The parent owns environment reads; the child receives shaped closures.
 - 06-08: Mirrored handler shape from Plan 06-07 verbatim — both SIWA-success sites are now byte-similar at the call-site logic level. Eases future maintenance (e.g., adding rate-limiting, telemetry, retry on Keychain write failure — would update both sites identically). Locks the rule that any future SIWA-success site (e.g., a hypothetical "promote anonymous → signed-in" sheet from a Stats CTA) MUST follow the same `Task { @MainActor in switch result }` shape with the D-02/D-03 sequence. The handler is effectively a project-level pattern, not a per-screen one.
 - 07-01: P7 doc-drift cleanup — refreshed ROADMAP.md plan-completion counts (P3 4/4, P4 6/6, P5 7/7, P6 9/9), synced REQUIREMENTS.md traceability (35/35 Complete), flipped 06-VERIFICATION.md status pending → complete with sign-off rows pointing to 06-UAT.md as canonical evidence per v1.0-MILESTONE-AUDIT.md, advanced STATE.md current_position to Phase 7. Single docs-only commit per CLAUDE.md §8.10. ZERO code changes.
+- 06.1-03: Padding reduced from theme.spacing.l (16pt) to theme.spacing.s (8pt) on Mines board horizontal — RESEARCH open question #1 option (a). Eliminates Easy/Medium clamping-at-floor regression on 390pt iPhones while preserving 1-token visual breath
+- 06.1-03: .scaleEffect anchored to LazyVGrid (not ScrollView) — cosmetic-only zoom; ScrollView clipping stays stable for consistent scroll-bumper behavior during pinch
+- 06.1-03: cellSize and clampZoomScale extracted as static MinesweeperBoardView funcs — pure-computation testable from gamekitTests without SwiftUI dependency; instance computed property delegates to static helper for single-source-of-truth
+- 06.1-03: MagnifyGesture default minimumScaleDelta accepted (Plan §Pitfall 5 mentioned 0.05 as defensive lock); RESEARCH HIGH confidence on .simultaneousGesture parent/child decoupling means manual SC1 50-tap recipe is the empirical gate; bumped only if SC1 surfaces misfires
+- 06.1-03: Source-comment self-discipline rule reapplied for the 4th time — rephrased GeometryReader and MagnificationGesture prohibition comments to keep negative-greps clean even where prose narrates the prohibition (precedents P4 04-01 / P6 06-06 / P6 06-07)
+- 06.1-03: Four-commit shape (test/feat/feat/docs) honors TDD RED -> GREEN gate (project precedent across Plans 04-02/05-01/05-06/06-01/06-02 locked) AND CLAUDE.md §8.10 atomic-per-coherent-feature; each commit independently bisectable; supersedes plan §Success Criteria's single-commit suggestion
 
 ### Pending Todos
 
@@ -261,8 +268,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: P7 doc-drift cleanup landing
-Resume file: --resume-file
+Last session: 2026-04-28T02:39:32.828Z
+Stopped at: Completed 06.1-03 — Mines auto-scale + pinch-zoom (A11Y-05); manual recipes pending human execution
+Resume file: None
 
 **Planned Phase:** 7 (release) — 6 plans — 2026-04-27T22:00:00.000Z
