@@ -98,6 +98,9 @@
         }
       }
     },
+    "8 games coming" : {
+
+    },
     "ABOUT" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -639,6 +642,9 @@
     "Syncing…" : {
 
     },
+    "Tap to play" : {
+
+    },
     "The file couldn't be read. Check that it's a GameKit stats export and try again." : {
 
     },
@@ -685,6 +691,9 @@
           }
         }
       }
+    },
+    "Upcoming" : {
+
     },
     "Version" : {
 

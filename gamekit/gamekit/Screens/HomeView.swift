@@ -2,15 +2,17 @@
 //  HomeView.swift
 //  gamekit
 //
-//  Phase 1 (SHELL-01): 9 game cards in PROJECT.md long-term-vision order.
-//  Minesweeper is the only enabled card. The other 8 are disabled
-//  placeholders that surface a ComingSoonOverlay on tap (D-03, D-06).
+//  Phase 6.1 (SHELL-05): Home shows 2 square tiles in a 2-column
+//  LazyVGrid — Minesweeper (enabled hero) + Upcoming (placeholder).
+//  Tapping the Upcoming tile presents UpcomingGamesView in a sheet
+//  listing the 8 planned games. Tapping any sheet row dismisses the
+//  sheet and surfaces the existing ComingSoonOverlay (1.8s).
 //
-//  Per D-02: this file owns its own NavigationStack — RootTabView
-//  does not (Anti-Pattern 3 in ARCHITECTURE.md).
+//  Per P1 D-02: this file owns its own NavigationStack — RootTabView
+//  does not (Anti-Pattern 3 in ARCHITECTURE.md). The Mines push via
+//  navigationDestination(isPresented:) is preserved verbatim from P1.
 //
-//  Real Minesweeper destination ships at Phase 3 (MINES-02..07);
-//  P1 destination is a token-styled "Coming in P3" placeholder.
+//  Real Minesweeper destination ships at Phase 3 (MINES-02..07).
 //
 
 import SwiftUI
@@ -22,25 +24,42 @@ struct HomeView: View {
 
     @State private var showingComingSoon: GameCard?
     @State private var navigateToMines: Bool = false
+    @State private var showingUpcoming: Bool = false
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: theme.spacing.s) {
-                    ForEach(cards) { card in
-                        cardRow(card)
-                    }
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: theme.spacing.m),
+                        GridItem(.flexible(), spacing: theme.spacing.m)
+                    ],
+                    spacing: theme.spacing.m
+                ) {
+                    minesTile
+                    upcomingTile
                 }
+                .padding(.horizontal, theme.spacing.l)
                 .padding(.vertical, theme.spacing.l)
-                .padding(.horizontal, theme.spacing.s)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .top)
             }
             .background(theme.colors.background.ignoresSafeArea())
             .navigationTitle(String(localized: "GameKit"))
             .navigationDestination(isPresented: $navigateToMines) {
                 MinesweeperGameView()
+            }
+            .sheet(isPresented: $showingUpcoming) {
+                UpcomingGamesView(theme: theme) { card in
+                    showingComingSoon = card
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 1_800_000_000)
+                        if showingComingSoon?.id == card.id {
+                            showingComingSoon = nil
+                        }
+                    }
+                }
             }
             .overlay(alignment: .bottom) {
                 if let card = showingComingSoon {
@@ -53,58 +72,65 @@ struct HomeView: View {
         }
     }
 
-    @ViewBuilder
-    private func cardRow(_ card: GameCard) -> some View {
-        Button {
-            handleTap(card)
-        } label: {
-            DKCard(theme: theme) {
-                HStack(spacing: theme.spacing.m) {
-                    Image(systemName: card.symbol)
-                        .font(.title2)
-                        .foregroundStyle(card.isEnabled
-                            ? theme.colors.accentPrimary
-                            : theme.colors.textTertiary)
+    // MARK: - Tiles
 
-                    VStack(alignment: .leading, spacing: theme.spacing.xs) {
-                        Text(card.title)
-                            .font(theme.typography.headline)
-                            .foregroundStyle(card.isEnabled
-                                ? theme.colors.textPrimary
-                                : theme.colors.textTertiary)
-                        if !card.isEnabled {
-                            Text(String(localized: "Coming soon"))
-                                .font(theme.typography.caption)
-                                .foregroundStyle(theme.colors.textTertiary)
-                        }
-                    }
-                    Spacer()
-                    Image(systemName: card.isEnabled ? "chevron.right" : "lock")
-                        .foregroundStyle(theme.colors.textTertiary)
-                }
-                .opacity(card.isEnabled ? 1.0 : 0.6)
-            }
+    @ViewBuilder
+    private var minesTile: some View {
+        Button {
+            navigateToMines = true
+        } label: {
+            tileCard(
+                symbol: "square.grid.4x3.fill",
+                iconColor: theme.colors.accentPrimary,
+                title: String(localized: "Minesweeper"),
+                caption: String(localized: "Tap to play")
+            )
         }
         .buttonStyle(.plain)
     }
 
-    private func handleTap(_ card: GameCard) {
-        if card.isEnabled {
-            navigateToMines = true
-        } else {
-            showingComingSoon = card
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 1_800_000_000)
-                if showingComingSoon?.id == card.id {
-                    showingComingSoon = nil
-                }
-            }
+    @ViewBuilder
+    private var upcomingTile: some View {
+        Button {
+            showingUpcoming = true
+        } label: {
+            tileCard(
+                symbol: "sparkles",
+                iconColor: theme.colors.accentSecondary,
+                title: String(localized: "Upcoming"),
+                caption: String(localized: "8 games coming")
+            )
         }
+        .buttonStyle(.plain)
     }
 
+    @ViewBuilder
+    private func tileCard(
+        symbol: String,
+        iconColor: Color,
+        title: String,
+        caption: String
+    ) -> some View {
+        DKCard(theme: theme) {
+            VStack(spacing: theme.spacing.s) {
+                Image(systemName: symbol)
+                    .font(.system(size: 56))
+                    .foregroundStyle(iconColor)
+                Text(title)
+                    .font(theme.typography.headline)
+                    .foregroundStyle(theme.colors.textPrimary)
+                Text(caption)
+                    .font(theme.typography.caption)
+                    .foregroundStyle(theme.colors.textSecondary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .aspectRatio(1, contentMode: .fit)
+        .frame(maxWidth: .infinity)
+    }
 }
 
-// MARK: - GameCard model + data
+// MARK: - GameCard model
 
 struct GameCard: Identifiable, Equatable {
     let id: String
@@ -112,15 +138,3 @@ struct GameCard: Identifiable, Equatable {
     let symbol: String
     let isEnabled: Bool
 }
-
-private let cards: [GameCard] = [
-    GameCard(id: "minesweeper",   title: String(localized: "Minesweeper"),    symbol: "square.grid.4x3.fill", isEnabled: true),
-    GameCard(id: "merge",         title: String(localized: "Merge"),          symbol: "square.stack.3d.up",   isEnabled: false),
-    GameCard(id: "wordGrid",      title: String(localized: "Word Grid"),      symbol: "textformat.abc",       isEnabled: false),
-    GameCard(id: "solitaire",     title: String(localized: "Solitaire"),      symbol: "suit.spade",           isEnabled: false),
-    GameCard(id: "sudoku",        title: String(localized: "Sudoku"),         symbol: "9.square",             isEnabled: false),
-    GameCard(id: "nonogram",      title: String(localized: "Nonogram"),       symbol: "square.grid.3x3",      isEnabled: false),
-    GameCard(id: "flow",          title: String(localized: "Flow"),           symbol: "scribble.variable",    isEnabled: false),
-    GameCard(id: "patternMemory", title: String(localized: "Pattern Memory"), symbol: "rectangle.grid.2x2",   isEnabled: false),
-    GameCard(id: "chessPuzzles",  title: String(localized: "Chess Puzzles"),  symbol: "checkmark.shield",     isEnabled: false),
-]
