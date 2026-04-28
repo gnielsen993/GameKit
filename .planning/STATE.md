@@ -93,6 +93,10 @@ Progress: [██████████] 100%
 
 ## Accumulated Context
 
+### Roadmap Evolution
+
+- Phase 6.1 inserted after Phase 6 (2026-04-27): pre-release polish — Home cards 2-per-row grid + Mines flag-mode toggle + Hard-board horizontal-scroll fix; pre-deploy gate before P7 wave 2 (URGENT)
+
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.

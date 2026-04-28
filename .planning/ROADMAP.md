@@ -143,6 +143,18 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 06-09-PLAN.md — Wave-3 — manual SC1-SC5 verification checkpoint (06-VERIFICATION.md template + sign-off)
 **UI hint**: yes
 
+### Phase 06.1: pre-release polish — Home cards 2-per-row grid + Mines flag-mode toggle + Hard-board horizontal-scroll fix; pre-deploy gate before P7 wave 2 (INSERTED)
+
+**Goal**: Three pre-release polish items land before P7 wave 2 — Home shows a 2-column square grid (Mines hero + Upcoming sheet), Minesweeper gains a Reveal/Flag interaction-mode FAB toggle, and the Mines board auto-scales to fit width with pinch-zoom (graduates A11Y-V2-02 → v1).
+**Requirements**: SHELL-05, MINES-12, A11Y-05
+**Depends on:** Phase 6
+**Plans:** 3 plans
+
+Plans:
+- [ ] 06.1-01-PLAN.md — Home 2-col grid (Mines + Upcoming sheet) + UpcomingGamesView sibling — SHELL-05
+- [ ] 06.1-02-PLAN.md — Minesweeper Reveal/Flag interaction-mode toggle (VM + FAB) — MINES-12
+- [ ] 06.1-03-PLAN.md — Mines board auto-scale + pinch-zoom (MagnifyGesture + onGeometryChange) — A11Y-05 (graduates A11Y-V2-02)
+
 ### Phase 7: Release
 **Goal**: Pre-submission gating — the App Store / TestFlight failure modes are all checklist-preventable, and this is the checklist.
 **Depends on**: Phase 6
