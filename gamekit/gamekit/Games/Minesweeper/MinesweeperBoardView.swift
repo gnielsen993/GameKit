@@ -3,9 +3,14 @@
 //  gamekit
 //
 //  Composes MinesweeperCellView instances into a LazyVGrid.
-//  Easy 9×9 (cell 44pt) and Medium 16×16 (cell 40pt) render without scrolling
-//  on iPhone 13/15 standard widths; Hard 16×30 (cell 36pt) wraps in a
-//  horizontal ScrollView regardless of device (CONTEXT Discretion (a)).
+//
+//  Phase 6.1 (A11Y-05) — cellSize is auto-scaled to the available width via
+//  .onGeometryChange measurement. The pre-P6.1 fixed-per-difficulty switch
+//  (Easy 44pt / Medium 40pt / Hard 36pt) has been replaced with a width-driven
+//  formula clamped to an 18pt floor. On standard iPhone widths (>=390pt) Easy
+//  and Medium fit comfortably without horizontal scroll; Hard clamps at the
+//  18pt floor and falls back to horizontal scroll (CONTEXT D-16) — pinch-zoom
+//  (Plan 06.1-03 Task 3) is the accessibility escape hatch.
 //
 //  Phase 3 invariants (per CONTEXT D-12, UI-SPEC §Layout & Sizing,
 //  RESEARCH §Pattern 5 loss-state per-cell switch is OWNED BY MinesweeperCellView):
@@ -37,17 +42,68 @@ struct MinesweeperBoardView: View {
     let onTap: (MinesweeperIndex) -> Void
     let onLongPress: (MinesweeperIndex) -> Void
 
-    // MARK: - Cell-size heuristic (UI-SPEC §Layout & Sizing)
+    // P6.1 (A11Y-05) — measured ScrollView width via .onGeometryChange.
+    // Default 0 yields the minCellSize floor on the first render; the
+    // background measurement triggers a single follow-up render with the
+    // real width (RESEARCH §Pattern 4 — onGeometryChange runs in the
+    // background layout pass and does NOT cause a layout-feedback loop).
+    @State private var availableWidth: CGFloat = 0
+
+    // MARK: - P6.1 (A11Y-05) cellSize / pinch-zoom constants
     //
-    // Intrinsic component dimensions; NOT a spacing token.
-    // Easy 44pt = HIG min; Medium 40pt; Hard 36pt = documented carve-out
-    // (gesture accuracy validated as part of SC1 manual-test pass).
+    // 18pt floor (CONTEXT D-13 + Discretion #1) — tap-target tolerable for
+    // casual play; pinch-zoom gives the user the escape hatch when cells
+    // clamp at floor on narrow screens.
+    static let minCellSize: CGFloat = 18
+
+    // Pinch-zoom range (CONTEXT D-14 + Discretion #4). Below 0.8 cells become
+    // illegible; above 2.0 the user might as well play a different difficulty.
+    static let minZoomScale: CGFloat = 0.8
+    static let maxZoomScale: CGFloat = 2.0
+
+    /// Pure formula extracted for unit testing (Plan 06.1-03 Wave 0).
+    /// Returns the per-cell side length given the available container
+    /// width, column count, and surrounding padding/spacing values.
+    ///
+    /// Formula derivation (CONTEXT D-13):
+    ///   usable       = max(0, width - 2 * padding)
+    ///   spacingTotal = max(0, (cols - 1)) * spacing
+    ///   cellSize     = max(minCellSize, (usable - spacingTotal) / cols)
+    ///
+    /// Sub-floor cases (e.g. Hard 30-col on iPhone SE 320pt) clamp to
+    /// `minCellSize` and rely on the horizontal-scroll fallback
+    /// (`scrollAxis(for:)`) plus pinch-zoom-out for the accessibility path.
+    static func cellSize(forWidth width: CGFloat, cols: Int, padding: CGFloat, spacing: CGFloat) -> CGFloat {
+        guard cols > 0 else { return minCellSize }
+        let colsF = CGFloat(cols)
+        let usable = max(0, width - 2 * padding)
+        let spacingTotal = max(0, colsF - 1) * spacing
+        let computed = (usable - spacingTotal) / colsF
+        return max(minCellSize, computed)
+    }
+
+    /// Pure clamp extracted for unit testing (Plan 06.1-03 Wave 0).
+    /// Clamps a proposed zoom scale to the [minZoomScale, maxZoomScale]
+    /// range. Used by Task 3's MagnifyGesture .onChanged handler.
+    static func clampZoomScale(_ value: CGFloat) -> CGFloat {
+        return min(maxZoomScale, max(minZoomScale, value))
+    }
+
+    // P6.1 — instance computed property delegates to the static helper so
+    // the view's body reads exactly one source of truth for cellSize math
+    // and the static helper stays unit-testable from gamekitTests.
+    //
+    // RESEARCH open question #1 RESOLVED — option (a): horizontal padding
+    // reduced from theme.spacing.l (16pt) to theme.spacing.s (8pt) so Easy
+    // 9-col + Medium 16-col fit comfortably on 390pt iPhone widths without
+    // clamping at the 18pt floor.
     private var cellSize: CGFloat {
-        switch board.difficulty {
-        case .easy:   return 44
-        case .medium: return 40
-        case .hard:   return 36
-        }
+        Self.cellSize(
+            forWidth: availableWidth,
+            cols: board.cols,
+            padding: theme.spacing.s,
+            spacing: theme.spacing.xs
+        )
     }
 
     private var columns: [GridItem] {
@@ -101,15 +157,35 @@ struct MinesweeperBoardView: View {
                     )
                 }
             }
-            .padding(.horizontal, theme.spacing.l)
+            // P6.1 (A11Y-05) — option (a) padding reduction. Horizontal padding
+            // dropped from theme.spacing.l (16pt) to theme.spacing.s (8pt) so
+            // the auto-scale formula gives Easy/Medium boards comfortable cell
+            // sizes on 390pt iPhone widths without hitting the 18pt floor.
+            .padding(.horizontal, theme.spacing.s)
             .padding(.vertical, theme.spacing.s)
         }
+        // P6.1 (A11Y-05) — measure available width without participating in
+        // layout. The .background(Color.clear...) trick runs in the background
+        // layout pass; assigning to availableWidth triggers a single follow-up
+        // render with the correct cellSize. The proxy-based pattern avoids the
+        // greedy layout-feedback loop that plagues the older container-reader
+        // approach (RESEARCH §Pattern 4). Color.clear is the standard SwiftUI
+        // transparent placeholder (NOT a hex/RGB literal) and is exempt from
+        // FOUND-07.
+        .background(
+            Color.clear
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.width
+                } action: { newWidth in
+                    availableWidth = newWidth
+                }
+        )
     }
 
-    /// Hard scrolls horizontally; Easy/Medium do not scroll on phones ≥ 390pt.
-    /// (On iPhone SE 320pt, Medium will scroll horizontally too — `.horizontal`
-    /// is harmless when content fits because ScrollView no-ops; the guard here
-    /// is a layout choice for the typical-device path.)
+    /// Hard scrolls horizontally as a fallback for sub-floor cases (e.g.
+    /// iPhone SE 320pt where 30 × 18pt + 29 × 4pt > viewport width).
+    /// Easy/Medium return `[]` because the auto-scale formula keeps cells
+    /// inside the viewport on standard iPhone widths.
     private func scrollAxis(for difficulty: MinesweeperDifficulty) -> Axis.Set {
         difficulty == .hard ? .horizontal : []
     }
