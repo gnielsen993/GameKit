@@ -4,13 +4,20 @@
 //
 //  Composes MinesweeperCellView instances into a LazyVGrid.
 //
-//  Phase 6.1 (A11Y-05) — cellSize is auto-scaled to the available width via
-//  .onGeometryChange measurement. The pre-P6.1 fixed-per-difficulty switch
-//  (Easy 44pt / Medium 40pt / Hard 36pt) has been replaced with a width-driven
-//  formula clamped to an 18pt floor. On standard iPhone widths (>=390pt) Easy
-//  and Medium fit comfortably without horizontal scroll; Hard clamps at the
-//  18pt floor and falls back to horizontal scroll (CONTEXT D-16) — pinch-zoom
-//  (Plan 06.1-03 Task 3) is the accessibility escape hatch.
+//  Phase 6.1 (A11Y-05):
+//    - cellSize is auto-scaled to the available width via .onGeometryChange.
+//      The pre-P6.1 fixed-per-difficulty switch (Easy 44pt / Medium 40pt /
+//      Hard 36pt) has been replaced with a width-driven formula clamped to
+//      an 18pt floor. Easy and Medium fit comfortably on standard iPhone
+//      widths (>=390pt) without horizontal scroll; Hard clamps at the floor
+//      and falls back to horizontal scroll (CONTEXT D-16).
+//    - MagnifyGesture pinch-zoom layer applied via .simultaneousGesture
+//      coexists with the cell-level LongPressGesture(0.25).exclusively(
+//      before: TapGesture()) — single-finger taps/long-presses hit the
+//      child gesture by default child-priority; two-finger pinch hits the
+//      parent simultaneously. Scale clamped to [0.8, 2.0]; zoom persists
+//      across vm.restart() within the session via in-memory @State and
+//      resets on cold launch (CONTEXT D-14, Discretion #9).
 //
 //  Phase 3 invariants (per CONTEXT D-12, UI-SPEC §Layout & Sizing,
 //  RESEARCH §Pattern 5 loss-state per-cell switch is OWNED BY MinesweeperCellView):
@@ -48,6 +55,16 @@ struct MinesweeperBoardView: View {
     // real width (RESEARCH §Pattern 4 — onGeometryChange runs in the
     // background layout pass and does NOT cause a layout-feedback loop).
     @State private var availableWidth: CGFloat = 0
+
+    // P6.1 (A11Y-05) — pinch-zoom state. Dual-@State pattern (RESEARCH §Pattern 3):
+    //   - zoomScale: live commit-on-end value (also used by .scaleEffect)
+    //   - baseZoomScale: snapshot at .onChanged START so each new pinch
+    //     gesture composes from the accumulated zoom (NOT resetting to 1.0)
+    // Persists across vm.restart() within session because the zoom lives in
+    // view @State and the VM's restart() cannot reach view state (CONTEXT
+    // D-14, Discretion #9 — in-memory only). Cold launch resets to 1.0.
+    @State private var zoomScale: CGFloat = 1.0
+    @State private var baseZoomScale: CGFloat = 1.0
 
     // MARK: - P6.1 (A11Y-05) cellSize / pinch-zoom constants
     //
@@ -163,6 +180,12 @@ struct MinesweeperBoardView: View {
             // sizes on 390pt iPhone widths without hitting the 18pt floor.
             .padding(.horizontal, theme.spacing.s)
             .padding(.vertical, theme.spacing.s)
+            // P6.1 (A11Y-05) — pinch-zoom scale layer.
+            // Applied to LazyVGrid (NOT the ScrollView) so the ScrollView's
+            // clipping frame stays stable during zoom — only the board
+            // content scales. Anchor .center keeps the visual pivot at the
+            // viewport midpoint regardless of pinch-finger position.
+            .scaleEffect(zoomScale, anchor: .center)
         }
         // P6.1 (A11Y-05) — measure available width without participating in
         // layout. The .background(Color.clear...) trick runs in the background
@@ -178,6 +201,27 @@ struct MinesweeperBoardView: View {
                     proxy.size.width
                 } action: { newWidth in
                     availableWidth = newWidth
+                }
+        )
+        // P6.1 (A11Y-05) — pinch-zoom via MagnifyGesture (iOS 17+).
+        // CRITICAL: .simultaneousGesture (NOT .gesture) per RESEARCH §Pattern 3
+        // — child cell LongPressGesture(0.25).exclusively(before: TapGesture())
+        // continues to win for single-finger taps and long-presses; this
+        // parent gesture fires independently for two-finger pinch only.
+        // CRITICAL: MagnifyGesture is the iOS 17+ pinch primitive (the
+        // earlier iOS 16 spelling is deprecated and would emit a build
+        // warning). The .magnification value on .onChanged is the delta
+        // multiplier from gesture START (1.0 = no change), so we compose
+        // live = baseZoomScale * delta and commit baseZoomScale on .onEnded
+        // so each new pinch resumes from the accumulated zoom.
+        .simultaneousGesture(
+            MagnifyGesture()
+                .onChanged { value in
+                    let proposed = baseZoomScale * value.magnification
+                    zoomScale = Self.clampZoomScale(proposed)
+                }
+                .onEnded { _ in
+                    baseZoomScale = zoomScale
                 }
         )
     }
