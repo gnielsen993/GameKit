@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 06.1-01 — Home 2-col grid + Upcoming sheet (SHELL-05); manual recipes pending human execution
-last_updated: "2026-04-28T02:50:44.505Z"
+status: verifying
+stopped_at: Completed 06.1-02 — Minesweeper Reveal/Flag interaction-mode toggle (MINES-12); manual recipes pending human execution; phase 06.1 final plan landed
+last_updated: "2026-04-28T03:09:44.371Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 49
-  completed_plans: 45
-  percent: 92
+  completed_plans: 46
+  percent: 94
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 
 Phase: 06.1 (pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-28
 
-Progress: [█████████░] 92%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -92,6 +92,7 @@ Progress: [█████████░] 92%
 | Phase 06-cloudkit-siwa P08 | 13 | 2 tasks | 1 files |
 | Phase 06.1 P03 | 25 | 4 tasks | 3 files |
 | Phase 06.1 P01 | 5 | 3 tasks | 4 files |
+| Phase 06.1 P02 | 12 | 4 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -256,6 +257,12 @@ Recent decisions affecting current work:
 - 06.1-01: xcstringstool sync invocation requires --stringsdata pointing to compiler-generated .stringsdata under DerivedData (NOT --positional-arguments + .swift files); the -print0 | xargs -0 form is load-bearing because shell word-splitting of $(find ...) was being interpreted as a single argument
 - 06.1-01: Source-comment self-discipline reapplied for the FIFTH time — UpcomingGamesView header rephrases 'modelContext' prohibition as 'SwiftData context-environment' to keep negative-greps clean (precedents P4 04-01 / P6 06-06 / P6 06-07 / P6.1 06-03)
 - 06.1-01: Two-commit shape (feat for code + docs for REQUIREMENTS) over plan's suggested single feat commit — matches CLAUDE.md §8.10 'one feature OR one grouped batch per commit' and 06.1-03 four-commit precedent; both commits independently bisectable
+- 06.1-02: TDD plan-level RED -> GREEN gate honored — test commit aa81374 (7 RED InteractionModeTests under @Suite("InteractionMode") with 'cannot find member' compile errors for interactionMode/handleTap/handleLongPress/toggleInteractionMode/modeToggleCount) precedes feat commit 9d824c8 in git log; same shape as Plans 04-02/05-01/05-06/06-01/06-02/06.1-03 all locked test-before-feat
+- 06.1-02: MinesweeperInteractionMode enum is file-scope Foundation-only (Sendable, Equatable, Codable). VM extension adds interactionMode + modeToggleCount + toggleInteractionMode() + handleTap(at:) + handleLongPress(at:); restart() resets both interactionMode = .reveal AND modeToggleCount = 0. Foundation-only invariant preserved (single import Foundation; verified by structural test vmSourceFile_importsOnlyFoundation). VM line count 381 -> 461 (within plan's 400-450 explicit acceptance range; under <500 hard cap)
+- 06.1-02: GameView FAB (64pt circular Button below board) — icon swap cursorarrow.click <-> flag.fill, tint swap theme.colors.accentPrimary <-> theme.colors.danger (non-error semantic for flag mode per CONTEXT Discretion #6, no new DesignKit token per D-19), .opacity(0) + .allowsHitTesting(false) hide post-terminal preserves layout (RESEARCH open question #2), .sensoryFeedback(.impact(weight: .light), trigger: settingsStore.hapticsEnabled ? viewModel.modeToggleCount : 0) gating-at-source pattern from Plan 05-06
+- 06.1-02: CellView + BoardView UNTOUCHED — git diff HEAD~3..HEAD on both files returns 0 lines. LongPressGesture(minimumDuration: 0.25) + .exclusively(before: TapGesture()) + cell-level .sensoryFeedback(.selection / .impact(.light)) all byte-identical preservation. Mode-routing logic lives ENTIRELY in vm.handleTap / vm.handleLongPress (CLAUDE.md §1 lightweight MVVM, ARCHITECTURE Anti-Pattern 1). View tier passes vm.handleTap/handleLongPress closures down via GameView -> BoardView -> CellView with no internal mode awareness
+- 06.1-02: Four-commit shape (test/feat/feat/docs) — aa81374 RED gate -> 9d824c8 VM GREEN -> 6b166f0 GameView FAB -> 7276556 docs+xcstrings. Same precedent as 06.1-03 four-commit shape. Plan §Success Criteria suggested single atomic commit; the body §Task 1 explicitly required RED -> GREEN gate making the four-commit shape the only correct interpretation. Each commit independently bisectable
+- 06.1-02: Phase 6.1 final REQUIREMENTS.md state — Coverage 38/38 (final target REACHED). Wave 1 (06.1-03) shipped A11Y-05 (graduated A11Y-V2-02 -> v1); Wave 2 plans (06.1-01 SHELL-05, 06.1-02 MINES-12) added two new v1 IDs. Each plan's xcstrings + REQ edits disjoint by section (Accessibility / App Shell / Minesweeper); JSON merge clean across all three
 
 ### Pending Todos
 
@@ -275,8 +282,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-28T02:50:44.499Z
-Stopped at: Completed 06.1-01 — Home 2-col grid + Upcoming sheet (SHELL-05); manual recipes pending human execution
+Last session: 2026-04-28T03:09:44.365Z
+Stopped at: Completed 06.1-02 — Minesweeper Reveal/Flag interaction-mode toggle (MINES-12); manual recipes pending human execution; phase 06.1 final plan landed
 Resume file: None
 
 **Planned Phase:** 7 (release) — 6 plans — 2026-04-27T22:00:00.000Z
