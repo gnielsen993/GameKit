@@ -4,6 +4,16 @@
     "" : {
 
     },
+    "%@ %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$lld"
+          }
+        }
+      }
+    },
     "%@ coming soon" : {
       "comment" : "Disabled-card overlay caption with game name interpolated",
       "extractionState" : "manual",
@@ -22,6 +32,16 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@: %2$lld games, %3$lld wins, %4$@, best time %5$@"
+          }
+        }
+      }
+    },
+    "%@: %lld games, best score %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld games, best score %3$@"
           }
         }
       }
@@ -101,31 +121,6 @@
     "8 games coming" : {
 
     },
-    "ABOUT" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ABOUT"
-          }
-        }
-      }
-    },
-    "APPEARANCE" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APPEARANCE"
-          }
-        }
-      }
-    },
-    "AUDIO" : {
-
-    },
     "Abandon" : {
       "comment" : "Destructive button in mid-game difficulty-change alert (D-10)",
       "extractionState" : "automatic",
@@ -150,22 +145,39 @@
         }
       }
     },
+    "ABOUT" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ABOUT"
+          }
+        }
+      }
+    },
     "Acknowledgments" : {
 
     },
     "All data stored locally. CloudKit sync optional. No analytics. No tracking." : {
 
     },
-    "BEST TIMES" : {
+    "APPEARANCE" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BEST TIMES"
+            "value" : "APPEARANCE"
           }
         }
       }
+    },
+    "Appearance mode" : {
+
+    },
+    "AUDIO" : {
+
     },
     "Bad luck" : {
       "comment" : "End-state card title — loss outcome (D-03 part 1)",
@@ -206,7 +218,21 @@
     "Best" : {
 
     },
+    "BEST TIMES" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BEST TIMES"
+          }
+        }
+      }
+    },
     "Best times and win streaks save automatically. No accounts. No leaderboards. Just your numbers." : {
+
+    },
+    "Best: %lld" : {
 
     },
     "Cancel" : {
@@ -232,6 +258,9 @@
           }
         }
       }
+    },
+    "Change mode" : {
+
     },
     "Chess Puzzles" : {
       "extractionState" : "manual",
@@ -262,6 +291,9 @@
 
     },
     "Couldn't import stats" : {
+
+    },
+    "Dark" : {
 
     },
     "DATA" : {
@@ -297,13 +329,16 @@
         }
       }
     },
+    "Empty" : {
+
+    },
     "Export stats" : {
 
     },
     "Finish intro" : {
 
     },
-    "Flag mode active. Double-tap to switch to Reveal mode." : {
+    "Flag" : {
 
     },
     "Flagged, row %lld column %lld" : {
@@ -329,6 +364,19 @@
         }
       }
     },
+    "Game over" : {
+
+    },
+    "Game over. Score: %lld. Best: %lld." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Game over. Score: %1$lld. Best: %2$lld."
+          }
+        }
+      }
+    },
     "GameKit" : {
       "comment" : "App / Home navigation title",
       "extractionState" : "manual",
@@ -341,9 +389,6 @@
         }
       }
     },
-    "GameKit is built with care, by hand, with no telemetry, no ads, and no third-party dependencies beyond the above." : {
-
-    },
     "GameKit · v1.0" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -355,19 +400,11 @@
         }
       }
     },
-    "Games" : {
+    "GameKit is built with care, by hand, with no telemetry, no ads, and no third-party dependencies beyond the above." : {
 
     },
-    "HISTORY" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HISTORY"
-          }
-        }
-      }
+    "Games" : {
+
     },
     "Haptics" : {
 
@@ -384,6 +421,17 @@
         }
       }
     },
+    "HISTORY" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HISTORY"
+          }
+        }
+      }
+    },
     "Home" : {
       "comment" : "Home tab label",
       "extractionState" : "manual",
@@ -396,13 +444,22 @@
         }
       }
     },
+    "iCloud unavailable" : {
+
+    },
     "Import stats" : {
+
+    },
+    "Infinite" : {
+
+    },
+    "Infinite mode" : {
 
     },
     "Last synced %@" : {
 
     },
-    "MINESWEEPER" : {
+    "Light" : {
 
     },
     "Make it yours" : {
@@ -431,6 +488,12 @@
         }
       }
     },
+    "MERGE" : {
+
+    },
+    "Merge board" : {
+
+    },
     "Mine, row %lld column %lld" : {
       "comment" : "Cell a11y label — trip-mine state after loss (D-19, 1-indexed)",
       "extractionState" : "automatic",
@@ -454,6 +517,12 @@
         }
       }
     },
+    "MINESWEEPER" : {
+
+    },
+    "Mode" : {
+
+    },
     "More themes" : {
 
     },
@@ -461,6 +530,9 @@
 
     },
     "No games played yet." : {
+
+    },
+    "No Merge games played yet." : {
 
     },
     "Nonogram" : {
@@ -495,6 +567,9 @@
 
     },
     "Privacy" : {
+
+    },
+    "Profile" : {
 
     },
     "Quit GameKit" : {
@@ -536,7 +611,7 @@
     "Restart to enable iCloud sync" : {
 
     },
-    "Reveal mode active. Double-tap to switch to Flag mode." : {
+    "Reveal" : {
 
     },
     "Revealed, %lld mines adjacent, row %lld column %lld" : {
@@ -563,10 +638,7 @@
         }
       }
     },
-    "SF Symbols · Apple Inc." : {
-
-    },
-    "SYNC" : {
+    "Score" : {
 
     },
     "Settings" : {
@@ -580,6 +652,9 @@
           }
         }
       }
+    },
+    "SF Symbols · Apple Inc." : {
+
     },
     "Sign in with Apple to sync your stats across iPhone, iPad, and Mac. Optional — the app works fully without it." : {
 
@@ -636,6 +711,9 @@
         }
       }
     },
+    "SYNC" : {
+
+    },
     "Sync across devices" : {
 
     },
@@ -646,6 +724,9 @@
 
     },
     "Syncing…" : {
+
+    },
+    "System" : {
 
     },
     "Tap to play" : {
@@ -669,6 +750,9 @@
 
     },
     "This file was exported from a newer GameKit. Update the app and try again." : {
+
+    },
+    "Tile %lld" : {
 
     },
     "Time elapsed" : {
@@ -704,7 +788,13 @@
     "Version" : {
 
     },
+    "Win" : {
+
+    },
     "Win %" : {
+
+    },
+    "Win mode (stop at 2048)" : {
 
     },
     "Wins" : {
@@ -717,6 +807,19 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Word Grid"
+          }
+        }
+      }
+    },
+    "You reached 2048!" : {
+
+    },
+    "You reached 2048! Score: %lld. Best: %lld." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You reached 2048! Score: %1$lld. Best: %2$lld."
           }
         }
       }
@@ -780,9 +883,6 @@
       }
     },
     "Your stats will sync to all devices signed in to this iCloud account. Quit GameKit and reopen to finish setup." : {
-
-    },
-    "iCloud unavailable" : {
 
     }
   },

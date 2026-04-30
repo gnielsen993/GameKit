@@ -23,4 +23,5 @@ import Foundation
 /// Raw value is the stable serialization key (D-04) — renaming = data break.
 enum GameKind: String, Codable, Sendable, CaseIterable {
     case minesweeper
+    case merge
 }

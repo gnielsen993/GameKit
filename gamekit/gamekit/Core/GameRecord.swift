@@ -43,6 +43,12 @@ final class GameRecord {
     var durationSeconds: Double = 0
     var playedAt: Date = Date()
     var schemaVersion: Int = 1
+    /// Score-based games (Merge) populate this; time-based games (Minesweeper)
+    /// leave it nil. Optional for additive schema compatibility — old records
+    /// keep `score == nil`. SwiftData lightweight migration handles this
+    /// without a userland schemaVersion bump on this model (the JSON envelope
+    /// schemaVersion bumps to 2 for the same change at the codec layer).
+    var score: Int? = nil
 
     /// Safe-fallback accessor (D-02) — unknown raw → `.minesweeper`.
     var gameKind: GameKind { GameKind(rawValue: gameKindRaw) ?? .minesweeper }
@@ -56,13 +62,15 @@ final class GameRecord {
         difficulty: String,
         outcome: Outcome,
         durationSeconds: Double,
-        playedAt: Date = .now
+        playedAt: Date = .now,
+        score: Int? = nil
     ) {
         self.gameKindRaw = gameKind.rawValue
         self.difficultyRaw = difficulty
         self.outcomeRaw = outcome.rawValue
         self.durationSeconds = durationSeconds
         self.playedAt = playedAt
+        self.score = score
         // id, schemaVersion default-initialized
     }
 }

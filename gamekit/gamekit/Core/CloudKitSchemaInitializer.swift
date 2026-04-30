@@ -50,7 +50,7 @@ enum CloudKitSchemaInitializer {
         desc.shouldAddStoreAsynchronously = false
 
         guard let mom = NSManagedObjectModel.makeManagedObjectModel(
-            for: [GameRecord.self, BestTime.self]
+            for: [GameRecord.self, BestTime.self, BestScore.self]
         ) else {
             throw NSError(
                 domain: "CloudKitSchemaInitializer",

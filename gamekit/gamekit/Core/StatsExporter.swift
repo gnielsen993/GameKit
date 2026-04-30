@@ -45,8 +45,16 @@ import os
 @MainActor
 enum StatsExporter {
 
-    /// Pinned at 1 in P4; bumping requires a deliberate, additive migration plan.
-    static let envelopeSchemaVersion: Int = 1
+    /// Bumped to 2 alongside the Merge schema additions (`GameRecord.score`,
+    /// `BestScore` model, `bestScores` envelope field). The IMPORT path
+    /// accepts both v1 and v2 envelopes (`acceptedSchemaVersions`); the
+    /// EXPORT path always writes the current version.
+    static let envelopeSchemaVersion: Int = 2
+
+    /// Schema versions the importer accepts. v1 envelopes are tolerated
+    /// because the codec auto-defaults v2-only keys (`bestScores`,
+    /// `Record.score`); the v1 → v2 transition is purely additive.
+    static let acceptedSchemaVersions: Set<Int> = [1, 2]
 
     private static let logger = Logger(
         subsystem: "com.lauterstar.gamekit",
@@ -61,6 +69,7 @@ enum StatsExporter {
     static func export(modelContext: ModelContext) throws -> Data {
         let records = try modelContext.fetch(FetchDescriptor<GameRecord>())
         let bests = try modelContext.fetch(FetchDescriptor<BestTime>())
+        let bestScores = try modelContext.fetch(FetchDescriptor<BestScore>())
 
         let envelope = StatsExportEnvelope(
             schemaVersion: envelopeSchemaVersion,
@@ -73,7 +82,8 @@ enum StatsExporter {
                     outcomeRaw: rec.outcomeRaw,
                     durationSeconds: rec.durationSeconds,
                     playedAt: rec.playedAt,
-                    schemaVersion: rec.schemaVersion
+                    schemaVersion: rec.schemaVersion,
+                    score: rec.score
                 )
             },
             bestTimes: bests.map { best in
@@ -84,6 +94,16 @@ enum StatsExporter {
                     seconds: best.seconds,
                     achievedAt: best.achievedAt,
                     schemaVersion: best.schemaVersion
+                )
+            },
+            bestScores: bestScores.map { bs in
+                StatsExportEnvelope.BestScoreEntry(
+                    id: bs.id,
+                    gameKindRaw: bs.gameKindRaw,
+                    difficultyRaw: bs.difficultyRaw,
+                    score: bs.score,
+                    achievedAt: bs.achievedAt,
+                    schemaVersion: bs.schemaVersion
                 )
             }
         )
@@ -123,7 +143,8 @@ enum StatsExporter {
 
         // Step 2: Validate schemaVersion. If mismatch, throw — existing
         //         data UNTOUCHED (no transaction opened yet). RESEARCH Pitfall 6.
-        guard envelope.schemaVersion == envelopeSchemaVersion else {
+        //         Accept v1 and v2 (additive transition).
+        guard acceptedSchemaVersions.contains(envelope.schemaVersion) else {
             throw StatsImportError.schemaVersionMismatch(
                 found: envelope.schemaVersion,
                 expected: envelopeSchemaVersion
@@ -134,6 +155,7 @@ enum StatsExporter {
         try modelContext.transaction {
             try modelContext.delete(model: GameRecord.self)
             try modelContext.delete(model: BestTime.self)
+            try modelContext.delete(model: BestScore.self)
 
             for r in envelope.gameRecords {
                 let rec = GameRecord(
@@ -141,7 +163,8 @@ enum StatsExporter {
                     difficulty: r.difficultyRaw,
                     outcome: Outcome(rawValue: r.outcomeRaw) ?? .loss,
                     durationSeconds: r.durationSeconds,
-                    playedAt: r.playedAt
+                    playedAt: r.playedAt,
+                    score: r.score
                 )
                 rec.id = r.id                          // preserve UUID for round-trip equality
                 rec.schemaVersion = r.schemaVersion
@@ -156,6 +179,17 @@ enum StatsExporter {
                 )
                 best.id = b.id
                 best.schemaVersion = b.schemaVersion
+                modelContext.insert(best)
+            }
+            for bs in envelope.bestScores {
+                let best = BestScore(
+                    gameKind: GameKind(rawValue: bs.gameKindRaw) ?? .merge,
+                    difficulty: bs.difficultyRaw,
+                    score: bs.score,
+                    achievedAt: bs.achievedAt
+                )
+                best.id = bs.id
+                best.schemaVersion = bs.schemaVersion
                 modelContext.insert(best)
             }
         }

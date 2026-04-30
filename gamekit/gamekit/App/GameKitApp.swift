@@ -72,7 +72,7 @@ struct GameKitApp: App {
         )
         _cloudSyncStatusObserver = State(initialValue: observer)
 
-        let schema = Schema([GameRecord.self, BestTime.self])
+        let schema = Schema([GameRecord.self, BestTime.self, BestScore.self])
         let config = ModelConfiguration(
             schema: schema,
             cloudKitDatabase: store.cloudSyncEnabled

@@ -101,15 +101,57 @@ final class GameStats {
         try modelContext.save()
     }
 
-    /// Atomic reset of all stats — deletes every `GameRecord` and every
-    /// `BestTime` inside one `modelContext.transaction { ... }` block
-    /// (D-13). Partial reset is impossible by construction. Calls
-    /// `try modelContext.save()` after the transaction.
+    /// Score-record overload (Merge). Inserts a `GameRecord` carrying both
+    /// the outcome and the integer `score`; if `score > 0`, evaluates
+    /// `BestScore` (insert-or-mutate, higher-only). Mirrors the time-based
+    /// path's invariants: insert FIRST, evaluate SECOND (best-effort), save
+    /// THIRD. `mode` is the per-game mode key (e.g. MergeMode.rawValue) and
+    /// is stored in `difficultyRaw` so a single SwiftData column carries
+    /// both per-difficulty and per-mode discriminators.
+    func record(
+        gameKind: GameKind,
+        mode: String,
+        outcome: Outcome,
+        score: Int
+    ) throws {
+        let record = GameRecord(
+            gameKind: gameKind,
+            difficulty: mode,
+            outcome: outcome,
+            durationSeconds: 0,
+            playedAt: .now,
+            score: score
+        )
+        modelContext.insert(record)
+
+        if score > 0 {
+            do {
+                try evaluateBestScore(
+                    gameKind: gameKind,
+                    mode: mode,
+                    score: score
+                )
+            } catch {
+                logger.error(
+                    "BestScore evaluation failed: \(error.localizedDescription, privacy: .public)"
+                )
+            }
+        }
+
+        try modelContext.save()
+    }
+
+    /// Atomic reset of all stats — deletes every `GameRecord`, every
+    /// `BestTime`, and every `BestScore` inside one
+    /// `modelContext.transaction { ... }` block (D-13). Partial reset is
+    /// impossible by construction. Calls `try modelContext.save()` after
+    /// the transaction.
     func resetAll() throws {
         // D-13: atomic via transaction. iOS 17.3+ batch-delete API.
         try modelContext.transaction {
             try modelContext.delete(model: GameRecord.self)
             try modelContext.delete(model: BestTime.self)
+            try modelContext.delete(model: BestScore.self)
         }
         try modelContext.save()
     }
@@ -147,6 +189,40 @@ final class GameStats {
                 gameKind: gameKind,
                 difficulty: difficulty,
                 seconds: seconds,
+                achievedAt: .now
+            )
+            modelContext.insert(best)
+        }
+    }
+
+    /// BestScore insert-or-mutate (higher-only). Mirrors `evaluateBestTime`
+    /// with the comparison inverted — score-chase games reward larger
+    /// numbers. Equal-score is a no-op (matches the BestTime "calmer fewer
+    /// writes" precedent).
+    private func evaluateBestScore(
+        gameKind: GameKind,
+        mode: String,
+        score: Int
+    ) throws {
+        let kindRaw = gameKind.rawValue
+        let descriptor = FetchDescriptor<BestScore>(
+            predicate: #Predicate {
+                $0.gameKindRaw == kindRaw && $0.difficultyRaw == mode
+            }
+        )
+
+        let existing = try modelContext.fetch(descriptor)
+        if let current = existing.first {
+            // Higher-only — equal-score is a no-op.
+            if score > current.score {
+                current.score = score
+                current.achievedAt = .now
+            }
+        } else {
+            let best = BestScore(
+                gameKind: gameKind,
+                difficulty: mode,
+                score: score,
                 achievedAt: .now
             )
             modelContext.insert(best)
