@@ -51,7 +51,10 @@ struct MinesweeperCellView: View {
         tileBackground
             .frame(width: cellSize, height: cellSize)
             .overlay(glyph)
-            .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
+            .overlay(
+                Rectangle()
+                    .stroke(theme.colors.textPrimary.opacity(0.18), lineWidth: 0.5)
+            )
             .contentShape(Rectangle())
             .gesture(
                 LongPressGesture(minimumDuration: 0.25)
@@ -83,7 +86,22 @@ struct MinesweeperCellView: View {
 
     @ViewBuilder
     private var tileBackground: some View {
-        Rectangle().fill(backgroundFill)
+        ZStack {
+            Rectangle().fill(backgroundFill)
+            // Hidden/flagged cells get a strong textPrimary tint so they
+            // stand out against the surface across every preset (tested
+            // on Paper / Cream / Classic where surface ≈ background).
+            if needsHiddenTint {
+                Rectangle().fill(theme.colors.textPrimary.opacity(0.22))
+            }
+        }
+    }
+
+    private var needsHiddenTint: Bool {
+        switch cell.state {
+        case .hidden, .flagged: return true
+        default: return false
+        }
     }
 
     private var backgroundFill: Color {
@@ -91,7 +109,7 @@ struct MinesweeperCellView: View {
         case .revealed:
             return theme.colors.surface
         case .hidden, .flagged:
-            return theme.colors.surfaceElevated
+            return theme.colors.surface
         case .mineHit:
             return theme.colors.danger
         }

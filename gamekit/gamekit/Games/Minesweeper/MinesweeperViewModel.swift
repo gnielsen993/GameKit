@@ -380,6 +380,17 @@ final class MinesweeperViewModel {
         modeToggleCount += 1
     }
 
+    /// Set interaction mode directly. No-op when already at target mode or
+    /// when the game has ended. Used by pill-flipper UI where the user taps
+    /// a specific segment rather than a single toggle button.
+    func setInteractionMode(_ mode: MinesweeperInteractionMode) {
+        if case .won = gameState { return }
+        if case .lost = gameState { return }
+        guard interactionMode != mode else { return }
+        interactionMode = mode
+        modeToggleCount += 1
+    }
+
     /// View-tier entry point for tap gesture. Branches on `interactionMode`
     /// (CONTEXT D-06 / D-11). View NEVER calls `reveal(at:)` /
     /// `toggleFlag(at:)` directly after Phase 6.1 — mode-routing logic

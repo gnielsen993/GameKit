@@ -28,7 +28,7 @@ nonisolated enum MinesweeperDifficulty: String, CaseIterable, Codable, Sendable 
         switch self {
         case .easy:   9
         case .medium: 16
-        case .hard:   16
+        case .hard:   24
         }
     }
 
@@ -36,7 +36,7 @@ nonisolated enum MinesweeperDifficulty: String, CaseIterable, Codable, Sendable 
         switch self {
         case .easy:   9
         case .medium: 16
-        case .hard:   30
+        case .hard:   16
         }
     }
 
@@ -44,7 +44,7 @@ nonisolated enum MinesweeperDifficulty: String, CaseIterable, Codable, Sendable 
         switch self {
         case .easy:   10
         case .medium: 40
-        case .hard:   99
+        case .hard:   80
         }
     }
 

@@ -103,31 +103,5 @@ struct MinesweeperBoardLayoutTests {
                 "Hard 30-col @ 320pt iPhone SE should clamp to 18pt floor; got \(result)")
     }
 
-    // MARK: - clampZoomScale tests
-    //
-    // Pinch-zoom range [0.8, 2.0] per CONTEXT D-14 / Discretion #4.
-
-    @Test
-    func zoomScale_clamped_lowerBound() {
-        // Below 0.8 must clamp up to 0.8.
-        let result = MinesweeperBoardView.clampZoomScale(0.5)
-        #expect(result == 0.8,
-                "Below 0.8 must clamp to 0.8; got \(result)")
-    }
-
-    @Test
-    func zoomScale_clamped_upperBound() {
-        // Above 2.0 must clamp down to 2.0.
-        let result = MinesweeperBoardView.clampZoomScale(2.5)
-        #expect(result == 2.0,
-                "Above 2.0 must clamp to 2.0; got \(result)")
-    }
-
-    @Test
-    func zoomScale_inRange_identity() {
-        // Inside [0.8, 2.0] returns input unchanged.
-        let result = MinesweeperBoardView.clampZoomScale(1.3)
-        #expect(result == 1.3,
-                "In-range value 1.3 must pass through unchanged; got \(result)")
-    }
+    // Pinch-zoom removed; clampZoomScale tests deleted with the feature.
 }
