@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GameKit — Classic preset sketches</title>
+<style>
+  :root {
+    --gap: 24px;
+    --phone-w: 280px;
+    --phone-h: 580px;
+    --bezel: 14px;
+    --island-w: 96px;
+    --island-h: 28px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0d0d10;
+    color: #ececec;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header.page {
+    padding: 32px 40px 16px;
+    border-bottom: 1px solid #1f1f24;
+  }
+  header.page h1 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  header.page p {
+    margin: 0;
+    font-size: 14px;
+    color: #9b9ba3;
+    max-width: 720px;
+    line-height: 1.5;
+  }
+  main { padding: 24px 40px 60px; }
+
+  section.variant {
+    margin: 32px 0 48px;
+    padding: 24px;
+    border: 1px solid #1f1f24;
+    border-radius: 18px;
+    background: #131318;
+  }
+  section.variant > h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  section.variant > p.tagline {
+    margin: 0 0 20px;
+    font-size: 13px;
+    color: #b3b3bc;
+    max-width: 720px;
+    line-height: 1.5;
+  }
+  .row {
+    display: flex;
+    gap: var(--gap);
+    flex-wrap: wrap;
+  }
+  .phone-wrap {
+    text-align: center;
+  }
+  .phone-wrap .label {
+    margin-top: 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8a8a93;
+  }
+  .phone {
+    width: var(--phone-w);
+    height: var(--phone-h);
+    border-radius: 36px;
+    border: 4px solid #2a2a32;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+  }
+  .phone::before {
+    /* Dynamic island */
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--island-w);
+    height: var(--island-h);
+    background: #000;
+    border-radius: 999px;
+    z-index: 30;
+  }
+  .screen {
+    position: absolute;
+    inset: var(--bezel);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status bar shared across all variants — pushed below dynamic island */
+  .status {
+    height: 44px;
+    flex: 0 0 44px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 18px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    z-index: 10;
+  }
+
+  /* App-bar shared shape; per-variant colors override */
+  .appbar {
+    flex: 0 0 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-weight: 700;
+  }
+  .appbar .title {
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
+  .appbar .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ======================================================================
+     VARIANT A — "Coin-Op"
+     Deep jewel-tone bg, neon glow, condensed display type, CRT bloom.
+     ====================================================================== */
+  .v-coinop .screen {
+    background:
+      radial-gradient(ellipse at top, #1d0d3a 0%, #0a0418 70%) #0a0418;
+    color: #efe9ff;
+    font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  }
+  .v-coinop .status { color: #efe9ff; }
+  .v-coinop .appbar { color: #fde047; }
+  .v-coinop .appbar .title {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 8px rgba(253,224,71,0.6);
+  }
+  .v-coinop .appbar .icon {
+    background: rgba(253,224,71,0.15);
+    color: #fde047;
+    border: 1px solid rgba(253,224,71,0.5);
+  }
+  .v-coinop .marquee {
+    margin: 0 16px 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba(253,224,71,0.4);
+    border-radius: 4px;
+    background: rgba(253,224,71,0.08);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #fde047;
+    text-align: center;
+    text-shadow: 0 0 6px rgba(253,224,71,0.5);
+  }
+  .v-coinop .tile-grid {
+    margin: 0 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .v-coinop .tile {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 2px solid #5b2a96;
+    background:
+      linear-gradient(180deg, rgba(124,58,237,0.25), rgba(124,58,237,0.05));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow:
+      inset 0 0 0 1px rgba(253,224,71,0.15),
+      0 0 24px rgba(124,58,237,0.3);
+  }
+  .v-coinop .tile .glyph {
+    font-size: 38px;
+    color: #fde047;
+    text-shadow: 0 0 12px rgba(253,224,71,0.8);
+    line-height: 1;
+  }
+  .v-coinop .tile .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #efe9ff;
+  }
+  .v-coinop .scoreboard {
+    margin: auto 16px 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .v-coinop .scoreboard .chip {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid rgba(253,224,71,0.3);
+    border-radius: 4px;
+    background: rgba(0,0,0,0.4);
+    font-family: "Space Mono", "Menlo", monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #efe9ff;
+  }
+  .v-coinop .scoreboard .chip .num {
+    display: block;
+    font-size: 22px;
+    color: #fde047;
+    text-shadow: 0 0 8px rgba(253,224,71,0.5);
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+  }
+  /* Mines board (Coin-Op) */
+  .v-coinop .mines-board {
+    margin: 12px 16px;
+    aspect-ratio: 1;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid #5b2a96;
+    border-radius: 8px;
+    padding: 4px;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 1px;
+    box-shadow: inset 0 0 24px rgba(124,58,237,0.4);
+  }
+  .v-coinop .mines-board .cell {
+    background: #1a0d3a;
+    border: 1px solid rgba(253,224,71,0.1);
+    display: grid;
+    place-items: center;
+    font-family: "Space Mono", "Menlo", monospace;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .v-coinop .mines-board .cell.r {
+    background: rgba(0,0,0,0.6);
+    border-color: rgba(253,224,71,0.05);
+  }
+  .v-coinop .n1 { color: #67e8f9; }
+  .v-coinop .n2 { color: #86efac; }
+  .v-coinop .n3 { color: #f9a8d4; }
+  .v-coinop .n4 { color: #c4b5fd; }
+  /* Solitaire (Coin-Op) */
+  .v-coinop .solitaire {
+    flex: 1;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .v-coinop .solitaire .top-row {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+  }
+  .v-coinop .solitaire .pile {
+    width: 32px;
+    height: 46px;
+    border-radius: 4px;
+    border: 1px dashed rgba(253,224,71,0.4);
+    background: rgba(0,0,0,0.3);
+    display: grid;
+    place-items: center;
+    font-size: 9px;
+    color: #fde047;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .v-coinop .solitaire .deck {
+    background: linear-gradient(135deg, #5b2a96, #2a0d5a);
+    border-color: #5b2a96;
+    color: #fde047;
+    font-size: 14px;
+  }
+  .v-coinop .solitaire .face {
+    background: linear-gradient(180deg, #fef3c7, #fde047);
+    color: #2a0d5a;
+    font-weight: 800;
+    font-size: 11px;
+    border: 1px solid rgba(0,0,0,0.3);
+  }
+  .v-coinop .solitaire .face.red { color: #be185d; }
+  .v-coinop .solitaire .tableau {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .v-coinop .solitaire .tableau .col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .v-coinop .solitaire .tableau .col .card {
+    height: 14px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, #5b2a96, #2a0d5a);
+    border: 1px solid rgba(253,224,71,0.2);
+  }
+  .v-coinop .solitaire .tableau .col .card.face {
+    height: 38px;
+    background: linear-gradient(180deg, #fef3c7, #fde047);
+    color: #2a0d5a;
+    font-weight: 800;
+    font-size: 11px;
+    text-align: center;
+    line-height: 38px;
+  }
+  .v-coinop .solitaire .tableau .col .card.face.red { color: #be185d; }
+
+  /* ======================================================================
+     VARIANT B — "Chrome Diner"
+     1950s-60s arcade restomod. Chrome grey + cream + pastel red/teal.
+     ====================================================================== */
+  .v-chrome .screen {
+    background:
+      linear-gradient(180deg, #f5f1e8 0%, #ede7d7 100%);
+    color: #2a2620;
+    font-family: "Inter", "SF Pro", system-ui, sans-serif;
+  }
+  .v-chrome .status { color: #2a2620; }
+  .v-chrome .appbar {
+    background:
+      linear-gradient(180deg, #e9e3d3 0%, #d8d2c2 100%);
+    border-bottom: 1px solid #b8b2a3;
+    color: #2a2620;
+  }
+  .v-chrome .appbar .title {
+    font-family: "DM Serif Display", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 19px;
+    letter-spacing: 0;
+  }
+  .v-chrome .appbar .icon {
+    background: #c0392b;
+    color: #fff;
+  }
+  .v-chrome .marquee {
+    margin: 16px 16px 12px;
+    padding: 14px 12px;
+    background: #c0392b;
+    color: #fff;
+    border-radius: 6px;
+    font-family: "DM Serif Display", "Times New Roman", serif;
+    font-size: 13px;
+    text-align: center;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.25),
+      0 2px 0 #8c2820;
+  }
+  .v-chrome .marquee small {
+    display: block;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-top: 2px;
+    opacity: 0.8;
+  }
+  .v-chrome .tile-grid {
+    margin: 0 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .v-chrome .tile {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #b8b2a3;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.5),
+      0 2px 0 #b8b2a3,
+      0 4px 8px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #2a2620;
+  }
+  .v-chrome .tile .glyph {
+    font-size: 38px;
+    color: #c0392b;
+    line-height: 1;
+  }
+  .v-chrome .tile .label {
+    font-family: "DM Serif Display", "Times New Roman", serif;
+    font-size: 14px;
+  }
+  .v-chrome .scoreboard {
+    margin: auto 16px 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .v-chrome .scoreboard .chip {
+    flex: 1;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid #b8b2a3;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6b6358;
+  }
+  .v-chrome .scoreboard .chip .num {
+    display: block;
+    font-family: "DM Serif Display", "Times New Roman", serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: #2a2620;
+    margin-top: 2px;
+  }
+  /* Mines board (Chrome Diner) */
+  .v-chrome .mines-board {
+    margin: 12px 16px;
+    aspect-ratio: 1;
+    background: #b8b2a3;
+    border: 1px solid #6b6358;
+    border-radius: 8px;
+    padding: 3px;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 1px;
+    box-shadow: inset 0 2px 0 rgba(0,0,0,0.15);
+  }
+  .v-chrome .mines-board .cell {
+    background:
+      linear-gradient(135deg, #f5f1e8 0%, #ddd6c4 100%);
+    box-shadow:
+      inset 1px 1px 0 #fff,
+      inset -1px -1px 0 #8a8378;
+    display: grid;
+    place-items: center;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .v-chrome .mines-board .cell.r {
+    background: #e9e3d3;
+    box-shadow:
+      inset 1px 1px 0 #b8b2a3;
+  }
+  .v-chrome .n1 { color: #1d4ed8; }
+  .v-chrome .n2 { color: #15803d; }
+  .v-chrome .n3 { color: #c0392b; }
+  .v-chrome .n4 { color: #6b21a8; }
+  /* Solitaire (Chrome Diner) */
+  .v-chrome .solitaire {
+    flex: 1;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background:
+      radial-gradient(ellipse at top, #15803d 0%, #0d4a25 100%);
+  }
+  .v-chrome .solitaire .top-row {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+  }
+  .v-chrome .solitaire .pile {
+    width: 32px;
+    height: 46px;
+    border-radius: 4px;
+    border: 1px dashed rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.2);
+    display: grid;
+    place-items: center;
+    font-size: 9px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .v-chrome .solitaire .deck {
+    background:
+      repeating-linear-gradient(45deg, #c0392b 0 4px, #8c2820 4px 8px);
+    border: 1px solid #fff;
+  }
+  .v-chrome .solitaire .face {
+    background: #fff;
+    color: #2a2620;
+    font-family: "DM Serif Display", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 12px;
+    border: 1px solid #b8b2a3;
+  }
+  .v-chrome .solitaire .face.red { color: #c0392b; }
+  .v-chrome .solitaire .tableau {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .v-chrome .solitaire .tableau .col { display: flex; flex-direction: column; gap: 2px; }
+  .v-chrome .solitaire .tableau .col .card {
+    height: 14px;
+    border-radius: 3px;
+    background:
+      repeating-linear-gradient(45deg, #c0392b 0 4px, #8c2820 4px 8px);
+    border: 1px solid #fff;
+  }
+  .v-chrome .solitaire .tableau .col .card.face {
+    height: 38px;
+    background: #fff;
+    color: #2a2620;
+    font-family: "DM Serif Display", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 12px;
+    text-align: center;
+    line-height: 38px;
+    border: 1px solid #b8b2a3;
+  }
+  .v-chrome .solitaire .tableau .col .card.face.red { color: #c0392b; }
+
+  /* ======================================================================
+     VARIANT C — "Wood Cabinet"
+     Walnut paneling, brass accents, cream UI surfaces. High-end home arcade.
+     ====================================================================== */
+  .v-wood .screen {
+    background:
+      linear-gradient(180deg, #f4ebd9 0%, #ebe1c8 100%);
+    color: #2b1d0e;
+    font-family: "Inter", "SF Pro", system-ui, sans-serif;
+  }
+  .v-wood .status { color: #2b1d0e; }
+  .v-wood .appbar {
+    background:
+      linear-gradient(180deg, #4a2e18 0%, #3a2310 100%);
+    border-bottom: 1px solid #2a1808;
+    color: #f4ebd9;
+    box-shadow: inset 0 -2px 0 #d4a574;
+  }
+  .v-wood .appbar .title {
+    font-family: "Playfair Display", "Times New Roman", serif;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: 0.02em;
+    color: #d4a574;
+  }
+  .v-wood .appbar .icon {
+    background: #d4a574;
+    color: #2b1d0e;
+  }
+  .v-wood .marquee {
+    margin: 14px 16px 12px;
+    padding: 14px 16px;
+    background:
+      linear-gradient(180deg, #4a2e18, #3a2310);
+    color: #d4a574;
+    border-radius: 8px;
+    border: 1px solid #2a1808;
+    box-shadow:
+      inset 0 1px 0 #6a4222,
+      inset 0 0 0 2px #d4a574 inset;
+    font-family: "Playfair Display", "Times New Roman", serif;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+  .v-wood .marquee small {
+    display: block;
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-top: 2px;
+    color: #c89a64;
+  }
+  .v-wood .tile-grid {
+    margin: 0 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .v-wood .tile {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, #fbf5e6, #f4ebd9);
+    border: 2px solid #4a2e18;
+    box-shadow:
+      inset 0 0 0 1px #d4a574,
+      0 2px 0 #2a1808;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #2b1d0e;
+  }
+  .v-wood .tile .glyph {
+    font-size: 38px;
+    color: #4a2e18;
+    line-height: 1;
+  }
+  .v-wood .tile .label {
+    font-family: "Playfair Display", "Times New Roman", serif;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .v-wood .scoreboard {
+    margin: auto 16px 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .v-wood .scoreboard .chip {
+    flex: 1;
+    padding: 10px 12px;
+    background:
+      linear-gradient(180deg, #4a2e18, #3a2310);
+    color: #d4a574;
+    border-radius: 8px;
+    border: 1px solid #2a1808;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .v-wood .scoreboard .chip .num {
+    display: block;
+    font-family: "Playfair Display", "Times New Roman", serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: #f4ebd9;
+    margin-top: 2px;
+  }
+  /* Mines board (Wood Cabinet) */
+  .v-wood .mines-board {
+    margin: 12px 16px;
+    aspect-ratio: 1;
+    background: #4a2e18;
+    border: 2px solid #2a1808;
+    border-radius: 6px;
+    padding: 3px;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 1px;
+    box-shadow:
+      inset 0 0 0 1px #d4a574,
+      0 2px 0 #2a1808;
+  }
+  .v-wood .mines-board .cell {
+    background:
+      linear-gradient(135deg, #f4ebd9 0%, #d9cfb4 100%);
+    box-shadow:
+      inset 1px 1px 0 #fff,
+      inset -1px -1px 0 #8a7a5a;
+    display: grid;
+    place-items: center;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .v-wood .mines-board .cell.r {
+    background: #e0d6bd;
+    box-shadow: inset 1px 1px 0 #b89e74;
+  }
+  .v-wood .n1 { color: #1e40af; }
+  .v-wood .n2 { color: #166534; }
+  .v-wood .n3 { color: #991b1b; }
+  .v-wood .n4 { color: #581c87; }
+  /* Solitaire (Wood Cabinet) */
+  .v-wood .solitaire {
+    flex: 1;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background:
+      radial-gradient(ellipse at top, #166534 0%, #0a3d1f 100%);
+    border-top: 2px solid #4a2e18;
+  }
+  .v-wood .solitaire .top-row {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+  }
+  .v-wood .solitaire .pile {
+    width: 32px;
+    height: 46px;
+    border-radius: 4px;
+    border: 1px dashed rgba(212,165,116,0.5);
+    background: rgba(0,0,0,0.2);
+    display: grid;
+    place-items: center;
+    font-size: 9px;
+    color: #d4a574;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .v-wood .solitaire .deck {
+    background:
+      repeating-linear-gradient(0deg, #4a2e18 0 6px, #6a4222 6px 12px);
+    border: 1px solid #d4a574;
+  }
+  .v-wood .solitaire .face {
+    background: #f4ebd9;
+    color: #2b1d0e;
+    font-family: "Playfair Display", "Times New Roman", serif;
+    font-weight: 700;
+    font-size: 12px;
+    border: 1px solid #4a2e18;
+  }
+  .v-wood .solitaire .face.red { color: #991b1b; }
+  .v-wood .solitaire .tableau {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .v-wood .solitaire .tableau .col { display: flex; flex-direction: column; gap: 2px; }
+  .v-wood .solitaire .tableau .col .card {
+    height: 14px;
+    border-radius: 3px;
+    background:
+      repeating-linear-gradient(0deg, #4a2e18 0 6px, #6a4222 6px 12px);
+    border: 1px solid #d4a574;
+  }
+  .v-wood .solitaire .tableau .col .card.face {
+    height: 38px;
+    background: #f4ebd9;
+    color: #2b1d0e;
+    font-family: "Playfair Display", "Times New Roman", serif;
+    font-weight: 700;
+    font-size: 12px;
+    text-align: center;
+    line-height: 38px;
+    border: 1px solid #4a2e18;
+  }
+  .v-wood .solitaire .tableau .col .card.face.red { color: #991b1b; }
+
+  /* Status bar internals (battery, signal) — keep tiny */
+  .status .left, .status .right { display: inline-flex; gap: 4px; align-items: center; }
+  .status .battery {
+    width: 22px;
+    height: 10px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    position: relative;
+  }
+  .status .battery::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: currentColor;
+    width: 80%;
+  }
+</style>
+</head>
+<body>
+<header class="page">
+  <h1>GameKit — Classic preset sketches</h1>
+  <p>
+    Restomod arcade direction: old-school design language, modern execution.
+    Three variants × three screens (Home, Minesweeper, Solitaire) so we can
+    pick the right Classic baseline before refactoring DesignKit. Each variant
+    is a candidate "feel"; per-game contexts then layer their own tweaks
+    (Mines = Win 95 greys, Sudoku = green felt, etc) on top of the chosen
+    foundation.
+  </p>
+</header>
+
+<main>
+
+<!-- ============================================================ VARIANT A -->
+<section class="variant v-coinop">
+  <h2>A — Coin-Op</h2>
+  <p class="tagline">
+    Saturated jewel-tone bg, neon-yellow accent with subtle glow, condensed
+    display type. Pinball / Galaga marquee energy. Loudest of the three —
+    "you stepped into the arcade."
+  </p>
+  <div class="row">
+
+    <!-- HOME -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">GameKit</span>
+            <span class="icon">G</span>
+          </div>
+          <div class="body">
+            <div class="marquee">★ Insert Coin to Play ★</div>
+            <div class="tile-grid">
+              <div class="tile"><span class="glyph">▣</span><span class="label">Mines</span></div>
+              <div class="tile"><span class="glyph">▤</span><span class="label">Merge</span></div>
+              <div class="tile"><span class="glyph">♠</span><span class="label">Solitaire</span></div>
+              <div class="tile"><span class="glyph">⊞</span><span class="label">Sudoku</span></div>
+            </div>
+            <div class="scoreboard">
+              <div class="chip">High Score<span class="num">12,480</span></div>
+              <div class="chip">Today<span class="num">04</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Home</div>
+    </div>
+
+    <!-- MINES -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">Minesweeper</span>
+            <span class="icon">⏱</span>
+          </div>
+          <div class="body">
+            <div class="scoreboard" style="margin: 8px 16px;">
+              <div class="chip">Mines<span class="num">042</span></div>
+              <div class="chip">Time<span class="num">1:24</span></div>
+            </div>
+            <div class="mines-board" id="mines-coinop"></div>
+            <div class="marquee" style="margin-top:auto">⚠ Tap to reveal · Hold to flag</div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Minesweeper</div>
+    </div>
+
+    <!-- SOLITAIRE -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">Solitaire</span>
+            <span class="icon">♠</span>
+          </div>
+          <div class="body solitaire">
+            <div class="top-row">
+              <div class="pile deck">▦</div>
+              <div class="pile face">A♠</div>
+              <div class="pile">♠</div>
+              <div class="pile">♥</div>
+              <div class="pile">♦</div>
+              <div class="pile">♣</div>
+            </div>
+            <div class="tableau">
+              <div class="col"><div class="card face">A</div></div>
+              <div class="col"><div class="card"></div><div class="card face red">7♥</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card face">K♣</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face red">5♦</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face">9♠</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face red">3♥</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face">J♣</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Solitaire</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================ VARIANT B -->
+<section class="variant v-chrome">
+  <h2>B — Chrome Diner</h2>
+  <p class="tagline">
+    1950s arcade restomod. Cream + brushed grey + diner red. Serif title
+    over plate-chrome bar. Subtle skeuomorphic bevels but executed cleanly.
+    "Mid-century parlor with modern grid."
+  </p>
+  <div class="row">
+
+    <!-- HOME -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">GameKit</span>
+            <span class="icon">G</span>
+          </div>
+          <div class="body">
+            <div class="marquee">Now Playing<small>Pick a Game</small></div>
+            <div class="tile-grid">
+              <div class="tile"><span class="glyph">▣</span><span class="label">Mines</span></div>
+              <div class="tile"><span class="glyph">▤</span><span class="label">Merge</span></div>
+              <div class="tile"><span class="glyph">♠</span><span class="label">Solitaire</span></div>
+              <div class="tile"><span class="glyph">⊞</span><span class="label">Sudoku</span></div>
+            </div>
+            <div class="scoreboard">
+              <div class="chip">High Score<span class="num">12,480</span></div>
+              <div class="chip">Today<span class="num">04</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Home</div>
+    </div>
+
+    <!-- MINES -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">Minesweeper</span>
+            <span class="icon">⏱</span>
+          </div>
+          <div class="body">
+            <div class="scoreboard" style="margin: 8px 16px;">
+              <div class="chip">Mines<span class="num">042</span></div>
+              <div class="chip">Time<span class="num">1:24</span></div>
+            </div>
+            <div class="mines-board" id="mines-chrome"></div>
+            <div class="marquee" style="margin-top:auto">Tap to reveal · Hold to flag</div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Minesweeper</div>
+    </div>
+
+    <!-- SOLITAIRE -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">Solitaire</span>
+            <span class="icon">♠</span>
+          </div>
+          <div class="body solitaire">
+            <div class="top-row">
+              <div class="pile deck"></div>
+              <div class="pile face">A♠</div>
+              <div class="pile">♠</div>
+              <div class="pile">♥</div>
+              <div class="pile">♦</div>
+              <div class="pile">♣</div>
+            </div>
+            <div class="tableau">
+              <div class="col"><div class="card face">A</div></div>
+              <div class="col"><div class="card"></div><div class="card face red">7♥</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card face">K♣</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face red">5♦</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face">9♠</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face red">3♥</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face">J♣</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Solitaire</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================ VARIANT C -->
+<section class="variant v-wood">
+  <h2>C — Wood Cabinet</h2>
+  <p class="tagline">
+    High-end home arcade cabinet. Walnut top-bar, brass marquee accent,
+    cream UI surfaces, green felt for table games. Most "luxury restomod."
+    Speaks to a calmer, ad-free, no-aggressive-monetization product.
+  </p>
+  <div class="row">
+
+    <!-- HOME -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">GameKit</span>
+            <span class="icon">G</span>
+          </div>
+          <div class="body">
+            <div class="marquee">The Parlor<small>Choose a Game</small></div>
+            <div class="tile-grid">
+              <div class="tile"><span class="glyph">▣</span><span class="label">Mines</span></div>
+              <div class="tile"><span class="glyph">▤</span><span class="label">Merge</span></div>
+              <div class="tile"><span class="glyph">♠</span><span class="label">Solitaire</span></div>
+              <div class="tile"><span class="glyph">⊞</span><span class="label">Sudoku</span></div>
+            </div>
+            <div class="scoreboard">
+              <div class="chip">High Score<span class="num">12,480</span></div>
+              <div class="chip">Today<span class="num">04</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Home</div>
+    </div>
+
+    <!-- MINES -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">Minesweeper</span>
+            <span class="icon">⏱</span>
+          </div>
+          <div class="body">
+            <div class="scoreboard" style="margin: 8px 16px;">
+              <div class="chip">Mines<span class="num">042</span></div>
+              <div class="chip">Time<span class="num">1:24</span></div>
+            </div>
+            <div class="mines-board" id="mines-wood"></div>
+            <div class="marquee" style="margin-top:auto">Tap to reveal · Hold to flag</div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Minesweeper</div>
+    </div>
+
+    <!-- SOLITAIRE -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="status">
+            <span class="left">9:25</span>
+            <span class="right">5G <span class="battery"></span></span>
+          </div>
+          <div class="appbar">
+            <span class="title">Solitaire</span>
+            <span class="icon">♠</span>
+          </div>
+          <div class="body solitaire">
+            <div class="top-row">
+              <div class="pile deck"></div>
+              <div class="pile face">A♠</div>
+              <div class="pile">♠</div>
+              <div class="pile">♥</div>
+              <div class="pile">♦</div>
+              <div class="pile">♣</div>
+            </div>
+            <div class="tableau">
+              <div class="col"><div class="card face">A</div></div>
+              <div class="col"><div class="card"></div><div class="card face red">7♥</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card face">K♣</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face red">5♦</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face">9♠</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face red">3♥</div></div>
+              <div class="col"><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card"></div><div class="card face">J♣</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Solitaire</div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<script>
+// Generate Mines boards. Same layout for all 3 variants — the styling makes
+// each variant feel different (CRT glow vs chrome bevel vs wood frame).
+const MINES_LAYOUT = [
+  // 9x9: digit = adjacent count, "r" = revealed empty, "" = hidden, "F" = flagged, "B" = mine
+  ["r","r","1","","","","1","",""],
+  ["r","r","1","2","2","2","2","F",""],
+  ["1","1","1","1","r","r","1","2",""],
+  ["","","","","r","r","1","1",""],
+  ["","","","","r","r","r","r","r"],
+  ["","","2","1","1","r","r","r","r"],
+  ["","","","","1","1","r","r","r"],
+  ["","","","","","","1","1","1"],
+  ["","","","","","","","","F"],
+];
+
+function makeBoard(targetId, variantClass) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  for (const row of MINES_LAYOUT) {
+    for (const cell of row) {
+      const div = document.createElement("div");
+      div.className = "cell" + (cell === "" || cell === "F" ? "" : " r");
+      const isDigit = !isNaN(parseInt(cell, 10));
+      if (isDigit) {
+        const n = parseInt(cell, 10);
+        div.classList.add("n" + n);
+        div.textContent = String(n);
+      } else if (cell === "F") {
+        div.textContent = "⚑";
+        div.style.color = variantClass === "v-coinop" ? "#fb7185" : "#c0392b";
+      }
+      el.appendChild(div);
+    }
+  }
+}
+makeBoard("mines-coinop", "v-coinop");
+makeBoard("mines-chrome", "v-chrome");
+makeBoard("mines-wood", "v-wood");
+</script>
+</body>
+</html>
