@@ -51,6 +51,16 @@ struct StatsView: View {
     @Query(filter: #Predicate<BestTime> { $0.gameKindRaw == "minesweeper" })
     private var minesBestTimes: [BestTime]
 
+    @Query(
+        filter: #Predicate<GameRecord> { $0.gameKindRaw == "merge" },
+        sort: \.playedAt,
+        order: .reverse
+    )
+    private var mergeRecords: [GameRecord]
+
+    @Query(filter: #Predicate<BestScore> { $0.gameKindRaw == "merge" })
+    private var mergeBestScores: [BestScore]
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
@@ -67,12 +77,112 @@ struct StatsView: View {
                             bestTimes: minesBestTimes
                         )
                     }
+
+                    settingsSectionHeader(theme: theme, String(localized: "MERGE"))
+
+                    DKCard(theme: theme) {
+                        MergeStatsCard(
+                            theme: theme,
+                            records: mergeRecords,
+                            bestScores: mergeBestScores
+                        )
+                    }
                 }
                 .padding(theme.spacing.l)
             }
             .background(theme.colors.background.ignoresSafeArea())
             .navigationTitle(String(localized: "Stats"))
         }
+    }
+}
+
+// MARK: - Merge stats card (props-only, no @Query)
+
+private struct MergeStatsCard: View {
+    let theme: Theme
+    let records: [GameRecord]
+    let bestScores: [BestScore]
+
+    var body: some View {
+        if records.isEmpty {
+            Text(String(localized: "No Merge games played yet."))
+                .font(theme.typography.body)
+                .foregroundStyle(theme.colors.textTertiary)
+                .frame(maxWidth: .infinity)
+        } else {
+            Grid(
+                alignment: .leading,
+                horizontalSpacing: theme.spacing.m,
+                verticalSpacing: theme.spacing.s
+            ) {
+                GridRow {
+                    Text("").gridColumnAlignment(.leading)
+                    Text(String(localized: "Games")).gridColumnAlignment(.trailing)
+                    Text(String(localized: "Best")).gridColumnAlignment(.trailing)
+                }
+                .font(theme.typography.caption.weight(.semibold))
+                .foregroundStyle(theme.colors.textSecondary)
+
+                Rectangle()
+                    .fill(theme.colors.border)
+                    .frame(height: 1)
+                    .gridCellColumns(3)
+
+                ForEach(MergeMode.allCases, id: \.self) { mode in
+                    MergeModeStatsRow(
+                        theme: theme,
+                        mode: mode,
+                        records: records,
+                        bestScores: bestScores
+                    )
+                }
+            }
+        }
+    }
+}
+
+private struct MergeModeStatsRow: View {
+    let theme: Theme
+    let mode: MergeMode
+    let records: [GameRecord]
+    let bestScores: [BestScore]
+
+    private var games: Int {
+        records.filter { $0.difficultyRaw == mode.rawValue }.count
+    }
+
+    private var bestText: String {
+        guard let best = bestScores.first(where: { $0.difficultyRaw == mode.rawValue }) else {
+            return "—"
+        }
+        return "\(best.score)"
+    }
+
+    private var displayName: String {
+        switch mode {
+        case .winMode:  return String(localized: "Win")
+        case .infinite: return String(localized: "Infinite")
+        }
+    }
+
+    var body: some View {
+        GridRow {
+            Text(displayName)
+                .font(theme.typography.body)
+                .foregroundStyle(theme.colors.textPrimary)
+            Text("\(games)")
+                .font(theme.typography.monoNumber)
+                .monospacedDigit()
+                .foregroundStyle(theme.colors.textPrimary)
+                .gridColumnAlignment(.trailing)
+            Text(bestText)
+                .font(theme.typography.monoNumber)
+                .monospacedDigit()
+                .foregroundStyle(theme.colors.textPrimary)
+                .gridColumnAlignment(.trailing)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("\(displayName): \(games) games, best score \(bestText)"))
     }
 }
 

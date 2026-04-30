@@ -132,10 +132,26 @@ struct SettingsView: View {
     @ViewBuilder
     private var appearanceSection: some View {
         // P5 (D-14, SHELL-02 + CLAUDE.md §2 theme picker UX convention):
-        // 5 Classic preset swatches inline + NavigationLink to FullThemePickerView.
+        // System/Light/Dark mode picker + 5 Classic preset swatches inline +
+        // NavigationLink to FullThemePickerView.
         settingsSectionHeader(theme: theme, String(localized: "APPEARANCE"))
         DKCard(theme: theme) {
             VStack(alignment: .leading, spacing: theme.spacing.l) {
+                Picker(
+                    String(localized: "Appearance mode"),
+                    selection: Binding(
+                        get: { themeManager.mode },
+                        set: { themeManager.mode = $0 }
+                    )
+                ) {
+                    Text(String(localized: "System")).tag(ThemeMode.system)
+                    Text(String(localized: "Light")).tag(ThemeMode.light)
+                    Text(String(localized: "Dark")).tag(ThemeMode.dark)
+                }
+                .pickerStyle(.segmented)
+                Rectangle()
+                    .fill(theme.colors.border)
+                    .frame(height: 1)
                 DKThemePicker(
                     themeManager: themeManager,
                     theme: theme,

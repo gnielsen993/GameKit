@@ -24,7 +24,10 @@ struct HomeView: View {
 
     @State private var showingComingSoon: GameCard?
     @State private var navigateToMines: Bool = false
+    @State private var navigateToMerge: Bool = false
     @State private var showingUpcoming: Bool = false
+    @State private var showingSettings: Bool = false
+    @State private var showingStats: Bool = false
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
@@ -39,6 +42,7 @@ struct HomeView: View {
                     spacing: theme.spacing.m
                 ) {
                     minesTile
+                    mergeTile
                     upcomingTile
                 }
                 .padding(.horizontal, theme.spacing.l)
@@ -47,8 +51,32 @@ struct HomeView: View {
             }
             .background(theme.colors.background.ignoresSafeArea())
             .navigationTitle(String(localized: "GameKit"))
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            showingStats = true
+                        } label: {
+                            Label(String(localized: "Stats"), systemImage: "chart.bar")
+                        }
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Label(String(localized: "Settings"), systemImage: "gearshape")
+                        }
+                    } label: {
+                        Image(systemName: "person.crop.circle")
+                            .font(.system(size: 22))
+                            .foregroundStyle(theme.colors.textPrimary)
+                    }
+                    .accessibilityLabel(Text("Profile"))
+                }
+            }
             .navigationDestination(isPresented: $navigateToMines) {
                 MinesweeperGameView()
+            }
+            .navigationDestination(isPresented: $navigateToMerge) {
+                MergeGameView()
             }
             .sheet(isPresented: $showingUpcoming) {
                 UpcomingGamesView(theme: theme) { card in
@@ -60,6 +88,12 @@ struct HomeView: View {
                         }
                     }
                 }
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
+            }
+            .sheet(isPresented: $showingStats) {
+                StatsView()
             }
             .overlay(alignment: .bottom) {
                 if let card = showingComingSoon {
@@ -83,6 +117,21 @@ struct HomeView: View {
                 symbol: "square.grid.4x3.fill",
                 iconColor: theme.colors.accentPrimary,
                 title: String(localized: "Minesweeper"),
+                caption: String(localized: "Tap to play")
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var mergeTile: some View {
+        Button {
+            navigateToMerge = true
+        } label: {
+            tileCard(
+                symbol: "square.stack.3d.up.fill",
+                iconColor: theme.colors.accentSecondary,
+                title: String(localized: "Merge"),
                 caption: String(localized: "Tap to play")
             )
         }

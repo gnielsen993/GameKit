@@ -2,10 +2,11 @@
 //  RootTabView.swift
 //  gamekit
 //
-//  3-tab TabView root per D-02 (TabView with three tabs — Home / Stats /
-//  Settings; each tab owns its own NavigationStack inside its root view).
-//  RootTabView itself is stateless — does not hold a NavigationStack
-//  (ARCHITECTURE.md Anti-Pattern 3).
+//  Root scene wrapper. Tab bar removed — Home is the sole root surface;
+//  Settings/Stats/Account reach through a profile button on HomeView's
+//  toolbar (sheet routing). RootTabView retains the IntroFlow + scenePhase
+//  + AuthStore alert wiring so those side effects keep firing exactly once
+//  at the scene root.
 //
 //  P5 (D-23, SHELL-04): drives the 3-step IntroFlowView via
 //  .fullScreenCover gated on settingsStore.hasSeenIntro. The cover presents
@@ -33,25 +34,12 @@ struct RootTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.authStore) private var authStore
 
-    @State private var selectedTab: Int = 0
     @State private var isIntroPresented: Bool = false
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            HomeView()
-                .tabItem { Label(String(localized: "Home"), systemImage: "house") }
-                .tag(0)
-
-            StatsView()
-                .tabItem { Label(String(localized: "Stats"), systemImage: "chart.bar") }
-                .tag(1)
-
-            SettingsView()
-                .tabItem { Label(String(localized: "Settings"), systemImage: "gearshape") }
-                .tag(2)
-        }
+        HomeView()
         .tint(theme.colors.accentPrimary)
         .fullScreenCover(isPresented: $isIntroPresented) {
             IntroFlowView()
