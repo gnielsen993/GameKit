@@ -52,6 +52,28 @@ DesignKit · HabitTracker · FitnessTracker · PantryPlanner.
 - "Personality" comes from preset + layout emphasis, not random
   styling.
 
+### Classic preset — restomod policy
+The `Classic` preset (`ThemePreset.classicMuted` in DesignKit) is
+**Chrome Diner**: cream paper bg, white card surfaces, brushed-grey
+bezels, diner-red accent. The aesthetic is "rethink of classics with
+modern styles" — old design language, modern execution.
+
+Hard rules for new games and screens:
+- **Layout, spacing, radii, motion, typography weights stay modern.**
+  Classic only changes colors + surface treatment ("the skin"). Do NOT
+  add serif fonts, skeuomorphic depth, or retro layout shifts when the
+  preset is Classic.
+- **Default consumer baseline = Chrome Diner.** A new game ships with
+  no Classic-specific code — it inherits Chrome Diner from DesignKit.
+- **Per-context overrides arrive only when needed.** Felt-table games
+  (Solitaire, Sudoku) will need a green-felt board surface. When the
+  first such game lands, plumb a `@Environment(\.classicAnchorOverride)`
+  hook from DesignKit so consumers can swap a narrow subset of anchors
+  (typically just the game-board background) without forking the whole
+  preset. Until then: don't speculate-build the override surface.
+- **Visual audit on Classic + one Loud preset (Voltage / Dracula).**
+  Game-screen changes still need the §8.12 contrast pass.
+
 ---
 
 ## 2) DesignKit: how to consume it
