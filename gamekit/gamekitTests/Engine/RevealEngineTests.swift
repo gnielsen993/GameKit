@@ -124,26 +124,26 @@ nonisolated struct RevealEngineTests {
 
     // MARK: - SC3: iterative flood-fill on cluster-corner Hard board (no stack growth)
 
-    /// Build a Hard board with mines forced into the top-left 11×9 corner region
-    /// (99 mines fit in 99 cells), then tap (15, 29) — far corner — and assert
+    /// Build a Hard board with mines forced into the top-left 10×8 corner region
+    /// (80 mines fit in 80 cells), then tap (23, 15) — far corner — and assert
     /// the cascade reveals the entire bottom-right empty region. The fact that
     /// this test PASSES without stack overflow IS the ROADMAP P2 SC3 proof.
     @Test
     func cornerClusteredHardBoard_floodFillTerminates() {
-        let rows = 16, cols = 30, mineCount = 99
+        let rows = 24, cols = 16, mineCount = 80
 
-        // Mine indices: first 99 cells in row-major order from (0,0)
-        // through the top-left 11×9 region.
+        // Mine indices: first 80 cells in row-major order from (0,0)
+        // through the top-left 10×8 region.
         var mineIndices: Set<MinesweeperIndex> = []
         var placed = 0
-        outer: for r in 0..<11 {
-            for c in 0..<9 {
+        outer: for r in 0..<10 {
+            for c in 0..<8 {
                 mineIndices.insert(MinesweeperIndex(row: r, col: c))
                 placed += 1
                 if placed == mineCount { break outer }
             }
         }
-        #expect(mineIndices.count == mineCount, "Cluster must contain exactly 99 mines")
+        #expect(mineIndices.count == mineCount, "Cluster must contain exactly 80 mines")
 
         // Build cells with correct adjacency
         var cells: [MinesweeperCell] = []
@@ -165,16 +165,16 @@ nonisolated struct RevealEngineTests {
             cells: cells
         )
 
-        // Tap far corner (15, 29) — guaranteed non-mine (cluster is top-left).
-        let tap = MinesweeperIndex(row: 15, col: 29)
+        // Tap far corner (23, 15) — guaranteed non-mine (cluster is top-left).
+        let tap = MinesweeperIndex(row: 23, col: 15)
         #expect(board.cell(at: tap).isMine == false)
 
         let result = RevealEngine.reveal(at: tap, on: board)
 
         // Should reveal a LARGE region (all bottom-right empty cells + their numbered border).
-        // 480 total cells - 99 mines = 381 non-mine; cascade reveals most of the open region.
-        // Conservative lower bound: should reveal more than 200 cells without stack overflow.
-        #expect(result.revealed.count > 200,
+        // 384 total cells - 80 mines = 304 non-mine; cascade reveals most of the open region.
+        // Conservative lower bound: should reveal more than 150 cells without stack overflow.
+        #expect(result.revealed.count > 150,
             "Far-corner tap on cluster-corner board must reveal a large region (got \(result.revealed.count))")
 
         // No mines were revealed by cascade

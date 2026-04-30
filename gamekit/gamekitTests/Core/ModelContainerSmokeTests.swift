@@ -55,14 +55,15 @@ struct ModelContainerSmokeTests {
 
     // MARK: - Schema lock (D-10 + SC3)
 
-    @Test("schema is exactly [GameRecord, BestTime]")
+    @Test("schema is exactly [GameRecord, BestTime, BestScore]")
     func schemaIsLocked() throws {
         // SC3 schema lock — prevents accidental re-ordering / additions.
-        // When game 2 (Sudoku) adds its own @Model, this test will fail —
-        // intentional. Update the assertion deliberately at that time.
-        let schema = Schema([GameRecord.self, BestTime.self])
-        #expect(schema.entities.count == 2)
+        // BestScore added in the Merge phase (additive — JSON envelope
+        // bumped to v2; SwiftData lightweight migration handles the model
+        // addition transparently).
+        let schema = Schema([GameRecord.self, BestTime.self, BestScore.self])
+        #expect(schema.entities.count == 3)
         let names = schema.entities.map { $0.name }.sorted()
-        #expect(names == ["BestTime", "GameRecord"])
+        #expect(names == ["BestScore", "BestTime", "GameRecord"])
     }
 }

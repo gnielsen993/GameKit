@@ -59,9 +59,9 @@ nonisolated struct BoardGeneratorTests {
             firstTap: MinesweeperIndex(row: 0, col: 0),
             rng: &rng
         )
-        #expect(board.cells.count(where: \.isMine) == 99,
-            "Hard must place exactly 99 mines (seed: \(seed))")
-        #expect(board.cells.count == 480)
+        #expect(board.cells.count(where: \.isMine) == 80,
+            "Hard must place exactly 80 mines (seed: \(seed))")
+        #expect(board.cells.count == 384)
     }
 
     // MARK: - SC2: first-tap safety at corner / interior / far-corner
@@ -95,7 +95,7 @@ nonisolated struct BoardGeneratorTests {
             firstTap: firstTap,
             rng: &rng
         )
-        let safeZone = [firstTap] + firstTap.neighbors8(rows: 16, cols: 30)
+        let safeZone = [firstTap] + firstTap.neighbors8(rows: 24, cols: 16)
         #expect(safeZone.count == 4)
         for idx in safeZone {
             #expect(board.cell(at: idx).isMine == false,
@@ -103,36 +103,36 @@ nonisolated struct BoardGeneratorTests {
         }
     }
 
-    /// Hard interior (8,15): exclusion zone = self + 8 neighbors = 9 cells
-    /// Per ROADMAP SC2: "Hard center tap (8,15) ... 9-cell exclusion"
+    /// Hard interior (12,8): exclusion zone = self + 8 neighbors = 9 cells.
+    /// Reshape from 16×30 to 24×16 moved the canonical interior coordinate.
     @Test(arguments: seeds)
     func firstTapSafeAtInterior_Hard(seed: UInt64) {
         var rng = SeededGenerator(seed: seed)
-        let firstTap = MinesweeperIndex(row: 8, col: 15)
+        let firstTap = MinesweeperIndex(row: 12, col: 8)
         let board = BoardGenerator.generate(
             difficulty: .hard,
             firstTap: firstTap,
             rng: &rng
         )
-        let safeZone = [firstTap] + firstTap.neighbors8(rows: 16, cols: 30)
-        #expect(safeZone.count == 9, "Hard (8,15) interior safe zone must be 9 cells")
+        let safeZone = [firstTap] + firstTap.neighbors8(rows: 24, cols: 16)
+        #expect(safeZone.count == 9, "Hard (12,8) interior safe zone must be 9 cells")
         for idx in safeZone {
             #expect(board.cell(at: idx).isMine == false,
-                "Hard (8,15) safe-zone cell \(idx) must NOT be a mine (seed: \(seed))")
+                "Hard (12,8) safe-zone cell \(idx) must NOT be a mine (seed: \(seed))")
         }
     }
 
-    /// Hard far-corner (15,29): exclusion zone = self + 3 neighbors = 4 cells
+    /// Hard far-corner (23,15): exclusion zone = self + 3 neighbors = 4 cells
     @Test(arguments: seeds)
     func firstTapSafeAtFarCorner_Hard(seed: UInt64) {
         var rng = SeededGenerator(seed: seed)
-        let firstTap = MinesweeperIndex(row: 15, col: 29)
+        let firstTap = MinesweeperIndex(row: 23, col: 15)
         let board = BoardGenerator.generate(
             difficulty: .hard,
             firstTap: firstTap,
             rng: &rng
         )
-        let safeZone = [firstTap] + firstTap.neighbors8(rows: 16, cols: 30)
+        let safeZone = [firstTap] + firstTap.neighbors8(rows: 24, cols: 16)
         #expect(safeZone.count == 4)
         for idx in safeZone {
             #expect(board.cell(at: idx).isMine == false,
@@ -195,7 +195,7 @@ nonisolated struct BoardGeneratorTests {
             let start = ContinuousClock.now
             _ = BoardGenerator.generate(
                 difficulty: .hard,
-                firstTap: MinesweeperIndex(row: 8, col: 15),
+                firstTap: MinesweeperIndex(row: 12, col: 8),
                 rng: &rng
             )
             samples.append(ContinuousClock.now - start)

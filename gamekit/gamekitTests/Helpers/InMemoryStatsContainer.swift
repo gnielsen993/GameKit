@@ -37,7 +37,7 @@ enum InMemoryStatsContainer {
     static func make(
         cloudKit: ModelConfiguration.CloudKitDatabase = .none
     ) throws -> ModelContainer {
-        let schema = Schema([GameRecord.self, BestTime.self])
+        let schema = Schema([GameRecord.self, BestTime.self, BestScore.self])
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: true,

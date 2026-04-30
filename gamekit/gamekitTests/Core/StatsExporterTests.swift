@@ -104,7 +104,7 @@ struct StatsExporterTests {
 
         // schemaVersion + envelope shape preserved.
         #expect(envOriginal.schemaVersion == envRestored.schemaVersion)
-        #expect(envOriginal.schemaVersion == 1, "SC4 — schemaVersion survives the round-trip")
+        #expect(envOriginal.schemaVersion == 2, "SC4 — schemaVersion survives the round-trip")
         #expect(envOriginal.gameRecords.count == envRestored.gameRecords.count)
         #expect(envOriginal.bestTimes.count == envRestored.bestTimes.count)
 
@@ -156,7 +156,7 @@ struct StatsExporterTests {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let data = try encoder.encode(future)
 
-        #expect(throws: StatsImportError.schemaVersionMismatch(found: 99, expected: 1)) {
+        #expect(throws: StatsImportError.schemaVersionMismatch(found: 99, expected: 2)) {
             try StatsExporter.importing(data, modelContext: ctx)
         }
         // Existing data UNTOUCHED — RESEARCH Pitfall 6.

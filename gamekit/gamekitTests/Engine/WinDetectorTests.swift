@@ -3,7 +3,7 @@
 //  gamekitTests
 //
 //  Swift Testing coverage for WinDetector (CONTEXT D-15..D-19).
-//  Proves ROADMAP P2 SC4 (Hard 16x30/99: 380=ongoing, 381=won, mine=lost).
+//  Proves ROADMAP P2 SC4 (Hard 24x16/80: 303=ongoing, 304=won, mine=lost).
 //
 //  All randomized tests use SeededGenerator (Plan 02) — failure on seed N
 //  is reproducible by re-running with seed N (D-13).
@@ -27,7 +27,7 @@ nonisolated struct WinDetectorTests {
 
     private static func hardBoard(
         seed: UInt64,
-        firstTap: MinesweeperIndex = MinesweeperIndex(row: 8, col: 15)
+        firstTap: MinesweeperIndex = MinesweeperIndex(row: 12, col: 8)
     ) -> MinesweeperBoard {
         var rng = SeededGenerator(seed: seed)
         return BoardGenerator.generate(difficulty: .hard, firstTap: firstTap, rng: &rng)
@@ -42,7 +42,7 @@ nonisolated struct WinDetectorTests {
         #expect(WinDetector.isLost(board) == false, "Freshly-generated board cannot be lost (no mine yet hit)")
     }
 
-    // MARK: - SC4: 381/381 non-mine cells revealed -> won
+    // MARK: - SC4: 304/304 non-mine cells revealed -> won
 
     @Test
     func revealedAllNonMineCells_isWon() {
@@ -57,19 +57,19 @@ nonisolated struct WinDetectorTests {
                 state: .revealed
             ))
         }
-        #expect(updates.count == 381,
-            "Hard 16x30/99 must have 480-99=381 non-mine cells (got \(updates.count))")
+        #expect(updates.count == 304,
+            "Hard 24x16/80 must have 384-80=304 non-mine cells (got \(updates.count))")
         let revealedBoard = board.replacingCells(updates)
-        #expect(WinDetector.isWon(revealedBoard) == true, "All 381 non-mine cells revealed = won (SC4)")
+        #expect(WinDetector.isWon(revealedBoard) == true, "All 304 non-mine cells revealed = won (SC4)")
         #expect(WinDetector.isLost(revealedBoard) == false)
     }
 
-    // MARK: - SC4: 380/381 non-mine cells revealed -> ongoing
+    // MARK: - SC4: 303/304 non-mine cells revealed -> ongoing
 
     @Test
-    func revealed380NonMineCells_isOngoing() {
+    func revealed303NonMineCells_isOngoing() {
         let board = Self.hardBoard(seed: 42)
-        // Reveal 380 of the 381 non-mine cells (skip the first one we encounter)
+        // Reveal 303 of the 304 non-mine cells (skip the first one we encounter)
         var skipped = false
         let updates: [(MinesweeperIndex, MinesweeperCell)] = board.allIndices().compactMap { idx in
             let cell = board.cell(at: idx)
@@ -84,9 +84,9 @@ nonisolated struct WinDetectorTests {
                 state: .revealed
             ))
         }
-        #expect(updates.count == 380, "Should leave exactly one non-mine cell hidden")
+        #expect(updates.count == 303, "Should leave exactly one non-mine cell hidden")
         let partialBoard = board.replacingCells(updates)
-        #expect(WinDetector.isWon(partialBoard) == false, "380/381 non-mine cells revealed = ongoing (SC4)")
+        #expect(WinDetector.isWon(partialBoard) == false, "303/304 non-mine cells revealed = ongoing (SC4)")
         #expect(WinDetector.isLost(partialBoard) == false)
     }
 
