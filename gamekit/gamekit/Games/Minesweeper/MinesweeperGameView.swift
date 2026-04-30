@@ -96,7 +96,6 @@ struct MinesweeperGameView: View {
                 ) { content, value in
                     content.offset(x: value)
                 } keyframes: { _ in
-                    LinearKeyframe(0.0, duration: 0.0)
                     LinearKeyframe(8.0, duration: 0.1)
                     LinearKeyframe(-8.0, duration: 0.1)
                     LinearKeyframe(4.0, duration: 0.1)
