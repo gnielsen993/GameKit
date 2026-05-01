@@ -9,9 +9,11 @@
 //    - APPEARANCE card — 5 Classic preset swatches (DKThemePicker(catalog: .core,
 //      grouped: false)) + 1pt divider + "More themes & custom colors" NavigationLink
 //      to FullThemePickerView (D-14, CLAUDE.md §2 theme picker UX convention)
-//    - AUDIO card (NEW P5) — 2 SettingsToggleRow rows bound to settingsStore:
+//    - HAPTICS card (P5; v1.0 single-row) — 1 SettingsToggleRow:
 //      * Haptics (iphone.radiowaves.left.and.right) → settingsStore.hapticsEnabled (default true)
-//      * Sound effects (speaker.wave.2.fill) → settingsStore.sfxEnabled (default false)
+//      Sound effects toggle hidden for v1.0 (Plan 06 D-17 — CAF bundle
+//      punted to v1.0.1; Apple Review rejects toggles that do nothing).
+//      Section header AUDIO → HAPTICS until v1.0.1 reinstates SFX row.
 //    - DATA card (P4 verbatim per D-16) — Export / Import / Reset stats rows
 //    - ABOUT card (NEW P5) — Version (mono digits) / Privacy (inline disclosure)
 //      / Acknowledgments (NavigationLink to AcknowledgmentsView)
@@ -175,10 +177,17 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var audioSection: some View {
-        // P5 (D-15): two SettingsToggleRow rows bound to settingsStore.
-        // Haptics defaults true (D-10 premium feel); SFX defaults false
-        // (D-10 / ROADMAP SC2 — sound is opt-in).
-        settingsSectionHeader(theme: theme, String(localized: "AUDIO"))
+        // P5 (D-15) originally shipped two SettingsToggleRow rows: Haptics +
+        // Sound effects. The SFX rows depend on tap.caf / win.caf / loss.caf
+        // bundle resources (P5 G-1) which were punted to v1.0.1 per Plan 06
+        // D-17. Apple App Store Review rejects toggles that visibly do
+        // nothing, so for v1.0 the SFX row is hidden — section header
+        // renamed AUDIO → HAPTICS and only the Haptics toggle ships.
+        // SettingsStore.sfxEnabled, SFXPlayer, and the .sensoryFeedback /
+        // play(...) call sites are intentionally LEFT IN PLACE so v1.0.1
+        // just bundles the CAFs and re-adds the SFX row here — no
+        // behavioral migration needed. Default for sfxEnabled stays false.
+        settingsSectionHeader(theme: theme, String(localized: "HAPTICS"))
         DKCard(theme: theme) {
             VStack(spacing: 0) {
                 SettingsToggleRow(
@@ -186,15 +195,6 @@ struct SettingsView: View {
                     glyph: "iphone.radiowaves.left.and.right",
                     label: String(localized: "Haptics"),
                     isOn: Bindable(settingsStore).hapticsEnabled
-                )
-                Rectangle()
-                    .fill(theme.colors.border)
-                    .frame(height: 1)
-                SettingsToggleRow(
-                    theme: theme,
-                    glyph: "speaker.wave.2.fill",
-                    label: String(localized: "Sound effects"),
-                    isOn: Bindable(settingsStore).sfxEnabled
                 )
             }
         }
