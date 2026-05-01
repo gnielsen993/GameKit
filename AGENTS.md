@@ -29,8 +29,8 @@ Mirror of `CLAUDE.md` §0.1 — drift between the two is a bug.
 
 | Fact | Value | Last updated |
 |------|-------|--------------|
-| Display name (home screen) | **CorePlay** | 2026-04-30 |
-| Full brand (App Store / marketing) | **CorePlay Arcade** | 2026-04-30 |
+| Display name (home screen) | **GameDrawer** | 2026-05-01 |
+| Full brand (App Store / marketing) | **GameDrawer** (no suffix) | 2026-05-01 |
 | Bundle ID | `com.lauterstar.gamekit` | locked — never change per §5 |
 | Repo / target name | `gamekit` | locked |
 | Target iOS | 17+ | — |
@@ -43,7 +43,8 @@ Mirror of `CLAUDE.md` §0.1 — drift between the two is a bug.
 
 Naming history (display name only — bundle ID never changes):
 GameKit (internal/repo) → PixelParlor (rejected — genre mismatch) →
-PlayCore (superseded same day) → **CorePlay** (current).
+PlayCore (superseded same day) → CorePlay (superseded next day —
+abstraction over concrete metaphor) → **GameDrawer** (current).
 Full provenance: `assets/icon/AI_PROVENANCE.md`.
 
 ## 0.2) Where to look for live state
