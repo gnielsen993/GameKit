@@ -64,6 +64,26 @@ Rule: when the user asks "what's going on" / "status" / "where are
 we", read `STATE.md` + `git log` first, then §0.1 — do not answer
 from this file alone.
 
+## 0.3) Release Log — `Docs/releases/`
+
+Per-version release notes for the iOS app live in `Docs/releases/`,
+keyed off `MARKETING_VERSION` (in
+`gamekit/gamekit.xcodeproj/project.pbxproj`). Mirrors the convention
+used across the sibling repos.
+
+**Steps for every significant feature, fix, or change:**
+1. Check the current `MARKETING_VERSION`.
+2. If `Docs/releases/v{version}.md` does not exist, create it from
+   `Docs/releases/TEMPLATE.md`.
+3. Add the change under the appropriate section (Summary,
+   User-facing changes, Internal changes, Fixes, Risks/notes).
+4. Keep entries brief and factual.
+5. Land the release-log update in the same commit as the code change.
+
+A new file is opened on every `MARKETING_VERSION` bump. Don't mutate
+a shipped version's file. Skip the log for self-explanatory or
+doc-only commits.
+
 ---
 
 ## 1) Non-Negotiables (hard constraints)
@@ -297,3 +317,9 @@ the same commit:
 Plus the canonical artifact (e.g. `AI_PROVENANCE.md` for icon /
 naming, `pbxproj` for display name). Never let §0.1 drift past
 truth — a stale §0.1 misleads every future session.
+
+### 9.14 Every significant change appends to `Docs/releases/v{current}.md`
+See §0.3. Pull `MARKETING_VERSION` from `pbxproj`, append a bullet
+under the right section, land in the same commit as the code. Skip
+only for self-explanatory refactors, doc-only edits, and work that
+didn't actually ship in this `MARKETING_VERSION`.
