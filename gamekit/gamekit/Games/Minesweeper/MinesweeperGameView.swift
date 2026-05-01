@@ -45,6 +45,7 @@ struct MinesweeperGameView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @State private var didInjectStats = false           // one-shot guard (RESEARCH Pitfall 8)
+    @Environment(\.dismiss) private var dismiss
 
     // P5 (D-04/D-07/D-08) — animation/haptics/SFX environment reads.
     // accessibilityReduceMotion gates ALL animation surfaces per D-04.
@@ -145,7 +146,26 @@ struct MinesweeperGameView: View {
         }
         .navigationTitle(String(localized: "Minesweeper"))
         .navigationBarTitleDisplayMode(.inline)
+        // 2026-05-01: Hide the system back chevron + edge-swipe-to-go-back
+        // gesture so cell long-press / pinch-to-zoom interactions near the
+        // left edge don't get hijacked. Custom back ToolbarItem below is
+        // the only path off this screen (besides win/loss → Home from the
+        // end-state card). Matches MergeGameView for cross-game consistency.
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(theme.colors.textPrimary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Back to The Drawer"))
+            }
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     viewModel.restart()

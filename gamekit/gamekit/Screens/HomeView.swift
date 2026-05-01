@@ -129,7 +129,7 @@ struct HomeView: View {
                 symbol: "sparkles",
                 iconColor: theme.colors.accentSecondary,
                 title: String(localized: "Upcoming"),
-                caption: String(localized: "8 games coming")
+                caption: String(localized: "7 games coming")
             )
         }
         .buttonStyle(.plain)

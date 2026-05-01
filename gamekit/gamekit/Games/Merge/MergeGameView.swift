@@ -27,6 +27,7 @@ struct MergeGameView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @Environment(\.settingsStore) private var settingsStore
+    @Environment(\.dismiss) private var dismiss
     @State private var didInjectStats = false
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
@@ -78,7 +79,28 @@ struct MergeGameView: View {
         }
         .navigationTitle(String(localized: "Merge"))
         .navigationBarTitleDisplayMode(.inline)
+        // 2026-05-01: Hide the system back chevron + edge-swipe-to-go-back
+        // gesture. Merge's tile interaction is swipe-driven, so the iOS
+        // edge-swipe-back gesture was hijacking play swipes near the left
+        // edge. The custom back ToolbarItem below replaces the chevron and
+        // is the only path off this screen (besides win/loss → Home from
+        // the end-state card). Same treatment applied to MinesweeperGameView
+        // for consistency across game screens.
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(theme.colors.textPrimary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Back to The Drawer"))
+            }
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     viewModel.restart()
