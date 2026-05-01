@@ -73,23 +73,22 @@ struct RootTabView: View {
             }
         }
         .alert(
-            String(localized: "Restart to enable iCloud sync"),
+            String(localized: "Quit and reopen to finish iCloud setup"),
             isPresented: Bindable(authStore).shouldShowRestartPrompt
         ) {
-            // D-04 + D-05 verbatim. Cancel uses .cancel role; Quit GameKit
-            // uses default role (NOT .destructive — quitting is non-destructive,
-            // data is safe; PATTERNS §S7 line 1002).
-            Button(String(localized: "Cancel"), role: .cancel) { }
-            Button(String(localized: "Quit GameKit")) {
-                // T-06-05 / D-05 LOCK: dismiss-only — no programmatic
-                // termination of any kind (App Store Review red flag).
-                // The body copy instructs the user to manually swipe
-                // up from the app switcher and reopen; that
-                // user-initiated action is the only Review-compliant
-                // termination path.
-            }
+            // D-04 + D-05 (revised 2026-05-01): button labels updated for
+            // honesty. The previous "Restart to enable iCloud sync" title +
+            // "Quit GameKit" button promised an action that the dismiss-only
+            // body never delivered, which read as "broken" to users. New
+            // copy makes it explicit that the user is the one doing the
+            // quitting. T-06-05 / D-05 LOCK preserved — both buttons remain
+            // dismiss-only; no programmatic termination (App Store Review
+            // red flag). App name interpolated from AppInfo.displayName so
+            // future renames don't re-introduce the brand-drift bug.
+            Button(String(localized: "Later"), role: .cancel) { }
+            Button(String(localized: "OK")) { }
         } message: {
-            Text(String(localized: "Your stats will sync to all devices signed in to this iCloud account. Quit GameKit and reopen to finish setup."))
+            Text(String(localized: "Your stats will sync to all devices signed in to this iCloud account. Swipe up in the app switcher to quit \(AppInfo.displayName), then reopen it to finish setup."))
         }
     }
 }
