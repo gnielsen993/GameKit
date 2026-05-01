@@ -22,6 +22,50 @@ Do not expand scope past MVP without an explicit ask.
 
 ---
 
+## 0.1) Project status — current facts
+
+Slow-moving facts. **Update in the same commit** when any change.
+Mirror of `CLAUDE.md` §0.1 — drift between the two is a bug.
+
+| Fact | Value | Last updated |
+|------|-------|--------------|
+| Display name (home screen) | **CorePlay** | 2026-04-30 |
+| Full brand (App Store / marketing) | **CorePlay Arcade** | 2026-04-30 |
+| Bundle ID | `com.lauterstar.gamekit` | locked — never change per §5 |
+| Repo / target name | `gamekit` | locked |
+| Target iOS | 17+ | — |
+| Swift / UI | Swift 6 + SwiftUI | — |
+| Current milestone | `v1.0` (verifying, ~94% per `.planning/STATE.md`) | see STATE.md for live % |
+| Current MVP game | Minesweeper | — |
+| Next game (post-MVP) | Nonogram (Game 3, after Merge) | 2026-04-28 |
+| Icon | Stack-of-three-game-boxes (light / dark / tinted) | 2026-04-30 ev. |
+| Classic preset | Chrome Diner (cream + brushed grey + diner red) | 2026-04-28 |
+
+Naming history (display name only — bundle ID never changes):
+GameKit (internal/repo) → PixelParlor (rejected — genre mismatch) →
+PlayCore (superseded same day) → **CorePlay** (current).
+Full provenance: `assets/icon/AI_PROVENANCE.md`.
+
+## 0.2) Where to look for live state
+
+Don't duplicate fast-moving state in this file. Read the canonical
+sources at session start instead.
+
+| Question | Source |
+|----------|--------|
+| What changed recently? | `git log --oneline -20` |
+| What phase / plan are we on? | `.planning/STATE.md` (front-matter + Current Position) |
+| What's the milestone scope? | `.planning/ROADMAP.md` + `v1.0-MILESTONE-AUDIT.md` |
+| What's the active phase doing? | `.planning/phases/<NN>-<name>/PLAN.md` (latest mtime) |
+| Why was X chosen? | matching ADR/PRD in `.planning/phases/.../` + commit body |
+| Icon / branding history | `assets/icon/AI_PROVENANCE.md` |
+
+Rule: when the user asks "what's going on" / "status" / "where are
+we", read `STATE.md` + `git log` first, then §0.1 — do not answer
+from this file alone.
+
+---
+
 ## 1) Non-Negotiables (hard constraints)
 
 ### Tech & architecture
@@ -241,3 +285,15 @@ Every game-screen change is verified against at least one Loud /
 Moody preset (e.g. Voltage / Dracula) in addition to the default
 Classic preset. Legibility regressions = fix the token usage, don't
 carve out an exception.
+
+### 9.13 Brand / project-status changes update §0.1 + CLAUDE.md in the same commit
+When any user-facing fact in §0.1 changes (display name, full brand,
+bundle ID, target iOS, current milestone label, MVP/next-game pick,
+icon direction, Classic-preset character), update **both** files in
+the same commit:
+1. `AGENTS.md` §0.1 row + `Last updated` date
+2. `CLAUDE.md` §0.1 (mirror — drift is a bug)
+
+Plus the canonical artifact (e.g. `AI_PROVENANCE.md` for icon /
+naming, `pbxproj` for display name). Never let §0.1 drift past
+truth — a stale §0.1 misleads every future session.

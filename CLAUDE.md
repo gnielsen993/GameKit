@@ -19,6 +19,51 @@ DesignKit · HabitTracker · FitnessTracker · PantryPlanner.
 
 ---
 
+## 0.1) Project status — current facts
+
+Slow-moving facts. **Update in the same commit** when any change.
+Ordered by how often a session needs them.
+
+| Fact | Value | Last updated |
+|------|-------|--------------|
+| Display name (home screen) | **CorePlay** | 2026-04-30 |
+| Full brand (App Store / marketing) | **CorePlay Arcade** | 2026-04-30 |
+| Bundle ID | `com.lauterstar.gamekit` | locked — never change per §1 |
+| Repo / target name | `gamekit` | locked |
+| Target iOS | 17+ | — |
+| Swift / UI | Swift 6 + SwiftUI | — |
+| Current milestone | `v1.0` (verifying, ~94% per `.planning/STATE.md`) | see STATE.md for live % |
+| Current MVP game | Minesweeper | — |
+| Next game (post-MVP) | Nonogram (Game 3, after Merge) | 2026-04-28 |
+| Icon | Stack-of-three-game-boxes (light / dark / tinted) | 2026-04-30 ev. |
+| Classic preset | Chrome Diner (cream + brushed grey + diner red) | 2026-04-28 |
+
+Naming history (display name only — bundle ID never changes):
+GameKit (internal/repo) → PixelParlor (rejected — genre mismatch) →
+PlayCore (superseded same day) → **CorePlay** (current).
+Full provenance: `assets/icon/AI_PROVENANCE.md`.
+
+## 0.2) Where to look for live state
+
+Don't duplicate fast-moving state in this file. Read the canonical
+sources at session start instead.
+
+| Question | Source |
+|----------|--------|
+| What changed recently? | `git log --oneline -20` |
+| What phase / plan are we on? | `.planning/STATE.md` (front-matter + Current Position) |
+| What's the milestone scope? | `.planning/ROADMAP.md` + `v1.0-MILESTONE-AUDIT.md` |
+| What's the active phase doing? | `.planning/phases/<NN>-<name>/PLAN.md` (latest mtime) |
+| Why was X chosen? | matching ADR/PRD in `.planning/phases/.../` + commit body |
+| Icon / branding history | `assets/icon/AI_PROVENANCE.md` |
+| Persistent decisions across sessions | Claude Code memory (auto-loaded) |
+
+Rule: when the user asks "what's going on" / "status" / "where are
+we", read `STATE.md` + `git log` first, then this §0.1 block — do
+not answer from prior-session memory alone.
+
+---
+
 ## 1) Absolute Constraints (Do Not Violate)
 
 ### Stack
@@ -250,3 +295,17 @@ Every game-screen change is verified against at least one Loud or
 Moody preset (e.g. Voltage / Dracula) in addition to the default
 Classic preset. If mines / numbers / flags stop being legible under
 any preset, fix the token usage — don't carve out an exception.
+
+### 8.13 Brand / project-status changes update §0.1 + AGENTS.md in the same commit
+When any user-facing fact in §0.1 changes (display name, full brand,
+bundle ID, target iOS, current milestone label, MVP/next-game pick,
+icon direction, Classic-preset character), update **all three** in
+the same commit:
+1. `CLAUDE.md` §0.1 row + `Last updated` date
+2. `AGENTS.md` §0.1 (mirror)
+3. Relevant memory file under `~/.claude/projects/.../memory/` if
+   the fact is also pinned there (e.g. `project_app_name.md`).
+
+Plus the canonical artifact (e.g. `AI_PROVENANCE.md` for icon /
+naming, `pbxproj` for display name). Never let §0.1 drift past
+truth — a stale §0.1 misleads every future session.
