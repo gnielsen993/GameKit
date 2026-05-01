@@ -98,7 +98,12 @@ tweaks, in-flight work that did not ship in that `MARKETING_VERSION`.
   for tiny key-value shapes)
 - Lightweight MVVM
 - iOS 17+
-- Offline-only — no backend, no cloud, no analytics, no accounts
+- **Offline-first. Optional iCloud sync via Sign in with Apple
+  (Phase 06).** No third-party backend, no analytics SDKs, no
+  required accounts. iCloud sync never gates gameplay — the user
+  can play forever signed-out, and signing out preserves local
+  stats. CloudKit container `iCloud.com.lauterstar.gamekit` is the
+  only network surface; SIWA is the only auth surface.
 
 ### Product
 - **No ads. No coins. No fake currency. No energy systems. No

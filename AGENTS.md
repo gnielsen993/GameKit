@@ -95,7 +95,12 @@ doc-only commits.
 - Persistence: SwiftData (default), UserDefaults for tiny shapes
 - Pattern: lightweight MVVM (no TCA / Redux unless explicitly asked)
 - iOS 17+
-- Offline-first — no backend, no cloud, no analytics, no accounts
+- **Offline-first. Optional iCloud sync via Sign in with Apple
+  (Phase 06).** No third-party backend, no analytics SDKs, no
+  required accounts. iCloud sync never gates gameplay; signed-out
+  users keep all functionality and stats local. CloudKit container
+  `iCloud.com.lauterstar.gamekit` is the only network surface; SIWA
+  is the only auth surface.
 - Export/Import JSON backup (versioned) for persisted shapes
 
 ### Product
