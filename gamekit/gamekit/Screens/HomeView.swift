@@ -2,17 +2,21 @@
 //  HomeView.swift
 //  gamekit
 //
-//  Phase 6.1 (SHELL-05): Home shows 2 square tiles in a 2-column
-//  LazyVGrid — Minesweeper (enabled hero) + Upcoming (placeholder).
-//  Tapping the Upcoming tile presents UpcomingGamesView in a sheet
-//  listing the 8 planned games. Tapping any sheet row dismisses the
-//  sheet and surfaces the existing ComingSoonOverlay (1.8s).
+//  The Drawer — entry point to all playable games. Renders one square
+//  tile per `GameDescriptor.all` entry plus a static Upcoming tile that
+//  presents `UpcomingGamesView` in a sheet.
+//
+//  Routing (refactored 2026-05-01 to fix expansibility audit finding):
+//    - NavigationStack owns a `path: [GameRoute]` instead of a per-game
+//      `@State navigateToX: Bool` flag.
+//    - A single `.navigationDestination(for: GameRoute.self)` switch
+//      maps a route case to its game view.
+//    - Adding game #N = one descriptor entry in GameDescriptor.all +
+//      one case in GameRoute + one switch arm here. HomeView body,
+//      @State, and modifiers stay constant.
 //
 //  Per P1 D-02: this file owns its own NavigationStack — RootTabView
-//  does not (Anti-Pattern 3 in ARCHITECTURE.md). The Mines push via
-//  navigationDestination(isPresented:) is preserved verbatim from P1.
-//
-//  Real Minesweeper destination ships at Phase 3 (MINES-02..07).
+//  does not (Anti-Pattern 3 in ARCHITECTURE.md).
 //
 
 import SwiftUI
@@ -22,9 +26,8 @@ struct HomeView: View {
     @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
 
+    @State private var path: [GameRoute] = []
     @State private var showingComingSoon: GameCard?
-    @State private var navigateToMines: Bool = false
-    @State private var navigateToMerge: Bool = false
     @State private var showingUpcoming: Bool = false
     @State private var showingSettings: Bool = false
     @State private var showingStats: Bool = false
@@ -32,7 +35,7 @@ struct HomeView: View {
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 LazyVGrid(
                     columns: [
@@ -41,8 +44,9 @@ struct HomeView: View {
                     ],
                     spacing: theme.spacing.m
                 ) {
-                    minesTile
-                    mergeTile
+                    ForEach(GameDescriptor.all) { descriptor in
+                        gameTile(for: descriptor)
+                    }
                     upcomingTile
                 }
                 .padding(.horizontal, theme.spacing.l)
@@ -50,33 +54,14 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, alignment: .top)
             }
             .background(theme.colors.background.ignoresSafeArea())
-            .navigationTitle(String(localized: "GameKit"))
+            .navigationTitle(String(localized: "The Drawer"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button {
-                            showingStats = true
-                        } label: {
-                            Label(String(localized: "Stats"), systemImage: "chart.bar")
-                        }
-                        Button {
-                            showingSettings = true
-                        } label: {
-                            Label(String(localized: "Settings"), systemImage: "gearshape")
-                        }
-                    } label: {
-                        Image(systemName: "person.crop.circle")
-                            .font(.system(size: 22))
-                            .foregroundStyle(theme.colors.textPrimary)
-                    }
-                    .accessibilityLabel(Text("Profile"))
+                    profileMenu
                 }
             }
-            .navigationDestination(isPresented: $navigateToMines) {
-                MinesweeperGameView()
-            }
-            .navigationDestination(isPresented: $navigateToMerge) {
-                MergeGameView()
+            .navigationDestination(for: GameRoute.self) { route in
+                destination(for: route)
             }
             .sheet(isPresented: $showingUpcoming) {
                 UpcomingGamesView(theme: theme) { card in
@@ -106,33 +91,30 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Routing
+
+    @ViewBuilder
+    private func destination(for route: GameRoute) -> some View {
+        switch route {
+        case .minesweeper:
+            MinesweeperGameView()
+        case .merge:
+            MergeGameView()
+        }
+    }
+
     // MARK: - Tiles
 
     @ViewBuilder
-    private var minesTile: some View {
+    private func gameTile(for descriptor: GameDescriptor) -> some View {
         Button {
-            navigateToMines = true
+            path.append(descriptor.route)
         } label: {
             tileCard(
-                symbol: "square.grid.4x3.fill",
-                iconColor: theme.colors.accentPrimary,
-                title: String(localized: "Minesweeper"),
-                caption: String(localized: "Tap to play")
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    @ViewBuilder
-    private var mergeTile: some View {
-        Button {
-            navigateToMerge = true
-        } label: {
-            tileCard(
-                symbol: "square.stack.3d.up.fill",
-                iconColor: theme.colors.accentSecondary,
-                title: String(localized: "Merge"),
-                caption: String(localized: "Tap to play")
+                symbol: descriptor.symbol,
+                iconColor: accentColor(for: descriptor.accent),
+                title: String(localized: String.LocalizationValue(descriptor.titleKey)),
+                caption: String(localized: String.LocalizationValue(descriptor.captionKey))
             )
         }
         .buttonStyle(.plain)
@@ -151,6 +133,27 @@ struct HomeView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var profileMenu: some View {
+        Menu {
+            Button {
+                showingStats = true
+            } label: {
+                Label(String(localized: "Stats"), systemImage: "chart.bar")
+            }
+            Button {
+                showingSettings = true
+            } label: {
+                Label(String(localized: "Settings"), systemImage: "gearshape")
+            }
+        } label: {
+            Image(systemName: "person.crop.circle")
+                .font(.system(size: 22))
+                .foregroundStyle(theme.colors.textPrimary)
+        }
+        .accessibilityLabel(Text("Profile"))
     }
 
     @ViewBuilder
@@ -177,9 +180,16 @@ struct HomeView: View {
         .aspectRatio(1, contentMode: .fit)
         .frame(maxWidth: .infinity)
     }
+
+    private func accentColor(for role: AccentRole) -> Color {
+        switch role {
+        case .primary:   return theme.colors.accentPrimary
+        case .secondary: return theme.colors.accentSecondary
+        }
+    }
 }
 
-// MARK: - GameCard model
+// MARK: - GameCard model (used by UpcomingGamesView)
 
 struct GameCard: Identifiable, Equatable {
     let id: String

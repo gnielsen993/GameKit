@@ -59,7 +59,6 @@ struct SettingsView: View {
     @State private var isImportErrorAlertPresented = false
     @State private var importErrorMessage: String = ""
     @State private var exportDocument: StatsExportDocument?
-    @State private var isPrivacyExpanded: Bool = false
 
     @Environment(\.settingsStore) private var settingsStore
 
@@ -78,7 +77,7 @@ struct SettingsView: View {
                     audioSection
                     SettingsSyncSection(theme: theme)
                     dataSection
-                    aboutSection
+                    SettingsAboutSection(theme: theme)
                 }
                 .padding(theme.spacing.l)
             }
@@ -240,87 +239,6 @@ struct SettingsView: View {
         }
     }
 
-    @ViewBuilder
-    private var aboutSection: some View {
-        // P5 (D-17): Version (mono) / Privacy (inline disclosure) /
-        // Acknowledgments (NavigationLink). Three rows separated by 1pt
-        // theme.colors.border dividers per UI-SPEC §Layout.
-        settingsSectionHeader(theme: theme, String(localized: "ABOUT"))
-        DKCard(theme: theme) {
-            VStack(spacing: 0) {
-                // Version row (mono digits per UI-SPEC §Typography).
-                HStack {
-                    Text(String(localized: "Version"))
-                        .font(theme.typography.body)
-                        .foregroundStyle(theme.colors.textPrimary)
-                    Spacer()
-                    Text(versionDisplay)
-                        .font(theme.typography.monoNumber)
-                        .monospacedDigit()
-                        .foregroundStyle(theme.colors.textSecondary)
-                }
-                .frame(minHeight: 44)
-
-                Rectangle()
-                    .fill(theme.colors.border)
-                    .frame(height: 1)
-
-                // Privacy row (inline disclosure per UI-SPEC option A).
-                Button {
-                    withAnimation(.easeInOut(duration: theme.motion.fast)) {
-                        isPrivacyExpanded.toggle()
-                    }
-                } label: {
-                    HStack {
-                        Text(String(localized: "Privacy"))
-                            .font(theme.typography.body)
-                            .foregroundStyle(theme.colors.textPrimary)
-                        Spacer()
-                        Image(systemName: isPrivacyExpanded ? "chevron.up" : "chevron.down")
-                            .font(.caption)
-                            .foregroundStyle(theme.colors.textTertiary)
-                    }
-                    .frame(minHeight: 44)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-
-                if isPrivacyExpanded {
-                    Text(String(localized: "All data stored locally. CloudKit sync optional. No analytics. No tracking."))
-                        .font(theme.typography.body)
-                        .foregroundStyle(theme.colors.textSecondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, theme.spacing.s)
-                }
-
-                Rectangle()
-                    .fill(theme.colors.border)
-                    .frame(height: 1)
-
-                // Acknowledgments row (NavigationLink to file-private destination).
-                NavigationLink(destination: AcknowledgmentsView()) {
-                    settingsNavRow(
-                        theme: theme,
-                        title: String(localized: "Acknowledgments")
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    // MARK: - Computed (D-17)
-
-    /// Reads CFBundleShortVersionString + CFBundleVersion from Info.plist
-    /// and renders as "1.0 (42)". Defensive fallbacks prevent crash on
-    /// malformed bundle metadata (T-05-12 mitigation).
-    private var versionDisplay: String {
-        let info = Bundle.main.infoDictionary
-        let version = (info?["CFBundleShortVersionString"] as? String) ?? "1.0"
-        let build = (info?["CFBundleVersion"] as? String) ?? "1"
-        return "\(version) (\(build))"
-    }
-
     // MARK: - Actions
 
     private func beginExport() {
@@ -425,3 +343,5 @@ private struct SettingsToggleRow: View {
 
 // AcknowledgmentsView lives in `Screens/AcknowledgmentsView.swift` (extracted
 // per CLAUDE.md §8.1 to keep this file under the ~400-line soft cap).
+// SettingsAboutSection lives in `Screens/SettingsAboutSection.swift` (extracted
+// 2026-05-01 to keep this file under the §8.5 hard 500-line cap).
