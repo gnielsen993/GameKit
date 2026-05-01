@@ -26,13 +26,13 @@ signed_off_date: ""
 
 | # | Invariant | Source | Status | Evidence |
 |---|-----------|--------|--------|----------|
-| PF-01 | Doc-drift cleanup landed | Plan 07-01 | ☐ | git log shows `docs(07-01): refresh planning artifacts` |
-| PF-02 | Real app icon shipped (light/dark/tinted), 1024² PNGs in AppIcon.appiconset | Plan 07-02 | ☐ | git log shows `feat(07-02): real arcade-machine app icon` + Xcode preview screenshot |
+| PF-01 | Doc-drift cleanup landed | Plan 07-01 | ☑ | Verified 2026-05-01 — ROADMAP plan counts, REQUIREMENTS traceability, 06-VERIFICATION.md status, STATE.md current_position all aligned. Commit `d89968e docs(07-01): advance STATE.md to Phase 7 pre-flight + log GameDrawer rename`. |
+| PF-02 | Real app icon shipped (light/dark/tinted), 1024² PNGs in AppIcon.appiconset | Plan 07-02 | ☑ | Commit `d03f1fa feat(branding): rebrand to PlayCore + stack-of-games icon + ASC export compliance` — three appearance variants in `gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/`; provenance in `assets/icon/AI_PROVENANCE.md`. |
 | PF-03 | CloudKit Production schema deployed via Dashboard "Deploy to Production" button | Plan 07-03, D-04 | ☐ | `.planning/phases/07-release/screenshots/dashboard-deploy.png` |
 | PF-04 | Production schema verified — `CD_GameRecord` + `CD_BestTime` exist with same indexes as Development | Plan 07-03 verification rung 1, D-06 | ☐ | `.planning/phases/07-release/screenshots/dashboard-production-recordtypes.png` |
-| PF-05 | Privacy policy markdown shipped at `docs/privacy.md` and live on GitHub Pages | Plan 07-04 Tasks 1+2, D-08 | ☐ | Pages URL: `__________________________` |
+| PF-05 | Privacy + Terms live on website (`gamedrawer.lauterstar.com/privacy.html` + `/terms.html`); Settings ABOUT rows link to them via `AppInfo.privacyURL` / `AppInfo.termsURL` | Plan 07-04 Tasks 1+2, D-08 (revised) | ☐ | Privacy URL: `https://gamedrawer.lauterstar.com/privacy.html` (DNS go-live pending). Terms URL: `https://gamedrawer.lauterstar.com/terms.html` (same). Code-side ✅ — AppInfo + SettingsAboutSection.swift land 2026-05-01. |
 | PF-06 | 12 theme-matrix screenshots + 4 warm-accent screenshots captured | Plan 07-04 Task 3, D-13 + D-14 | ☐ | `.planning/phases/07-release/screenshots/themes/` (12 files) + `.planning/phases/07-release/screenshots/warm-accent/` (4 files) |
-| PF-07 | Public app name locked | Plan 07-04 Task 4, Discretion #1 | ☐ | Locked name: `__________________________` |
+| PF-07 | Public app name locked | Plan 07-04 Task 4, Discretion #1 | ☑ | Locked name: `GameDrawer` (2026-05-01, `INFOPLIST_KEY_CFBundleDisplayName` Debug+Release in `gamekit.xcodeproj/project.pbxproj`) |
 | PF-08 | App Store Connect metadata draft saved (description / subtitle / keywords / promo / URLs / screenshots / age / category / copyright) | Plan 07-04 Task 5, D-07 | ☐ | ASC pane screenshots in `.planning/phases/07-release/screenshots/asc/` |
 | PF-09 | Privacy nutrition label answered "Data Not Collected" with verbatim reasoning | Plan 07-04 Task 6, D-12 + SC2 | ☐ | Reasoning: `CloudKit private DB, encrypted, dev has no access; no analytics SDKs; MetricKit not integrated → Data Not Collected` |
 
@@ -74,7 +74,7 @@ signed_off_date: ""
 | SC2-B | Reasoning recorded verbatim: `CloudKit private DB, encrypted, dev has no access; no analytics SDKs; MetricKit not integrated → Data Not Collected` | ☐ | This row's text |
 | SC2-C | Reasoning matches the binary: zero analytics SDKs in `gamekit/` | ☐ | `! grep -ri "FIRApp\|Sentry\|Bugsnag\|Mixpanel\|GoogleAnalytics" gamekit/` returns no matches |
 | SC2-D | MetricKit explicitly NOT integrated (Discretion #6) | ☐ | `! grep -ri "MetricKit\|MXMetricManager" gamekit/` returns no matches |
-| SC2-E | Privacy policy URL on the binary's App Store page resolves to GitHub Pages markdown matching the same reasoning | ☐ | URL: `__________________________` |
+| SC2-E | Privacy policy URL on the binary's App Store page resolves to a public URL matching the same reasoning | ☐ | URL: `https://gamedrawer.lauterstar.com/privacy.html` (D-08 revised — custom domain replaces GitHub Pages stopgap; awaiting DNS go-live). |
 
 **Verifier:** _______________  **Date:** ___________  **Status:** ☐ PASS / ☐ FAIL / ☐ DEFERRED
 
