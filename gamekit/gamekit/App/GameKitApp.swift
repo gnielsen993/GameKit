@@ -72,6 +72,29 @@ struct GameKitApp: App {
         )
         _cloudSyncStatusObserver = State(initialValue: observer)
 
+        // P6 (Pitfall D): one-shot CloudKit schema deploy to Development.
+        // The lldb-driven flow specified in Plan 06-03 (paused-frame `expr
+        // try? GameKitApp._runtimeDeployCloudKitSchema()`) is unreliable in
+        // practice — pausing usually lands in libsystem_kernel where Swift
+        // module resolution fails ("cannot find 'GameKitApp' in scope").
+        // This DEBUG-only block runs the same call automatically on the
+        // first launch per device, gates with UserDefaults so it never
+        // runs twice, and prints the outcome to the console. Remove the
+        // UserDefaults flag locally to force a redeploy; the block is
+        // stripped entirely from Release builds.
+        #if DEBUG
+        let schemaDeployedKey = "gamekit.debug.didDeployCloudKitSchemaOnce.v1"
+        if !UserDefaults.standard.bool(forKey: schemaDeployedKey) {
+            do {
+                try CloudKitSchemaInitializer.deployDevelopmentSchema()
+                UserDefaults.standard.set(true, forKey: schemaDeployedKey)
+                print("✅ CloudKit schema deployed to Development. Refresh CloudKit Dashboard → iCloud.com.lauterstar.gamekit → Development → Schema → Record Types to confirm CD_GameRecord + CD_BestTime + CD_BestScore.")
+            } catch {
+                print("❌ CloudKit schema deploy failed: \(error). Most common cause: iPhone iCloud account ≠ the Apple Developer account that owns container iCloud.com.lauterstar.gamekit. Sign the device into the matching iCloud account and relaunch.")
+            }
+        }
+        #endif
+
         let schema = Schema([GameRecord.self, BestTime.self, BestScore.self])
         let config = ModelConfiguration(
             schema: schema,
