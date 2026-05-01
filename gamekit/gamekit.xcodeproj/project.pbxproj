@@ -33,9 +33,22 @@
 		5F7F31AE2F9C707B00BA99BA /* gamekitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = gamekitUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5FF7D7962FA55574009C2E9B /* Exceptions for "gamekit" folder in "gamekit" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5F7F31962F9C707900BA99BA /* gamekit */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5F7F31992F9C707900BA99BA /* gamekit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5FF7D7962FA55574009C2E9B /* Exceptions for "gamekit" folder in "gamekit" target */,
+			);
 			path = gamekit;
 			sourceTree = "<group>";
 		};
@@ -410,6 +423,7 @@
 				DEVELOPMENT_TEAM = JCWX4BK8GW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = gamekit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GameDrawer;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -446,6 +460,7 @@
 				DEVELOPMENT_TEAM = JCWX4BK8GW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = gamekit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = GameDrawer;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

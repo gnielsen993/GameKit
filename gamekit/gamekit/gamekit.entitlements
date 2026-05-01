@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<!--
-    P6 (CONTEXT D-09 + RESEARCH §A9 + PATTERNS §13): the gamekit target
-    MUST have ALL FOUR of the following capabilities registered in
-    Xcode → gamekit target → Signing & Capabilities. These live in
-    project.pbxproj capability blocks (managed by Xcode UI, NOT
-    hand-patched per CLAUDE.md §8.8) — this entitlements file ONLY
-    ships com.apple.developer.applesignin (P5 D-21).
-
-      1. Sign in with Apple                       → THIS file
-      2. iCloud → CloudKit
-         + container "iCloud.com.lauterstar.gamekit"  → project.pbxproj
-      3. iCloud → CloudKit Documents               (auto with #2)
-      4. Background Modes → Remote notifications   → project.pbxproj
-
-    If ANY of #2, #3, #4 are missing, GameKitApp.init() crashes at
-    runtime when constructing `cloudKitDatabase: .private(...)`.
-    Threat T-06-09 mitigation. Verify in Xcode UI; do NOT hand-edit
-    project.pbxproj.
--->
 <dict>
+	<key>aps-environment</key>
+	<string>development</string>
 	<key>com.apple.developer.applesignin</key>
 	<array>
 		<string>Default</string>
+	</array>
+	<key>com.apple.developer.icloud-container-identifiers</key>
+	<array>
+		<string>iCloud.com.lauterstar.gamekit</string>
+	</array>
+	<key>com.apple.developer.icloud-services</key>
+	<array>
+		<string>CloudKit</string>
 	</array>
 </dict>
 </plist>
