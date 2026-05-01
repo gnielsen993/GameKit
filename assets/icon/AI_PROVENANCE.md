@@ -4,16 +4,18 @@ AI service used: ChatGPT image generation (DALL·E 3)
 Initial generation: 2026-04-27 (outline-stencil)
 Revision 1: 2026-04-29 (filled colorful arcade cabinet, "GameKit" CRT)
 Revision 2: 2026-04-30 morning (PixelParlor — Cream Hero arcade cabinet, FT-teal trim)
-Revision 3: 2026-04-30 evening (PlayCore — Stack of Three Games, FT-teal box) — CURRENT
+Revision 3: 2026-04-30 evening (PlayCore — Stack of Three Games, FT-teal box)
+Revision 3a: 2026-04-30 (rename only — display name PlayCore → CorePlay; full brand "CorePlay Arcade"; icon artwork unchanged) — CURRENT
 Subject lineage: "old school arcade machine" → restomod cream-hero cabinet → stack of three game boxes (away from arcade-genre signal toward calm-classic-suite signal)
 
 ## Naming history (display-name only, bundle ID unchanged throughout)
 
 - `GameKit` — internal/repo name only, never shipped externally
 - `PixelParlor` — chosen 2026-04-30 morning, rejected same day. Retro/arcade connotation conflicted with the actual product (Sudoku, Minesweeper, Solitaire — calm logic puzzles, not arcade)
-- `PlayCore` — current display name as of 2026-04-30 evening. Calm, modern, neutral, doesn't lock genre
+- `PlayCore` — chosen 2026-04-30 evening, superseded same day. Short, neutral, but inverted form preferred for brand voice
+- `CorePlay` — current display name as of 2026-04-30. Full brand "CorePlay Arcade" (App Store / marketing); home-screen short name "CorePlay". Same neutral/calm tone, better cadence
 
-`INFOPLIST_KEY_CFBundleDisplayName = PlayCore` in Debug + Release. Bundle ID
+`INFOPLIST_KEY_CFBundleDisplayName = CorePlay` in Debug + Release. Bundle ID
 `com.lauterstar.gamekit` and target name `gamekit` unchanged per CLAUDE §1.
 
 ## Approval (2026-04-30 evening — Revision 3 PlayCore)
