@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 06.1-02 — Minesweeper Reveal/Flag interaction-mode toggle (MINES-12); manual recipes pending human execution; phase 06.1 final plan landed
-last_updated: "2026-04-28T03:09:44.371Z"
-last_activity: 2026-04-28
+status: executing
+stopped_at: "Phase 7 Release pre-flight in progress. PF-01 doc-drift verified clean (ROADMAP + REQUIREMENTS + 06-VERIFICATION + STATE.md aligned); PF-02 real icon ✅; PF-07 public app name locked → GameDrawer ✅. Next: PF-03 CloudKit Dev → Production schema deploy via Dashboard, then PF-04/05/06/08/09 then SC1-SC5 sweep."
+last_updated: "2026-05-01T00:00:00.000Z"
+last_activity: 2026-05-01
 progress:
   total_phases: 8
   completed_phases: 7
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-24)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 06.1 — pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode
+**Current focus:** Phase 07 — Release (pre-flight PF-01..09 + SC1-SC5 sweep before TestFlight upload). v1.0 ships under display name **GameDrawer**.
 
 ## Current Position
 
-Phase: 06.1 (pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
-Last activity: 2026-04-28
+Phase: 07-release — PRE-FLIGHT
+Plan: pre-flight tasks PF-01..09 (canonical: `.planning/phases/07-release/07-CHECKLIST.md`)
+Status: PF-01 (doc-drift) ✅ · PF-02 (icon) ✅ · PF-07 (name = GameDrawer) ✅ · PF-03/04 (CloudKit Prod schema deploy) ☐ · PF-05 (privacy.md live URL) ☐ · PF-06 (theme-matrix screenshots) ☐ · PF-08 (ASC metadata) ☐ · PF-09 (privacy nutrition label) ☐
+Last activity: 2026-05-01
 
 Progress: [█████████░] 94%
 
@@ -245,6 +245,8 @@ Recent decisions affecting current work:
 - 06-08: `IntroStep3SignInView` signature change — `let onSignIn: () -> Void` REMOVED; `let onSIWARequest: (ASAuthorizationAppleIDRequest) -> Void` + `let onSIWACompletion: (Result<ASAuthorization, Error>) -> Void` ADDED. The two new closure props let the parent `IntroFlowView` thread its `handleSIWARequest` and `handleSIWACompletion` instance methods down without the child view depending on `@Environment(\.authStore)` directly — preserves P5's "leaf views are props-only" pattern (CLAUDE.md §8.2). The parent owns environment reads; the child receives shaped closures.
 - 06-08: Mirrored handler shape from Plan 06-07 verbatim — both SIWA-success sites are now byte-similar at the call-site logic level. Eases future maintenance (e.g., adding rate-limiting, telemetry, retry on Keychain write failure — would update both sites identically). Locks the rule that any future SIWA-success site (e.g., a hypothetical "promote anonymous → signed-in" sheet from a Stats CTA) MUST follow the same `Task { @MainActor in switch result }` shape with the D-02/D-03 sequence. The handler is effectively a project-level pattern, not a per-screen one.
 - 07-01: P7 doc-drift cleanup — refreshed ROADMAP.md plan-completion counts (P3 4/4, P4 6/6, P5 7/7, P6 9/9), synced REQUIREMENTS.md traceability (35/35 Complete), flipped 06-VERIFICATION.md status pending → complete with sign-off rows pointing to 06-UAT.md as canonical evidence per v1.0-MILESTONE-AUDIT.md, advanced STATE.md current_position to Phase 7. Single docs-only commit per CLAUDE.md §8.10. ZERO code changes.
+- 2026-05-01: PF-01 verified clean — ROADMAP / REQUIREMENTS / 06-VERIFICATION already in sync from the earlier 07-01 sweep; STATE.md frontmatter + Current Position advanced to Phase 7 pre-flight in this pass. PF-01 row in 07-CHECKLIST.md eligible to tick.
+- 2026-05-01: Display name renamed CorePlay → **GameDrawer** (full brand also GameDrawer, no Arcade suffix). Concrete drawer-of-games metaphor preferred over play/core abstraction. Bundle ID + repo unchanged per CLAUDE §1. Naming history GameKit → PixelParlor → PlayCore → CorePlay → GameDrawer logged in `assets/icon/AI_PROVENANCE.md`. P7 PF-07 unsatisfied → re-satisfied with GameDrawer in this pass.
 - 06.1-03: Padding reduced from theme.spacing.l (16pt) to theme.spacing.s (8pt) on Mines board horizontal — RESEARCH open question #1 option (a). Eliminates Easy/Medium clamping-at-floor regression on 390pt iPhones while preserving 1-token visual breath
 - 06.1-03: .scaleEffect anchored to LazyVGrid (not ScrollView) — cosmetic-only zoom; ScrollView clipping stays stable for consistent scroll-bumper behavior during pinch
 - 06.1-03: cellSize and clampZoomScale extracted as static MinesweeperBoardView funcs — pure-computation testable from gamekitTests without SwiftUI dependency; instance computed property delegates to static helper for single-source-of-truth
