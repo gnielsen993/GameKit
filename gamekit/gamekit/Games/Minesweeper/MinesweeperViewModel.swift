@@ -16,6 +16,18 @@
 //    - First-tap-safety preserved end-to-end (CLAUDE.md §8.11): the .idle
 //      branch in reveal(at:) is the ONLY path that calls BoardGenerator.generate
 //
+//  File layout (split 2026-05-01 to clear §8.1 split-smell zone, was 472 LOC):
+//    - This file: stored properties, init, core game-state methods (reveal,
+//      toggleFlag, restart, setDifficulty, requestDifficultyChange,
+//      confirmDifficultyChange, cancelDifficultyChange, computeLossContext,
+//      idleBoard)
+//    - MinesweeperViewModel+Timer.swift — frozenElapsed, pause, resume,
+//      freezeTimer
+//    - MinesweeperViewModel+Persistence.swift — attachGameStats,
+//      recordTerminalState, lastDifficultyKey
+//    - MinesweeperViewModel+InteractionMode.swift — toggleInteractionMode,
+//      setInteractionMode, handleTap, handleLongPress
+//
 
 import Foundation
 // The Observation module ships with the Swift 5.9+ stdlib; @Observable
@@ -58,8 +70,13 @@ final class MinesweeperViewModel {
     private(set) var gameState: MinesweeperGameState = .idle
     private(set) var difficulty: MinesweeperDifficulty
     private(set) var flaggedCount: Int = 0
-    private(set) var timerAnchor: Date?               // nil = paused/idle/terminal (D-05)
-    private(set) var pausedElapsed: TimeInterval = 0  // accumulator (D-06)
+    /// Treated as read-only by external (view) callers; the Timer extension
+    /// in the sibling file writes through internal access. Same applies to
+    /// `pausedElapsed`, `gameStats`, `interactionMode`, `modeToggleCount`
+    /// below — Swift `private(set)` does not cross file boundaries, so
+    /// these intentionally drop to module-internal write access.
+    var timerAnchor: Date?               // nil = paused/idle/terminal (D-05)
+    var pausedElapsed: TimeInterval = 0  // accumulator (D-06)
     private(set) var lossContext: LossContext?
 
     /// Interaction-mode toggle (CONTEXT D-06 / D-11 — Phase 6.1).
@@ -68,7 +85,7 @@ final class MinesweeperViewModel {
     /// lives in `handleTap(at:)` / `handleLongPress(at:)`; the cell view
     /// never branches on mode itself (CLAUDE.md §1 lightweight MVVM,
     /// ARCHITECTURE Anti-Pattern 1).
-    private(set) var interactionMode: MinesweeperInteractionMode = .reveal
+    var interactionMode: MinesweeperInteractionMode = .reveal
 
     // MARK: - P5 animation orchestration (CONTEXT D-05/D-06)
     //
@@ -110,8 +127,9 @@ final class MinesweeperViewModel {
     /// with `revealCount` and `flagToggleCount` (RESEARCH open question #3 —
     /// `.sensoryFeedback` is value-change-driven, so resetting to 0 still
     /// fires the haptic on the first post-restart toggle when the value
-    /// flips 0 → 1).
-    private(set) var modeToggleCount: Int = 0
+    /// flips 0 → 1). Treated as read-only by external callers; the
+    /// InteractionMode extension writes through internal access.
+    var modeToggleCount: Int = 0
 
     // MARK: - Difficulty-switch confirmation flow (D-10, RESEARCH Pitfall 4)
 
@@ -122,16 +140,20 @@ final class MinesweeperViewModel {
 
     // MARK: - Injection seams (test-friendly defaults)
 
-    private let userDefaults: UserDefaults
-    private let clock: () -> Date          // injectable for deterministic tests of timer math
-    private var rng: any RandomNumberGenerator
+    /// Module-internal access (was `private`) so the Timer / Persistence /
+    /// InteractionMode extensions in sibling files can read these injection
+    /// seams. External callers should not touch them.
+    let userDefaults: UserDefaults
+    let clock: () -> Date          // injectable for deterministic tests of timer math
+    var rng: any RandomNumberGenerator
 
     /// Persistence boundary — VM does NOT import SwiftData. GameStats is
     /// forward-resolved within the gamekit module (RESEARCH §Code Examples 4
     /// line 1131; ARCHITECTURE Anti-Pattern 1). Constructed in
     /// MinesweeperGameView.body via .task using @Environment(\.modelContext);
     /// attached via attachGameStats(_:) one-shot per scene (RESEARCH Pitfall 8).
-    private(set) var gameStats: GameStats?
+    /// Treated as read-only by external callers; Persistence extension writes.
+    var gameStats: GameStats?
 
     // MARK: - Derived presentations (no caching — recomputed per access)
 
@@ -139,13 +161,7 @@ final class MinesweeperViewModel {
         board.mineCount - flaggedCount
     }
 
-    /// Wall-clock elapsed at the moment of access. Used by the end-state
-    /// card after the timer freezes (D-08). System-clock-rollback safe:
-    /// negative deltas clamp to 0 (RESEARCH §Pattern 2).
-    var frozenElapsed: TimeInterval {
-        guard let anchor = timerAnchor else { return pausedElapsed }
-        return pausedElapsed + max(0, clock().timeIntervalSince(anchor))
-    }
+    // `frozenElapsed` lives in MinesweeperViewModel+Timer.swift.
 
     var terminalOutcome: GameOutcome? {
         switch gameState {
@@ -181,17 +197,7 @@ final class MinesweeperViewModel {
         self.board = Self.idleBoard(for: resolved)
     }
 
-    // MARK: - Persistence injection (Plan 04-05 D-14, RESEARCH Pitfall 8)
-
-    /// One-shot setter called from MinesweeperGameView.body's `.task` modifier
-    /// (RESEARCH Pitfall 8 — `GameStats(modelContext:)` MUST NOT live inside
-    /// `body` because that constructs a new instance on every render). Second
-    /// call is benign no-op — production fires this exactly once per scene
-    /// lifecycle.
-    func attachGameStats(_ stats: GameStats) {
-        guard self.gameStats == nil else { return }
-        self.gameStats = stats
-    }
+    // `attachGameStats(_:)` lives in MinesweeperViewModel+Persistence.swift.
 
     // MARK: - Public API consumed by views
 
@@ -348,97 +354,16 @@ final class MinesweeperViewModel {
         showingAbandonAlert = false
     }
 
-    /// scenePhase .background path (D-06). No-op outside .playing.
-    func pause() {
-        guard case .playing = gameState, let anchor = timerAnchor else { return }
-        pausedElapsed += max(0, clock().timeIntervalSince(anchor))
-        timerAnchor = nil
-    }
+    // `pause()` and `resume()` live in MinesweeperViewModel+Timer.swift.
 
-    /// scenePhase .active path (D-06). No-op outside .playing.
-    /// Idempotent — calling twice without a pause in between is a no-op.
-    func resume() {
-        guard case .playing = gameState, timerAnchor == nil else { return }
-        timerAnchor = clock()
-    }
-
-    // MARK: - Phase 6.1 (MINES-12) — Interaction-mode toggle + tap routing
-
-    /// Toggle between `.reveal` and `.flag` modes. Bumps `modeToggleCount`
-    /// for the FAB-level `.sensoryFeedback(.impact(.light))` haptic
-    /// (CONTEXT D-09). Terminal states (.won / .lost) are a structural
-    /// no-op — the FAB hides post-terminal per CONTEXT D-09 / RESEARCH
-    /// open question #2, but this guard ensures any future call site
-    /// also can't change mode after the game ends.
-    func toggleInteractionMode() {
-        if case .won = gameState { return }
-        if case .lost = gameState { return }
-        switch interactionMode {
-        case .reveal: interactionMode = .flag
-        case .flag:   interactionMode = .reveal
-        }
-        modeToggleCount += 1
-    }
-
-    /// Set interaction mode directly. No-op when already at target mode or
-    /// when the game has ended. Used by pill-flipper UI where the user taps
-    /// a specific segment rather than a single toggle button.
-    func setInteractionMode(_ mode: MinesweeperInteractionMode) {
-        if case .won = gameState { return }
-        if case .lost = gameState { return }
-        guard interactionMode != mode else { return }
-        interactionMode = mode
-        modeToggleCount += 1
-    }
-
-    /// View-tier entry point for tap gesture. Branches on `interactionMode`
-    /// (CONTEXT D-06 / D-11). View NEVER calls `reveal(at:)` /
-    /// `toggleFlag(at:)` directly after Phase 6.1 — mode-routing logic
-    /// lives in the VM (CLAUDE.md §1 lightweight MVVM, ARCHITECTURE
-    /// Anti-Pattern 1).
-    func handleTap(at index: MinesweeperIndex) {
-        switch interactionMode {
-        case .reveal: reveal(at: index)
-        case .flag:   toggleFlag(at: index)
-        }
-    }
-
-    /// View-tier entry point for long-press gesture. Long-press is ALWAYS
-    /// the OPPOSITE of the current mode's tap action — provides a
-    /// quick-action escape regardless of which mode is active (CONTEXT
-    /// D-06). The 0.25s threshold + `.exclusively(before:)` gesture
-    /// composition are owned by `MinesweeperCellView` and are NOT touched
-    /// by Phase 6.1 (ROADMAP P3 SC1 lock + Plan 03-03 invariant).
-    func handleLongPress(at index: MinesweeperIndex) {
-        switch interactionMode {
-        case .reveal: toggleFlag(at: index)   // current MINES-02 long-press semantic
-        case .flag:   reveal(at: index)       // inverted — long-press reveals in flag mode
-        }
-    }
+    // Phase 6.1 (MINES-12) interaction-mode toggle + tap routing
+    // (toggleInteractionMode, setInteractionMode, handleTap, handleLongPress)
+    // lives in MinesweeperViewModel+InteractionMode.swift.
 
     // MARK: - Private helpers
 
-    /// Writes a GameRecord (and updates BestTime on win-and-faster) at terminal
-    /// state. Wraps `try? gameStats?.record(...)` — failure is logged inside
-    /// GameStats via os.Logger and gameplay UI continues to render the terminal
-    /// state (D-15 — persistence failure must NOT block the user from seeing
-    /// the win/loss overlay). MUST be called AFTER `freezeTimer()` so
-    /// `frozenElapsed` holds the correct elapsed value (RESEARCH Pitfall 3).
-    private func recordTerminalState(outcome: GameOutcome) {
-        try? gameStats?.record(
-            gameKind: .minesweeper,
-            difficulty: difficulty.rawValue,        // P2 D-02 / P4 D-05 canonical key
-            outcome: outcome == .win ? .win : .loss,
-            durationSeconds: frozenElapsed
-        )
-    }
-
-    private func freezeTimer() {
-        if let anchor = timerAnchor {
-            pausedElapsed += max(0, clock().timeIntervalSince(anchor))
-        }
-        timerAnchor = nil
-    }
+    // `recordTerminalState(outcome:)` lives in MinesweeperViewModel+Persistence.swift.
+    // `freezeTimer()` lives in MinesweeperViewModel+Timer.swift.
 
     private func computeLossContext() -> LossContext {
         var minesHit = 0
@@ -464,9 +389,5 @@ final class MinesweeperViewModel {
         )
     }
 
-    // MARK: - Constants
-
-    /// UserDefaults key per D-11 — locked at "mines.lastDifficulty".
-    /// Renaming = data break for any user who already played a game.
-    static let lastDifficultyKey = "mines.lastDifficulty"
+    // `lastDifficultyKey` lives in MinesweeperViewModel+Persistence.swift.
 }
