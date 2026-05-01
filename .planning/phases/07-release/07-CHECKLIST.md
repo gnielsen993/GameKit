@@ -28,8 +28,8 @@ signed_off_date: ""
 |---|-----------|--------|--------|----------|
 | PF-01 | Doc-drift cleanup landed | Plan 07-01 | ☑ | Verified 2026-05-01 — ROADMAP plan counts, REQUIREMENTS traceability, 06-VERIFICATION.md status, STATE.md current_position all aligned. Commit `d89968e docs(07-01): advance STATE.md to Phase 7 pre-flight + log GameDrawer rename`. |
 | PF-02 | Real app icon shipped (light/dark/tinted), 1024² PNGs in AppIcon.appiconset | Plan 07-02 | ☑ | Commit `d03f1fa feat(branding): rebrand to PlayCore + stack-of-games icon + ASC export compliance` — three appearance variants in `gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/`; provenance in `assets/icon/AI_PROVENANCE.md`. |
-| PF-03 | CloudKit Production schema deployed via Dashboard "Deploy to Production" button | Plan 07-03, D-04 | ☐ | `.planning/phases/07-release/screenshots/dashboard-deploy.png` |
-| PF-04 | Production schema verified — `CD_GameRecord` + `CD_BestTime` exist with same indexes as Development | Plan 07-03 verification rung 1, D-06 | ☐ | `.planning/phases/07-release/screenshots/dashboard-production-recordtypes.png` |
+| PF-03 | CloudKit Production schema deployed via Dashboard "Deploy to Production" button | Plan 07-03, D-04 | ☑ | Deployed 2026-05-01. Dev schema materialized via auto-deploy block in GameKitApp.init() (commit `36d65c6`); Dashboard "Deploy Schema to Production" button promoted Dev → Prod. Screenshot evidence (optional) → `.planning/phases/07-release/screenshots/dashboard-deploy.png`. |
+| PF-04 | Production schema verified — `CD_GameRecord` + `CD_BestTime` + `CD_BestScore` exist with same indexes as Development | Plan 07-03 verification rung 1, D-06 | ☑ | Verified 2026-05-01 via Dashboard Production env. All three CD_* types present (Merge added `CD_BestScore` to the original P6 spec of two types). Screenshot evidence (optional) → `.planning/phases/07-release/screenshots/dashboard-production-recordtypes.png`. |
 | PF-05 | Privacy + Terms live on website (`gamedrawer.lauterstar.com/privacy.html` + `/terms.html`); Settings ABOUT rows link to them via `AppInfo.privacyURL` / `AppInfo.termsURL` | Plan 07-04 Tasks 1+2, D-08 (revised) | ☐ | Privacy URL: `https://gamedrawer.lauterstar.com/privacy.html` (DNS go-live pending). Terms URL: `https://gamedrawer.lauterstar.com/terms.html` (same). Code-side ✅ — AppInfo + SettingsAboutSection.swift land 2026-05-01. |
 | PF-06 | 12 theme-matrix screenshots + 4 warm-accent screenshots captured | Plan 07-04 Task 3, D-13 + D-14 | ☐ | `.planning/phases/07-release/screenshots/themes/` (12 files) + `.planning/phases/07-release/screenshots/warm-accent/` (4 files) |
 | PF-07 | Public app name locked | Plan 07-04 Task 4, Discretion #1 | ☑ | Locked name: `GameDrawer` (2026-05-01, `INFOPLIST_KEY_CFBundleDisplayName` Debug+Release in `gamekit.xcodeproj/project.pbxproj`) |
@@ -47,7 +47,7 @@ signed_off_date: ""
 | # | Sign-off row | Status | Evidence |
 |---|--------------|--------|----------|
 | SC1-A | Real arcade-machine app icon shipped (light/dark/tinted) | ☐ | git log + Xcode preview screenshot from 07-02 |
-| SC1-B | CloudKit schema promoted Dev → Production via Dashboard | ☐ | `dashboard-deploy.png` + `dashboard-production-recordtypes.png` |
+| SC1-B | CloudKit schema promoted Dev → Production via Dashboard | ☑ | Deployed 2026-05-01 — Production env now has CD_GameRecord + CD_BestTime + CD_BestScore (commit `36d65c6` GameKitApp auto-deploy block landed Dev schema; Dashboard "Deploy to Production" button promoted). |
 | SC1-C | Container ID `iCloud.com.lauterstar.gamekit` unchanged in `gamekit/gamekit/gamekit.entitlements` | ☐ | `grep -F "iCloud.com.lauterstar.gamekit" gamekit/gamekit/gamekit.entitlements` |
 | SC1-D | Container ID `iCloud.com.lauterstar.gamekit` unchanged in `gamekit.xcodeproj/project.pbxproj` | ☐ | `grep -F "iCloud.com.lauterstar.gamekit" gamekit.xcodeproj/project.pbxproj` |
 | SC1-E | Bundle ID `com.lauterstar.gamekit` unchanged in `gamekit.xcodeproj/project.pbxproj` | ☐ | `grep -E "PRODUCT_BUNDLE_IDENTIFIER = com\.lauterstar\.gamekit" gamekit.xcodeproj/project.pbxproj` |
@@ -153,7 +153,7 @@ Pitfall 11 lists the 4 most expensive submission-day failure modes. This table c
 |-------------------------|--------------|--------|
 | Privacy nutrition label inconsistent with binary | SC2-A + SC2-B + SC2-C + SC2-D | ☐ |
 | Sign in with Apple capability missing in entitlements | SC1-G | ☐ |
-| CloudKit container not provisioned for Production | SC1-B + SC3-C..F | ☐ |
+| CloudKit container not provisioned for Production | SC1-B + SC3-C..F | ☑ (SC1-B 2026-05-01; SC3-C..F still pending TestFlight build) |
 | Bundle ID friction (`com.lauterstar.gamekit` vs `com.lauterstar.GameKit`) | SC1-E + P1 pre-commit hook | ☐ |
 
 ---
