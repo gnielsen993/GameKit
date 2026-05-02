@@ -168,7 +168,9 @@ private struct IntroStep1ThemesView: View {
                 maxGridHeight: nil,
                 grouped: false
             )
-            .allowsHitTesting(false)            // read-only per D-19
+            // D-19 read-only override: P7 polish — first-launch users
+            // expect to actually pick a theme here. Tap writes through
+            // themeManager so the surrounding intro re-tints in place.
             Spacer(minLength: theme.spacing.xxl)
         }
         .padding(theme.spacing.l)
@@ -265,8 +267,10 @@ private struct IntroStep3SignInView: View {
                         onCompletion: { result in onSIWACompletion(result) }
                     )
                     .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
-                    .frame(height: 44)
-                    // Apple HIG forbids tint override; system rounds to ~50pt — accept (UI-SPEC line 253).
+                    .frame(height: 56)
+                    // Apple HIG forbids tint override. P7 polish: bumped from 44 → 56pt
+                    // because at 44 the system glyph + label hugs the rounded edges and
+                    // looks pinched (UI-SPEC line 253 superseded).
                     DKButton(
                         String(localized: "Skip"),
                         style: .secondary,

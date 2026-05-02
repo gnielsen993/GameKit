@@ -118,7 +118,7 @@
         }
       }
     },
-    "8 games coming" : {
+    "7 games coming" : {
 
     },
     "Abandon" : {
@@ -182,7 +182,7 @@
     "Apple Mail isn't set up" : {
 
     },
-    "AUDIO" : {
+    "Back to The Drawer" : {
 
     },
     "Bad luck" : {
@@ -427,6 +427,9 @@
     "Haptics" : {
 
     },
+    "HAPTICS" : {
+
+    },
     "Hard" : {
       "comment" : "Difficulty option — 16x30 / 99 mines",
       "extractionState" : "automatic",
@@ -475,6 +478,9 @@
 
     },
     "Last synced %@" : {
+
+    },
+    "Later" : {
 
     },
     "Light" : {
@@ -590,7 +596,7 @@
     "Profile" : {
 
     },
-    "Quit GameKit" : {
+    "Quit and reopen to finish iCloud setup" : {
 
     },
     "Reset all stats" : {
@@ -625,9 +631,6 @@
           }
         }
       }
-    },
-    "Restart to enable iCloud sync" : {
-
     },
     "Reveal" : {
 
@@ -696,9 +699,6 @@
           }
         }
       }
-    },
-    "Sound effects" : {
-
     },
     "Stats" : {
       "comment" : "Stats tab + nav title",
@@ -906,7 +906,7 @@
         }
       }
     },
-    "Your stats will sync to all devices signed in to this iCloud account. Quit GameKit and reopen to finish setup." : {
+    "Your stats will sync to all devices signed in to this iCloud account. Swipe up in the app switcher to quit %@, then reopen it to finish setup." : {
 
     }
   },

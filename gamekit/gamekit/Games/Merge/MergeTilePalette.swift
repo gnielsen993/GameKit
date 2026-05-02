@@ -20,6 +20,7 @@
 //
 
 import SwiftUI
+import UIKit
 import DesignKit
 
 enum MergeTilePalette {
@@ -51,14 +52,52 @@ enum MergeTilePalette {
     }
 
     /// Foreground text color for the given tile value. Picks textPrimary on
-    /// dark tiles and background on light tiles so the digit reads on every
-    /// audit preset.
+    /// light tiles and background on dark tiles so the digit reads on every
+    /// audit preset (CLAUDE.md §8.12).
+    ///
+    /// P7 polish: replaced the original "≥512 = light text" cutoff with
+    /// per-tile relative-luminance lookup. Classic gameNumberPalette[3] (the
+    /// `16` tile) is `#212121` near-black, so the old logic painted dark text
+    /// on a near-black tile and the digit disappeared. The new logic compares
+    /// the perceived luminance of the tile color to the perceived luminance
+    /// of the theme's `textPrimary` and `background` and picks whichever has
+    /// the larger contrast distance — works for every preset without per-
+    /// preset special-casing.
     static func textColor(forValue value: Int, theme: Theme) -> Color {
-        // Higher tiers use saturated accents — flip to the background color
-        // (typically near-white in light mode, near-black in dark mode) for
-        // legibility.
-        if value >= 512 { return theme.colors.background }
-        return theme.colors.textPrimary
+        let bg = tileColor(forValue: value, theme: theme)
+        return Self.bestContrastingForeground(
+            for: bg,
+            candidates: [theme.colors.textPrimary, theme.colors.background]
+        )
+    }
+
+    /// Returns whichever candidate has the larger absolute relative-luminance
+    /// distance from the given background color. Mirrors the WCAG contrast
+    /// approach without the full ratio math — a luminance gap >= ~0.5 reads
+    /// cleanly at body / titleNumber type sizes (Wong audit basis).
+    private static func bestContrastingForeground(
+        for background: Color,
+        candidates: [Color]
+    ) -> Color {
+        let bgLum = relativeLuminance(of: background)
+        var best = candidates[0]
+        var bestGap = abs(bgLum - relativeLuminance(of: best))
+        for candidate in candidates.dropFirst() {
+            let gap = abs(bgLum - relativeLuminance(of: candidate))
+            if gap > bestGap {
+                bestGap = gap
+                best = candidate
+            }
+        }
+        return best
+    }
+
+    /// Perceived luminance per ITU-R BT.601 (cheap, good enough for tile
+    /// digits). Returns 0..1.
+    private static func relativeLuminance(of color: Color) -> CGFloat {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a)
+        return 0.299 * r + 0.587 * g + 0.114 * b
     }
 
     /// Font scaling: 1024+ digits need to fit within the tile, so step the

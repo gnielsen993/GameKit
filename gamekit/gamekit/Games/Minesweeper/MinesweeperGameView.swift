@@ -45,6 +45,7 @@ struct MinesweeperGameView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @State private var didInjectStats = false           // one-shot guard (RESEARCH Pitfall 8)
+    @State private var showDifficultyPicker = false      // P7 polish (kink #4)
     @Environment(\.dismiss) private var dismiss
 
     // P5 (D-04/D-07/D-08) — animation/haptics/SFX environment reads.
@@ -268,14 +269,35 @@ struct MinesweeperGameView: View {
                 lossContext: viewModel.lossContext,
                 onRestart: { viewModel.restart() },
                 onChangeDifficulty: {
-                    // CONTEXT D-03 (refined W-02): "Change difficulty" calls restart()
-                    // for fresh idle at the same difficulty. The user changes the
-                    // difficulty itself by tapping the trailing toolbar Menu.
-                    // P3 ships the simplest path; sheet-presented difficulty picker
-                    // deferred to P5 polish.
-                    viewModel.restart()
+                    // P7 polish (kink #4): the original D-03 W-02 path called
+                    // restart() and required the user to find the toolbar menu
+                    // to actually change difficulty — confusing because the
+                    // button literally says "Change difficulty". Now we surface
+                    // the same difficulty list the toolbar menu uses, via a
+                    // native confirmationDialog (declared on the GameView body).
+                    showDifficultyPicker = true
                 }
             )
+        }
+        .confirmationDialog(
+            String(localized: "Change difficulty"),
+            isPresented: $showDifficultyPicker,
+            titleVisibility: .visible
+        ) {
+            ForEach(MinesweeperDifficulty.allCases, id: \.self) { difficulty in
+                Button(difficultyDisplayName(difficulty)) {
+                    viewModel.requestDifficultyChange(difficulty)
+                }
+            }
+            Button(String(localized: "Cancel"), role: .cancel) { }
+        }
+    }
+
+    private func difficultyDisplayName(_ d: MinesweeperDifficulty) -> String {
+        switch d {
+        case .easy:   return String(localized: "Easy")
+        case .medium: return String(localized: "Medium")
+        case .hard:   return String(localized: "Hard")
         }
     }
 }

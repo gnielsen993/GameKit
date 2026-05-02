@@ -82,9 +82,9 @@ struct SettingsSyncSection: View {
                 onCompletion: handleSIWACompletion
             )
             .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
-            .frame(height: 44)
+            .frame(height: 56)
         }
-        .frame(minHeight: 44)
+        .frame(minHeight: 56)
         .padding(.horizontal, theme.spacing.s)
     }
 
