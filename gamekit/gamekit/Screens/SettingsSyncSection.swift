@@ -11,13 +11,23 @@
 //  sibling Screens/AcknowledgmentsView.swift instead of file-private
 //  inside SettingsView.swift").
 //
-//  Two rows (D-10):
-//    1. Sign-in row — SignInWithAppleButton when signed-out;
-//       static "Signed in to iCloud" when signed-in (NO sign-out
-//       button per ARCHITECTURE §line 423 + Pitfall 5 — T-06-row-noSignOut).
+//  Rows (D-10 + P7.1):
+//    1. Sign-in row — SignInWithAppleButton when signed-out; "Signed
+//       in to iCloud" label when signed-in.
 //    2. Sync-status row — reads CloudSyncStatusObserver.status; wrapped
 //       in TimelineView(.periodic(from: .now, by: 60)) so "Synced X ago"
 //       ticks once per minute without observer churn (D-12).
+//    3. Sign-out row (P7.1; signed-in only) — clears local Keychain;
+//       SwiftData stats stay (offline-first §1).
+//    4. Delete-account row (P7.1; signed-in only) — App Store Guideline
+//       5.1.1(v). Confirm alert → AuthStore.deleteAccount wipes the
+//       CloudKit private zone + Keychain. Failure path shows a follow-up
+//       alert directing the user to System Settings to finish revocation.
+//
+//  P7.1 supersedes the original T-06-row-noSignOut lock ("System Settings
+//  is the only sign-out path"): App Store Review rejects SIWA apps that
+//  don't expose in-app sign-out + delete account from the same surface
+//  as account creation.
 //
 //  SIWA-completion handler (PERSIST-04 D-02 + D-03 + Pattern 4):
 //    success -> AuthStore.signIn(userID:) -> SettingsStore.cloudSyncEnabled = true
@@ -28,7 +38,6 @@
 //  Threat mitigations:
 //    T-06-04 (requestedScopes drift): request.requestedScopes = [] (SC2 verbatim)
 //    T-06-03 (one-shot Apple-issued JWT): handler extracts ONLY credential.user String
-//    T-06-row-noSignOut: signed-in row has NO Button
 //
 
 import SwiftUI
@@ -44,6 +53,12 @@ struct SettingsSyncSection: View {
     @Environment(\.authStore) private var authStore
     @Environment(\.cloudSyncStatusObserver) private var cloudSyncStatusObserver
 
+    // P7.1 alert state — destructive delete confirm + cloud-wipe-failed
+    // follow-up. Both default false; alert(isPresented:) toggles back on
+    // dismiss so the rows stay tappable.
+    @State private var isDeleteConfirmPresented: Bool = false
+    @State private var isDeleteCloudFailedAlertPresented: Bool = false
+
     var body: some View {
         settingsSectionHeader(theme: theme, String(localized: "SYNC"))
         DKCard(theme: theme) {
@@ -53,7 +68,36 @@ struct SettingsSyncSection: View {
                     .fill(theme.colors.border)
                     .frame(height: 1)
                 syncStatusRow
+                if authStore.isSignedIn {
+                    Rectangle()
+                        .fill(theme.colors.border)
+                        .frame(height: 1)
+                    signOutRow
+                    Rectangle()
+                        .fill(theme.colors.border)
+                        .frame(height: 1)
+                    deleteAccountRow
+                }
             }
+        }
+        .alert(
+            String(localized: "Delete account?"),
+            isPresented: $isDeleteConfirmPresented
+        ) {
+            Button(String(localized: "Cancel"), role: .cancel) {}
+            Button(String(localized: "Delete account"), role: .destructive) {
+                Task { await performDeleteAccount() }
+            }
+        } message: {
+            Text(String(localized: "This wipes your iCloud-synced stats from this Apple ID and signs you out of \(AppInfo.displayName). Local stats on this device are kept — use Reset stats in DATA to clear them. To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → \(AppInfo.displayName)."))
+        }
+        .alert(
+            String(localized: "Couldn't reach iCloud"),
+            isPresented: $isDeleteCloudFailedAlertPresented
+        ) {
+            Button(String(localized: "OK"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "You're signed out on this device, but we couldn't wipe the iCloud copy of your stats right now. Reconnect to the internet and sign in again to retry, or open Settings → Apple ID → Sign in with Apple → \(AppInfo.displayName) to revoke access."))
         }
     }
 
@@ -90,8 +134,8 @@ struct SettingsSyncSection: View {
 
     @ViewBuilder
     private var signedInRow: some View {
-        // T-06-row-noSignOut: NO Button. System Settings is the only sign-out
-        // path (ARCHITECTURE §line 423 + Pitfall 5 lock).
+        // P7.1: status-only label — sign-out and delete-account live in
+        // dedicated rows below (App Store 5.1.1(v) requires both surfaces).
         HStack(spacing: theme.spacing.s) {
             Image(systemName: "checkmark.icloud.fill")
                 .foregroundStyle(theme.colors.success)
@@ -102,6 +146,65 @@ struct SettingsSyncSection: View {
         }
         .frame(minHeight: 44)
         .padding(.horizontal, theme.spacing.s)
+    }
+
+    // MARK: - P7.1 sign-out + delete-account rows
+
+    @ViewBuilder
+    private var signOutRow: some View {
+        Button {
+            authStore.signOut()
+            // D-08 same-store-path: keep cloudSyncEnabled mirrored to
+            // signed-in state. Cloud rows on iCloud server stay intact;
+            // re-signing-in restores sync (Pitfall 4).
+            settingsStore.cloudSyncEnabled = false
+        } label: {
+            HStack(spacing: theme.spacing.s) {
+                Image(systemName: "rectangle.portrait.and.arrow.right")
+                    .foregroundStyle(theme.colors.textPrimary)
+                Text(String(localized: "Sign out"))
+                    .font(theme.typography.body)
+                    .foregroundStyle(theme.colors.textPrimary)
+                Spacer()
+            }
+            .frame(minHeight: 44)
+            .padding(.horizontal, theme.spacing.s)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(String(localized: "Sign out of iCloud"))
+    }
+
+    @ViewBuilder
+    private var deleteAccountRow: some View {
+        Button {
+            isDeleteConfirmPresented = true
+        } label: {
+            HStack(spacing: theme.spacing.s) {
+                Image(systemName: "trash")
+                    .foregroundStyle(theme.colors.danger)
+                Text(String(localized: "Delete account"))
+                    .font(theme.typography.body)
+                    .foregroundStyle(theme.colors.textPrimary)
+                Spacer()
+            }
+            .frame(minHeight: 44)
+            .padding(.horizontal, theme.spacing.s)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(String(localized: "Delete account and iCloud data"))
+        .accessibilityHint(String(localized: "Wipes your iCloud-synced stats and signs out"))
+    }
+
+    private func performDeleteAccount() async {
+        let outcome = await authStore.deleteAccount()
+        // D-08 mirror: clear the flag locally; container reconfigures to
+        // .none on next cold-start (same-store-path preserves local rows).
+        settingsStore.cloudSyncEnabled = false
+        if !outcome.cloudWipeSucceeded {
+            isDeleteCloudFailedAlertPresented = true
+        }
     }
 
     // MARK: - Row 2: Sync status (D-10 + D-12 TimelineView)

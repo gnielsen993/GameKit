@@ -187,4 +187,80 @@ struct AuthStoreTests {
         // D-15: zero `getCredentialState` calls when nothing is stored.
         #expect(stub.callCount == 0)
     }
+
+    // MARK: - P7.1 — signOut() (App Store 5.1.1(v))
+
+    @Test("signOut clears Keychain userID")
+    func signOut_clearsKeychain() throws {
+        let backend = InMemoryKeychainBackend()
+        let store = AuthStore(
+            backend: backend,
+            credentialStateProvider: StubCredentialStateProvider(),
+            cloudAccountWiper: InMemoryCloudAccountWiper()
+        )
+        try store.signIn(userID: "fake.user.id.signout.001")
+        #expect(store.isSignedIn == true)
+
+        store.signOut()
+
+        #expect(store.currentUserID == nil)
+        #expect(store.isSignedIn == false)
+    }
+
+    @Test("signOut never throws and is idempotent on already-signed-out state")
+    func signOut_idempotent() {
+        let backend = InMemoryKeychainBackend()
+        let store = AuthStore(
+            backend: backend,
+            credentialStateProvider: StubCredentialStateProvider(),
+            cloudAccountWiper: InMemoryCloudAccountWiper()
+        )
+        // No signIn — already signed out.
+        store.signOut()
+        store.signOut()
+        #expect(store.isSignedIn == false)
+    }
+
+    // MARK: - P7.1 — deleteAccount() (App Store 5.1.1(v))
+
+    @Test("deleteAccount happy path: cloud wipe + Keychain clear, outcome.cloudWipeSucceeded == true")
+    func deleteAccount_happyPath() async throws {
+        let backend = InMemoryKeychainBackend()
+        let wiper = InMemoryCloudAccountWiper()
+        let store = AuthStore(
+            backend: backend,
+            credentialStateProvider: StubCredentialStateProvider(),
+            cloudAccountWiper: wiper
+        )
+        try store.signIn(userID: "fake.user.id.delete.001")
+
+        let outcome = await store.deleteAccount()
+
+        #expect(wiper.callCount == 1)
+        #expect(outcome.cloudWipeSucceeded == true)
+        #expect(store.currentUserID == nil)
+        #expect(store.isSignedIn == false)
+    }
+
+    @Test("deleteAccount cloud-wipe failure still clears local; outcome.cloudWipeSucceeded == false")
+    func deleteAccount_cloudWipeFails_localStillCleared() async throws {
+        struct FakeError: Error {}
+        let backend = InMemoryKeychainBackend()
+        let wiper = InMemoryCloudAccountWiper()
+        wiper.errorToThrow = FakeError()
+        let store = AuthStore(
+            backend: backend,
+            credentialStateProvider: StubCredentialStateProvider(),
+            cloudAccountWiper: wiper
+        )
+        try store.signIn(userID: "fake.user.id.delete.002")
+
+        let outcome = await store.deleteAccount()
+
+        #expect(wiper.callCount == 1)
+        #expect(outcome.cloudWipeSucceeded == false)
+        // Local Keychain MUST still be cleared even when cloud wipe failed.
+        #expect(store.currentUserID == nil)
+        #expect(store.isSignedIn == false)
+    }
 }

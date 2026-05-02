@@ -105,6 +105,7 @@ final class AuthStore {
 
     private let backend: KeychainBackend
     private let credentialStateProvider: CredentialStateProvider
+    private let cloudAccountWiper: CloudAccountWiper
 
     // MARK: - Observed state
 
@@ -122,10 +123,12 @@ final class AuthStore {
 
     init(
         backend: KeychainBackend = SystemKeychainBackend(),
-        credentialStateProvider: CredentialStateProvider = SystemCredentialStateProvider()
+        credentialStateProvider: CredentialStateProvider = SystemCredentialStateProvider(),
+        cloudAccountWiper: CloudAccountWiper = CloudKitAccountWiper()
     ) {
         self.backend = backend
         self.credentialStateProvider = credentialStateProvider
+        self.cloudAccountWiper = cloudAccountWiper
         registerRevocationObserver()
     }
 
@@ -138,6 +141,40 @@ final class AuthStore {
         try backend.write(userID, account: Self.appleUserIDAccount)
         // T-06-02 lock: NEVER interpolate userID into log output.
         Self.logger.info("Signed in (userID hidden)")
+    }
+
+    // MARK: - Sign-out / Delete-account (P7.1 — App Store 5.1.1(v))
+
+    /// User-initiated sign-out. Clears the local Keychain userID entry
+    /// only; SwiftData stats stay untouched (offline-first §1). Cloud
+    /// rows persist on iCloud — re-signing-in restores sync. Mirrors
+    /// the silent revocation path; never throws to UI.
+    func signOut() {
+        clearLocalSignInState(reason: "user-initiated sign-out")
+    }
+
+    /// User-initiated account delete (App Store Guideline 5.1.1(v)).
+    /// Best-effort wipe of the CloudKit private-database zone, then
+    /// clears local Keychain. Failures during cloud wipe are logged
+    /// and surfaced via the returned `DeleteAccountOutcome` so the UI
+    /// can show a follow-up hint pointing the user to Settings →
+    /// Apple ID → Sign in with Apple → GameDrawer for full credential
+    /// revocation (Apple does not expose client-side revokeToken for
+    /// SIWA — server-to-server only).
+    @discardableResult
+    func deleteAccount() async -> DeleteAccountOutcome {
+        var cloudWipeSucceeded = true
+        do {
+            try await cloudAccountWiper.wipePrivateZones()
+        } catch {
+            cloudWipeSucceeded = false
+            // T-06-02 lock: localizedDescription only; never the userID.
+            Self.logger.error(
+                "Cloud zone wipe failed during deleteAccount: \(error.localizedDescription, privacy: .public)"
+            )
+        }
+        clearLocalSignInState(reason: "user-initiated account delete")
+        return DeleteAccountOutcome(cloudWipeSucceeded: cloudWipeSucceeded)
     }
 
     // MARK: - Lifecycle (D-14)
@@ -215,12 +252,23 @@ final class AuthStore {
     #endif
 }
 
+// MARK: - DeleteAccountOutcome (P7.1)
+
+/// Returned by `AuthStore.deleteAccount()` so the SettingsView delete
+/// flow can show a follow-up hint when the cloud-side wipe failed
+/// (offline, no iCloud, transient CloudKit error). Local Keychain wipe
+/// always proceeds; this surfaces only the cloud-half status.
+struct DeleteAccountOutcome: Sendable {
+    let cloudWipeSucceeded: Bool
+}
+
 // MARK: - EnvironmentKey injection (PATTERNS §S1; mirrors SettingsStore.swift:124-135)
 
 private struct AuthStoreKey: EnvironmentKey {
     @MainActor static let defaultValue = AuthStore(
         backend: SystemKeychainBackend(),
-        credentialStateProvider: SystemCredentialStateProvider()
+        credentialStateProvider: SystemCredentialStateProvider(),
+        cloudAccountWiper: CloudKitAccountWiper()
     )
 }
 
