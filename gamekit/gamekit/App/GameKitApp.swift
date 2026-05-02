@@ -111,6 +111,20 @@ struct GameKitApp: App {
             // means a non-schema issue (e.g. disk write barrier).
             fatalError("Failed to construct shared ModelContainer: \(error)")
         }
+
+        // DEBUG-only: pre-populate stats with realistic dummy records on
+        // first launch per device so screenshot sessions show populated
+        // cards (best times, recent games, score history) instead of empty
+        // states. Gated by UserDefaults flag (one-shot per install) AND
+        // cloudSyncEnabled (refuses to push fake records to a real iCloud
+        // account). Reset command + reseed instructions live in
+        // App/DummyDataSeeder.swift.
+        #if DEBUG
+        DummyDataSeeder.seedIfNeeded(
+            container: sharedContainer,
+            cloudSyncEnabled: store.cloudSyncEnabled
+        )
+        #endif
     }
 
     var body: some Scene {
