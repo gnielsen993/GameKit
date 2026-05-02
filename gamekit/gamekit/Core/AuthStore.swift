@@ -114,10 +114,16 @@ final class AuthStore {
     /// to true; RootTabView's `.alert(isPresented:)` reads via Bindable.
     var shouldShowRestartPrompt: Bool = false
 
-    // MARK: - Computed (read-through to backend)
+    /// P7.1 fix: stored, not computed. The @Observable macro only tracks
+    /// stored properties; the previous computed read of `backend.read(...)`
+    /// gave the right value but never invalidated SwiftUI views when the
+    /// underlying Keychain row changed (signOut / deleteAccount UI was
+    /// stuck on the signed-in card). Always mirrored from `backend` via
+    /// the helper below — Keychain remains the persistence truth, this
+    /// is the observable surface.
+    private(set) var currentUserID: String?
 
-    var isSignedIn: Bool { backend.read(account: Self.appleUserIDAccount) != nil }
-    var currentUserID: String? { backend.read(account: Self.appleUserIDAccount) }
+    var isSignedIn: Bool { currentUserID != nil }
 
     // MARK: - Init
 
@@ -129,6 +135,10 @@ final class AuthStore {
         self.backend = backend
         self.credentialStateProvider = credentialStateProvider
         self.cloudAccountWiper = cloudAccountWiper
+        // Hydrate observable state from Keychain at construction so a
+        // cold-launch with a persisted userID renders the signed-in UI
+        // on first paint (matches D-15 reinstall path: nil if absent).
+        self.currentUserID = backend.read(account: Self.appleUserIDAccount)
         registerRevocationObserver()
     }
 
@@ -139,6 +149,8 @@ final class AuthStore {
     /// per PERSIST-05 "never nag".
     func signIn(userID: String) throws {
         try backend.write(userID, account: Self.appleUserIDAccount)
+        // P7.1: mirror to observable surface so SwiftUI re-renders.
+        currentUserID = userID
         // T-06-02 lock: NEVER interpolate userID into log output.
         Self.logger.info("Signed in (userID hidden)")
     }
@@ -238,16 +250,20 @@ final class AuthStore {
             Self.logger.error(
                 "Failed to clear sign-in state: \(error.localizedDescription, privacy: .public)"
             )
-            // Continue: caller-observable surface is `currentUserID == nil`
-            // on next backend.read(); even if delete fails, the next sign-in
-            // overwrites idempotently (KeychainBackend.write delete-then-add).
+            // Continue: even if Keychain delete fails, we still flip the
+            // observable surface to nil so SwiftUI reflects the intent.
+            // The next sign-in overwrites idempotently (delete-then-add).
         }
+        // P7.1: always mirror to observable surface, even on Keychain
+        // delete failure — UI must reflect the user's stated intent.
+        currentUserID = nil
     }
 
     // MARK: - DEBUG test seams (PATTERNS §S5 — internal #if DEBUG)
     #if DEBUG
     internal func clearForTesting() {
         try? backend.delete(account: Self.appleUserIDAccount)
+        currentUserID = nil
     }
     #endif
 }

@@ -41,6 +41,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import AuthenticationServices
 import DesignKit
 import os
@@ -49,6 +50,7 @@ struct SettingsSyncSection: View {
     let theme: Theme
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.settingsStore) private var settingsStore
     @Environment(\.authStore) private var authStore
     @Environment(\.cloudSyncStatusObserver) private var cloudSyncStatusObserver
@@ -89,7 +91,7 @@ struct SettingsSyncSection: View {
                 Task { await performDeleteAccount() }
             }
         } message: {
-            Text(String(localized: "This wipes your iCloud-synced stats from this Apple ID and signs you out of \(AppInfo.displayName). Local stats on this device are kept — use Reset stats in DATA to clear them. To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → \(AppInfo.displayName)."))
+            Text(String(localized: "This wipes your iCloud-synced stats AND your local stats on this device, and signs you out of \(AppInfo.displayName). To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → \(AppInfo.displayName)."))
         }
         .alert(
             String(localized: "Couldn't reach iCloud"),
@@ -200,8 +202,20 @@ struct SettingsSyncSection: View {
     private func performDeleteAccount() async {
         let outcome = await authStore.deleteAccount()
         // D-08 mirror: clear the flag locally; container reconfigures to
-        // .none on next cold-start (same-store-path preserves local rows).
+        // .none on next cold-start (same-store-path preserves the file).
         settingsStore.cloudSyncEnabled = false
+        // P7.1 user-feedback: "delete account" must also wipe local
+        // stats — leaving GameRecord/BestTime/BestScore rows behind
+        // contradicts the user's stated intent. Mirrors the Reset stats
+        // path in DATA section. Failure logged silently per
+        // PERSIST-05 "never nag".
+        do {
+            try GameStats(modelContext: modelContext).resetAll()
+        } catch {
+            Self.logger.error(
+                "Local stats wipe failed during deleteAccount: \(error.localizedDescription, privacy: .public)"
+            )
+        }
         if !outcome.cloudWipeSucceeded {
             isDeleteCloudFailedAlertPresented = true
         }
