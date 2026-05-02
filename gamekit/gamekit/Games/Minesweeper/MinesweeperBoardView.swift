@@ -82,6 +82,33 @@ struct MinesweeperBoardView: View {
         return max(minCellSize, computed)
     }
 
+    /// 2026-05-02 — iPad fix. Width-only sizing was correct for iPhone
+    /// (height was always the slack dimension) but on iPad 13" portrait
+    /// Hard's 16 cols × ~62pt cells produced 24 × 62 = 1488pt of grid
+    /// height which overflowed the available vertical space — the
+    /// LazyVGrid extended past the viewport with no ScrollView, so the
+    /// visible region rendered as a blank gray rectangle.
+    ///
+    /// New formula: take the smaller of width-bound and height-bound
+    /// per-cell sizes so the whole board fits both axes regardless of
+    /// device aspect. Same `minCellSize` floor.
+    static func cellSize(
+        forWidth width: CGFloat,
+        height: CGFloat,
+        cols: Int,
+        rows: Int,
+        padding: CGFloat,
+        spacing: CGFloat
+    ) -> CGFloat {
+        let widthBound = cellSize(forWidth: width, cols: cols, padding: padding, spacing: spacing)
+        guard rows > 0 else { return widthBound }
+        let rowsF = CGFloat(rows)
+        let usableHeight = max(0, height - 2 * padding)
+        let spacingTotalH = max(0, rowsF - 1) * spacing
+        let heightBound = (usableHeight - spacingTotalH) / rowsF
+        return max(minCellSize, min(widthBound, heightBound))
+    }
+
     var body: some View {
         // P5 D-01: extract the engine-ordered reveal list once per render so
         // the per-cell delay lookup is O(n) instead of O(n²).
@@ -94,7 +121,9 @@ struct MinesweeperBoardView: View {
         GeometryReader { proxy in
             let cs = Self.cellSize(
                 forWidth: proxy.size.width,
+                height: proxy.size.height,
                 cols: board.cols,
+                rows: board.rows,
                 padding: theme.spacing.s,
                 spacing: 0
             )
@@ -135,7 +164,11 @@ struct MinesweeperBoardView: View {
             }
             .padding(.horizontal, theme.spacing.s)
             .padding(.vertical, theme.spacing.s)
-            .frame(width: proxy.size.width, alignment: .top)
+            // 2026-05-02 — center horizontally so iPad Hard (16 cols at
+            // height-bound size) doesn't pin to the leading edge with
+            // a wide trailing gap. iPhone Easy/Medium also benefit when
+            // height is the binding constraint in landscape.
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .center)
         }
     }
 }
