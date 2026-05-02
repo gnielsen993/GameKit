@@ -46,13 +46,13 @@ signed_off_date: ""
 
 | # | Sign-off row | Status | Evidence |
 |---|--------------|--------|----------|
-| SC1-A | Real arcade-machine app icon shipped (light/dark/tinted) | ☐ | git log + Xcode preview screenshot from 07-02 |
+| SC1-A | Real arcade-machine app icon shipped (light/dark/tinted) | ☑ | Verified 2026-05-01 — commit `d03f1fa feat(branding): rebrand to PlayCore + stack-of-games icon + ASC export compliance` shipped 3 appearance variants in `gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/`; stack-of-three-game-boxes art (light/dark/tinted) per §0.1; provenance in `assets/icon/AI_PROVENANCE.md`. |
 | SC1-B | CloudKit schema promoted Dev → Production via Dashboard | ☑ | Deployed 2026-05-01 — Production env now has CD_GameRecord + CD_BestTime + CD_BestScore (commit `36d65c6` GameKitApp auto-deploy block landed Dev schema; Dashboard "Deploy to Production" button promoted). |
-| SC1-C | Container ID `iCloud.com.lauterstar.gamekit` unchanged in `gamekit/gamekit/gamekit.entitlements` | ☐ | `grep -F "iCloud.com.lauterstar.gamekit" gamekit/gamekit/gamekit.entitlements` |
-| SC1-D | Container ID `iCloud.com.lauterstar.gamekit` unchanged in `gamekit.xcodeproj/project.pbxproj` | ☐ | `grep -F "iCloud.com.lauterstar.gamekit" gamekit.xcodeproj/project.pbxproj` |
-| SC1-E | Bundle ID `com.lauterstar.gamekit` unchanged in `gamekit.xcodeproj/project.pbxproj` | ☐ | `grep -E "PRODUCT_BUNDLE_IDENTIFIER = com\.lauterstar\.gamekit" gamekit.xcodeproj/project.pbxproj` |
-| SC1-F | Capabilities verified in Xcode → Targets → gamekit → Signing & Capabilities: Sign in with Apple ✓; iCloud / CloudKit ✓; Background Modes (Remote notifications) ✓ | ☐ | Xcode capabilities pane screenshot |
-| SC1-G | Entitlements file `gamekit/gamekit/gamekit.entitlements` declares `com.apple.developer.applesignin` | ☐ | `grep -F "com.apple.developer.applesignin" gamekit/gamekit/gamekit.entitlements` |
+| SC1-C | Container ID `iCloud.com.lauterstar.gamekit` unchanged in `gamekit/gamekit/gamekit.entitlements` | ☑ | Verified 2026-05-01 — `grep -F "iCloud.com.lauterstar.gamekit" gamekit/gamekit/gamekit.entitlements` returns 1 match inside `<com.apple.developer.icloud-container-identifiers>` array. |
+| SC1-D | Container ID `iCloud.com.lauterstar.gamekit` unchanged in `gamekit.xcodeproj/project.pbxproj` | ☑ | Verified 2026-05-01 — `grep -F "iCloud.com.lauterstar.gamekit" gamekit/gamekit.xcodeproj/project.pbxproj` returns zero matches. **This is the correct state**: modern Xcode 16 stores container IDs only in the `.entitlements` file referenced by `CODE_SIGN_ENTITLEMENTS = gamekit/gamekit.entitlements;` — pbxproj only carries the entitlements path, never the container ID. SC1-C is the load-bearing check; SC1-D's "unchanged" passes vacuously (zero before, zero now). |
+| SC1-E | Bundle ID `com.lauterstar.gamekit` unchanged in `gamekit.xcodeproj/project.pbxproj` | ☑ | Verified 2026-05-01 — `grep -E "PRODUCT_BUNDLE_IDENTIFIER = com\.lauterstar\.gamekit" gamekit/gamekit.xcodeproj/project.pbxproj` returns 6 matches (app Debug+Release, tests Debug+Release, uitests Debug+Release). All match P1 lock. |
+| SC1-F | Capabilities verified in Xcode → Targets → gamekit → Signing & Capabilities: Sign in with Apple ✓; iCloud / CloudKit ✓; Background Modes (Remote notifications) ✓ | ☑ | Verified 2026-05-01 — Xcode Signing & Capabilities pane (Team: Lauterstar LLC, Bundle ID: com.lauterstar.gamekit, Build Succeeded): Sign In with Apple capability section present; iCloud → CloudKit ✓ with container `iCloud.com.lauterstar.gamekit` checked; Background Modes → Remote notifications ✓. Push Notifications capability also present. File-side cross-check: entitlements declares `com.apple.developer.applesignin`, `com.apple.developer.icloud-services = [CloudKit]`, `com.apple.developer.icloud-container-identifiers = [iCloud.com.lauterstar.gamekit]`, `aps-environment = development`; `Info.plist` declares `UIBackgroundModes = [remote-notification]`. |
+| SC1-G | Entitlements file `gamekit/gamekit/gamekit.entitlements` declares `com.apple.developer.applesignin` | ☑ | Verified 2026-05-01 — `grep -F "com.apple.developer.applesignin" gamekit/gamekit/gamekit.entitlements` returns 1 match inside `<array><string>Default</string></array>`. |
 
 **Verifier:** _______________  **Date:** ___________  **Status:** ☐ PASS / ☐ FAIL / ☐ DEFERRED
 
@@ -72,8 +72,8 @@ signed_off_date: ""
 |---|--------------|--------|----------|
 | SC2-A | App Store Connect "App Privacy" panel shows "Data Not Collected" | ☐ | `.planning/phases/07-release/screenshots/asc/07-app-privacy-data-not-collected.png` |
 | SC2-B | Reasoning recorded verbatim: `CloudKit private DB, encrypted, dev has no access; no analytics SDKs; MetricKit not integrated → Data Not Collected` | ☐ | This row's text |
-| SC2-C | Reasoning matches the binary: zero analytics SDKs in `gamekit/` | ☐ | `! grep -ri "FIRApp\|Sentry\|Bugsnag\|Mixpanel\|GoogleAnalytics" gamekit/` returns no matches |
-| SC2-D | MetricKit explicitly NOT integrated (Discretion #6) | ☐ | `! grep -ri "MetricKit\|MXMetricManager" gamekit/` returns no matches |
+| SC2-C | Reasoning matches the binary: zero analytics SDKs in `gamekit/` | ☑ | Verified 2026-05-01 — `grep -ri "FIRApp\|Sentry\|Bugsnag\|Mixpanel\|GoogleAnalytics" gamekit/` returns zero matches. |
+| SC2-D | MetricKit explicitly NOT integrated (Discretion #6) | ☑ | Verified 2026-05-01 — `grep -ri "MetricKit\|MXMetricManager" gamekit/` returns zero matches. |
 | SC2-E | Privacy policy URL on the binary's App Store page resolves to a public URL matching the same reasoning | ☐ | URL: `https://gamedrawer.lauterstar.com/privacy.html` (D-08 revised — custom domain replaces GitHub Pages stopgap; awaiting DNS go-live). |
 
 **Verifier:** _______________  **Date:** ___________  **Status:** ☐ PASS / ☐ FAIL / ☐ DEFERRED
@@ -131,11 +131,11 @@ signed_off_date: ""
 
 | # | Sign-off row | Status | Evidence |
 |---|--------------|--------|----------|
-| SC5-A | Release checklist documented at `.planning/phases/07-release/07-CHECKLIST.md` (this file — phase-local equivalent per Discretion #10) | ☐ | This file's existence |
+| SC5-A | Release checklist documented at `.planning/phases/07-release/07-CHECKLIST.md` (this file — phase-local equivalent per Discretion #10) | ☑ | Verified 2026-05-01 — file exists; rows PF-01..PF-09 + SC1..SC5 present per Discretion #10 phase-local convention. |
 | SC5-B | All Pre-flight rows PF-01..PF-09 ticked | ☐ | This file's Pre-flight section |
 | SC5-C | All SC1-SC4 sign-off rows ticked | ☐ | SC1, SC2, SC3, SC4 sections above |
-| SC5-D | `MARKETING_VERSION = 1.0` set via Xcode UI (NOT pbxproj hand-patch per CLAUDE.md §8.8 + Discretion #7) | ☐ | `grep -E "MARKETING_VERSION = 1\.0" gamekit.xcodeproj/project.pbxproj` |
-| SC5-E | `CURRENT_PROJECT_VERSION = 1` set via Xcode UI (Discretion #7) | ☐ | `grep -E "CURRENT_PROJECT_VERSION = 1" gamekit.xcodeproj/project.pbxproj` |
+| SC5-D | `MARKETING_VERSION = 1.0` set via Xcode UI (NOT pbxproj hand-patch per CLAUDE.md §8.8 + Discretion #7) | ☑ | Verified 2026-05-01 — `grep -E "MARKETING_VERSION = 1\.0" gamekit/gamekit.xcodeproj/project.pbxproj` returns 6 matches (app+tests+uitests Debug+Release). Already at target value, no Xcode UI edit needed. |
+| SC5-E | `CURRENT_PROJECT_VERSION = 1` set via Xcode UI (Discretion #7) | ☑ | Verified 2026-05-01 — `grep -E "CURRENT_PROJECT_VERSION = 1" gamekit/gamekit.xcodeproj/project.pbxproj` returns 6 matches. Already at target value. Bump to `2` (build number) only required if a TestFlight upload is rejected for duplicate build number — first upload uses `1`. |
 | SC5-F | TestFlight Internal-only build uploaded (D-15 — no External Beta, no Public Link) | ☐ | TestFlight build number + upload timestamp: `_______________________` |
 | SC5-G | Internal Tester(s) invited via App Store Connect → TestFlight → Internal Testing → Add Testers | ☐ | Tester emails: `_______________________` (NOT committed to repo) |
 | SC5-H | Soak monitor — Xcode Organizer shows zero crash reports during 1d–1w soak (D-16 adaptive) | ☐ | Soak duration: `_____` days; Organizer crashes: `_____` |
