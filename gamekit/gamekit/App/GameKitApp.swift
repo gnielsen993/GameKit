@@ -43,6 +43,12 @@ struct GameKitApp: App {
     let sharedContainer: ModelContainer
 
     init() {
+        // Register GameDrawer's "Classic" identity (Chrome Diner) into the
+        // DesignKit configuration seam. MUST run before ThemeManager() — a
+        // stored `.classicMuted` preference resolves through the registered
+        // preset's anchors. See Core/GameKitClassic.swift.
+        DesignKit.configure(classicPreset: GameKitClassic.chromeDiner)
+
         // SettingsStore must be constructed BEFORE the container so
         // cloudSyncEnabled is available for ModelConfiguration (D-08).
         let store = SettingsStore()
