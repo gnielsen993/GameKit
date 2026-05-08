@@ -100,6 +100,8 @@ struct HomeView: View {
             MinesweeperGameView()
         case .merge:
             MergeGameView()
+        case .nonogram:
+            NonogramGameView()
         }
     }
 

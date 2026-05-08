@@ -162,6 +162,9 @@
     "Add a Mail account in iOS Settings to use the in-app composer, or pick another option." : {
 
     },
+    "Animations" : {
+
+    },
     "APPEARANCE" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -305,6 +308,9 @@
     "Couldn't import stats" : {
 
     },
+    "Couldn't reach iCloud" : {
+
+    },
     "Dark" : {
 
     },
@@ -312,6 +318,15 @@
 
     },
     "Default mail app" : {
+
+    },
+    "Delete account" : {
+
+    },
+    "Delete account and iCloud data" : {
+
+    },
+    "Delete account?" : {
 
     },
     "DesignKit · own work" : {
@@ -351,6 +366,9 @@
 
     },
     "Export stats" : {
+
+    },
+    "FEEL" : {
 
     },
     "Finish intro" : {
@@ -425,9 +443,6 @@
 
     },
     "Haptics" : {
-
-    },
-    "HAPTICS" : {
 
     },
     "Hard" : {
@@ -680,6 +695,12 @@
     "Sign in with Apple to sync your stats across iPhone, iPad, and Mac. Optional — the app works fully without it." : {
 
     },
+    "Sign out" : {
+
+    },
+    "Sign out of iCloud" : {
+
+    },
     "Signed in to iCloud" : {
 
     },
@@ -776,6 +797,16 @@
     "This file was exported from a newer GameKit. Update the app and try again." : {
 
     },
+    "This wipes your iCloud-synced stats AND your local stats on this device, and signs you out of %@. To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This wipes your iCloud-synced stats AND your local stats on this device, and signs you out of %1$@. To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → %2$@."
+          }
+        }
+      }
+    },
     "Tile %lld" : {
 
     },
@@ -822,6 +853,9 @@
 
     },
     "Wins" : {
+
+    },
+    "Wipes your iCloud-synced stats and signs out" : {
 
     },
     "Word Grid" : {
@@ -871,6 +905,9 @@
           }
         }
       }
+    },
+    "You're signed out on this device, but we couldn't wipe the iCloud copy of your stats right now. Reconnect to the internet and sign in again to retry, or open Settings → Apple ID → Sign in with Apple → %@ to revoke access." : {
+
     },
     "Your best times will appear here." : {
       "extractionState" : "manual",
