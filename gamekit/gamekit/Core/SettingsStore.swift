@@ -70,6 +70,19 @@ final class SettingsStore {
         }
     }
 
+    /// Whether end-of-game choreography fires — Minesweeper loss cascade
+    /// (mine-wave reveal + wrong-flag pop, then end card) and win confetti.
+    /// Default `true`. Gated at the view layer: when false, end cards
+    /// appear immediately without the pre-roll.
+    /// `accessibilityReduceMotion` always wins; this flag only matters when
+    /// Reduce Motion is OFF. (User-driven preference layered on top of the
+    /// system accessibility flag.)
+    var animationsEnabled: Bool {
+        didSet {
+            userDefaults.set(animationsEnabled, forKey: Self.animationsEnabledKey)
+        }
+    }
+
     /// Whether the 3-step `IntroFlowView` `.fullScreenCover` has been
     /// dismissed at least once (CONTEXT D-23 default `false`). Set to
     /// `true` by Plan 05-05's `IntroFlowView` on Skip or Done. Read by
@@ -104,6 +117,10 @@ final class SettingsStore {
     /// Renaming would re-show the 3-step intro to existing users; locked.
     static let hasSeenIntroKey = "gamekit.hasSeenIntro"
 
+    /// UserDefaults key for the end-of-game animations flag.
+    /// Default-true on fresh install; preference loss on rename.
+    static let animationsEnabledKey = "gamekit.animationsEnabled"
+
     // MARK: - Init
 
     init(userDefaults: UserDefaults = .standard) {
@@ -118,6 +135,9 @@ final class SettingsStore {
         self.sfxEnabled = userDefaults.bool(forKey: Self.sfxEnabledKey)
         // D-23 default-false: same — bool(forKey:) returns false for unset.
         self.hasSeenIntro = userDefaults.bool(forKey: Self.hasSeenIntroKey)
+        // Default-true on fresh install — same optional-cast trick as
+        // hapticsEnabled so a never-touched key honors the default.
+        self.animationsEnabled = (userDefaults.object(forKey: Self.animationsEnabledKey) as? Bool) ?? true
     }
 }
 

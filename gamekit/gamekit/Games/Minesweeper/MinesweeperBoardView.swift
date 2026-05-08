@@ -46,6 +46,11 @@ struct MinesweeperBoardView: View {
     let revealCount: Int
     let flagToggleCount: Int
 
+    // Loss cascade orchestration — flipped by GameView's loss-stage Task.
+    let lossMinesRevealed: Bool
+    let lossWrongFlagsPopped: Bool
+    let lossTripIdx: MinesweeperIndex?
+
     let onTap: (MinesweeperIndex) -> Void
     let onLongPress: (MinesweeperIndex) -> Void
 
@@ -152,6 +157,9 @@ struct MinesweeperBoardView: View {
                         reduceMotion: reduceMotion,
                         revealCount: revealCount,
                         flagToggleCount: flagToggleCount,
+                        lossMinesRevealed: lossMinesRevealed,
+                        lossWrongFlagsPopped: lossWrongFlagsPopped,
+                        lossTripIdx: lossTripIdx,
                         onTap: onTap,
                         onLongPress: onLongPress
                     )

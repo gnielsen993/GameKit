@@ -48,6 +48,16 @@ struct MinesweeperGameView: View {
     @State private var showDifficultyPicker = false      // P7 polish (kink #4)
     @Environment(\.dismiss) private var dismiss
 
+    // End-of-game choreography (gated on settingsStore.animationsEnabled).
+    // - Loss: mines wave outward from trip cell → wrong flags pop → end card.
+    // - Win:  confetti for a beat → end card.
+    // When animations are off (or Reduce Motion is on), all flags flip true
+    // immediately so the end card lands without a pre-roll.
+    @State private var lossMinesRevealed = false
+    @State private var lossWrongFlagsPopped = false
+    @State private var endCardVisible = false
+    @State private var showConfetti = false
+
     // P5 (D-04/D-07/D-08) — animation/haptics/SFX environment reads.
     // accessibilityReduceMotion gates ALL animation surfaces per D-04.
     // settingsStore + sfxPlayer flow into the locked Plan 05-03
@@ -85,6 +95,9 @@ struct MinesweeperGameView: View {
                     reduceMotion: reduceMotion,
                     revealCount: viewModel.revealCount,
                     flagToggleCount: viewModel.flagToggleCount,
+                    lossMinesRevealed: lossMinesRevealed,
+                    lossWrongFlagsPopped: lossWrongFlagsPopped,
+                    lossTripIdx: tripCellIndex,
                     onTap: { viewModel.handleTap(at: $0) },
                     onLongPress: { viewModel.handleLongPress(at: $0) }
                 )
@@ -140,9 +153,21 @@ struct MinesweeperGameView: View {
                     .easeInOut(duration: theme.motion.slow)
                 }
 
-            // End-state overlay — terminal state only (D-02 + D-18: no animation in P3)
-            if let outcome = viewModel.terminalOutcome {
+            // Confetti — fires on win for a beat before the end card lands.
+            // Always rendered above the win-sweep wash and below the end card.
+            // Driven by `showConfetti` which the win-orchestration Task flips.
+            if showConfetti {
+                ConfettiView(theme: theme)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
+            }
+
+            // End-state overlay — gated on `endCardVisible` so the loss
+            // cascade / win confetti finish their pre-roll first.
+            if let outcome = viewModel.terminalOutcome, endCardVisible {
                 endStateOverlay(outcome: outcome)
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
             }
         }
         .navigationTitle(String(localized: "Minesweeper"))
@@ -230,12 +255,21 @@ struct MinesweeperGameView: View {
             case .winSweep:
                 Haptics.playAHAP(named: "win", hapticsEnabled: settingsStore.hapticsEnabled)
                 sfxPlayer.play(.win, sfxEnabled: settingsStore.sfxEnabled)
+                runWinChoreography()
             case .lossShake:
                 Haptics.playAHAP(named: "loss", hapticsEnabled: settingsStore.hapticsEnabled)
                 sfxPlayer.play(.loss, sfxEnabled: settingsStore.sfxEnabled)
+                runLossChoreography()
             case .revealing:
                 sfxPlayer.play(.tap, sfxEnabled: settingsStore.sfxEnabled)
-            case .idle, .flagging:
+            case .idle:
+                // Restart resets to .idle — clear all choreography flags so
+                // the next session's end-state lands clean.
+                lossMinesRevealed = false
+                lossWrongFlagsPopped = false
+                endCardVisible = false
+                showConfetti = false
+            case .flagging:
                 break
             }
         }
@@ -298,6 +332,70 @@ struct MinesweeperGameView: View {
         case .easy:   return String(localized: "Easy")
         case .medium: return String(localized: "Medium")
         case .hard:   return String(localized: "Hard")
+        }
+    }
+
+    // MARK: - End-of-game choreography
+
+    /// Trip-mine index drives the loss-wave origin (chebyshev distance per
+    /// cell). nil outside loss states.
+    private var tripCellIndex: MinesweeperIndex? {
+        if case .lost(let idx) = viewModel.gameState { return idx }
+        return nil
+    }
+
+    /// Loss sequence: cascade reveal mines from trip cell → pop wrong flags
+    /// → show end card. Skipped when animations are off; everything flips
+    /// true atomically so the card lands without a pre-roll.
+    private func runLossChoreography() {
+        let animate = settingsStore.animationsEnabled && !reduceMotion
+        guard animate else {
+            lossMinesRevealed = true
+            lossWrongFlagsPopped = true
+            endCardVisible = true
+            return
+        }
+        Task { @MainActor in
+            // Mines wave outward — per-cell delay computed in CellView from
+            // chebyshev distance to the trip cell. Wave duration ≈ 1.0s for
+            // a 24-row Hard board (max chebyshev × 0.045 capped at 1.2s).
+            lossMinesRevealed = true
+            try? await Task.sleep(for: .milliseconds(900))
+            // Wrong flags pop with a spring scale.
+            lossWrongFlagsPopped = true
+            try? await Task.sleep(for: .milliseconds(450))
+            // End card slides in (the .transition on the conditional view
+            // owns the easing — we just flip the gate).
+            withAnimation(.easeOut(duration: 0.3)) {
+                endCardVisible = true
+            }
+        }
+    }
+
+    /// Win sequence: confetti for a beat → end card. Skipped when animations
+    /// are off; end card lands immediately.
+    private func runWinChoreography() {
+        let animate = settingsStore.animationsEnabled && !reduceMotion
+        guard animate else {
+            endCardVisible = true
+            return
+        }
+        Task { @MainActor in
+            withAnimation(.easeOut(duration: 0.2)) {
+                showConfetti = true
+            }
+            // Hold the confetti for ~1.2s so the user reads the celebration
+            // before the card overlays it.
+            try? await Task.sleep(for: .milliseconds(1200))
+            withAnimation(.easeOut(duration: 0.3)) {
+                endCardVisible = true
+            }
+            // Let confetti continue falling under the card for another beat,
+            // then fade it out so the end-card composition is clean.
+            try? await Task.sleep(for: .milliseconds(1400))
+            withAnimation(.easeIn(duration: 0.5)) {
+                showConfetti = false
+            }
         }
     }
 }

@@ -44,13 +44,42 @@ struct MinesweeperCellView: View {
     let revealCount: Int
     let flagToggleCount: Int
 
+    // Loss-cascade orchestration. Both flags flip true together when
+    // animations are off (or Reduce Motion is on); when animations are on,
+    // the GameView Tasks them in sequence: mines wave first, then wrong
+    // flags pop ~0.6s later.
+    let lossMinesRevealed: Bool
+    let lossWrongFlagsPopped: Bool
+    /// Trip-mine index — wave origin for the per-cell stagger. nil while
+    /// not in a loss state.
+    let lossTripIdx: MinesweeperIndex?
+
     let onTap: (MinesweeperIndex) -> Void
     let onLongPress: (MinesweeperIndex) -> Void
 
     var body: some View {
         tileBackground
             .frame(width: cellSize, height: cellSize)
-            .overlay(glyph)
+            .overlay(
+                glyph
+                    // Loss cascade: per-cell delay based on chebyshev distance
+                    // from the trip cell so mines reveal as a wave radiating
+                    // outward. Wrong-flag pop uses the same timing curve but
+                    // starts after the mines wave finishes (orchestrated in
+                    // GameView).
+                    .animation(
+                        reduceMotion
+                            ? nil
+                            : .easeOut(duration: 0.28).delay(lossWaveDelay),
+                        value: lossMinesRevealed
+                    )
+                    .animation(
+                        reduceMotion
+                            ? nil
+                            : .spring(response: 0.32, dampingFraction: 0.55).delay(lossWaveDelay * 0.5),
+                        value: lossWrongFlagsPopped
+                    )
+            )
             .overlay(
                 Rectangle()
                     .stroke(theme.colors.textPrimary.opacity(0.18), lineWidth: 0.5)
@@ -119,27 +148,29 @@ struct MinesweeperCellView: View {
 
     @ViewBuilder
     private var glyph: some View {
-        switch (cell.state, cell.isMine, isLost) {
+        switch (cell.state, cell.isMine, lossMinesRevealed, lossWrongFlagsPopped) {
 
         // 1. Trip mine — circle.fill on the danger background (background already
         //    supplies danger fill).
-        case (.mineHit, _, _):
+        case (.mineHit, _, _, _):
             Image(systemName: "circle.fill")
                 .resizable().scaledToFit()
                 .frame(width: cellSize * 0.45, height: cellSize * 0.45)
                 .foregroundStyle(theme.colors.textPrimary)
 
-        // 2. On loss, flip every other still-hidden mine to a visible mine glyph
-        //    (D-17 step 2).
-        case (.hidden, true, true):
+        // 2. On loss, flip every other still-hidden mine to a visible mine
+        //    glyph (D-17 step 2). Gated on `lossMinesRevealed` so the
+        //    GameView's wave Task can stagger this across the board.
+        case (.hidden, true, true, _):
             Image(systemName: "circle.fill")
                 .resizable().scaledToFit()
                 .frame(width: cellSize * 0.45, height: cellSize * 0.45)
                 .foregroundStyle(theme.colors.textPrimary)
+                .transition(.scale(scale: 0.4).combined(with: .opacity))
 
         // 3. On loss, mark wrongly-flagged cells with X overlay on the flag
-        //    (D-17 step 3).
-        case (.flagged, false, true):
+        //    (D-17 step 3). Gated on `lossWrongFlagsPopped`.
+        case (.flagged, false, _, true):
             ZStack {
                 Image(systemName: "flag.fill")
                     .resizable().scaledToFit()
@@ -150,9 +181,10 @@ struct MinesweeperCellView: View {
                     .frame(width: cellSize * 0.7, height: cellSize * 0.7)
                     .foregroundStyle(theme.colors.danger)
             }
+            .transition(.scale(scale: 1.4).combined(with: .opacity))
 
         // 4. Normal flag (in-progress; correctly-placed flag-on-mine after loss).
-        case (.flagged, _, _):
+        case (.flagged, _, _, _):
             Image(systemName: "flag.fill")
                 .resizable().scaledToFit()
                 .frame(width: cellSize * 0.55, height: cellSize * 0.55)
@@ -163,13 +195,13 @@ struct MinesweeperCellView: View {
                 .symbolEffect(.bounce, value: reduceMotion ? 0 : flagToggleCount)
 
         // 5. Revealed numbered cell — adjacency 1...8 from theme.gameNumber(_:).
-        case (.revealed, _, _) where cell.adjacentMineCount > 0:
+        case (.revealed, _, _, _) where cell.adjacentMineCount > 0:
             Text("\(cell.adjacentMineCount)")
                 .font(.system(size: cellSize * 0.55, weight: .bold, design: .rounded))
                 .foregroundStyle(theme.gameNumber(cell.adjacentMineCount))
 
         // 6. Revealed empty cell (zero adjacency) — no glyph.
-        case (.revealed, _, _):
+        case (.revealed, _, _, _):
             EmptyView()
 
         // 7. Hidden non-mine pre-loss — no glyph.
@@ -178,9 +210,13 @@ struct MinesweeperCellView: View {
         }
     }
 
-    private var isLost: Bool {
-        if case .lost = gameState { return true }
-        return false
+    /// Per-cell delay for the loss reveal wave. Distance from the trip cell
+    /// (chebyshev — diagonals count as one step) × stagger; clamped so the
+    /// far corner doesn't keep animating past 1.2s.
+    private var lossWaveDelay: Double {
+        guard let trip = lossTripIdx else { return 0 }
+        let chebyshev = max(abs(index.row - trip.row), abs(index.col - trip.col))
+        return min(Double(chebyshev) * 0.045, 1.2)
     }
 
     // MARK: - Accessibility (D-19 — baked at view creation; 1-indexed row/col;

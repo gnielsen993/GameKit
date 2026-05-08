@@ -187,7 +187,7 @@ struct SettingsView: View {
         // play(...) call sites are intentionally LEFT IN PLACE so v1.0.1
         // just bundles the CAFs and re-adds the SFX row here — no
         // behavioral migration needed. Default for sfxEnabled stays false.
-        settingsSectionHeader(theme: theme, String(localized: "HAPTICS"))
+        settingsSectionHeader(theme: theme, String(localized: "FEEL"))
         DKCard(theme: theme) {
             VStack(spacing: 0) {
                 SettingsToggleRow(
@@ -195,6 +195,15 @@ struct SettingsView: View {
                     glyph: "iphone.radiowaves.left.and.right",
                     label: String(localized: "Haptics"),
                     isOn: Bindable(settingsStore).hapticsEnabled
+                )
+                Rectangle()
+                    .fill(theme.colors.border)
+                    .frame(height: 1)
+                SettingsToggleRow(
+                    theme: theme,
+                    glyph: "sparkles",
+                    label: String(localized: "Animations"),
+                    isOn: Bindable(settingsStore).animationsEnabled
                 )
             }
         }
