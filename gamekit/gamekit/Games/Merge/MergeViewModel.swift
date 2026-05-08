@@ -60,7 +60,17 @@ final class MergeViewModel {
             ?? MergeMode(rawValue: userDefaults.string(forKey: Self.lastModeKey) ?? "")
             ?? .winMode
         self.mode = resolved
+        // Auto-populate the initial board so the user lands on something to
+        // play, not an empty grid. The original "first-swipe spawns the
+        // board" pattern read as broken — a swipe against an empty board
+        // doesn't communicate that it both *creates* and *moves* tiles.
+        //
+        // Two-step init to satisfy Swift's "self fully initialized before
+        // inout self.rng" rule: assign `.empty` first, then re-assign with
+        // the spawned board.
         self.board = .empty
+        self.board = BoardSpawner.initial(rng: &self.rng)
+        self.state = .playing
     }
 
     // MARK: - GameStats injection (lazy, one-shot)
@@ -72,17 +82,10 @@ final class MergeViewModel {
 
     // MARK: - Public API
 
-    /// Lazy first-spawn — the initial board is built on the first user
-    /// gesture (mirrors Minesweeper's first-tap-safe pattern). No score or
-    /// state mutation happens at .idle except the spawn + transition.
+    /// Apply a swipe. The initial board is now spawned at VM init / restart
+    /// so the user always lands on a populated grid; the historical
+    /// `.idle` first-swipe-spawns-the-board branch was removed.
     func handleSwipe(_ direction: SwipeDirection) {
-        if case .idle = state {
-            board = BoardSpawner.initial(rng: &rng)
-            state = .playing
-            // First swipe IS a real swipe — fall through and apply slide
-            // against the freshly spawned board.
-        }
-
         // Block input on terminal states. `.won` is non-terminal in winMode
         // when the player has continued past it (`hasContinuedPastWin == true`).
         switch state {
@@ -137,10 +140,12 @@ final class MergeViewModel {
 
     /// Same mode, fresh board. Score / state / continuation flag reset.
     /// Best-score is session-local on the VM; persistence is via GameStats.
+    /// Re-spawns the initial 2-tile board (matches VM init) so the player
+    /// can act immediately without an extra swipe.
     func restart() {
-        board = .empty
+        board = BoardSpawner.initial(rng: &rng)
         score = 0
-        state = .idle
+        state = .playing
         hasContinuedPastWin = false
         mergeCount = 0
         terminalCount = 0

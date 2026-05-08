@@ -27,22 +27,22 @@ struct MergeViewModelTests {
         return (GameStats(modelContext: ctx), ctx)
     }
 
-    // MARK: - Idle → Playing
+    // MARK: - Initial spawn
 
-    @Test("first swipe transitions idle → playing and seeds the board")
-    func firstSwipeSeedsBoard() {
+    @Test("VM init seeds board immediately and starts in .playing")
+    func initSeedsBoardImmediately() {
         let vm = MergeViewModel(
             mode: .winMode,
             userDefaults: Self.isolatedDefaults(),
             rng: SeededGenerator(seed: 1)
         )
-        #expect(vm.state == .idle)
-        #expect(vm.board.tileCount == 0)
+        // Board is auto-spawned at init — no first-swipe-seeds-board step.
+        #expect(vm.state == .playing)
+        #expect(vm.board.tileCount == 2)
         vm.handleSwipe(.left)
         #expect(vm.state == .playing)
-        // Initial spawn = 2 tiles, swipe consumed one slide, post-slide
-        // spawn adds one — board has 2 or 3 tiles depending on whether
-        // the initial swipe collapsed any pair. Either way: > 0.
+        // After one slide + spawn the board has 2 or 3 tiles depending on
+        // whether the slide collapsed the initial pair.
         #expect(vm.board.tileCount >= 2)
     }
 
@@ -197,10 +197,12 @@ struct MergeViewModelTests {
         vm.handleSwipe(.left)
         let scoreBefore = vm.score
         vm.restart()
-        #expect(vm.state == .idle)
+        // restart re-spawns the initial 2-tile board so the player can act
+        // immediately; state stays at .playing, not .idle.
+        #expect(vm.state == .playing)
         #expect(vm.score == 0)
         #expect(vm.hasContinuedPastWin == false)
-        #expect(vm.board.tileCount == 0)
+        #expect(vm.board.tileCount == 2)
         // bestScore is session-local — does NOT reset.
         #expect(vm.bestScore >= scoreBefore)
     }
@@ -215,7 +217,7 @@ struct MergeViewModelTests {
         let scoreBefore = vm.score
         vm.setMode(.infinite)
         #expect(vm.mode == .infinite)
-        #expect(vm.state == .idle, "mode change must restart the session")
+        #expect(vm.state == .playing, "mode change restarts → re-spawned board, state = .playing")
         #expect(vm.score == 0, "mode change must reset score")
         #expect(defaults.string(forKey: MergeViewModel.lastModeKey) == "infinite")
         // Existence of `scoreBefore` proves we played at least one slide pre-swap.
