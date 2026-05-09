@@ -40,6 +40,15 @@ final class NonogramViewModel {
     /// Bumps every time the player attempts a wrong placement in lives mode.
     /// Used as a `.sensoryFeedback(.error)` trigger by the GameView.
     private(set) var wrongAttemptCount: Int = 0
+    /// Bumps every time a row OR column transitions from "not fully
+    /// crossed off" to "fully crossed off". Drives a heavier haptic so
+    /// finishing a line feels distinct from individual cell taps.
+    private(set) var lineCompletionCount: Int = 0
+    /// Tracks already-completed lines so we don't re-fire the haptic on
+    /// every later mutation in an already-finished row/col. Strings are
+    /// `"r<idx>"` / `"c<idx>"` so the same key can't collide between rows
+    /// and columns.
+    private var completedLineKeys: Set<String> = []
     /// Flat index (row * size + col) of the most-recent wrong-tap cell.
     /// Drives the red-flash + shake feedback in CellView. Auto-cleared
     /// ~0.6s after being set.
@@ -207,6 +216,8 @@ final class NonogramViewModel {
         markCount = 0
         wrongAttemptCount = 0
         lastWrongAttemptIdx = nil
+        lineCompletionCount = 0
+        completedLineKeys = []
         interactionMode = .place
         livesRemaining = NonogramGameMode.livesPerPuzzle
         lockedCells = []
@@ -318,8 +329,43 @@ final class NonogramViewModel {
             if prev == .filled { placeCount += 1 } else { markCount += 1 }
         }
 
+        // Detect any row/col that just became fully satisfied. Bump the
+        // completion counter once per newly-completed line so the haptic
+        // fires exactly when the player snaps a hint set into place.
+        updateLineCompletions(touchedRow: row, touchedCol: col)
+
         if let puzzle = currentPuzzle, NonogramWinDetector.isWon(board: board, puzzle: puzzle) {
             recordWin()
+        }
+    }
+
+    /// Recompute the completion state for the touched row + column only —
+    /// no other lines could have changed in this single-cell mutation.
+    /// Bumps `lineCompletionCount` for each line that newly transitioned
+    /// to fully-crossed-off; un-completing a previously-finished line
+    /// drops it from the tracked set without firing a haptic.
+    private func updateLineCompletions(touchedRow: Int, touchedCol: Int) {
+        let rowMask = NonogramHints.rowsCrossOff(board: board, hints: rowHints)
+        let colMask = NonogramHints.columnsCrossOff(board: board, hints: columnHints)
+
+        let rowKey = "r\(touchedRow)"
+        let rowComplete = touchedRow >= 0 && touchedRow < rowMask.count
+            && rowMask[touchedRow].allSatisfy { $0 }
+        if rowComplete && !completedLineKeys.contains(rowKey) {
+            completedLineKeys.insert(rowKey)
+            lineCompletionCount += 1
+        } else if !rowComplete {
+            completedLineKeys.remove(rowKey)
+        }
+
+        let colKey = "c\(touchedCol)"
+        let colComplete = touchedCol >= 0 && touchedCol < colMask.count
+            && colMask[touchedCol].allSatisfy { $0 }
+        if colComplete && !completedLineKeys.contains(colKey) {
+            completedLineKeys.insert(colKey)
+            lineCompletionCount += 1
+        } else if !colComplete {
+            completedLineKeys.remove(colKey)
         }
     }
 

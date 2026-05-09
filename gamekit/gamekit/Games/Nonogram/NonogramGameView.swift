@@ -72,6 +72,24 @@ struct NonogramGameView: View {
                         .error,
                         trigger: settingsStore.hapticsEnabled ? viewModel.wrongAttemptCount : 0
                     )
+                    // Per-block tap: light click on placing/erasing a fill,
+                    // softer selection on toggling a mark. Mode-aware via
+                    // separate counters on the VM.
+                    .sensoryFeedback(
+                        .impact(weight: .light, intensity: 0.7),
+                        trigger: settingsStore.hapticsEnabled ? viewModel.placeCount : 0
+                    )
+                    .sensoryFeedback(
+                        .selection,
+                        trigger: settingsStore.hapticsEnabled ? viewModel.markCount : 0
+                    )
+                    // Heavier "snap" when a row OR column completes — the
+                    // dopamine beat for a solved line. Distinct from
+                    // per-cell taps so the player feels progress.
+                    .sensoryFeedback(
+                        .impact(weight: .medium, intensity: 1.0),
+                        trigger: settingsStore.hapticsEnabled ? viewModel.lineCompletionCount : 0
+                    )
                 } else {
                     Spacer()
                     Text(String(localized: "No puzzles bundled yet"))
