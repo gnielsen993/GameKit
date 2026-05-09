@@ -59,6 +59,12 @@ struct NonogramBoardView: View {
     /// (horizontal swipe) or column (vertical swipe).
     @State private var dragStartRow: Int? = nil
     @State private var dragStartCol: Int? = nil
+    /// Cell state at the drag's start cell. Subsequent cells along the
+    /// swipe path are only mutated when their current state matches this
+    /// — so starting on a blank and swiping through filled cells leaves
+    /// the filled cells alone (player intent is "extend the run of
+    /// blanks I started on").
+    @State private var dragStartState: NonogramCellState? = nil
     /// Locked-in axis for the current drag. nil until the player has moved
     /// far enough for SwiftUI to disambiguate horizontal vs vertical.
     @State private var dragAxis: SlideAxis? = nil
@@ -112,7 +118,10 @@ struct NonogramBoardView: View {
                 VStack(spacing: 0) {
                     ForEach(Array((columnHints[safe: col] ?? []).enumerated()), id: \.offset) { idx, value in
                         let crossed = crossMask[safe: idx] ?? false
-                        Text(value > 0 ? "\(value)" : "")
+                        // Empty columns emit `[0]` per nonogram convention —
+                        // render the 0 explicitly so the player sees a hint
+                        // rather than a blank slot.
+                        Text("\(value)")
                             .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
                             .foregroundStyle(crossed
                                              ? theme.colors.textTertiary
@@ -134,7 +143,7 @@ struct NonogramBoardView: View {
                     Spacer(minLength: 0)
                     ForEach(Array((rowHints[safe: row] ?? []).enumerated()), id: \.offset) { idx, value in
                         let crossed = crossMask[safe: idx] ?? false
-                        Text(value > 0 ? "\(value)" : "")
+                        Text("\(value)")
                             .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
                             .foregroundStyle(crossed
                                              ? theme.colors.textTertiary
@@ -169,11 +178,40 @@ struct NonogramBoardView: View {
                 }
             }
         }
+        // Bold 5×5 super-cell rules — standard nonogram convention so the
+        // player can count cell positions without losing place. Drawn as
+        // an overlay on top of the cell grid; doesn't intercept gestures.
+        .overlay(superCellRules(cellSize: cellSize).allowsHitTesting(false))
         // Slide-to-fill: a drag with at-least-8pt movement starts a smear.
         // Below threshold, the per-cell tap/long-press gestures fire as
         // before. simultaneousGesture lets the drag coexist with the cell
         // gestures without one starving the other.
         .simultaneousGesture(slideGesture(cellSize: cellSize))
+    }
+
+    /// Bold internal grid lines every 5 cells. Drawn at full board span;
+    /// edge lines (0 and `board.size`) are deliberately skipped — the
+    /// outer board border lives on the cell view itself.
+    @ViewBuilder
+    private func superCellRules(cellSize: CGFloat) -> some View {
+        let n = board.size
+        let span = cellSize * CGFloat(n)
+        let lineColor = theme.colors.textPrimary.opacity(0.55)
+        let thickness: CGFloat = 1.5
+        ZStack(alignment: .topLeading) {
+            ForEach(Array(stride(from: 5, to: n, by: 5)), id: \.self) { i in
+                let offset = cellSize * CGFloat(i)
+                Rectangle()
+                    .fill(lineColor)
+                    .frame(width: thickness, height: span)
+                    .offset(x: offset - thickness / 2, y: 0)
+                Rectangle()
+                    .fill(lineColor)
+                    .frame(width: span, height: thickness)
+                    .offset(x: 0, y: offset - thickness / 2)
+            }
+        }
+        .frame(width: span, height: span, alignment: .topLeading)
     }
 
     private func slideGesture(cellSize: CGFloat) -> some Gesture {
@@ -193,10 +231,12 @@ struct NonogramBoardView: View {
                     )
                     dragStartRow = row
                     dragStartCol = col
+                    dragStartState = startCell
                 }
                 guard let target = dragTarget,
                       let startRow = dragStartRow,
-                      let startCol = dragStartCol
+                      let startCol = dragStartCol,
+                      let startState = dragStartState
                 else { return }
 
                 // Decide axis once the player has moved past the start cell.
@@ -216,6 +256,15 @@ struct NonogramBoardView: View {
 
                 if dragVisited.contains(idx) { return }
                 dragVisited.insert(idx)
+                // Same-type filter: only flip cells that match the drag's
+                // start-cell state. The start cell itself is already
+                // committed when its target was applied on the first
+                // onChanged sample (handled by the VM), so subsequent
+                // cells need this guard to avoid stomping mismatched
+                // cells.
+                let cellState = board.cell(row: lockedRow, col: lockedCol)
+                let isStartCell = (lockedRow == startRow && lockedCol == startCol)
+                guard isStartCell || cellState == startState else { return }
                 let ok = onSlide(lockedRow, lockedCol, target)
                 if !ok {
                     dragAborted = true
@@ -228,6 +277,7 @@ struct NonogramBoardView: View {
                 dragAxis = nil
                 dragStartRow = nil
                 dragStartCol = nil
+                dragStartState = nil
             }
     }
 
