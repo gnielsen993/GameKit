@@ -78,7 +78,7 @@ extension GameDescriptor {
         GameDescriptor(
             kind: .nonogram,
             titleKey: "Nonogram",
-            captionKey: "Gallery preview",
+            captionKey: "Tap to play",
             symbol: "square.grid.3x3.square",
             accent: .primary,
             route: .nonogram

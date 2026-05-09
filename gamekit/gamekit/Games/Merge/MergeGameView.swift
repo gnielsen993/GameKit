@@ -66,7 +66,7 @@ struct MergeGameView: View {
                 MergeModePill(
                     theme: theme,
                     mode: viewModel.mode,
-                    onSelect: { viewModel.setMode($0) }
+                    onSelect: { viewModel.requestModeChange($0) }
                 )
                 .padding(.top, theme.spacing.s)
                 .opacity(isTerminal ? 0 : 1)
@@ -118,9 +118,22 @@ struct MergeGameView: View {
                 MergeToolbarMenu(
                     theme: theme,
                     currentMode: viewModel.mode,
-                    onSelect: { viewModel.setMode($0) }
+                    onSelect: { viewModel.requestModeChange($0) }
                 )
             }
+        }
+        .alert(
+            String(localized: "Abandon current game?"),
+            isPresented: $viewModel.showingAbandonAlert
+        ) {
+            Button(String(localized: "Cancel"), role: .cancel) {
+                viewModel.cancelModeChange()
+            }
+            Button(String(localized: "Abandon"), role: .destructive) {
+                viewModel.confirmModeChange()
+            }
+        } message: {
+            Text(String(localized: "Switching modes resets the board. Your current score will be lost."))
         }
         .task {
             guard !didInjectStats else { return }

@@ -69,7 +69,6 @@ private let upcomingGames: [GameCard] = [
     GameCard(id: "wordGrid",      title: String(localized: "Word Grid"),      symbol: "textformat.abc",       isEnabled: false),
     GameCard(id: "solitaire",     title: String(localized: "Solitaire"),      symbol: "suit.spade",           isEnabled: false),
     GameCard(id: "sudoku",        title: String(localized: "Sudoku"),         symbol: "9.square",             isEnabled: false),
-    GameCard(id: "nonogram",      title: String(localized: "Nonogram"),       symbol: "square.grid.3x3",      isEnabled: false),
     GameCard(id: "flow",          title: String(localized: "Flow"),           symbol: "scribble.variable",    isEnabled: false),
     GameCard(id: "patternMemory", title: String(localized: "Pattern Memory"), symbol: "rectangle.grid.2x2",   isEnabled: false),
     GameCard(id: "chessPuzzles",  title: String(localized: "Chess Puzzles"),  symbol: "checkmark.shield",     isEnabled: false),

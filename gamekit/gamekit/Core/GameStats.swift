@@ -63,7 +63,8 @@ final class GameStats {
         gameKind: GameKind,
         difficulty: String,
         outcome: Outcome,
-        durationSeconds: Double
+        durationSeconds: Double,
+        puzzleId: String? = nil
     ) throws {
         // 1. Insert GameRecord unconditionally (D-12 step 1).
         //    Done BEFORE BestTime evaluation so a flaky predicate cannot
@@ -73,7 +74,8 @@ final class GameStats {
             difficulty: difficulty,
             outcome: outcome,
             durationSeconds: durationSeconds,
-            playedAt: .now
+            playedAt: .now,
+            puzzleId: puzzleId
         )
         modelContext.insert(record)
 

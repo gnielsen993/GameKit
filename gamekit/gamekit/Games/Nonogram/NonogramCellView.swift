@@ -19,6 +19,9 @@ struct NonogramCellView: View {
     let cellSize: CGFloat
     let theme: Theme
     let isInteractive: Bool
+    /// True when this cell is the most-recent wrong-tap in Lives mode.
+    /// Drives a brief red flash + horizontal jitter for clear feedback.
+    let wrongFlash: Bool
     let onTap: () -> Void
     let onLongPress: () -> Void
 
@@ -27,12 +30,19 @@ struct NonogramCellView: View {
             Rectangle()
                 .fill(backgroundFill)
             glyph
+            if wrongFlash {
+                Rectangle()
+                    .fill(theme.colors.danger.opacity(0.55))
+                    .transition(.opacity)
+            }
         }
         .frame(width: cellSize, height: cellSize)
         .overlay(
             Rectangle()
                 .stroke(theme.colors.textPrimary.opacity(0.18), lineWidth: 0.5)
         )
+        .offset(x: wrongFlash ? 3 : 0)
+        .animation(.spring(response: 0.18, dampingFraction: 0.35), value: wrongFlash)
         .contentShape(Rectangle())
         .gesture(
             LongPressGesture(minimumDuration: 0.25)

@@ -46,11 +46,19 @@ enum NonogramLibrary {
     }
 
     private static func load(difficulty: NonogramDifficulty) -> [NonogramPuzzle] {
-        guard let url = Bundle.main.url(
+        // Xcode's processed-resource pipeline flattens Resources/nonograms/
+        // into the bundle root, so look up by name only — no subdirectory.
+        // Try the subdirectory path first anyway in case a future blue-
+        // folder reference preserves the structure.
+        let url = Bundle.main.url(
             forResource: difficulty.rawValue,
             withExtension: "json",
             subdirectory: "nonograms"
-        ) else {
+        ) ?? Bundle.main.url(
+            forResource: difficulty.rawValue,
+            withExtension: "json"
+        )
+        guard let url else {
             print("ℹ️ NonogramLibrary: no bundle file for \(difficulty.rawValue)")
             return []
         }

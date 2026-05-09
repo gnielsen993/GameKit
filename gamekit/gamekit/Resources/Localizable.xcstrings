@@ -282,6 +282,9 @@
         }
       }
     },
+    "Choose size" : {
+
+    },
     "Coming soon" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -492,6 +495,9 @@
     "Infinite mode" : {
 
     },
+    "Large  -  20 × 20" : {
+
+    },
     "Last synced %@" : {
 
     },
@@ -515,6 +521,9 @@
           }
         }
       }
+    },
+    "Medium  -  15 × 15" : {
+
     },
     "Merge" : {
       "extractionState" : "manual",
@@ -568,10 +577,16 @@
     "More themes & custom colors" : {
 
     },
+    "Next puzzle" : {
+
+    },
     "No games played yet." : {
 
     },
     "No Merge games played yet." : {
+
+    },
+    "No puzzles bundled yet" : {
 
     },
     "Nonogram" : {
@@ -603,6 +618,9 @@
       }
     },
     "Pick a theme that fits your mood. Five Classic palettes here, dozens more in Settings." : {
+
+    },
+    "Previous puzzle" : {
 
     },
     "Privacy Policy" : {
@@ -708,6 +726,9 @@
 
     },
     "Skip intro" : {
+
+    },
+    "Small  -  10 × 10" : {
 
     },
     "Solitaire" : {
@@ -821,6 +842,9 @@
           }
         }
       }
+    },
+    "Tiny  -  5 × 5" : {
+
     },
     "Track your progress" : {
 

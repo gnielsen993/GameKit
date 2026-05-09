@@ -61,6 +61,16 @@ struct StatsView: View {
     @Query(filter: #Predicate<BestScore> { $0.gameKindRaw == "merge" })
     private var mergeBestScores: [BestScore]
 
+    @Query(
+        filter: #Predicate<GameRecord> { $0.gameKindRaw == "nonogram" },
+        sort: \.playedAt,
+        order: .reverse
+    )
+    private var nonogramRecords: [GameRecord]
+
+    @Query(filter: #Predicate<BestTime> { $0.gameKindRaw == "nonogram" })
+    private var nonogramBestTimes: [BestTime]
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
@@ -85,6 +95,16 @@ struct StatsView: View {
                             theme: theme,
                             records: mergeRecords,
                             bestScores: mergeBestScores
+                        )
+                    }
+
+                    settingsSectionHeader(theme: theme, String(localized: "NONOGRAM"))
+
+                    DKCard(theme: theme) {
+                        NonogramStatsCard(
+                            theme: theme,
+                            records: nonogramRecords,
+                            bestTimes: nonogramBestTimes
                         )
                     }
                 }

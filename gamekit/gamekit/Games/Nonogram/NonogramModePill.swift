@@ -2,11 +2,9 @@
 //  NonogramModePill.swift
 //  gamekit
 //
-//  Two-segment pill flipping between place mode and mark mode. Same
-//  silhouette as MinesweeperModePill so users feel cross-game consistency.
-//
-//  Reserved for play mode; the gallery render renders the pill but
-//  swaps its colors to a quieter "preview" tone via `isInteractive`.
+//  Two-segment pill for place / mark interaction mode. Mirrors
+//  MinesweeperModePill exactly (typography, padding, min-height, capsule
+//  fill semantics) so the bottom picker reads the same across games.
 //
 
 import SwiftUI
@@ -20,8 +18,12 @@ struct NonogramModePill: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            segment(.place, glyph: "square.fill", label: "Place")
-            segment(.mark, glyph: "xmark", label: "Mark")
+            segment(.place,
+                    glyph: "square.fill",
+                    label: String(localized: "Place"))
+            segment(.mark,
+                    glyph: "xmark",
+                    label: String(localized: "Mark"))
         }
         .padding(theme.spacing.xs)
         .background(
@@ -32,28 +34,35 @@ struct NonogramModePill: View {
         )
     }
 
-    private func segment(
-        _ target: NonogramInteractionMode,
-        glyph: String,
-        label: String
-    ) -> some View {
+    @ViewBuilder
+    private func segment(_ target: NonogramInteractionMode,
+                         glyph: String,
+                         label: String) -> some View {
         let isActive = mode == target
-        return Button {
+        Button {
             guard isInteractive else { return }
             onSelect(target)
         } label: {
             HStack(spacing: theme.spacing.xs) {
                 Image(systemName: glyph)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                 Text(label)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(theme.typography.headline)
             }
-            .padding(.horizontal, theme.spacing.m)
-            .padding(.vertical, theme.spacing.xs)
-            .foregroundStyle(isActive ? theme.colors.surface : theme.colors.textPrimary)
+            .foregroundStyle(isActive
+                             ? theme.colors.background
+                             : theme.colors.textPrimary)
+            .padding(.horizontal, theme.spacing.l)
+            .padding(.vertical, theme.spacing.s)
+            .frame(minHeight: 44)
             .background(
-                Capsule().fill(isActive ? theme.colors.accentPrimary : Color.clear)
+                Capsule().fill(
+                    isActive
+                    ? (target == .mark ? theme.colors.danger : theme.colors.accentPrimary)
+                    : Color.clear
+                )
             )
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(label))
