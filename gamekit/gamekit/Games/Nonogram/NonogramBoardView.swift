@@ -77,9 +77,9 @@ struct NonogramBoardView: View {
     private enum SlideAxis { case horizontal, vertical }
 
     private static let minCellSize: CGFloat = 14
-    private static let minHintFont: CGFloat = 8
-    private static let maxHintFractionH: CGFloat = 0.32
-    private static let maxHintFractionV: CGFloat = 0.32
+    private static let minHintFont: CGFloat = 7
+    private static let maxHintFractionH: CGFloat = 0.40
+    private static let maxHintFractionV: CGFloat = 0.40
 
     var body: some View {
         GeometryReader { proxy in
@@ -133,6 +133,8 @@ struct NonogramBoardView: View {
                                              : theme.colors.textSecondary)
                             .monospacedDigit()
                             .strikethrough(crossed, color: theme.colors.textTertiary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
                     }
                 }
                 .frame(width: layout.cellSize, height: layout.colHintRowHeight, alignment: .bottom)
@@ -155,6 +157,9 @@ struct NonogramBoardView: View {
                                              : theme.colors.textSecondary)
                             .monospacedDigit()
                             .strikethrough(crossed, color: theme.colors.textTertiary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                            .fixedSize()
                     }
                 }
                 .frame(width: layout.rowHintColumnWidth, height: layout.cellSize)

@@ -82,4 +82,29 @@ struct NonogramCrossOffTests {
         #expect(mask == [false, true],
                 "Length-2 run at the right edge can only be the second hint.")
     }
+
+    @Test("Length-1 fill inside a length-12 hint range does NOT cross off the 12")
+    func partialRunDoesNotCrossOff() {
+        // 20 cells, hints [12]. Player has X-marked col 0, filled col 11.
+        // The length-1 fill could be part of an eventual length-12 run, but
+        // it's far from completing the hint. Strict matching = no cross-off.
+        var filled = Array(repeating: false, count: 20)
+        filled[11] = true
+        var marked = Array(repeating: false, count: 20)
+        marked[0] = true
+        let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [12])
+        #expect(mask == [false],
+                "Single fill in a 12-length-hint column is not a completion.")
+    }
+
+    @Test("Empty column + X marks ≠ all-empty puzzle ≠ cross-off")
+    func xMarkedColumnWithBigHintNoCrossOff() {
+        // 20 cells, hints [5]. X-mark at col 0 only, no fills anywhere.
+        // Player hasn't started filling. No cross-off should fire.
+        var marked = Array(repeating: false, count: 20)
+        marked[0] = true
+        let filled = Array(repeating: false, count: 20)
+        let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [5])
+        #expect(mask == [false], "No fills means no completion regardless of marks.")
+    }
 }
