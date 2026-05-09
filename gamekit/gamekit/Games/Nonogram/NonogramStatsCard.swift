@@ -17,11 +17,14 @@ struct NonogramStatsCard: View {
     let bestTimes: [BestTime]
 
     private var hasAnyRecord: Bool { !records.isEmpty }
+    /// Distinct curated puzzles solved. Procedural ids (`proc-*`) are
+    /// excluded so the count matches what the gallery actually renders.
     private var solvedCount: Int {
         Set(
             records
                 .filter { $0.outcomeRaw == Outcome.win.rawValue }
                 .compactMap { $0.puzzleIdRaw }
+                .filter { !$0.hasPrefix("proc-") }
         ).count
     }
 

@@ -378,11 +378,19 @@ final class NonogramViewModel {
         )
     }
 
+    /// Next puzzle for `difficulty`. Delegates to `NonogramPicker` so the
+    /// curated-unseen-first → procedural fallback rule lives in one place.
+    /// Always returns a valid puzzle (procedural Unlimited tier never
+    /// runs out).
     private func pickPuzzle(for difficulty: NonogramDifficulty) -> NonogramPuzzle? {
-        let pool = NonogramLibrary.puzzles(for: difficulty)
-        guard !pool.isEmpty else { return nil }
-        let idx = Int.random(in: 0..<pool.count, using: &rng)
-        return pool[idx]
+        var any: any RandomNumberGenerator = rng
+        let p = NonogramPicker.next(
+            difficulty: difficulty,
+            userDefaults: userDefaults,
+            rng: &any
+        )
+        rng = any
+        return p
     }
 
     // MARK: - Constants
