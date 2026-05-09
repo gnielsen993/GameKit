@@ -22,6 +22,10 @@ struct NonogramCellView: View {
     /// True when this cell is the most-recent wrong-tap in Lives mode.
     /// Drives a brief red flash + horizontal jitter for clear feedback.
     let wrongFlash: Bool
+    /// True when this cell sits in a row OR column that just completed
+    /// — drives a brief accent-tint pulse so the player can feel the
+    /// completion across the whole line, not just at the touched cell.
+    let completionFlash: Bool
     let onTap: () -> Void
     let onLongPress: () -> Void
 
@@ -30,6 +34,11 @@ struct NonogramCellView: View {
             Rectangle()
                 .fill(backgroundFill)
             glyph
+            if completionFlash {
+                Rectangle()
+                    .fill(theme.colors.accentPrimary.opacity(0.40))
+                    .transition(.opacity)
+            }
             if wrongFlash {
                 Rectangle()
                     .fill(theme.colors.danger.opacity(0.55))
@@ -43,6 +52,7 @@ struct NonogramCellView: View {
         )
         .offset(x: wrongFlash ? 3 : 0)
         .animation(.spring(response: 0.18, dampingFraction: 0.35), value: wrongFlash)
+        .animation(.easeOut(duration: 0.35), value: completionFlash)
         .contentShape(Rectangle())
         .gesture(
             LongPressGesture(minimumDuration: 0.25)

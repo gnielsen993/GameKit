@@ -49,6 +49,12 @@ final class NonogramViewModel {
     /// `"r<idx>"` / `"c<idx>"` so the same key can't collide between rows
     /// and columns.
     private var completedLineKeys: Set<String> = []
+    /// Row index of the most-recent line-completion event. Drives a
+    /// 700ms accent-glow on every cell in that row so the player gets a
+    /// visual "you nailed it" beat on top of the haptic. Auto-cleared.
+    private(set) var flashRow: Int?
+    /// Column index of the most-recent line-completion event.
+    private(set) var flashCol: Int?
     /// Flat index (row * size + col) of the most-recent wrong-tap cell.
     /// Drives the red-flash + shake feedback in CellView. Auto-cleared
     /// ~0.6s after being set.
@@ -218,6 +224,8 @@ final class NonogramViewModel {
         lastWrongAttemptIdx = nil
         lineCompletionCount = 0
         completedLineKeys = []
+        flashRow = nil
+        flashCol = nil
         interactionMode = .place
         livesRemaining = NonogramGameMode.livesPerPuzzle
         lockedCells = []
@@ -354,6 +362,7 @@ final class NonogramViewModel {
         if rowComplete && !completedLineKeys.contains(rowKey) {
             completedLineKeys.insert(rowKey)
             lineCompletionCount += 1
+            triggerFlashRow(touchedRow)
         } else if !rowComplete {
             completedLineKeys.remove(rowKey)
         }
@@ -364,8 +373,28 @@ final class NonogramViewModel {
         if colComplete && !completedLineKeys.contains(colKey) {
             completedLineKeys.insert(colKey)
             lineCompletionCount += 1
+            triggerFlashCol(touchedCol)
         } else if !colComplete {
             completedLineKeys.remove(colKey)
+        }
+    }
+
+    /// Light up `row` for ~700ms, then clear the flag. If a newer
+    /// completion lands in the meantime its own trigger overrides this
+    /// one, so the most-recent row's flash always wins.
+    private func triggerFlashRow(_ row: Int) {
+        flashRow = row
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(700))
+            if self.flashRow == row { self.flashRow = nil }
+        }
+    }
+
+    private func triggerFlashCol(_ col: Int) {
+        flashCol = col
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(700))
+            if self.flashCol == col { self.flashCol = nil }
         }
     }
 

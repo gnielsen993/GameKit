@@ -38,6 +38,11 @@ struct NonogramBoardView: View {
     /// no flash. Forwarded to CellView so the matching cell renders the
     /// red overlay + shake.
     let wrongFlashIdx: Int?
+    /// Most-recent row index that just transitioned to fully-satisfied.
+    /// Drives a brief accent glow on every cell in that row so the
+    /// player gets a visual "completed" beat. Nil → no flash.
+    let flashRow: Int?
+    let flashCol: Int?
     let onTap: (Int, Int) -> Void
     let onLongPress: (Int, Int) -> Void
     /// Slide-fill callback. Returns `true` if the mutation went through
@@ -171,6 +176,7 @@ struct NonogramBoardView: View {
                             theme: theme,
                             isInteractive: isInteractive,
                             wrongFlash: wrongFlashIdx == idx,
+                            completionFlash: flashRow == row || flashCol == col,
                             onTap: { onTap(row, col) },
                             onLongPress: { onLongPress(row, col) }
                         )
