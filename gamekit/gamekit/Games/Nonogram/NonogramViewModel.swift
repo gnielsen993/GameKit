@@ -330,8 +330,10 @@ final class NonogramViewModel {
                     }
                     return
                 }
-                // Correct mark — fall through to commit (don't lock; player
-                // may want to un-mark later for free).
+                // Correct mark — commit AND lock. In Lives mode a verified
+                // X is known truth, so the player can't un-mark it (matches
+                // the locking rule for verified fills above).
+                lockedCells.insert(idx)
             }
         }
 

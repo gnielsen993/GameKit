@@ -70,6 +70,12 @@ struct NonogramBoardView: View {
     /// the filled cells alone (player intent is "extend the run of
     /// blanks I started on").
     @State private var dragStartState: NonogramCellState? = nil
+    /// Most-recent sampled cell during the active drag — used to
+    /// interpolate a continuous path through every intermediate cell
+    /// when SwiftUI's onChanged samples don't catch every cell at high
+    /// finger velocity.
+    @State private var lastDragRow: Int? = nil
+    @State private var lastDragCol: Int? = nil
     /// Locked-in axis for the current drag. nil until the player has moved
     /// far enough for SwiftUI to disambiguate horizontal vs vertical.
     @State private var dragAxis: SlideAxis? = nil
@@ -78,8 +84,15 @@ struct NonogramBoardView: View {
 
     private static let minCellSize: CGFloat = 14
     private static let minHintFont: CGFloat = 7
-    private static let maxHintFractionH: CGFloat = 0.40
-    private static let maxHintFractionV: CGFloat = 0.40
+    /// Target board edge as a fraction of container width. Pinned so
+    /// the grid stays the same size across difficulties — only the
+    /// cells themselves shrink/grow as N changes.
+    private static let gridEdgeFraction: CGFloat = 0.78
+    /// Floor on the column-hint header height so vertical-hint stacks
+    /// have headroom even at small N.
+    private static let minColHintHeight: CGFloat = 80
+    /// Per-hint horizontal slot factor inside the row-hint column.
+    private static let perHintWidthFactor: CGFloat = 0.55
 
     var body: some View {
         GeometryReader { proxy in
@@ -131,7 +144,6 @@ struct NonogramBoardView: View {
                             .foregroundStyle(crossed
                                              ? theme.colors.textTertiary
                                              : theme.colors.textSecondary)
-                            .monospacedDigit()
                             .strikethrough(crossed, color: theme.colors.textTertiary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
@@ -146,7 +158,11 @@ struct NonogramBoardView: View {
         VStack(spacing: 0) {
             ForEach(0..<board.size, id: \.self) { row in
                 let crossMask = rowsCrossOff[safe: row] ?? []
-                HStack(spacing: theme.spacing.xs) {
+                // 2pt between adjacent hint numbers — tighter than
+                // theme.spacing.xs so "1 5" reads as two distinct hints
+                // without sprawling, while "15" (a single 2-digit hint)
+                // stays visually intact.
+                HStack(spacing: 2) {
                     Spacer(minLength: 0)
                     ForEach(Array((rowHints[safe: row] ?? []).enumerated()), id: \.offset) { idx, value in
                         let crossed = crossMask[safe: idx] ?? false
@@ -155,7 +171,6 @@ struct NonogramBoardView: View {
                             .foregroundStyle(crossed
                                              ? theme.colors.textTertiary
                                              : theme.colors.textSecondary)
-                            .monospacedDigit()
                             .strikethrough(crossed, color: theme.colors.textTertiary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
@@ -226,22 +241,15 @@ struct NonogramBoardView: View {
     }
 
     private func slideGesture(cellSize: CGFloat) -> some Gesture {
-        // 14pt minimum distance — higher than the 8pt SwiftUI default so
-        // a quick brush past a cell while the finger is repositioning
-        // doesn't accidentally start a drag.
-        DragGesture(minimumDistance: 14, coordinateSpace: .local)
+        // 10pt minimum distance — back from 14pt now that path
+        // interpolation handles fast swipes; high enough to avoid
+        // accidental drags from finger reposition but low enough that a
+        // quick swipe registers as a swipe instead of a tap.
+        DragGesture(minimumDistance: 10, coordinateSpace: .local)
             .onChanged { value in
                 guard isInteractive, !dragAborted else { return }
-                // Cell-detection deadzone: only count the touch as "in"
-                // a cell when it's past the cell's outer 18% on the
-                // axis that's currently driving motion. Brushing the
-                // cell border without committing to it doesn't fire.
-                let xCell = value.location.x / cellSize
-                let yCell = value.location.y / cellSize
-                let xFrac = xCell - xCell.rounded(.down)  // 0..1 within cell
-                let yFrac = yCell - yCell.rounded(.down)
-                let row = Int(yCell.rounded(.down))
-                let col = Int(xCell.rounded(.down))
+                let row = Int((value.location.y / cellSize).rounded(.down))
+                let col = Int((value.location.x / cellSize).rounded(.down))
                 guard row >= 0, row < board.size, col >= 0, col < board.size else { return }
 
                 // First sample: lock the start cell + capture intent.
@@ -277,35 +285,41 @@ struct NonogramBoardView: View {
                 // only the start cell is in play.
                 let lockedRow = (dragAxis == .horizontal) ? startRow : row
                 let lockedCol = (dragAxis == .vertical) ? startCol : col
-                let idx = lockedRow * board.size + lockedCol
 
-                if dragVisited.contains(idx) { return }
-
-                // Cell-edge deadzone: when crossing into a NEW cell, the
-                // touch must be past the outer 22% on the active axis
-                // before we commit. Stops "drifted past the border but
-                // didn't mean to enter the next cell" misfires that the
-                // user reported as accidental swipes.
-                if !dragVisited.isEmpty {
-                    let activeFrac: CGFloat = (dragAxis == .horizontal) ? xFrac : yFrac
-                    if activeFrac < 0.22 || activeFrac > 0.78 {
-                        return
-                    }
+                // Path interpolation — fast swipes can move several cells
+                // between two onChanged samples; without filling the
+                // intermediate cells the player sees gaps. Walk every
+                // cell from the previous sample to the current one along
+                // the locked axis so 60Hz sampling can't drop cells.
+                let cellsToVisit: [(Int, Int)]
+                if let prevRow = lastDragRow, let prevCol = lastDragCol,
+                   dragAxis != nil {
+                    cellsToVisit = cellsBetween(
+                        fromRow: prevRow, fromCol: prevCol,
+                        toRow: lockedRow, toCol: lockedCol,
+                        axis: dragAxis!,
+                        startRow: startRow, startCol: startCol
+                    )
+                } else {
+                    cellsToVisit = [(lockedRow, lockedCol)]
                 }
+                lastDragRow = lockedRow
+                lastDragCol = lockedCol
 
-                dragVisited.insert(idx)
-                // Same-type filter: only flip cells that match the drag's
-                // start-cell state. The start cell itself is already
-                // committed when its target was applied on the first
-                // onChanged sample (handled by the VM), so subsequent
-                // cells need this guard to avoid stomping mismatched
-                // cells.
-                let cellState = board.cell(row: lockedRow, col: lockedCol)
-                let isStartCell = (lockedRow == startRow && lockedCol == startCol)
-                guard isStartCell || cellState == startState else { return }
-                let ok = onSlide(lockedRow, lockedCol, target)
-                if !ok {
-                    dragAborted = true
+                for (r, c) in cellsToVisit {
+                    let idx = r * board.size + c
+                    if dragVisited.contains(idx) { continue }
+                    dragVisited.insert(idx)
+                    // Same-type filter: only flip cells that match the
+                    // drag's start state. Start cell always commits.
+                    let cellState = board.cell(row: r, col: c)
+                    let isStart = (r == startRow && c == startCol)
+                    guard isStart || cellState == startState else { continue }
+                    let ok = onSlide(r, c, target)
+                    if !ok {
+                        dragAborted = true
+                        break
+                    }
                 }
             }
             .onEnded { _ in
@@ -316,7 +330,36 @@ struct NonogramBoardView: View {
                 dragStartRow = nil
                 dragStartCol = nil
                 dragStartState = nil
+                lastDragRow = nil
+                lastDragCol = nil
             }
+    }
+
+    /// Inclusive cell path between two samples along the locked axis.
+    /// Returns ALL cells the swipe crossed in left-to-right or top-to-bottom
+    /// order so the caller can fill them in sequence — a fast swipe that
+    /// jumps from cell 3 to cell 7 in one frame still gets cells 4, 5, 6.
+    /// The "from" cell itself is omitted (already visited last frame).
+    private func cellsBetween(
+        fromRow: Int, fromCol: Int,
+        toRow: Int, toCol: Int,
+        axis: SlideAxis,
+        startRow: Int, startCol: Int
+    ) -> [(Int, Int)] {
+        switch axis {
+        case .horizontal:
+            let row = startRow
+            if toCol == fromCol { return [(row, toCol)] }
+            let step = toCol > fromCol ? 1 : -1
+            return stride(from: fromCol + step, through: toCol, by: step)
+                .map { (row, $0) }
+        case .vertical:
+            let col = startCol
+            if toRow == fromRow { return [(toRow, col)] }
+            let step = toRow > fromRow ? 1 : -1
+            return stride(from: fromRow + step, through: toRow, by: step)
+                .map { ($0, col) }
+        }
     }
 
     /// Mirror of NonogramViewModel's tap-toggle logic for the drag's
@@ -344,46 +387,45 @@ struct NonogramBoardView: View {
         let hintFont: CGFloat
     }
 
-    /// Two-pass fixed-point: cell size depends on hint widths, hint widths
-    /// depend on cell size. Three iterations is plenty for the estimate
-    /// to converge to a stable value.
+    /// Pin the GRID to a fixed proportion of the container, then size
+    /// the hint columns/rows from whatever's left. Result: the board's
+    /// outer dimensions stay roughly constant across difficulties — a
+    /// 5×5 puzzle has big chunky cells, a 20×20 has small dense cells,
+    /// but the player's eye lands on the same physical area each time.
+    /// Matches the layout pattern from competitor nonogram apps.
     private func computeLayout(in size: CGSize) -> Layout {
         let maxRowHints = rowHints.map(\.count).max() ?? 1
         let maxColHints = columnHints.map(\.count).max() ?? 1
 
-        let hintCapW = size.width * Self.maxHintFractionH
-        let hintCapH = size.height * Self.maxHintFractionV
+        // Target grid edge: keep board square and lean toward the
+        // smaller container axis. 70% of width keeps a comfortable
+        // hint margin; never exceed available height minus reserve for
+        // column hints.
+        let preferredEdge = size.width * Self.gridEdgeFraction
+        let maxByHeight = size.height - Self.minColHintHeight
+        let gridEdge = max(Self.minCellSize * CGFloat(board.size),
+                           min(preferredEdge, maxByHeight))
+        let cs = gridEdge / CGFloat(board.size)
 
-        // Per-hint horizontal slot factor: drops as hint count climbs so the
-        // hint column doesn't blow past its 32% cap. 0.7 for sparse rows,
-        // ~0.45 for crowded ones.
-        let perHintW = max(0.45, min(0.7, 1.0 / CGFloat(maxRowHints) * 4.5))
+        // Hint slots get whatever margin remains beside/above the grid.
+        // Symmetric horizontal reserve so the grid is centered.
+        let availableHintW = max(0, (size.width - gridEdge) / 2)
+        let availableHintH = max(0, size.height - gridEdge)
+        let rowHintW = min(availableHintW,
+                           CGFloat(maxRowHints) * cs * Self.perHintWidthFactor)
+        let colHintH = min(availableHintH,
+                           CGFloat(maxColHints) * cs * 0.55)
 
-        var cs = Self.minCellSize
-        for _ in 0..<3 {
-            let rowHintW = min(CGFloat(maxRowHints) * cs * perHintW, hintCapW)
-            let colHintH = min(CGFloat(maxColHints) * cs * 0.55, hintCapH)
-            // Reserve symmetric space on left + right so the grid centers.
-            let usableW = size.width - 2 * rowHintW
-            let usableH = size.height - colHintH
-            let widthBound = usableW / CGFloat(board.size)
-            let heightBound = usableH / CGFloat(board.size)
-            cs = max(Self.minCellSize, min(widthBound, heightBound))
-        }
-
-        let rowHintW = min(CGFloat(maxRowHints) * cs * perHintW, hintCapW)
-        let colHintH = min(CGFloat(maxColHints) * cs * 0.55, hintCapH)
-        let gridW = cs * CGFloat(board.size)
-
-        // Hint font scales with cell size but never drops below `minHintFont`
-        // so a crowded 20×20 row still has legible numbers.
-        let hintFont = max(Self.minHintFont, cs * 0.4)
+        // Hint font scales with cell size but never drops below
+        // minHintFont so a crowded 20×20 row stays legible. Cap on the
+        // upper end so 5×5 hints don't look comically large.
+        let hintFont = max(Self.minHintFont, min(cs * 0.42, 22))
 
         return Layout(
             cellSize: cs,
             rowHintColumnWidth: rowHintW,
             colHintRowHeight: colHintH,
-            gridWidth: gridW,
+            gridWidth: gridEdge,
             hintFont: hintFont
         )
     }
