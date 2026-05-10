@@ -36,6 +36,16 @@
         }
       }
     },
+    "%@: %lld games, %lld wins, best time %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld games, %3$lld wins, best time %4$@"
+          }
+        }
+      }
+    },
     "%@: %lld games, best score %@" : {
       "localizations" : {
         "en" : {
@@ -106,6 +116,16 @@
         }
       }
     },
+    "%lld of %lld lives remaining" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld lives remaining"
+          }
+        }
+      }
+    },
     "%lld seconds" : {
       "comment" : "VoiceOver spoken time component — seconds portion of elapsed",
       "extractionState" : "automatic",
@@ -118,7 +138,7 @@
         }
       }
     },
-    "7 games coming" : {
+    "6 games coming" : {
 
     },
     "Abandon" : {
@@ -271,6 +291,9 @@
     "Change mode" : {
 
     },
+    "Change size" : {
+
+    },
     "Chess Puzzles" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -403,6 +426,9 @@
         }
       }
     },
+    "Free" : {
+
+    },
     "Game over" : {
 
     },
@@ -415,6 +441,9 @@
           }
         }
       }
+    },
+    "Game settings" : {
+
     },
     "GameKit" : {
       "comment" : "App / Home navigation title",
@@ -495,7 +524,13 @@
     "Infinite mode" : {
 
     },
+    "Large" : {
+
+    },
     "Large  -  20 × 20" : {
+
+    },
+    "Large  ·  20 × 20" : {
 
     },
     "Last synced %@" : {
@@ -507,7 +542,13 @@
     "Light" : {
 
     },
+    "Lives  -  3 strikes" : {
+
+    },
     "Make it yours" : {
+
+    },
+    "Mark" : {
 
     },
     "Medium" : {
@@ -523,6 +564,9 @@
       }
     },
     "Medium  -  15 × 15" : {
+
+    },
+    "Medium  ·  15 × 15" : {
 
     },
     "Merge" : {
@@ -577,7 +621,7 @@
     "More themes & custom colors" : {
 
     },
-    "Next puzzle" : {
+    "New puzzle" : {
 
     },
     "No games played yet." : {
@@ -586,7 +630,13 @@
     "No Merge games played yet." : {
 
     },
+    "No Nonogram games played yet." : {
+
+    },
     "No puzzles bundled yet" : {
+
+    },
+    "No solved puzzles yet." : {
 
     },
     "Nonogram" : {
@@ -600,10 +650,19 @@
         }
       }
     },
+    "NONOGRAM" : {
+
+    },
     "Not signed in" : {
 
     },
     "OK" : {
+
+    },
+    "Out of lives" : {
+
+    },
+    "Pattern" : {
 
     },
     "Pattern Memory" : {
@@ -620,13 +679,16 @@
     "Pick a theme that fits your mood. Five Classic palettes here, dozens more in Settings." : {
 
     },
-    "Previous puzzle" : {
+    "Place" : {
 
     },
     "Privacy Policy" : {
 
     },
     "Profile" : {
+
+    },
+    "Puzzle size %@" : {
 
     },
     "Quit and reopen to finish iCloud setup" : {
@@ -722,13 +784,22 @@
     "Signed in to iCloud" : {
 
     },
+    "Size" : {
+
+    },
     "Skip" : {
 
     },
     "Skip intro" : {
 
     },
+    "Small" : {
+
+    },
     "Small  -  10 × 10" : {
+
+    },
+    "Small  ·  10 × 10" : {
 
     },
     "Solitaire" : {
@@ -738,6 +809,25 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Solitaire"
+          }
+        }
+      }
+    },
+    "Solved" : {
+
+    },
+    "Solved puzzles" : {
+
+    },
+    "Solved puzzles, %lld" : {
+
+    },
+    "Solved: %@, best %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Solved: %1$@, best %2$@"
           }
         }
       }
@@ -772,6 +862,9 @@
       }
     },
     "Support" : {
+
+    },
+    "Switching modes resets the board. Your current score will be lost." : {
 
     },
     "SYNC" : {
@@ -843,10 +936,19 @@
         }
       }
     },
+    "Tiny" : {
+
+    },
     "Tiny  -  5 × 5" : {
 
     },
+    "Tiny  ·  5 × 5" : {
+
+    },
     "Track your progress" : {
+
+    },
+    "Try again" : {
 
     },
     "Unrevealed, row %lld column %lld" : {
@@ -905,6 +1007,9 @@
           }
         }
       }
+    },
+    "You used all 3 lives" : {
+
     },
     "You won!" : {
       "comment" : "End-state card title — win outcome (D-03 part 1)",
