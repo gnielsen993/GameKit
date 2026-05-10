@@ -24,4 +24,5 @@ import Foundation
 enum GameKind: String, Codable, Sendable, CaseIterable {
     case minesweeper
     case merge
+    case nonogram
 }

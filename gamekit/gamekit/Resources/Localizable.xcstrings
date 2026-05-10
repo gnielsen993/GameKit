@@ -36,6 +36,16 @@
         }
       }
     },
+    "%@: %lld games, %lld wins, best time %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld games, %3$lld wins, best time %4$@"
+          }
+        }
+      }
+    },
     "%@: %lld games, best score %@" : {
       "localizations" : {
         "en" : {
@@ -106,6 +116,16 @@
         }
       }
     },
+    "%lld of %lld lives remaining" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld lives remaining"
+          }
+        }
+      }
+    },
     "%lld seconds" : {
       "comment" : "VoiceOver spoken time component — seconds portion of elapsed",
       "extractionState" : "automatic",
@@ -118,7 +138,7 @@
         }
       }
     },
-    "7 games coming" : {
+    "6 games coming" : {
 
     },
     "Abandon" : {
@@ -160,6 +180,9 @@
 
     },
     "Add a Mail account in iOS Settings to use the in-app composer, or pick another option." : {
+
+    },
+    "Animations" : {
 
     },
     "APPEARANCE" : {
@@ -268,6 +291,9 @@
     "Change mode" : {
 
     },
+    "Change size" : {
+
+    },
     "Chess Puzzles" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -278,6 +304,9 @@
           }
         }
       }
+    },
+    "Choose size" : {
+
     },
     "Coming soon" : {
       "extractionState" : "manual",
@@ -305,6 +334,9 @@
     "Couldn't import stats" : {
 
     },
+    "Couldn't reach iCloud" : {
+
+    },
     "Dark" : {
 
     },
@@ -312,6 +344,15 @@
 
     },
     "Default mail app" : {
+
+    },
+    "Delete account" : {
+
+    },
+    "Delete account and iCloud data" : {
+
+    },
+    "Delete account?" : {
 
     },
     "DesignKit · own work" : {
@@ -353,6 +394,9 @@
     "Export stats" : {
 
     },
+    "FEEL" : {
+
+    },
     "Finish intro" : {
 
     },
@@ -382,6 +426,9 @@
         }
       }
     },
+    "Free" : {
+
+    },
     "Game over" : {
 
     },
@@ -394,6 +441,9 @@
           }
         }
       }
+    },
+    "Game settings" : {
+
     },
     "GameKit" : {
       "comment" : "App / Home navigation title",
@@ -425,9 +475,6 @@
 
     },
     "Haptics" : {
-
-    },
-    "HAPTICS" : {
 
     },
     "Hard" : {
@@ -477,6 +524,15 @@
     "Infinite mode" : {
 
     },
+    "Large" : {
+
+    },
+    "Large  -  20 × 20" : {
+
+    },
+    "Large  ·  20 × 20" : {
+
+    },
     "Last synced %@" : {
 
     },
@@ -486,7 +542,13 @@
     "Light" : {
 
     },
+    "Lives  -  3 strikes" : {
+
+    },
     "Make it yours" : {
+
+    },
+    "Mark" : {
 
     },
     "Medium" : {
@@ -500,6 +562,12 @@
           }
         }
       }
+    },
+    "Medium  -  15 × 15" : {
+
+    },
+    "Medium  ·  15 × 15" : {
+
     },
     "Merge" : {
       "extractionState" : "manual",
@@ -553,10 +621,22 @@
     "More themes & custom colors" : {
 
     },
+    "New puzzle" : {
+
+    },
     "No games played yet." : {
 
     },
     "No Merge games played yet." : {
+
+    },
+    "No Nonogram games played yet." : {
+
+    },
+    "No puzzles bundled yet" : {
+
+    },
+    "No solved puzzles yet." : {
 
     },
     "Nonogram" : {
@@ -570,10 +650,19 @@
         }
       }
     },
+    "NONOGRAM" : {
+
+    },
     "Not signed in" : {
 
     },
     "OK" : {
+
+    },
+    "Out of lives" : {
+
+    },
+    "Pattern" : {
 
     },
     "Pattern Memory" : {
@@ -590,10 +679,16 @@
     "Pick a theme that fits your mood. Five Classic palettes here, dozens more in Settings." : {
 
     },
+    "Place" : {
+
+    },
     "Privacy Policy" : {
 
     },
     "Profile" : {
+
+    },
+    "Puzzle size %@" : {
 
     },
     "Quit and reopen to finish iCloud setup" : {
@@ -680,13 +775,31 @@
     "Sign in with Apple to sync your stats across iPhone, iPad, and Mac. Optional — the app works fully without it." : {
 
     },
+    "Sign out" : {
+
+    },
+    "Sign out of iCloud" : {
+
+    },
     "Signed in to iCloud" : {
+
+    },
+    "Size" : {
 
     },
     "Skip" : {
 
     },
     "Skip intro" : {
+
+    },
+    "Small" : {
+
+    },
+    "Small  -  10 × 10" : {
+
+    },
+    "Small  ·  10 × 10" : {
 
     },
     "Solitaire" : {
@@ -696,6 +809,25 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Solitaire"
+          }
+        }
+      }
+    },
+    "Solved" : {
+
+    },
+    "Solved puzzles" : {
+
+    },
+    "Solved puzzles, %lld" : {
+
+    },
+    "Solved: %@, best %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Solved: %1$@, best %2$@"
           }
         }
       }
@@ -730,6 +862,9 @@
       }
     },
     "Support" : {
+
+    },
+    "Switching modes resets the board. Your current score will be lost." : {
 
     },
     "SYNC" : {
@@ -776,6 +911,16 @@
     "This file was exported from a newer GameKit. Update the app and try again." : {
 
     },
+    "This wipes your iCloud-synced stats AND your local stats on this device, and signs you out of %@. To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This wipes your iCloud-synced stats AND your local stats on this device, and signs you out of %1$@. To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → %2$@."
+          }
+        }
+      }
+    },
     "Tile %lld" : {
 
     },
@@ -791,7 +936,19 @@
         }
       }
     },
+    "Tiny" : {
+
+    },
+    "Tiny  -  5 × 5" : {
+
+    },
+    "Tiny  ·  5 × 5" : {
+
+    },
     "Track your progress" : {
+
+    },
+    "Try again" : {
 
     },
     "Unrevealed, row %lld column %lld" : {
@@ -824,6 +981,9 @@
     "Wins" : {
 
     },
+    "Wipes your iCloud-synced stats and signs out" : {
+
+    },
     "Word Grid" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -848,6 +1008,9 @@
         }
       }
     },
+    "You used all 3 lives" : {
+
+    },
     "You won!" : {
       "comment" : "End-state card title — win outcome (D-03 part 1)",
       "extractionState" : "automatic",
@@ -871,6 +1034,9 @@
           }
         }
       }
+    },
+    "You're signed out on this device, but we couldn't wipe the iCloud copy of your stats right now. Reconnect to the internet and sign in again to retry, or open Settings → Apple ID → Sign in with Apple → %@ to revoke access." : {
+
     },
     "Your best times will appear here." : {
       "extractionState" : "manual",

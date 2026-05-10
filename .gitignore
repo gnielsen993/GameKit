@@ -4,3 +4,4 @@
 # Xcode user-local state
 xcuserdata/
 *.xcuserstate
+tools/nonogram/__pycache__/

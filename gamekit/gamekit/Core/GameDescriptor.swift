@@ -74,6 +74,14 @@ extension GameDescriptor {
             symbol: "square.stack.3d.up.fill",
             accent: .secondary,
             route: .merge
+        ),
+        GameDescriptor(
+            kind: .nonogram,
+            titleKey: "Nonogram",
+            captionKey: "Tap to play",
+            symbol: "square.grid.3x3.square",
+            accent: .primary,
+            route: .nonogram
         )
     ]
 }

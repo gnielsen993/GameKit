@@ -126,10 +126,49 @@ enum DummyDataSeeder {
             ))
         }
 
+        // Nonogram — winning records carry puzzleId so the Solved gallery
+        // has thumbnails to render. Best times wired per difficulty.
+        context.insert(BestTime(gameKind: .nonogram, difficulty: "tiny",   seconds: 14,  achievedAt: daysAgo(1)))
+        context.insert(BestTime(gameKind: .nonogram, difficulty: "small",  seconds: 78,  achievedAt: daysAgo(4)))
+        context.insert(BestTime(gameKind: .nonogram, difficulty: "medium", seconds: 312, achievedAt: daysAgo(9)))
+
+        let nonogramTinyWins: [(String, Double, Double)] = [
+            ("tiny-001", 14, 1), ("tiny-002", 22, 2),
+            ("tiny-003", 19, 5), ("tiny-004", 31, 8),
+        ]
+        for (pid, seconds, daysAgoVal) in nonogramTinyWins {
+            context.insert(GameRecord(
+                gameKind: .nonogram, difficulty: "tiny",
+                outcome: .win, durationSeconds: seconds,
+                playedAt: daysAgo(daysAgoVal), puzzleId: pid
+            ))
+        }
+        let nonogramSmallWins: [(String, Double, Double)] = [
+            ("small-001", 78, 4), ("small-002", 124, 11),
+        ]
+        for (pid, seconds, daysAgoVal) in nonogramSmallWins {
+            context.insert(GameRecord(
+                gameKind: .nonogram, difficulty: "small",
+                outcome: .win, durationSeconds: seconds,
+                playedAt: daysAgo(daysAgoVal), puzzleId: pid
+            ))
+        }
+        // One medium win + one loss for the row to show non-100% win rate.
+        context.insert(GameRecord(
+            gameKind: .nonogram, difficulty: "medium",
+            outcome: .win, durationSeconds: 312,
+            playedAt: daysAgo(9), puzzleId: "medium-001"
+        ))
+        context.insert(GameRecord(
+            gameKind: .nonogram, difficulty: "medium",
+            outcome: .loss, durationSeconds: 188,
+            playedAt: daysAgo(13)
+        ))
+
         do {
             try context.save()
             defaults.set(true, forKey: seedKey)
-            print("✅ Seeded dummy stats: 3 best times + 2 best scores + 33 game records. Reset: xcrun simctl spawn booted defaults delete com.lauterstar.gamekit \(seedKey) then relaunch.")
+            print("✅ Seeded dummy stats: 6 best times + 2 best scores + 41 game records. Reset: xcrun simctl spawn booted defaults delete com.lauterstar.gamekit \(seedKey) then relaunch.")
         } catch {
             print("❌ Dummy stats seed failed: \(error)")
         }

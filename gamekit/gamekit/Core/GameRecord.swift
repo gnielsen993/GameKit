@@ -49,6 +49,12 @@ final class GameRecord {
     /// without a userland schemaVersion bump on this model (the JSON envelope
     /// schemaVersion bumps to 2 for the same change at the codec layer).
     var score: Int? = nil
+    /// Library puzzle id for puzzle-based games (Nonogram); nil for
+    /// procedurally-generated games (Minesweeper / Merge). Optional →
+    /// SwiftData lightweight migration safe; not exported in v2 envelope
+    /// (round-trip determinism preserved). Stored locally to power the
+    /// "Solved puzzles" gallery in StatsView.
+    var puzzleIdRaw: String? = nil
 
     /// Safe-fallback accessor (D-02) — unknown raw → `.minesweeper`.
     var gameKind: GameKind { GameKind(rawValue: gameKindRaw) ?? .minesweeper }
@@ -63,7 +69,8 @@ final class GameRecord {
         outcome: Outcome,
         durationSeconds: Double,
         playedAt: Date = .now,
-        score: Int? = nil
+        score: Int? = nil,
+        puzzleId: String? = nil
     ) {
         self.gameKindRaw = gameKind.rawValue
         self.difficultyRaw = difficulty
@@ -71,6 +78,7 @@ final class GameRecord {
         self.durationSeconds = durationSeconds
         self.playedAt = playedAt
         self.score = score
+        self.puzzleIdRaw = puzzleId
         // id, schemaVersion default-initialized
     }
 }

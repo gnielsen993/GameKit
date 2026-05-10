@@ -20,4 +20,5 @@ import Foundation
 enum GameRoute: Hashable, Sendable {
     case minesweeper
     case merge
+    case nonogram
 }

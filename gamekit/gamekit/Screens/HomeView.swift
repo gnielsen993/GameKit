@@ -100,6 +100,8 @@ struct HomeView: View {
             MinesweeperGameView()
         case .merge:
             MergeGameView()
+        case .nonogram:
+            NonogramGameView()
         }
     }
 
@@ -129,7 +131,7 @@ struct HomeView: View {
                 symbol: "sparkles",
                 iconColor: theme.colors.accentSecondary,
                 title: String(localized: "Upcoming"),
-                caption: String(localized: "7 games coming")
+                caption: String(localized: "6 games coming")
             )
         }
         .buttonStyle(.plain)

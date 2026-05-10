@@ -63,7 +63,8 @@ final class GameStats {
         gameKind: GameKind,
         difficulty: String,
         outcome: Outcome,
-        durationSeconds: Double
+        durationSeconds: Double,
+        puzzleId: String? = nil
     ) throws {
         // 1. Insert GameRecord unconditionally (D-12 step 1).
         //    Done BEFORE BestTime evaluation so a flaky predicate cannot
@@ -73,7 +74,8 @@ final class GameStats {
             difficulty: difficulty,
             outcome: outcome,
             durationSeconds: durationSeconds,
-            playedAt: .now
+            playedAt: .now,
+            puzzleId: puzzleId
         )
         modelContext.insert(record)
 
@@ -154,6 +156,12 @@ final class GameStats {
             try modelContext.delete(model: BestScore.self)
         }
         try modelContext.save()
+
+        // Per-game progress trackers that live outside SwiftData. Currently
+        // only Nonogram's curated-rotation seen-set; future games extend
+        // here. Outside the transaction since UserDefaults isn't part of
+        // the modelContext.
+        NonogramPicker.resetSeen()
     }
 
     // MARK: - Private

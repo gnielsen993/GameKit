@@ -151,13 +151,54 @@ final class MergeViewModel {
         terminalCount = 0
     }
 
-    /// Mode setter. Persists the new mode to UserDefaults and restarts the
-    /// session — mid-session mode swaps would conflate score-board lineage.
+    /// Direct mode setter — used by `confirmModeChange()` after the user
+    /// approves abandoning their in-progress board. View callers should
+    /// route through `requestModeChange(_:)` so the abandon alert fires
+    /// when there's actual progress to lose.
     func setMode(_ newMode: MergeMode) {
         guard newMode != mode else { return }
         mode = newMode
         userDefaults.set(newMode.rawValue, forKey: Self.lastModeKey)
         restart()
+    }
+
+    // MARK: - Mode-change confirmation flow (mirrors Minesweeper's
+    // difficulty-change abandon alert)
+
+    /// Bound to `.alert(isPresented:)` in MergeGameView. Mutable (not
+    /// `private(set)`) so the alert binding can dismiss on user choice.
+    var showingAbandonAlert: Bool = false
+    private(set) var pendingModeChange: MergeMode?
+
+    /// View callers go through here so a mid-game mode swap pops the
+    /// abandon alert instead of immediately blowing away the score.
+    /// "Mid-game" = the player has scored at least one merge. Score 0
+    /// means they haven't made meaningful progress, so apply immediately.
+    func requestModeChange(_ newMode: MergeMode) {
+        guard newMode != mode else { return }
+        if score > 0 {
+            pendingModeChange = newMode
+            showingAbandonAlert = true
+        } else {
+            setMode(newMode)
+        }
+    }
+
+    /// User confirmed Abandon in the alert — apply the pending change.
+    func confirmModeChange() {
+        guard let target = pendingModeChange else {
+            showingAbandonAlert = false
+            return
+        }
+        pendingModeChange = nil
+        showingAbandonAlert = false
+        setMode(target)
+    }
+
+    /// User tapped Cancel — keep the in-progress game.
+    func cancelModeChange() {
+        pendingModeChange = nil
+        showingAbandonAlert = false
     }
 
     // MARK: - Private
