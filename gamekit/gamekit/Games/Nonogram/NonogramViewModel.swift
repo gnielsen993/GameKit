@@ -87,13 +87,24 @@ final class NonogramViewModel {
 
     /// Per-row, per-hint cross-off mask. `mask[row][hintIdx] = true` when
     /// the player has placed a run that uniquely satisfies that hint number.
-    var rowsCrossOff: [[Bool]] {
-        NonogramHints.rowsCrossOff(board: board, hints: rowHints)
-    }
+    /// Cached — recomputed only after a cell mutation, NOT on every view
+    /// read. The placement-enumeration algorithm is too expensive to run
+    /// for every SwiftUI render pass during a swipe (was the dominant
+    /// cause of swipe lag on 20×20 boards).
+    private(set) var rowsCrossOff: [[Bool]] = []
 
-    /// Per-column, per-hint cross-off mask.
-    var columnsCrossOff: [[Bool]] {
-        NonogramHints.columnsCrossOff(board: board, hints: columnHints)
+    /// Per-column, per-hint cross-off mask. Cached — see `rowsCrossOff`.
+    private(set) var columnsCrossOff: [[Bool]] = []
+
+    /// Recompute cross-off masks. Called after any board mutation.
+    private func refreshCrossOff() {
+        guard currentPuzzle != nil else {
+            rowsCrossOff = []
+            columnsCrossOff = []
+            return
+        }
+        rowsCrossOff = NonogramHints.rowsCrossOff(board: board, hints: rowHints)
+        columnsCrossOff = NonogramHints.columnsCrossOff(board: board, hints: columnHints)
     }
 
     /// Live elapsed seconds. While playing this advances with wall clock;
@@ -133,6 +144,7 @@ final class NonogramViewModel {
         self.currentPuzzle = nil
         self.board = .empty(size: resolved.size)
         self.currentPuzzle = pickPuzzle(for: resolved)
+        refreshCrossOff()
     }
 
     // MARK: - GameStats injection (lazy, one-shot)
@@ -199,6 +211,7 @@ final class NonogramViewModel {
         let preserved = currentPuzzle
         resetSessionState()
         currentPuzzle = preserved ?? pickPuzzle(for: difficulty)
+        refreshCrossOff()
     }
 
     /// Pick a fresh random puzzle and reset the session. Used by the win-
@@ -207,6 +220,7 @@ final class NonogramViewModel {
     func newPuzzle() {
         resetSessionState()
         currentPuzzle = pickPuzzle(for: difficulty)
+        refreshCrossOff()
     }
 
     /// Backwards-compat alias for code that still calls `tryAgain()`.
@@ -337,9 +351,9 @@ final class NonogramViewModel {
             if prev == .filled { placeCount += 1 } else { markCount += 1 }
         }
 
-        // Detect any row/col that just became fully satisfied. Bump the
-        // completion counter once per newly-completed line so the haptic
-        // fires exactly when the player snaps a hint set into place.
+        // Refresh cross-off ONCE per mutation; both the line-completion
+        // detector below and the view layer reuse the cached masks.
+        refreshCrossOff()
         updateLineCompletions(touchedRow: row, touchedCol: col)
 
         if let puzzle = currentPuzzle, NonogramWinDetector.isWon(board: board, puzzle: puzzle) {
@@ -353,8 +367,8 @@ final class NonogramViewModel {
     /// to fully-crossed-off; un-completing a previously-finished line
     /// drops it from the tracked set without firing a haptic.
     private func updateLineCompletions(touchedRow: Int, touchedCol: Int) {
-        let rowMask = NonogramHints.rowsCrossOff(board: board, hints: rowHints)
-        let colMask = NonogramHints.columnsCrossOff(board: board, hints: columnHints)
+        let rowMask = rowsCrossOff
+        let colMask = columnsCrossOff
 
         let rowKey = "r\(touchedRow)"
         let rowComplete = touchedRow >= 0 && touchedRow < rowMask.count

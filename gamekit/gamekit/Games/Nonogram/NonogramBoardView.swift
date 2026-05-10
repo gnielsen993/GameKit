@@ -226,11 +226,22 @@ struct NonogramBoardView: View {
     }
 
     private func slideGesture(cellSize: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 8, coordinateSpace: .local)
+        // 14pt minimum distance — higher than the 8pt SwiftUI default so
+        // a quick brush past a cell while the finger is repositioning
+        // doesn't accidentally start a drag.
+        DragGesture(minimumDistance: 14, coordinateSpace: .local)
             .onChanged { value in
                 guard isInteractive, !dragAborted else { return }
-                let row = Int((value.location.y / cellSize).rounded(.down))
-                let col = Int((value.location.x / cellSize).rounded(.down))
+                // Cell-detection deadzone: only count the touch as "in"
+                // a cell when it's past the cell's outer 18% on the
+                // axis that's currently driving motion. Brushing the
+                // cell border without committing to it doesn't fire.
+                let xCell = value.location.x / cellSize
+                let yCell = value.location.y / cellSize
+                let xFrac = xCell - xCell.rounded(.down)  // 0..1 within cell
+                let yFrac = yCell - yCell.rounded(.down)
+                let row = Int(yCell.rounded(.down))
+                let col = Int(xCell.rounded(.down))
                 guard row >= 0, row < board.size, col >= 0, col < board.size else { return }
 
                 // First sample: lock the start cell + capture intent.
@@ -251,10 +262,13 @@ struct NonogramBoardView: View {
                 else { return }
 
                 // Decide axis once the player has moved past the start cell.
+                // Threshold lowered to 0.35 cells so the lock kicks in
+                // quickly and downstream cells don't get spuriously
+                // mutated before the axis is known.
                 if dragAxis == nil {
                     let dx = abs(value.translation.width)
                     let dy = abs(value.translation.height)
-                    if max(dx, dy) > cellSize * 0.5 {
+                    if max(dx, dy) > cellSize * 0.35 {
                         dragAxis = (dx >= dy) ? .horizontal : .vertical
                     }
                 }
@@ -266,6 +280,19 @@ struct NonogramBoardView: View {
                 let idx = lockedRow * board.size + lockedCol
 
                 if dragVisited.contains(idx) { return }
+
+                // Cell-edge deadzone: when crossing into a NEW cell, the
+                // touch must be past the outer 22% on the active axis
+                // before we commit. Stops "drifted past the border but
+                // didn't mean to enter the next cell" misfires that the
+                // user reported as accidental swipes.
+                if !dragVisited.isEmpty {
+                    let activeFrac: CGFloat = (dragAxis == .horizontal) ? xFrac : yFrac
+                    if activeFrac < 0.22 || activeFrac > 0.78 {
+                        return
+                    }
+                }
+
                 dragVisited.insert(idx)
                 // Same-type filter: only flip cells that match the drag's
                 // start-cell state. The start cell itself is already
