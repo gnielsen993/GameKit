@@ -14,7 +14,7 @@ import SwiftData
 import DesignKit
 
 struct NonogramGameView: View {
-    @State private var viewModel = NonogramViewModel()
+    @State private var viewModel: NonogramViewModel
     @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
@@ -23,6 +23,10 @@ struct NonogramGameView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var didInjectStats = false
     @State private var showDifficultyPicker = false
+
+    init(initialDifficulty: NonogramDifficulty? = nil) {
+        _viewModel = State(initialValue: NonogramViewModel(difficulty: initialDifficulty))
+    }
     /// Gates the end-state card so the player gets a beat to admire the
     /// completed picture before the overlay covers it. Flipped true by a
     /// Task that runs on `state == .won`.
@@ -69,7 +73,9 @@ struct NonogramGameView: View {
                         onLongPress: { row, col in viewModel.handleLongPress(at: row, col: col) },
                         onSlide: { row, col, next in viewModel.setCell(at: row, col: col, to: next) }
                     )
-                    .padding(.horizontal, theme.spacing.s)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.horizontal, theme.spacing.m)
+                    .layoutPriority(1)
                     .sensoryFeedback(
                         .error,
                         trigger: settingsStore.hapticsEnabled ? viewModel.wrongAttemptCount : 0

@@ -8,8 +8,14 @@
 //  so adding game #N does not require new @State Bool flags or new
 //  navigationDestination modifiers in HomeView.
 //
-//  Hashable + Equatable so it can ride a `path: [GameRoute]` /
-//  `NavigationPath` binding on iOS 17+ NavigationStack.
+//  Each case carries an optional mode/difficulty (associated value) so the
+//  Home drawer's mode chips can deep-link straight into a specific mode.
+//  Passing `nil` falls back to the VM's last-played persistence (see each
+//  VM init's `mode/difficulty ?? UserDefaults ?? sensible default` chain).
+//
+//  Hashable + Sendable so the case + payload can ride a `[GameRoute]` path
+//  on iOS 17+ NavigationStack. All associated value types are raw-string
+//  enums that are already Hashable + Sendable.
 //
 //  Foundation-only — no SwiftUI imports. Routing destinations are resolved
 //  in HomeView (the screen that owns the NavigationStack), not here.
@@ -18,7 +24,7 @@
 import Foundation
 
 enum GameRoute: Hashable, Sendable {
-    case minesweeper
-    case merge
-    case nonogram
+    case minesweeper(MinesweeperDifficulty?)
+    case merge(MergeMode?)
+    case nonogram(NonogramDifficulty?)
 }

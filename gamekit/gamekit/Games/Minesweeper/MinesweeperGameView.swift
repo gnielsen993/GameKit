@@ -69,8 +69,8 @@ struct MinesweeperGameView: View {
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
-    init() {
-        _viewModel = State(initialValue: MinesweeperViewModel())
+    init(initialDifficulty: MinesweeperDifficulty? = nil) {
+        _viewModel = State(initialValue: MinesweeperViewModel(difficulty: initialDifficulty))
     }
 
     var body: some View {

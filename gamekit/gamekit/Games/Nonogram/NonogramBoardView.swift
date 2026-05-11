@@ -92,12 +92,30 @@ struct NonogramBoardView: View {
     /// have headroom even at small N.
     private static let minColHintHeight: CGFloat = 80
     /// Per-hint horizontal slot factor inside the row-hint column.
-    private static let perHintWidthFactor: CGFloat = 0.55
+    /// 0.35 is the aggressive setting chosen after stress-mode testing
+    /// showed cs=15 felt too small. Single-digit hints fit comfortably;
+    /// 2-digit hints (e.g. "10", "18") shrink via minimumScaleFactor to
+    /// stay inside the tighter slot. Math: 20·cs + 10·0.35·cs ≤ width →
+    /// cs ≤ width/23.5, so on a 402pt screen we land at cs ≈ 17.1
+    /// (vs 15.75 at 0.5).
+    private static let perHintWidthFactor: CGFloat = 0.35
+    /// Padding inside the hint strip on the OUTER edge (screen edge for
+    /// row hints, screen top for column hints). Keeps the leftmost /
+    /// topmost numbers from kissing the safe-area boundary.
+    private static let hintPaddingOuter: CGFloat = 4
+    /// Padding inside the hint strip on the INNER edge (against the
+    /// grid border). Bumped to 12pt so the numbers float off the grid
+    /// edge with clear breathing room rather than kissing the border.
+    private static let hintPaddingInner: CGFloat = 12
 
     var body: some View {
         GeometryReader { proxy in
             let layout = computeLayout(in: proxy.size)
-            let totalWidth = layout.gridWidth + 2 * layout.rowHintColumnWidth
+            // Single-side margin: all unused horizontal space sits to the
+            // LEFT of the grid so row hints can claim it. Old symmetric
+            // layout split the margin in two and clipped the long-end
+            // hints under the grid on dense boards.
+            let totalWidth = layout.gridWidth + layout.rowHintColumnWidth
             let totalHeight = layout.colHintRowHeight + layout.gridWidth // square grid
 
             VStack(spacing: 0) {
@@ -106,8 +124,6 @@ struct NonogramBoardView: View {
                         .frame(width: layout.rowHintColumnWidth, height: layout.colHintRowHeight)
                     columnHeader(layout: layout)
                         .frame(width: layout.gridWidth, height: layout.colHintRowHeight)
-                    Color.clear
-                        .frame(width: layout.rowHintColumnWidth, height: layout.colHintRowHeight)
                 }
 
                 HStack(spacing: 0) {
@@ -115,14 +131,26 @@ struct NonogramBoardView: View {
                         .frame(width: layout.rowHintColumnWidth, height: layout.gridWidth)
                     cellGrid(cellSize: layout.cellSize)
                         .frame(width: layout.gridWidth, height: layout.gridWidth)
-                    Color.clear
-                        .frame(width: layout.rowHintColumnWidth, height: layout.gridWidth)
+                        // Sharp dark border around the grid so the play
+                        // area reads as a defined object against the
+                        // surrounding hint margin and page background.
+                        .overlay(
+                            Rectangle()
+                                .stroke(theme.colors.textPrimary.opacity(0.85), lineWidth: 1.5)
+                        )
                 }
             }
             // Lock the composition to its exact computed size so SwiftUI's
             // proposal-based layout can't quietly inflate any sub-frame and
-            // open a gap between the column hints and the grid.
+            // open a gap between the column hints and the grid. Pin the
+            // composition to the TRAILING edge — row hints absorb all
+            // unused horizontal margin on the left, grid sits flush at
+            // the right edge of the screen so dense boards never clip.
             .frame(width: totalWidth, height: totalHeight)
+            // Center the composition in the available space (both axes).
+            // Any horizontal or vertical slack splits symmetrically so
+            // the board reads as a deliberately placed object rather
+            // than top-pinned with weight imbalance.
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .center)
         }
     }
@@ -152,6 +180,10 @@ struct NonogramBoardView: View {
                 .frame(width: layout.cellSize, height: layout.colHintRowHeight, alignment: .bottom)
             }
         }
+        // Breathing room inside the hint strip so numbers don't kiss
+        // the screen top or the grid's top edge.
+        .padding(.top, Self.hintPaddingOuter)
+        .padding(.bottom, Self.hintPaddingInner)
     }
 
     private func rowHeader(layout: Layout) -> some View {
@@ -180,6 +212,11 @@ struct NonogramBoardView: View {
                 .frame(width: layout.rowHintColumnWidth, height: layout.cellSize)
             }
         }
+        // Same breathing-room budget as the column hints, applied to
+        // the leading edge (screen edge) and the trailing edge (grid
+        // edge) — keeps the L-strip's inset feel symmetric on both axes.
+        .padding(.leading, Self.hintPaddingOuter)
+        .padding(.trailing, Self.hintPaddingInner)
     }
 
     // MARK: - Cell grid
@@ -241,15 +278,25 @@ struct NonogramBoardView: View {
     }
 
     private func slideGesture(cellSize: CGFloat) -> some Gesture {
-        // 10pt minimum distance — back from 14pt now that path
-        // interpolation handles fast swipes; high enough to avoid
-        // accidental drags from finger reposition but low enough that a
-        // quick swipe registers as a swipe instead of a tap.
-        DragGesture(minimumDistance: 10, coordinateSpace: .local)
+        // 12pt minimum distance — between the original 14 and the 10
+        // we landed on after path interpolation. Higher than 10 so a
+        // brushing finger doesn't kick off a drag, lower than 14 so a
+        // committed quick swipe still registers without a perceived tap
+        // delay.
+        DragGesture(minimumDistance: 12, coordinateSpace: .local)
             .onChanged { value in
                 guard isInteractive, !dragAborted else { return }
-                let row = Int((value.location.y / cellSize).rounded(.down))
-                let col = Int((value.location.x / cellSize).rounded(.down))
+                // Cell-detection with fractional position. xFrac/yFrac
+                // are the 0..1 offset within the current cell on each
+                // axis; used downstream for the cell-edge deadzone that
+                // stops "my finger drifted past the border but I didn't
+                // mean to enter the next cell" misfires.
+                let xCell = value.location.x / cellSize
+                let yCell = value.location.y / cellSize
+                let xFrac = xCell - xCell.rounded(.down)
+                let yFrac = yCell - yCell.rounded(.down)
+                let row = Int(yCell.rounded(.down))
+                let col = Int(xCell.rounded(.down))
                 guard row >= 0, row < board.size, col >= 0, col < board.size else { return }
 
                 // First sample: lock the start cell + capture intent.
@@ -285,6 +332,23 @@ struct NonogramBoardView: View {
                 // only the start cell is in play.
                 let lockedRow = (dragAxis == .horizontal) ? startRow : row
                 let lockedCol = (dragAxis == .vertical) ? startCol : col
+
+                // Cell-edge deadzone — restored from commit 538cbe1.
+                // When the finger crosses into a NEW cell on the active
+                // axis, the touch must be past the outer 22% before we
+                // commit. Stops drifted-past-the-border misfires that
+                // mark adjacent rows mid-swipe. Path interpolation
+                // (below) still backfills if the finger truly crossed
+                // through, but a glancing finger that barely nicks the
+                // border is rejected.
+                if let prevRow = lastDragRow, let prevCol = lastDragCol,
+                   dragAxis != nil,
+                   prevRow != lockedRow || prevCol != lockedCol {
+                    let activeFrac: CGFloat = (dragAxis == .horizontal) ? xFrac : yFrac
+                    if activeFrac < 0.22 || activeFrac > 0.78 {
+                        return
+                    }
+                }
 
                 // Path interpolation — fast swipes can move several cells
                 // between two onChanged samples; without filling the
@@ -396,25 +460,35 @@ struct NonogramBoardView: View {
     private func computeLayout(in size: CGSize) -> Layout {
         let maxRowHints = rowHints.map(\.count).max() ?? 1
         let maxColHints = columnHints.map(\.count).max() ?? 1
+        let n = CGFloat(board.size)
 
-        // Target grid edge: keep board square and lean toward the
-        // smaller container axis. 70% of width keeps a comfortable
-        // hint margin; never exceed available height minus reserve for
-        // column hints.
-        let preferredEdge = size.width * Self.gridEdgeFraction
+        // Fixed grid edge — the OUTER composition footprint stays
+        // constant across difficulties so the player's eye lands on the
+        // same physical area each time. Smaller puzzles get chunky
+        // cells, denser puzzles get small cells, but the board's
+        // overall size doesn't shift around.
+        //
+        // gridEdgeFraction (0.78) of the container width is reserved
+        // for the grid; the remaining horizontal margin holds the row
+        // hints regardless of how many hints the puzzle actually has.
+        // Hints rely on minimumScaleFactor to shrink digits into the
+        // fixed slot when worst-case hint counts exceed the budget.
+        let pad = Self.hintPaddingOuter + Self.hintPaddingInner
         let maxByHeight = size.height - Self.minColHintHeight
-        let gridEdge = max(Self.minCellSize * CGFloat(board.size),
+        let preferredEdge = size.width * Self.gridEdgeFraction
+        let gridEdge = max(Self.minCellSize * n,
                            min(preferredEdge, maxByHeight))
-        let cs = gridEdge / CGFloat(board.size)
+        let cs = gridEdge / n
 
-        // Hint slots get whatever margin remains beside/above the grid.
-        // Symmetric horizontal reserve so the grid is centered.
-        let availableHintW = max(0, (size.width - gridEdge) / 2)
+        // Hint slots take all leftover margin on each axis. This stays
+        // CONSTANT as N changes — hint area for 5×5 looks the same
+        // physical size as hint area for 20×20.
+        let availableHintW = max(0, size.width - gridEdge)
         let availableHintH = max(0, size.height - gridEdge)
-        let rowHintW = min(availableHintW,
-                           CGFloat(maxRowHints) * cs * Self.perHintWidthFactor)
+        let rowHintW = availableHintW
         let colHintH = min(availableHintH,
-                           CGFloat(maxColHints) * cs * 0.55)
+                           max(Self.minColHintHeight,
+                               CGFloat(maxColHints) * cs * 0.55 + pad))
 
         // Hint font scales with cell size but never drops below
         // minHintFont so a crowded 20×20 row stays legible. Cap on the

@@ -32,8 +32,8 @@ struct MergeGameView: View {
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
-    init() {
-        _viewModel = State(initialValue: MergeViewModel())
+    init(initialMode: MergeMode? = nil) {
+        _viewModel = State(initialValue: MergeViewModel(mode: initialMode))
     }
 
     var body: some View {

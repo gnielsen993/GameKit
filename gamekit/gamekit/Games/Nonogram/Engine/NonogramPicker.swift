@@ -31,6 +31,14 @@ enum NonogramPicker {
         userDefaults: UserDefaults = .standard,
         rng: inout any RandomNumberGenerator
     ) -> NonogramPuzzle {
+        #if DEBUG
+        // STRESS-TEST OVERRIDE — checkerboard puzzle generates the
+        // worst-case hint count per row + per column. Used to inspect
+        // hint-header layout under maximum density. REVERT before ship.
+        if Self.stressMode {
+            return checkerboard(for: difficulty)
+        }
+        #endif
         let pool = NonogramLibrary.puzzles(for: difficulty)
         let seenKey = seenKeyPrefix + difficulty.rawValue
         var seen = Set(userDefaults.stringArray(forKey: seenKey) ?? [])
@@ -59,4 +67,28 @@ enum NonogramPicker {
             userDefaults.removeObject(forKey: seenKeyPrefix + d.rawValue)
         }
     }
+
+    #if DEBUG
+    /// Flip to `true` to force every puzzle pick to a checkerboard with
+    /// max-density hints (every row + every col is `[1, 1, 1, …]`).
+    /// REVERT to `false` before merging to ship.
+    static let stressMode: Bool = false
+
+    /// Synthetic checkerboard puzzle for hint-header stress testing.
+    /// 5×5 → 3 hints per row/col, 10×10 → 5, 15×15 → 8, 20×20 → 10.
+    private static func checkerboard(for difficulty: NonogramDifficulty) -> NonogramPuzzle {
+        let n = difficulty.size
+        var bits = ""
+        for r in 0..<n {
+            for c in 0..<n {
+                bits.append((r + c) % 2 == 0 ? "1" : "0")
+            }
+        }
+        return NonogramPuzzle(
+            id: "stress-\(difficulty.rawValue)",
+            title: "Stress (debug)",
+            grid: bits
+        )
+    }
+    #endif
 }

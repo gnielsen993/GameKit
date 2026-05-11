@@ -2,18 +2,27 @@
 //  HomeView.swift
 //  gamekit
 //
-//  The Drawer — entry point to all playable games. Renders one square
-//  tile per `GameDescriptor.all` entry plus a static Upcoming tile that
-//  presents `UpcomingGamesView` in a sheet.
+//  The Drawer — entry point to all playable games. Renders one full-width
+//  drawer row per `GameDescriptor.all` entry plus a static Upcoming row
+//  that presents `UpcomingGamesView` in a sheet.
 //
-//  Routing (refactored 2026-05-01 to fix expansibility audit finding):
-//    - NavigationStack owns a `path: [GameRoute]` instead of a per-game
-//      `@State navigateToX: Bool` flag.
-//    - A single `.navigationDestination(for: GameRoute.self)` switch
-//      maps a route case to its game view.
+//  Drawer interaction (2026-05-11):
+//    - Each row is a closed drawer face. Tap → expand, revealing the
+//      game's mode chips inside the drawer cavity (see DrawerRow.swift).
+//    - Single accordion: only one drawer open at a time. Sibling drawers
+//      dim to 0.4 opacity while another is expanded so the open one
+//      reads as the focused element.
+//    - Tap a mode chip → push the chip's GameRoute (carries the chosen
+//      difficulty/mode as an associated value, see GameRoute.swift).
+//    - Tap the open drawer's face again, or tap any dimmed sibling, to
+//      collapse / switch.
+//
+//  Routing:
+//    - NavigationStack owns `path: [GameRoute]`. A single
+//      `.navigationDestination(for: GameRoute.self)` switch maps each
+//      case (with its associated mode) to its game view's init.
 //    - Adding game #N = one descriptor entry in GameDescriptor.all +
-//      one case in GameRoute + one switch arm here. HomeView body,
-//      @State, and modifiers stay constant.
+//      one case in GameRoute + one switch arm here.
 //
 //  Per P1 D-02: this file owns its own NavigationStack — RootTabView
 //  does not (Anti-Pattern 3 in ARCHITECTURE.md).
@@ -27,6 +36,7 @@ struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var path: [GameRoute] = []
+    @State private var expandedKind: GameKind?
     @State private var showingComingSoon: GameCard?
     @State private var showingUpcoming: Bool = false
     @State private var showingSettings: Bool = false
@@ -36,24 +46,54 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScrollView {
-                LazyVGrid(
-                    columns: [
-                        GridItem(.flexible(), spacing: theme.spacing.m),
-                        GridItem(.flexible(), spacing: theme.spacing.m)
-                    ],
-                    spacing: theme.spacing.m
-                ) {
-                    ForEach(GameDescriptor.all) { descriptor in
-                        gameTile(for: descriptor)
+            // Plain ZStack — no ScrollView. With 3 playable drawers +
+            // Upcoming the catalogue comfortably fits on every supported
+            // device; dropping ScrollView lets the whole page background
+            // receive taps so "tap anywhere outside" closes a drawer
+            // even above the first row or below Upcoming.
+            ZStack(alignment: .top) {
+                theme.colors.background
+                    .ignoresSafeArea()
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if expandedKind != nil { expandedKind = nil }
                     }
-                    upcomingTile
+
+                VStack(spacing: theme.spacing.s) {
+                    ForEach(GameDescriptor.all) { descriptor in
+                        DrawerRow(
+                            descriptor: descriptor,
+                            theme: theme,
+                            isExpanded: expandedKind == descriptor.kind,
+                            onToggle: {
+                                // When another drawer is open, tapping
+                                // any closed drawer collapses the cabinet
+                                // rather than switching expansion. Open
+                                // drawer's own face is hidden under the
+                                // cavity so its onToggle won't fire.
+                                if let active = expandedKind, active != descriptor.kind {
+                                    expandedKind = nil
+                                } else {
+                                    toggle(descriptor.kind)
+                                }
+                            },
+                            onSelectMode: { route in
+                                expandedKind = nil
+                                path.append(route)
+                            }
+                        )
+                        .opacity(opacity(for: descriptor.kind))
+                        .scaleEffect(scale(for: descriptor.kind), anchor: .top)
+                    }
+
+                    upcomingRow
+                        .opacity(expandedKind == nil ? 1 : 0.4)
                 }
-                .padding(.horizontal, theme.spacing.l)
-                .padding(.vertical, theme.spacing.l)
+                .padding(.horizontal, theme.spacing.m)
+                .padding(.top, theme.spacing.s)
                 .frame(maxWidth: .infinity, alignment: .top)
+                .animation(.spring(response: 0.42, dampingFraction: 0.78), value: expandedKind)
             }
-            .background(theme.colors.background.ignoresSafeArea())
             .navigationTitle(String(localized: "The Drawer"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -91,50 +131,90 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Accordion state
+
+    private func toggle(_ kind: GameKind) {
+        if expandedKind == kind {
+            expandedKind = nil
+        } else {
+            expandedKind = kind
+        }
+    }
+
+    private func opacity(for kind: GameKind) -> Double {
+        guard let expandedKind else { return 1 }
+        return expandedKind == kind ? 1 : 0.4
+    }
+
+    private func scale(for kind: GameKind) -> CGFloat {
+        guard let expandedKind else { return 1 }
+        return expandedKind == kind ? 1 : 0.98
+    }
+
     // MARK: - Routing
 
     @ViewBuilder
     private func destination(for route: GameRoute) -> some View {
         switch route {
-        case .minesweeper:
-            MinesweeperGameView()
-        case .merge:
-            MergeGameView()
-        case .nonogram:
-            NonogramGameView()
+        case .minesweeper(let difficulty):
+            MinesweeperGameView(initialDifficulty: difficulty)
+        case .merge(let mode):
+            MergeGameView(initialMode: mode)
+        case .nonogram(let difficulty):
+            NonogramGameView(initialDifficulty: difficulty)
         }
     }
 
-    // MARK: - Tiles
+    // MARK: - Upcoming row
 
     @ViewBuilder
-    private func gameTile(for descriptor: GameDescriptor) -> some View {
+    private var upcomingRow: some View {
         Button {
-            path.append(descriptor.route)
-        } label: {
-            tileCard(
-                symbol: descriptor.symbol,
-                iconColor: accentColor(for: descriptor.accent),
-                title: String(localized: String.LocalizationValue(descriptor.titleKey)),
-                caption: String(localized: String.LocalizationValue(descriptor.captionKey))
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    @ViewBuilder
-    private var upcomingTile: some View {
-        Button {
+            expandedKind = nil
             showingUpcoming = true
         } label: {
-            tileCard(
-                symbol: "sparkles",
-                iconColor: theme.colors.accentSecondary,
-                title: String(localized: "Upcoming"),
-                caption: String(localized: "6 games coming")
+            HStack(spacing: theme.spacing.m) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
+                        .fill(theme.colors.accentSecondary.opacity(0.18))
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(theme.colors.accentSecondary)
+                }
+                .frame(width: 52, height: 52)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(localized: "Upcoming"))
+                        .font(theme.typography.headline)
+                        .foregroundStyle(theme.colors.textPrimary)
+                    Text(String(localized: "6 games coming"))
+                        .font(theme.typography.caption)
+                        .foregroundStyle(theme.colors.textSecondary)
+                }
+
+                Spacer(minLength: theme.spacing.s)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(theme.colors.textSecondary)
+                    .frame(width: 28, height: 28)
+                    .background(Circle().fill(theme.colors.background.opacity(0.6)))
+            }
+            .padding(.horizontal, theme.spacing.l)
+            .padding(.vertical, theme.spacing.m)
+            .background(
+                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                    .fill(theme.colors.surface)
+                    .shadow(color: DrawerChrome.shadow.opacity(0.08), radius: 6, x: 0, y: 3)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                    .stroke(theme.colors.border.opacity(0.5), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
     }
 
     @ViewBuilder
@@ -156,38 +236,6 @@ struct HomeView: View {
                 .foregroundStyle(theme.colors.textPrimary)
         }
         .accessibilityLabel(Text("Profile"))
-    }
-
-    @ViewBuilder
-    private func tileCard(
-        symbol: String,
-        iconColor: Color,
-        title: String,
-        caption: String
-    ) -> some View {
-        DKCard(theme: theme) {
-            VStack(spacing: theme.spacing.s) {
-                Image(systemName: symbol)
-                    .font(.system(size: 56))
-                    .foregroundStyle(iconColor)
-                Text(title)
-                    .font(theme.typography.headline)
-                    .foregroundStyle(theme.colors.textPrimary)
-                Text(caption)
-                    .font(theme.typography.caption)
-                    .foregroundStyle(theme.colors.textSecondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .aspectRatio(1, contentMode: .fit)
-        .frame(maxWidth: .infinity)
-    }
-
-    private func accentColor(for role: AccentRole) -> Color {
-        switch role {
-        case .primary:   return theme.colors.accentPrimary
-        case .secondary: return theme.colors.accentSecondary
-        }
     }
 }
 

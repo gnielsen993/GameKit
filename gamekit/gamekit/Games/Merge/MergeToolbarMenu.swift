@@ -39,8 +39,8 @@ struct MergeToolbarMenu: View {
 
     private func displayName(for mode: MergeMode) -> String {
         switch mode {
-        case .winMode:  return String(localized: "Win mode (stop at 2048)")
-        case .infinite: return String(localized: "Infinite mode")
+        case .winMode:  return String(localized: "2048 · Classic")
+        case .infinite: return String(localized: "Infinite · Endless")
         }
     }
 }
