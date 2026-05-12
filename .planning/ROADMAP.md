@@ -1,7 +1,7 @@
 # Roadmap: GameKit
 
 **Created:** 2026-04-24
-**Last updated:** 2026-05-12 (v1.2 Video Mode milestone appended)
+**Last updated:** 2026-05-12 (Phase 8 design locked — v1.2 progress 1/6 phases complete)
 **Granularity:** standard (5–8 phases, 3–5 plans each)
 **Coverage:** v1.0 — 38/38 requirements mapped ✓ · v1.2 — 14/14 requirements mapped ✓
 
@@ -12,7 +12,7 @@ GameKit ships in named, append-only milestones. Phase numbering never resets —
 | Milestone | Phases | Status | Scope |
 |-----------|--------|--------|-------|
 | **v1.0** | 1 → 7 (incl. 6.1) | Phase 7 in progress (pre-flight) | MVP — Minesweeper-only ship to TestFlight / App Store |
-| **v1.2** | 8 → 13 | Not started (defining) | Video Mode — optional layout adaptation for PiP video overlays |
+| **v1.2** | 8 → 13 | In progress (Phase 8 complete 2026-05-12; 1/6 phases) | Video Mode — optional layout adaptation for PiP video overlays |
 
 v1.1 (Merge / Nonogram graduation) shipped under the v1.0 phase set as a post-MVP follow-up and did not open a new milestone band; both games are in production binary as of 2026-05-12 and become Video-Mode adoption targets in v1.2 Phase 12.
 
@@ -244,7 +244,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 
 ### v1.2 Phases
 
-- [ ] **Phase 8: Video Mode Design** - Screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row + win/loss banner sketch (design-only — no app code)
+- [x] **Phase 8: Video Mode Design** (2026-05-12) - Screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row + win/loss banner sketch (design-only — no app code)
 - [ ] **Phase 9: Video Mode Foundation** - VideoModeStore + Settings UI (toggle + 6-location picker + manual-selection copy) + shared compact control row component + environment plumbing
 - [ ] **Phase 10: Layout Primitives** - Small-PiP reposition system + Large-PiP reserved-band system + Off restore; verified end-to-end on a stub game screen
 - [ ] **Phase 11: Minesweeper Adoption** - Easy + Medium across all 6 locations + Hard 16×30 strategy implemented per Phase 8 ADR
@@ -269,7 +269,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 - [x] 08-03-banner-placement-PLAN.md — Author 08-BANNER-PLACEMENT.md (6-row opposite-of-PiP anchor table + DKButton + dampen-to-identity) + banner-placement HTML sketch (CONTEXT D-09..D-12; Phase 8 SC4)
 - [x] 08-04-layout-doc-PLAN.md — Author VIDEO-MODE-LAYOUTS.md (5 games x 6 PiP zones x both presets) + 5 per-game overlay HTML sketches (Phase 8 SC1; depends on 08-01)
 - [x] 08-05-hard-mines-adr-PLAN.md — 4 candidate-variant HTML sketches + 08-HARD-MINES-ADR.md (Accepted 2026-05-12: smaller-cells / Variant 1) + warning-compromise rollback + 06.1-03 deconfliction (CONTEXT D-13 resolved; Phase 8 SC2)
-- [ ] 08-06-design-lock-PLAN.md — Pre-flight artifact audit + Gabe's design-lock sign-off + 08-DESIGN-LOCK.md (Phase 8 SC5; unblocks Phase 9)
+- [x] 08-06-design-lock-PLAN.md — Pre-flight artifact audit + Gabe's design-lock sign-off + 08-DESIGN-LOCK.md (Phase 8 SC5; unblocks Phase 9) — completed 2026-05-12
 
 ### Phase 9: Video Mode Foundation
 **Goal**: The plumbing every later phase consumes is in place — a `VideoModeStore` persists the on/off toggle and selected location across launches, Settings exposes both controls plus the "manual selection only" explanation copy, and a single shared compact-control-row component is available for every game screen to adopt. No game layout changes yet; the system reads "off" by default and the existing v1.0 + v1.1 game layouts stay byte-identical.
@@ -343,7 +343,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 8. Video Mode Design | 5/6 | In progress | - |
+| 8. Video Mode Design | 6/6 | Complete | 2026-05-12 |
 | 9. Video Mode Foundation | 0/TBD | Not started | - |
 | 10. Layout Primitives | 0/TBD | Not started | - |
 | 11. Minesweeper Adoption | 0/TBD | Not started | - |

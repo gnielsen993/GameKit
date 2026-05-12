@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 08-05-hard-mines-adr-PLAN.md
-last_updated: "2026-05-12T23:30:15Z"
+stopped_at: Completed 08-06-design-lock-PLAN.md — Phase 8 complete; Phase 9 unblocked
+last_updated: "2026-05-12T23:45:00Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 14
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 55
-  completed_plans: 51
-  percent: 93
+  completed_plans: 52
+  percent: 95
 ---
 
 # Project State
@@ -21,19 +21,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 08 — video-mode-design
+**Current focus:** Phase 09 — video-mode-foundation (ready to plan)
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 08 (video-mode-design) — EXECUTING
-Plan: 5 of 6
-Status: Ready to execute
+Phase: 08 (video-mode-design) — **COMPLETE** (2026-05-12); Phase 09 unblocked
+Plan: 6 of 6 (Phase 8 closed)
+Status: Phase 8 complete; ready to plan Phase 9
 Last activity: 2026-05-12
 
-Progress: [█████████░] 93%
+Progress: [█████████▌] 95%
 
-**Next action:** Execute `08-06-design-lock-PLAN.md` — pre-flight artifact audit + Gabe's design-lock sign-off + `08-DESIGN-LOCK.md` (Phase 8 SC5; unblocks Phase 9). All four upstream artifacts (screenshots / VIDEO-MODE-LAYOUTS / 08-COMPACT-ROW-TOKENS / 08-BANNER-PLACEMENT / 08-HARD-MINES-ADR) are now in place — CONTEXT D-13 resolved 2026-05-12 with `smaller-cells` (Variant 1).
+**Next action:** Plan Phase 9 (`/gsd-plan-phase 9`) — Video Mode Foundation (`VideoModeStore` + Settings UI toggle + 6-location picker + manual-selection copy + shared compact control row component). Phase 9 consumes `08-COMPACT-ROW-TOKENS.md` (SC4) and `VIDEO-MODE-LAYOUTS.md` 6-zone vocabulary (SC3) from the now-locked Phase 8 design corpus.
 
 ## v1.0 Carry-Over
 
@@ -113,6 +113,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 08-video-mode-design P03 | 2 | 2 tasks | 2 files |
 | Phase 08 P04 | 8 | 2 tasks | 6 files |
 | Phase 08 P05 | continuation | 3 tasks (Task 1 + 2 prior agent; Task 3 this agent) | 5 files (4 sketches + 1 ADR) |
+| Phase 08 P06 | continuation | 3 tasks (1 audit + 1 checkpoint:human-verify + 1 doc author) | 2 files (08-DESIGN-LOCK.md + 08-06-SUMMARY.md) |
 
 ## Accumulated Context
 
@@ -304,15 +305,16 @@ Recent decisions affecting current work:
 - Layout doc references all 17 PiP-overlaid screenshots from 08-01 (deviation-extended set)
 - Mines Hard strategy deferred to 08-HARD-MINES-ADR.md (Plan 08-05) — NO pre-decision per CONTEXT D-13
 - Canonical 4-corner Hard Dracula set chosen as evidence anchor for Small-PiP placement across all games
+- **Phase 8 / Plan 06 (2026-05-12):** Phase 8 design locked; Phase 9 unblocked. `08-DESIGN-LOCK.md` records Gabe's verbatim sign-off ("design locked") and indexes all 4 artifacts by SC (SC1→LAYOUTS, SC2→ADR, SC3→TOKENS, SC4→BANNER). SC5 confirmed: zero `gamekit/` files modified during the entire phase. 08-01 17-PNG set adopted as v1.2 design baseline; PNG-count audit relaxed `== 10` → `>= 10` per Rule 1 (deviation accepted upstream in 08-01). v1.2 milestone progress 0/6 → 1/6 phases complete.
 
 ### Pending Todos
 
-- **v1.2 work queued (NEW):** Plan Phase 8 (Video Mode Design — screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row design tokens + win/loss banner sketch). Then Phase 9 (Foundation: VideoModeStore + Settings UI + shared compact row), Phase 10 (Layout primitives), Phase 11 (Minesweeper adoption), Phase 12 (Merge + Nonogram adoption), Phase 13 (Win/loss banner + a11y gating). See `.planning/ROADMAP.md` §Milestone v1.2 for full phase details.
+- **v1.2 work queued:** Phase 8 (Video Mode Design) is **complete** as of 2026-05-12 (`08-DESIGN-LOCK.md` signed off). Next: `/gsd-plan-phase 9` (Foundation: `VideoModeStore` + Settings UI + shared compact control row). Then Phase 10 (Layout primitives — research-flagged), Phase 11 (Minesweeper adoption — smaller-cells per 08-HARD-MINES-ADR), Phase 12 (Merge + Nonogram adoption), Phase 13 (Win/loss banner + a11y gating). See `.planning/ROADMAP.md` §Milestone v1.2 for full phase details.
 - **P7 work queued (v1.0 carry-over):** Plans 07-02 (icon production), 07-03 (CloudKit Production schema deploy), 07-04 (App Store metadata + privacy policy + screenshots), 07-05 (release checklist + 07-VERIFICATION.md template), 07-06 (TestFlight upload + SC1-SC5 manual sweep + submit). See `.planning/phases/07-release/` for plan files. v1.0 release work runs in parallel as non-coding tasks (DNS / ASC / nutrition label) and is NOT a blocker for v1.2 code work.
 
 ### Blockers/Concerns
 
-- *(no active v1.2 blockers — roadmap landed, Phase 8 ready to plan. v1.0 Phase 7 release pre-flight items continue in parallel; see §v1.0 Carry-Over for the open checklist.)*
+- *(no active v1.2 blockers — Phase 8 design locked 2026-05-12, Phase 9 unblocked and ready to plan. v1.0 Phase 7 release pre-flight items continue in parallel; see §v1.0 Carry-Over for the open checklist.)*
 
 ## Deferred Items
 
@@ -324,8 +326,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-12T23:18:53.400Z
-Stopped at: Completed 08-04-layout-doc-PLAN.md
+Last session: 2026-05-12T23:45:00Z
+Stopped at: Completed 08-06-design-lock-PLAN.md — Phase 8 closed; v1.2 milestone 1/6 phases complete
 Resume file: None
 
-**Planned Phase:** 8 (video-mode-design) — 6 plans — 2026-05-12T21:37:33.077Z
+**Planned Phase:** 8 (video-mode-design) — 6/6 plans complete — closed 2026-05-12. Next planning target: Phase 9 (video-mode-foundation).
