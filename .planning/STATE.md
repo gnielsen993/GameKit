@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 08-04-layout-doc-PLAN.md
-last_updated: "2026-05-12T23:18:58.382Z"
+stopped_at: Completed 08-05-hard-mines-adr-PLAN.md
+last_updated: "2026-05-12T23:30:15Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 14
   completed_phases: 7
   total_plans: 55
-  completed_plans: 50
-  percent: 91
+  completed_plans: 51
+  percent: 93
 ---
 
 # Project State
@@ -27,13 +27,13 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 08 (video-mode-design) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-05-12
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 93%
 
-**Next action:** Run `/gsd-plan-phase 8` to plan the Video Mode Design phase. Per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required", Phase 8 is screenshot-driven and produces the layout doc + Hard-Mines strategy ADR consumed by Phases 9–13 — it is NOT optional and MUST NOT be skipped to jump straight to code.
+**Next action:** Execute `08-06-design-lock-PLAN.md` — pre-flight artifact audit + Gabe's design-lock sign-off + `08-DESIGN-LOCK.md` (Phase 8 SC5; unblocks Phase 9). All four upstream artifacts (screenshots / VIDEO-MODE-LAYOUTS / 08-COMPACT-ROW-TOKENS / 08-BANNER-PLACEMENT / 08-HARD-MINES-ADR) are now in place — CONTEXT D-13 resolved 2026-05-12 with `smaller-cells` (Variant 1).
 
 ## v1.0 Carry-Over
 
@@ -112,6 +112,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 08-video-mode-design P02 | 2 | 2 tasks | 2 files |
 | Phase 08-video-mode-design P03 | 2 | 2 tasks | 2 files |
 | Phase 08 P04 | 8 | 2 tasks | 6 files |
+| Phase 08 P05 | continuation | 3 tasks (Task 1 + 2 prior agent; Task 3 this agent) | 5 files (4 sketches + 1 ADR) |
 
 ## Accumulated Context
 
@@ -133,6 +134,7 @@ Recent decisions affecting current work:
 - **Roadmap (2026-05-12):** v1.2 phase numbering continues from v1.0's last integer phase (7) — Phases 8–13 are v1.2. Numbering never resets across milestones per the new Milestones policy section in ROADMAP.md.
 - **Roadmap (2026-05-12):** Phase 8 is a mandatory design phase per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required". No app code is written in Phase 8 (throwaway sketches OK if they accelerate the decision). Phase 8 produces the Hard-Mines strategy ADR consumed by Phase 11.
 - **Roadmap (2026-05-12):** Phase 10 (Layout Primitives) flagged for `/gsd-research-phase` before planning — the SwiftUI adoption surface choice (`@Environment` injection vs. container view vs. modifier) is non-obvious. Phase 11 conditionally flagged depending on the Phase 8 Hard-Mines ADR outcome. Phases 9 / 12 / 13 proceed direct to planning with established patterns.
+- **Phase 8 / Plan 05 (2026-05-12):** Hard 16x30 Video-Mode strategy = **smaller-cells (Variant 1)**, locked in `08-HARD-MINES-ADR.md` (Status: Accepted 2026-05-12). CONTEXT D-13 resolved. Reuses 06.1-03 auto-scale infrastructure (only `Self.minCellSize` becomes Video-Mode-aware, gated on `videoModeStore.isOn`); zero gesture change; `MagnifyGesture` / cell-level `.exclusively(before:)` byte-identical. Rollback target = warning-compromise (Variant 4) if Phase 11 / TestFlight surfaces a Pro Max mis-tap regression OR §8.12 Dracula legibility regression. ROADMAP §v1.2 Phase 11 research-flag does NOT fire (smaller-cells is a ROADMAP-named skip-research outcome).
 - Deployment target fixed from 26.2 (template typo) to 17.0 per CLAUDE.md §1
 - Bundle ID com.lauterstar.gamekit contractually frozen as of P1-01 commit 3e8c43a
 - SWIFT_STRICT_CONCURRENCY = complete enabled across all 6 build configs
