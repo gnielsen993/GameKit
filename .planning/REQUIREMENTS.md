@@ -260,26 +260,38 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 
 ### v1.2 Traceability
 
-Filled by roadmapper.
+Populated 2026-05-12 by the roadmapper. Phase numbering continues from v1.0's last integer phase (7) — v1.2 occupies the 8–13 band, design-first (Phase 8) followed by code phases (9–13).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VIDEO-01 | TBD | Pending |
-| VIDEO-02 | TBD | Pending |
-| VIDEO-03 | TBD | Pending |
-| VIDEO-04 | TBD | Pending |
-| VIDEO-05 | TBD | Pending |
-| VIDEO-06 | TBD | Pending |
-| VIDEO-07 | TBD | Pending |
-| VIDEO-08 | TBD | Pending |
-| VIDEO-09 | TBD | Pending |
-| VIDEO-10 | TBD | Pending |
-| VIDEO-11 | TBD | Pending |
-| VIDEO-12 | TBD | Pending |
-| VIDEO-13 | TBD | Pending |
-| VIDEO-14 | TBD | Pending |
+| VIDEO-01 | Phase 9 | Pending |
+| VIDEO-02 | Phase 9 | Pending |
+| VIDEO-03 | Phase 9 | Pending |
+| VIDEO-04 | Phase 9 | Pending |
+| VIDEO-05 | Phase 10 | Pending |
+| VIDEO-06 | Phase 10 | Pending |
+| VIDEO-07 | Phase 11 | Pending |
+| VIDEO-08 | Phase 11 | Pending |
+| VIDEO-09 | Phase 12 | Pending |
+| VIDEO-10 | Phase 12 | Pending |
+| VIDEO-11 | Phase 13 | Pending |
+| VIDEO-12 | Phase 13 | Pending |
+| VIDEO-13 | Phase 10 | Pending |
+| VIDEO-14 | Phase 9 | Pending |
 
-**Notes on placement:**
+**v1.2 Coverage:**
+- v1.2 requirements: 14 total
+- Mapped to phases: 14 ✓
+- Unmapped: 0
+- Phase 8 (Video Mode Design) intentionally has no VIDEO-* mappings — it is the design-gate phase that produces the screenshot-annotated layout doc + Hard-Mines ADR + compact-row design tokens + win/loss banner sketch consumed by Phases 9–13. Per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required": "Do not skip this and jump straight to code."
+
+**Notes on v1.2 placement:**
+- **VIDEO-04 (compact control row component) is in Phase 9, not Phase 10**, because the component is plumbing every other phase consumes — building it alongside the store + Settings UI keeps the foundation phase coherent ("everything every game needs to read Video Mode state") while Phase 10 stays focused on the small/large/off reflow primitives that consume that component.
+- **VIDEO-13 (Off-restore) is in Phase 10, not Phase 9**, because the off-restore guarantee is fundamentally a layout-primitive concern — it asserts that the layout primitives degrade gracefully to the baseline layout, which can only be proven once the primitives exist. Each adoption phase (11 / 12 / 13) then carries a per-game off-restore spot-check in its own Success Criteria.
+- **VIDEO-08 (Hard Minesweeper strategy) is implemented in Phase 11**, but the *decision* (smaller cells / scroll / zoom / warning) is locked at Phase 8 in the Hard-Mines ADR. Phase 11's Success Criteria reference the ADR by name rather than re-deciding the approach.
+- **VIDEO-11 + VIDEO-12 (banner + a11y gating) bundled into Phase 13** because the banner IS the surface the a11y gates apply to — splitting them would create a phase where the banner ships without proper gating (a P0 a11y bug) or the gating ships without the surface to gate.
+
+**Notes on v1 placement (carried forward):**
 - **A11Y-02 (VoiceOver labels) is mapped to Phase 5** but cell-level `accessibilityLabel` is *baked in* at Phase 3 per PITFALLS Pitfall 13 (cheaper to bake in with the cell view than retrofit). Phase 5 polishes the labels on buttons, overlays, and the full VoiceOver navigation pass — Phase 3 ensures cells aren't retrofit.
 - **MINES-03 / MINES-04 / MINES-07 (engine-side) at Phase 2; MINES-07 (UI-side overlay) at Phase 3** — engine detection of win/loss lands at P2 in WinDetector tests; the actual user-visible overlay using `theme.colors.{success,danger}` lands at P3.
 - **THEME-02 at Phase 3** because the new `theme.colors.gameNumber(_:)` token must be added to DesignKit and consumed by Mines cells in Phase 3 (no hardcoded greys from day 1). The full 6-category legibility audit is Phase 5 (THEME-01).
@@ -289,4 +301,5 @@ Filled by roadmapper.
 ---
 *Requirements defined: 2026-04-24*
 *Traceability populated: 2026-04-24 — all 35 v1 requirements mapped*
-*v1.2 Video Mode requirements added: 2026-05-12 — VIDEO-01..14 (traceability pending roadmapper)*
+*v1.2 Video Mode requirements added: 2026-05-12 — VIDEO-01..14*
+*v1.2 Traceability populated: 2026-05-12 — all 14 v1.2 requirements mapped (Phase 8 design gate, Phases 9–13 implementation)*

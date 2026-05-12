@@ -1,8 +1,20 @@
 # Roadmap: GameKit
 
 **Created:** 2026-04-24
+**Last updated:** 2026-05-12 (v1.2 Video Mode milestone appended)
 **Granularity:** standard (5–8 phases, 3–5 plans each)
-**Coverage:** 35/35 v1 requirements mapped
+**Coverage:** v1.0 — 38/38 requirements mapped ✓ · v1.2 — 14/14 requirements mapped ✓
+
+## Milestones
+
+GameKit ships in named, append-only milestones. Phase numbering never resets — each milestone continues from the prior milestone's last integer phase. Earlier-milestone phases are preserved verbatim once shipped; insertions use decimal phases (e.g., 06.1).
+
+| Milestone | Phases | Status | Scope |
+|-----------|--------|--------|-------|
+| **v1.0** | 1 → 7 (incl. 6.1) | Phase 7 in progress (pre-flight) | MVP — Minesweeper-only ship to TestFlight / App Store |
+| **v1.2** | 8 → 13 | Not started (defining) | Video Mode — optional layout adaptation for PiP video overlays |
+
+v1.1 (Merge / Nonogram graduation) shipped under the v1.0 phase set as a post-MVP follow-up and did not open a new milestone band; both games are in production binary as of 2026-05-12 and become Video-Mode adoption targets in v1.2 Phase 12.
 
 ## Overview
 
@@ -216,6 +228,157 @@ The following are PROJECT.md long-term vision and are **not** roadmap phases:
 - Banner / interstitial / video ads, coins / fake currency / energy / hearts, aggressive subscription paywalls, required accounts, streak-shaming, push-notification nagging, pop-up rate-this-app modals, third-party backend, analytics / telemetry SDKs, multiplayer / leaderboards / social, asset-heavy games, localizations beyond EN, per-game alt-icon variants, `CKSyncEngine`, `@ModelActor` for MVP writes, `Canvas`-rendered Mines board, `GameProtocol` / runtime game registry / per-game `@Model`s, TCA / Redux.
 
 ---
+
+## Milestone v1.2: Video Mode
+
+**Opened:** 2026-05-12
+**Granularity:** standard (5–8 phases, 3–5 plans each)
+**Coverage:** 14/14 v1.2 requirements mapped ✓
+**Phase band:** 8 → 13 (continues from v1.0's last integer phase; numbering never resets per the Milestones policy above)
+
+### Milestone Overview
+
+Video Mode is an optional layout adaptation that keeps GameDrawer playable while a floating PiP video sits on screen. The user manually picks one of six PiP positions (Large top/bottom, Small TL/TR/BL/BR) and every game screen reflows accordingly: small PiP nudges controls away from the covered corner, large PiP reserves a vertical band and shrinks the playable area instead of letting the video occlude it. The v1.2 build order is design-first: a real screenshot-driven design phase establishes the six-location matrix, picks the hard-Minesweeper strategy, and locks the compact-control-row shape **before** any code ships. Code phases then proceed in a deliberate order — foundation (store + Settings + shared row component), layout primitives (small/large/off behavior verified on a stub), Minesweeper adoption (hardest case first because Hard 16×30 is the squeeze test), Merge + Nonogram adoption (lower-risk grids), and finally a non-board-covering win/loss banner that gates haptics/SFX/animations through the existing Settings toggles and Reduce Motion.
+
+The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` ("Design phase required"): the design must be driven by Gabe's screenshots, especially for large PiP and hard Minesweeper — **do not skip the design phase and jump straight to code.**
+
+### v1.2 Phases
+
+- [ ] **Phase 8: Video Mode Design** - Screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row + win/loss banner sketch (design-only — no app code)
+- [ ] **Phase 9: Video Mode Foundation** - VideoModeStore + Settings UI (toggle + 6-location picker + manual-selection copy) + shared compact control row component + environment plumbing
+- [ ] **Phase 10: Layout Primitives** - Small-PiP reposition system + Large-PiP reserved-band system + Off restore; verified end-to-end on a stub game screen
+- [ ] **Phase 11: Minesweeper Adoption** - Easy + Medium across all 6 locations + Hard 16×30 strategy implemented per Phase 8 ADR
+- [ ] **Phase 12: Merge + Nonogram Adoption** - Both grids reflow across all 6 locations with no legibility regression
+- [ ] **Phase 13: Win/Loss Banner + A11y Gating** - Non-board-covering banner replaces full-screen overlays; haptics/SFX/animations gated by Settings + Reduce Motion
+
+### v1.2 Phase Details
+
+### Phase 8: Video Mode Design
+**Goal**: Design is locked against Gabe's real screenshots before any code ships — the six-location matrix is annotated per game, the hard-Minesweeper strategy is chosen with rationale, the compact control row visual language is sketched, and the win/loss banner placement rules are pinned. This phase prevents the "jump straight to code" failure mode called out in `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` (§Design phase required).
+**Depends on**: v1.0 Phase 6.1 (Merge + Nonogram both shipped — both games' current screens are required design inputs; v1.0 release work runs in parallel and is not a blocker)
+**Requirements**: (no VIDEO-* mappings — design-only phase; this is the gate that unblocks Phase 9+)
+**Success Criteria** (what must be TRUE):
+  1. A screenshot-annotated layout doc (`.planning/phases/08-video-mode-design/VIDEO-MODE-LAYOUTS.md` or equivalent) exists with Gabe's current screenshots of Mines Easy, Mines Medium, Mines Hard, Merge, and Nonogram, each marked with all 6 PiP zones overlaid, plus a per-game / per-zone "where the controls go, what happens to the board" note.
+  2. A Hard Minesweeper strategy ADR records the chosen approach (smaller cells / scroll-pan / pinch-zoom / warning-and-compromise) with explicit rationale, screenshot evidence of the rejected alternatives, and a one-sentence rollback condition — referenced by name (e.g. "Phase 08 Hard-Mines ADR") from later phase Success Criteria so no downstream phase re-decides the approach.
+  3. The compact control row design tokens are sketched (target order `Back | primary info | picker | secondary info | settings`, picker pill sizing, spacing, hit targets) at the token level — concrete DesignKit anchors named, no hardcoded sizes; explicit per-game label mappings for Mines / Merge / Nonogram captured.
+  4. A non-board-covering win/loss banner placement sketch exists per PiP zone — every one of the 6 zones has a "banner goes here, primary action goes here, board stays visible" annotation, and the gating policy (haptics/SFX/animations + Reduce Motion) is restated for the banner explicitly.
+  5. No production app code is written in this phase (sketch HTML / Figma / SwiftUI Preview throwaways are acceptable if they accelerate the decision; they do not ship in the `gamekit` target). The phase exit is a "design locked — Phase 9 can begin" sign-off by Gabe.
+**Plans**: TBD
+
+### Phase 9: Video Mode Foundation
+**Goal**: The plumbing every later phase consumes is in place — a `VideoModeStore` persists the on/off toggle and selected location across launches, Settings exposes both controls plus the "manual selection only" explanation copy, and a single shared compact-control-row component is available for every game screen to adopt. No game layout changes yet; the system reads "off" by default and the existing v1.0 + v1.1 game layouts stay byte-identical.
+**Depends on**: Phase 8 (compact-row token spec + Settings copy come from the design doc)
+**Requirements**: VIDEO-01, VIDEO-02, VIDEO-03, VIDEO-04, VIDEO-14
+**Success Criteria** (what must be TRUE):
+  1. Settings exposes a Video Mode Off/On toggle (default Off); flipping it and force-quitting the app, then relaunching, restores the chosen state — persisted under a dedicated UserDefaults key (mirroring the SettingsStore D-29 pattern locked in v1.0 04-04 / 05-01).
+  2. When Video Mode is On, Settings reveals a video-location picker with exactly the 6 options from VIDEO-02 (Large top, Large bottom, Small top-left, Small top-right, Small bottom-left, Small bottom-right); the selected location persists across launches and is readable by every game screen via the shared `VideoModeStore` (`@Observable` + custom EnvironmentKey injection, same shape as SettingsStore / AuthStore / CloudSyncStatusObserver).
+  3. Settings displays a short explanatory paragraph that includes the "manual selection only" copy from VIDEO-14 verbatim — clarifying that GameDrawer cannot detect another app's PiP automatically. Copy lives in `Localizable.xcstrings`; zero hardcoded strings in source.
+  4. A shared `VideoCompactControlRow` (or equivalent) component exists in `Core/` (or `Screens/`) with the design-locked slot order `Back | primary info | picker | secondary info | settings`, reads DesignKit tokens only (zero `Color(...)` / hardcoded `cornerRadius:` / hardcoded `padding(` integers per the cross-cutting invariant), and is consumed by at least one stub call site that compiles.
+  5. With Video Mode Off (the default), Minesweeper / Merge / Nonogram render byte-identical to their pre-v1.2 layout — no visual residue from the new system on the off-path. Legibility check passes on Classic preset AND at least one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for the Settings screen's new Video Mode section.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 10: Layout Primitives
+**Goal**: The two reflow rules from `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §Core rule ("Small PiP = control-aware, Large PiP = board-aware") are implemented as reusable layout primitives, not per-game one-offs. A stub game screen proves both small-PiP corner-avoidance and large-PiP reserved-band behavior across all 6 locations, and toggling Video Mode Off restores the stub's normal layout with no residue.
+**Depends on**: Phase 9 (consumes `VideoModeStore` + compact control row component)
+**Requirements**: VIDEO-05, VIDEO-06, VIDEO-13
+**Success Criteria** (what must be TRUE):
+  1. Small-PiP layout primitive: for any selected Small location (TL / TR / BL / BR), back/settings/info chips + the picker are repositioned so the covered corner is empty; the playable board stays at normal size; secondary controls move to the opposite side rather than shrinking the board (per v1.2 plan §Small PiP behavior). Verified on a stub game screen for all 4 Small locations.
+  2. Large-PiP layout primitive: for Large top OR Large bottom, the corresponding band is reserved (board cannot extend into it); the board fits between the reserved band and the compact control row; the compromise order from `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §Compromise order is honored (secondary controls collapse before the board becomes unplayable). Verified on a stub game screen for both Large locations.
+  3. Off-restore: toggling Video Mode Off in Settings while the stub game screen is open restores the stub to its baseline layout immediately (no relaunch required), with no leftover compact-row chrome, no shrunken board, no reserved bands — verified by view-state diff against a control build with Video Mode never enabled.
+  4. The primitives are exposed as parameterless or environment-driven SwiftUI surfaces (e.g. `.videoModeAware()` modifier, `VideoModeContainer { ... }` view) that any game screen can adopt with minimal call-site code — adoption shape locked here so Phase 11 / 12 each become "wrap the existing game view" rather than "redesign the existing game view".
+  5. Stub game screen legibility verified on Classic preset AND at least one Loud preset (Voltage or Dracula) across all 6 PiP locations per CLAUDE.md §8.12 — chip / picker / info text stays legible on every preset when controls are repositioned.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 11: Minesweeper Adoption
+**Goal**: Minesweeper — the hardest Video Mode case per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §Minesweeper — adopts the layout primitives. Easy + Medium are fully playable across all 6 PiP locations on Classic and one Loud preset. Hard 16×30 ships the strategy chosen in the Phase 8 Hard-Mines ADR (smaller cells, scroll/pan, zoom, or warning + compromise), with rationale traceable back to that ADR by name.
+**Depends on**: Phase 10 (consumes layout primitives) AND Phase 8 (consumes the Hard-Mines strategy ADR)
+**Requirements**: VIDEO-07, VIDEO-08
+**Success Criteria** (what must be TRUE):
+  1. Minesweeper Easy (9×9/10) and Medium (16×16/40) are playable across all 6 PiP locations — first-tap, reveal, long-press flag, restart, win, and loss all complete without controls being trapped under the PiP zone for the selected location; manual recipe documents the per-location quick-check (one tap + one flag + one restart per location).
+  2. Minesweeper Hard (16×30/99) Video Mode implementation matches the Phase 8 Hard-Mines ADR exactly — the chosen approach (smaller cells / scroll-pan / pinch-zoom / warning + compromise) is implemented, referenced by name in the plan body, and the rejected alternatives are NOT re-debated in this phase. If the ADR mandates a copy string ("Video Mode works best with small PiP on Hard…"), it ships in `Localizable.xcstrings` with the Phase 8 wording.
+  3. Hard Minesweeper Video Mode is validated against Gabe's real screenshots (the same screenshots that drove the Phase 8 ADR) — final render parity confirmed for at least Large-top, Large-bottom, and one Small location.
+  4. Legibility regression check passes on Classic preset AND one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for Easy, Medium, AND Hard play state — mines / flags / adjacency numbers stay readable across all 6 PiP locations on both presets.
+  5. Video Mode Off restores the v1.0 / v1.0.6.1 Minesweeper layout byte-identical — pinch-zoom (A11Y-05), Reveal/Flag interaction-mode toggle (MINES-12), and the existing animation pass (MINES-08) all behave unchanged with the toggle Off (VIDEO-13 spot-check on Minesweeper).
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 12: Merge + Nonogram Adoption
+**Goal**: The two remaining v1.1 games — Merge (square board, swipe-driven) and Nonogram (grid + hints) — adopt the Video Mode layout primitives. Both reflow across all 6 PiP locations without legibility regression, with particular care given to Nonogram's row/column hints in Large-top and Large-bottom layouts where vertical real estate is most constrained.
+**Depends on**: Phase 11 (consumes the Minesweeper adoption pattern as the worst-case template — Merge + Nonogram are deliberately the easier cases)
+**Requirements**: VIDEO-09, VIDEO-10
+**Success Criteria** (what must be TRUE):
+  1. Merge plays across all 6 PiP locations — swipe-driven tile merging stays gesture-clean (no hijack from system swipe-back at edges; the `.navigationBarBackButtonHidden(true)` + custom toolbar back pattern from v1.0 commit `08d4bee` is preserved in Video Mode), score / mode-picker / best chips reflow per Phase 10 primitives, end-of-game flow remains reachable without an extra tap.
+  2. Nonogram plays across all 6 PiP locations — the playable grid stays usable, and **the row + column hints remain readable in Large-top AND Large-bottom layouts** (the worst case for Nonogram per VIDEO-10); hints do not collide with the reserved PiP band, do not collide with the compact control row, and do not shrink below their legibility floor on the smallest supported device.
+  3. Legibility regression check passes on Classic preset AND one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for BOTH games across all 6 PiP locations — Merge tile gradients + Nonogram hint digits + filled/marked cell states all stay readable.
+  4. Video Mode Off restores both games' baseline layouts byte-identical — Merge's swipe interaction, score persistence, and current end-of-game overlay all unchanged with the toggle Off (VIDEO-13 spot-check on Merge); Nonogram's swipe-fill / X-mark interactions and current overlays unchanged with the toggle Off (VIDEO-13 spot-check on Nonogram).
+  5. The compact control row shape from Phase 9 is consumed verbatim for both games — Merge slots `Back | Score | Mode picker | Best/time | Settings`, Nonogram slots `Back | Lives/size | Fill/Mark picker | Time | Settings` per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §Compact control row; no per-game forking of the shared component.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 13: Win/Loss Banner + A11y Gating
+**Goal**: The existing full-screen win/loss overlays (which violate the "board stays visible" rule that defines Video Mode) are replaced by a non-board-covering banner/pill that avoids the selected PiP zone, exposes the primary action (Play Again / Continue) without an extra tap, and routes ALL of its haptics / SFX / animations (including any confetti) through the existing Settings toggles and `accessibilityReduceMotion`. This phase closes the milestone — every other phase's polish surface (animation, haptics, SFX) gets one final pass through the A11y gate.
+**Depends on**: Phase 12 (consumes adopted Merge + Nonogram win/loss flows) AND Phase 11 (consumes adopted Minesweeper win/loss flow)
+**Requirements**: VIDEO-11, VIDEO-12
+**Success Criteria** (what must be TRUE):
+  1. Win and loss surfaces in Video Mode use a non-board-covering banner/pill (per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §Win/loss screens "hybrid minimal banner") in all three games (Minesweeper / Merge / Nonogram) — the board remains fully visible behind the banner, and the banner placement avoids the selected PiP zone in all 6 PiP locations.
+  2. The primary action on the banner (Play Again / Continue) is reachable in a single tap from the moment the banner appears — no second tap to expand a card, no "tap banner to reveal action" pattern. Manual recipe documents the per-location per-game one-tap-to-restart check.
+  3. Haptics gating: any win-banner haptic (success cue, optional arpeggio) is silenced when `settingsStore.hapticsEnabled == false`, gated at the source per the v1.0 05-03 D-10 contract (`hapticsEnabled` is the FIRST guard inside any haptic-firing surface). Verified by a Swift Testing unit test mirroring the v1.0 HapticsTests shape.
+  4. SFX gating: any win/loss banner sound is silenced when `settingsStore.sfxEnabled == false` (default false, matching MINES-10 / v1.0 05-03 lock); plays on `AVAudioSession.ambient` (does not duck user music) when enabled, mirroring the SFXPlayer construction lock from v1.0 05-03.
+  5. Animation + Reduce Motion gating: any banner confetti / sweep / spring animation is dampened to near-zero when `accessibilityReduceMotion` is on (per the v1.0 05-06 D-04 per-surface lock — `.identity` transition, `.symbolEffect` value=0, `.keyframeAnimator` trigger=false patterns); legibility regression check passes on Classic preset AND one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for play, win, AND loss states in all three games across all 6 PiP locations.
+**Plans**: TBD
+**UI hint**: yes
+
+### v1.2 Progress
+
+**Execution Order:**
+Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 → 11 → 12 → 13
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 8. Video Mode Design | 0/TBD | Not started | - |
+| 9. Video Mode Foundation | 0/TBD | Not started | - |
+| 10. Layout Primitives | 0/TBD | Not started | - |
+| 11. Minesweeper Adoption | 0/TBD | Not started | - |
+| 12. Merge + Nonogram Adoption | 0/TBD | Not started | - |
+| 13. Win/Loss Banner + A11y Gating | 0/TBD | Not started | - |
+
+### v1.2 Research Flags
+
+Phases that should run `/gsd-research-phase` before planning:
+
+- **Phase 8 (Video Mode Design):** N/A — this phase IS the research/design surface; running a research phase on top of a design phase would be circular. Phase 8 produces the artifacts (annotated screenshots + Hard-Mines ADR + compact-row spec + banner sketch) that downstream phases consume.
+- **Phase 10 (Layout Primitives):** YES — the SwiftUI surface for parameterless layout primitives that gracefully degrade across 6 PiP locations on the smallest supported device deserves a focused spike; the trade-off between `@Environment(\.videoModeLocation)` injection vs. a `VideoModeContainer { ... }` view modifier vs. a `.videoModeAware()` modifier is non-obvious and worth resolving before plan-writing.
+- **Phase 11 (Minesweeper Adoption):** CONDITIONAL — only if the Phase 8 Hard-Mines ADR picks scroll/pan or pinch-zoom (both interact with the existing A11Y-05 pinch-zoom + auto-scale system from 06.1-03 in ways that need a focused spike to deconflict). If the ADR picks smaller cells or warning-and-compromise, skip research and proceed direct to planning.
+
+Phases with standard patterns (skip research, proceed direct to planning):
+
+- **Phase 9 (Foundation):** Mirrors v1.0 04-04 (SettingsStore) + 05-04 (Settings UI extraction) + 06-07 (Settings SYNC section) patterns — additive @Observable store + custom EnvironmentKey + extracted Settings section.
+- **Phase 12 (Merge + Nonogram Adoption):** Once Phase 11 establishes the worst-case adoption template on Minesweeper, Merge + Nonogram are mechanical re-applications of the same wrap-the-game-view pattern.
+- **Phase 13 (Win/Loss Banner + A11y Gating):** Reuses the v1.0 05-06 animation-gating + 05-03 haptics/SFX-gating patterns verbatim — banner is just another animation surface routed through the same toggles.
+
+### v1.2 Cross-Cutting Invariants
+
+In addition to the v1.0 cross-cutting invariants above, v1.2 adds:
+
+- **Video Mode Off = byte-identical baseline:** Every Video-Mode-touching code path must include a "toggle Off restores prior layout with no visual residue" check (VIDEO-13). The off-path is the dominant runtime path — most users will never enable Video Mode — and any drift on the off-path is a P0 bug regardless of how well the on-path looks.
+- **Manual selection only:** No code path attempts to auto-detect another app's PiP frame (no public iOS API exposes it per VIDEO-14 + PROJECT.md Key Decisions). The Settings copy gate from Phase 9 SC3 is the contract; any future "auto-detect" speculation is rejected at PR time.
+- **A11y toggles gate everything Video-Mode-specific:** Every Video-Mode haptic, SFX, animation, banner confetti, and reflow motion routes through `settingsStore.hapticsEnabled`, `settingsStore.sfxEnabled`, and `accessibilityReduceMotion` — gated AT THE SOURCE per the v1.0 05-03 D-10 contract (the toggle is the FIRST guard inside the firing surface). No user-visible motion bypasses these toggles, even on banner confetti, even on the Settings preview rendering.
+- **Six PiP locations only — no portrait, no left/right:** v1.2 ships exactly the 6 locations from VIDEO-02 (Large top/bottom, Small TL/TR/BL/BR). Vertical/portrait PiP and Large left/right are explicit Out of Scope per PROJECT.md and REQUIREMENTS.md v1.2 §Out of Scope — speculation on these positions is deferred to v1.3+.
+
+### v1.2 Out-of-Scope Reminder
+
+The following are v1.2-deferred per PROJECT.md and REQUIREMENTS.md and are **not** v1.2 roadmap phases:
+
+- **Auto-detect of another app's PiP frame** — no public iOS API; deferred indefinitely.
+- **Sudoku Video Mode adoption** — Sudoku not yet built; will be designed Video-Mode-aware when the game itself lands in a future milestone.
+- **Vertical / portrait PiP layouts** — rare in practice; reconsidered at v1.3+ if real usage shows demand.
+- **Large left / large right PiP positions** — current observed iOS PiP positions are top + bottom + 4 corners only.
+- **Pinch-to-zoom hard Minesweeper as a Video-Mode-specific feature** — only enters scope if the Phase 8 Hard-Mines ADR picks it; otherwise stays a v1.3+ candidate.
+
+---
 *Roadmap created: 2026-04-24*
 *Phase sequencing: load-bearing convergence between research/ARCHITECTURE.md and research/PITFALLS.md*
 *Phase 6 planned: 2026-04-26 — 9 plans (3-wave + verification)*
+*Milestone v1.2 (Video Mode) appended: 2026-05-12 — 6 phases (08 design + 09–13 code), 14/14 VIDEO-* requirements mapped*

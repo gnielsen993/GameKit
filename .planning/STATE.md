@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: video-mode
-status: defining_requirements
-stopped_at: "Milestone v1.2 (Video Mode) opened 2026-05-12. PROJECT.md updated with VIDEO-01..14 requirements + v1.2 Out of Scope + Key Decisions. Next: REQUIREMENTS.md + ROADMAP.md. v1.0 release (PF-05 DNS / PF-06 screenshots / PF-08 ASC / PF-09 nutrition / SC1-SC5 sweep) continues in parallel — non-coding work, not gated by v1.2 code."
+status: planning
+stopped_at: "Milestone v1.2 (Video Mode) roadmapped 2026-05-12. ROADMAP.md appended with Phases 8-13 (8 design + 9-13 code); REQUIREMENTS.md v1.2 traceability populated 14/14. Next: /gsd-plan-phase 8 (design phase — produces screenshot-annotated layout doc + Hard-Mines ADR + compact-row tokens + win/loss banner sketch). v1.0 release (PF-05 DNS / PF-06 screenshots / PF-08 ASC / PF-09 nutrition / SC1-SC5 sweep) continues in parallel — non-coding work, not gated by v1.2 code."
 last_updated: "2026-05-12T00:00:00.000Z"
 last_activity: 2026-05-12
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,17 +21,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Milestone v1.2 — Video Mode (defining requirements). v1.0 TestFlight pre-flight continues in parallel as non-coding work.
+**Current focus:** Milestone v1.2 — Video Mode (planning Phase 8 — Design). v1.0 TestFlight pre-flight continues in parallel as non-coding work.
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: Not started (defining requirements)
+Phase: 8 — Video Mode Design (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-12 — milestone opened
+Status: Planning (roadmap landed; awaiting `/gsd-plan-phase 8`)
+Last activity: 2026-05-12 — milestone roadmapped (Phases 8–13)
 
-Progress: [░░░░░░░░░░] 0% (v1.2)
+Progress: [░░░░░░░░░░] 0% (0/6 v1.2 phases complete)
+
+**Next action:** Run `/gsd-plan-phase 8` to plan the Video Mode Design phase. Per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required", Phase 8 is screenshot-driven and produces the layout doc + Hard-Mines strategy ADR consumed by Phases 9–13 — it is NOT optional and MUST NOT be skipped to jump straight to code.
 
 ## v1.0 Carry-Over
 
@@ -113,6 +115,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 ### Roadmap Evolution
 
 - Phase 6.1 inserted after Phase 6 (2026-04-27): pre-release polish — Home cards 2-per-row grid + Mines flag-mode toggle + Hard-board horizontal-scroll fix; pre-deploy gate before P7 wave 2 (URGENT)
+- **Milestone v1.2 (Video Mode) opened (2026-05-12):** Phases 8–13 appended to ROADMAP.md continuing the v1.0 phase band (no renumbering). Phase 8 is a mandatory design phase (no app code) producing the screenshot-annotated layout doc + Hard-Mines ADR consumed by Phases 9–13. v1.2 occupies phases 8 (design) → 9 (foundation: VideoModeStore + Settings + compact row) → 10 (small/large/off layout primitives) → 11 (Minesweeper adoption) → 12 (Merge + Nonogram adoption) → 13 (win/loss banner + a11y gating). 14/14 VIDEO-* requirements mapped.
 
 ### Decisions
 
@@ -124,6 +127,9 @@ Recent decisions affecting current work:
 - **Project (2026-04-24):** MVP = Minesweeper only; second-game work deferred until Mines is shipping clean.
 - **Project (2026-04-24):** SwiftData with CloudKit-compatible schema from day 1 even though CloudKit only turns on at Phase 6.
 - **Project (2026-04-24):** Sign in with Apple + CloudKit private DB (optional, never gates gameplay) is the only auth/sync surface — no third-party backend.
+- **Roadmap (2026-05-12):** v1.2 phase numbering continues from v1.0's last integer phase (7) — Phases 8–13 are v1.2. Numbering never resets across milestones per the new Milestones policy section in ROADMAP.md.
+- **Roadmap (2026-05-12):** Phase 8 is a mandatory design phase per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required". No app code is written in Phase 8 (throwaway sketches OK if they accelerate the decision). Phase 8 produces the Hard-Mines strategy ADR consumed by Phase 11.
+- **Roadmap (2026-05-12):** Phase 10 (Layout Primitives) flagged for `/gsd-research-phase` before planning — the SwiftUI adoption surface choice (`@Environment` injection vs. container view vs. modifier) is non-obvious. Phase 11 conditionally flagged depending on the Phase 8 Hard-Mines ADR outcome. Phases 9 / 12 / 13 proceed direct to planning with established patterns.
 - Deployment target fixed from 26.2 (template typo) to 17.0 per CLAUDE.md §1
 - Bundle ID com.lauterstar.gamekit contractually frozen as of P1-01 commit 3e8c43a
 - SWIFT_STRICT_CONCURRENCY = complete enabled across all 6 build configs
@@ -286,14 +292,16 @@ Recent decisions affecting current work:
 - 06.1-02: CellView + BoardView UNTOUCHED — git diff HEAD~3..HEAD on both files returns 0 lines. LongPressGesture(minimumDuration: 0.25) + .exclusively(before: TapGesture()) + cell-level .sensoryFeedback(.selection / .impact(.light)) all byte-identical preservation. Mode-routing logic lives ENTIRELY in vm.handleTap / vm.handleLongPress (CLAUDE.md §1 lightweight MVVM, ARCHITECTURE Anti-Pattern 1). View tier passes vm.handleTap/handleLongPress closures down via GameView -> BoardView -> CellView with no internal mode awareness
 - 06.1-02: Four-commit shape (test/feat/feat/docs) — aa81374 RED gate -> 9d824c8 VM GREEN -> 6b166f0 GameView FAB -> 7276556 docs+xcstrings. Same precedent as 06.1-03 four-commit shape. Plan §Success Criteria suggested single atomic commit; the body §Task 1 explicitly required RED -> GREEN gate making the four-commit shape the only correct interpretation. Each commit independently bisectable
 - 06.1-02: Phase 6.1 final REQUIREMENTS.md state — Coverage 38/38 (final target REACHED). Wave 1 (06.1-03) shipped A11Y-05 (graduated A11Y-V2-02 -> v1); Wave 2 plans (06.1-01 SHELL-05, 06.1-02 MINES-12) added two new v1 IDs. Each plan's xcstrings + REQ edits disjoint by section (Accessibility / App Shell / Minesweeper); JSON merge clean across all three
+- **2026-05-12 (v1.2 roadmap):** Milestone v1.2 (Video Mode) phases 8–13 appended to ROADMAP.md and REQUIREMENTS.md v1.2 traceability populated 14/14. Phase 8 is a design phase (no app code) per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required" — produces screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row design tokens + win/loss banner sketch consumed by Phases 9–13. Phase numbering continues from v1.0's last integer phase (7); no renumbering of existing phases. Next: `/gsd-plan-phase 8`.
 
 ### Pending Todos
 
-- **P7 work queued**: Plans 07-02 (icon production), 07-03 (CloudKit Production schema deploy), 07-04 (App Store metadata + privacy policy + screenshots), 07-05 (release checklist + 07-VERIFICATION.md template), 07-06 (TestFlight upload + SC1-SC5 manual sweep + submit). See `.planning/phases/07-release/` for plan files.
+- **v1.2 work queued (NEW):** Plan Phase 8 (Video Mode Design — screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row design tokens + win/loss banner sketch). Then Phase 9 (Foundation: VideoModeStore + Settings UI + shared compact row), Phase 10 (Layout primitives), Phase 11 (Minesweeper adoption), Phase 12 (Merge + Nonogram adoption), Phase 13 (Win/loss banner + a11y gating). See `.planning/ROADMAP.md` §Milestone v1.2 for full phase details.
+- **P7 work queued (v1.0 carry-over):** Plans 07-02 (icon production), 07-03 (CloudKit Production schema deploy), 07-04 (App Store metadata + privacy policy + screenshots), 07-05 (release checklist + 07-VERIFICATION.md template), 07-06 (TestFlight upload + SC1-SC5 manual sweep + submit). See `.planning/phases/07-release/` for plan files. v1.0 release work runs in parallel as non-coding tasks (DNS / ASC / nutrition label) and is NOT a blocker for v1.2 code work.
 
 ### Blockers/Concerns
 
-- *(no active blockers — Phase 7 ready to execute. Earlier P6 06-03 Task 3 checkpoint and 06-09 BLOCKING checkpoint were resolved via the manual UAT recorded in 06-UAT.md and the doc-drift sweep in this plan.)*
+- *(no active v1.2 blockers — roadmap landed, Phase 8 ready to plan. v1.0 Phase 7 release pre-flight items continue in parallel; see §v1.0 Carry-Over for the open checklist.)*
 
 ## Deferred Items
 
@@ -305,8 +313,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-28T03:09:44.365Z
-Stopped at: Completed 06.1-02 — Minesweeper Reveal/Flag interaction-mode toggle (MINES-12); manual recipes pending human execution; phase 06.1 final plan landed
+Last session: 2026-05-12T00:00:00.000Z
+Stopped at: Milestone v1.2 (Video Mode) roadmapped — ROADMAP.md + REQUIREMENTS.md v1.2 traceability populated. Next: /gsd-plan-phase 8 (Video Mode Design — screenshot-driven, no app code).
 Resume file: None
 
-**Planned Phase:** 7 (release) — 6 plans — 2026-04-27T22:00:00.000Z
+**Planned Phase:** 8 (Video Mode Design) — TBD plans — 2026-05-12T00:00:00.000Z
