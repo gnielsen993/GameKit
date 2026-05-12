@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hard-Mines Video Mode — Variant 2: Scroll/pan</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px; background: #f3f3f0; color: #222; max-width: 1200px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .candidate-tag { display: inline-block; background: #1a73e8; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+  h2 { font-size: 14px; margin: 20px 0 8px; color: #333; }
+  p, li { font-size: 13px; line-height: 1.5; }
+  .deconflict-note { background: #ffe1d0; border-left: 4px solid #d04020; padding: 12px 14px; margin: 12px 0; border-radius: 6px; font-size: 13px; }
+  .stage { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; margin-top: 12px; }
+  .frame { position: relative; width: 280px; aspect-ratio: 9 / 19.5; border-radius: 32px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.18); background: #000; }
+  .frame .bg { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; }
+  .pip-band { position: absolute; top: 0; left: 0; right: 0; height: 22%; background: rgba(60,60,80,0.92); border-bottom: 2px solid #ff3b30; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+  /* Viewport showing only PART of the 16x30 board — at NORMAL cell size */
+  .viewport { position: absolute; top: 24%; left: 4%; right: 4%; bottom: 12%; overflow: hidden; background: rgba(255,255,255,0.18); border-radius: 8px; }
+  .board-overlay { position: absolute; top: 0; left: -30%; width: 165%; height: 100%; display: grid; grid-template-columns: repeat(16, 1fr); grid-template-rows: repeat(30, 1fr); gap: 1px; padding: 2px; }
+  .board-overlay .cell { background: rgba(170,180,200,0.55); border-radius: 1px; }
+  .board-overlay .cell.r { background: rgba(255,255,255,0.7); }
+  /* Pan direction arrows + indicators */
+  .pan-arrow { position: absolute; color: #fff; font-size: 18px; font-weight: 700; opacity: 0.85; text-shadow: 0 0 4px rgba(0,0,0,0.7); }
+  .pan-left  { left: 6%;  top: 50%; transform: translateY(-50%); }
+  .pan-right { right: 6%; top: 50%; transform: translateY(-50%); }
+  .scroll-bar { position: absolute; bottom: 13%; left: 8%; width: 84%; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+  .scroll-thumb { position: absolute; left: 18%; width: 32%; height: 100%; background: rgba(255,255,255,0.7); border-radius: 2px; }
+  .compact-row { position: absolute; bottom: 0; left: 0; right: 0; height: 9%; background: rgba(40,40,50,0.92); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; color: #fff; font-size: 9px; }
+  .compact-row .slot { padding: 2px 6px; background: rgba(255,255,255,0.12); border-radius: 4px; }
+  .compact-row .picker { background: #d04020; font-weight: 700; }
+  .annotation-list { font-size: 12px; max-width: 480px; }
+  .annotation-list li { margin: 6px 0; }
+  table { border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  td, th { border: 1px solid #ccc; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #e8e8e6; }
+  footer { margin-top: 24px; font-size: 12px; color: #777; border-top: 1px solid #ddd; padding-top: 12px; }
+  a { color: #0a66c2; }
+  code { font-size: 11px; background: #e8e8e6; padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<p><span class="candidate-tag">Candidate variant 2 of 4</span></p>
+<h1>Variant 2: Scroll/pan in Video Mode</h1>
+
+<p>The Hard 16x30 board keeps its <strong>current cell size</strong>. The board
+becomes wider than the viewport; the user pans horizontally (and possibly
+vertically) with a single-finger drag to see different regions of the board.</p>
+
+<div class="deconflict-note">
+  <strong>A11Y-05 / 06.1-03 deconfliction (HIGH RISK):</strong> the existing
+  <code>MagnifyGesture</code> from Plan 06.1-03 uses two-finger pinch. A new
+  single-finger drag gesture for scroll/pan composes with it via
+  <code>.simultaneousGesture(...)</code> — pinch = two-finger, pan = single-finger.
+  BUT cell-level <code>LongPressGesture(0.25).exclusively(before: TapGesture())</code>
+  is also single-finger. The composition must distinguish "drag" from "tap" by
+  movement threshold; misclassification = a flag-vs-pan misfire and a regression
+  of ROADMAP P3 SC1's 50-tap zero-misfire requirement. <strong>Phase 11
+  research-flag fires per ROADMAP §v1.2 Research Flags.</strong>
+</div>
+
+<div class="stage">
+  <div class="frame">
+    <img class="bg" src="../../../Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png" alt="Mines Hard Classic baseline">
+    <div class="pip-band">PiP-large top (reserved)</div>
+    <div class="viewport">
+      <div class="board-overlay"></div>
+      <div class="pan-arrow pan-left">‹</div>
+      <div class="pan-arrow pan-right">›</div>
+    </div>
+    <div class="scroll-bar"><div class="scroll-thumb"></div></div>
+    <div class="compact-row">
+      <div class="slot">Back</div>
+      <div class="slot">F/M</div>
+      <div class="slot picker">R/F</div>
+      <div class="slot">0:00</div>
+      <div class="slot">⚙</div>
+    </div>
+  </div>
+
+  <div class="annotation-list">
+    <h2>Behavior</h2>
+    <ul>
+      <li><strong>Cell size:</strong> unchanged — current 18pt floor from 06.1-03 preserved. Touch targets identical to non-Video-Mode Hard play.</li>
+      <li><strong>Viewport:</strong> shows ~10 of 16 columns at a time on Pro Max with PiP-large top. User pans to reach edges.</li>
+      <li><strong>Pan gesture:</strong> single-finger drag past a movement threshold (e.g. 8pt) cancels the cell tap and pans the viewport. Below threshold = cell tap fires.</li>
+      <li><strong>Scroll indicators:</strong> auto-hiding edge gradient + a hairline progress bar so the user knows offscreen content exists.</li>
+      <li><strong>Pinch still works:</strong> existing A11Y-05 unchanged. Pinching now feels like a "zoom into a panned region" interaction.</li>
+    </ul>
+
+    <h2>Pros</h2>
+    <ul>
+      <li>Cell size preserved — touch targets identical to v1.0 Hard play.</li>
+      <li>Mines/flag icons render at the same size users already know.</li>
+      <li>No legibility regression on any preset (CLAUDE.md §8.12 stays trivial).</li>
+    </ul>
+
+    <h2>Cons</h2>
+    <ul>
+      <li><strong>Highest deconfliction risk.</strong> Drag-vs-tap movement threshold is a regression vector for the cell-level <code>.exclusively(before:)</code> composition Phase 6.1-03 preserved verbatim.</li>
+      <li>Adds a new gesture surface — gesture-composition research needed (Phase 11 research-flag triggers).</li>
+      <li>The user can lose track of where they are on a 16x30 board mid-game.</li>
+      <li>Animated overshoot/decay of the pan may interfere with the cell-reveal cascade animation from Phase 5.</li>
+    </ul>
+
+    <h2>Gesture composition table</h2>
+    <table>
+      <tr><th>Input</th><th>Goes to</th></tr>
+      <tr><td>Single-finger tap (movement &lt; 8pt)</td><td>Cell <code>TapGesture</code> (reveal)</td></tr>
+      <tr><td>Single-finger long-press (≥0.25s, no movement)</td><td>Cell <code>LongPressGesture</code> (flag)</td></tr>
+      <tr><td>Single-finger drag (movement ≥ 8pt)</td><td>Viewport pan — cell gesture CANCELLED</td></tr>
+      <tr><td>Two-finger pinch</td><td>Parent <code>MagnifyGesture</code> (existing A11Y-05)</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>Screenshot evidence</h2>
+<ul>
+  <li><code>Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png</code> — baseline squeeze under current cell size (Classic).</li>
+  <li><code>Docs/screenshots/v1.2-design/mines-hard-dracula-pip-large.png</code> — baseline squeeze under current cell size (Dracula, §8.12 audit).</li>
+</ul>
+
+<footer>
+  Strategy ADR (Plan 08-05):
+  <a href="../../phases/08-video-mode-design/08-HARD-MINES-ADR.md">08-HARD-MINES-ADR.md</a>
+  · Layout doc:
+  <a href="../../phases/08-video-mode-design/VIDEO-MODE-LAYOUTS.md">VIDEO-MODE-LAYOUTS.md</a>
+  · Pinch-zoom origin:
+  <a href="../../phases/06.1-pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode/06.1-03-PLAN.md">06.1-03 (A11Y-05)</a>
+</footer>
+
+<script>
+  // Generate the 16x30 normal-cell grid (extends beyond viewport)
+  (function () {
+    var board = document.querySelector('.board-overlay');
+    if (!board) return;
+    var total = 16 * 30;
+    var revealed = [11, 12, 13, 27, 28, 43, 44, 59, 73, 89, 152, 168, 184, 200, 215, 231, 256, 272, 288, 304, 320];
+    var set = {};
+    revealed.forEach(function (i) { set[i] = true; });
+    for (var i = 0; i < total; i++) {
+      var d = document.createElement('div');
+      d.className = 'cell' + (set[i] ? ' r' : '');
+      board.appendChild(d);
+    }
+  })();
+</script>
+
+</body>
+</html>

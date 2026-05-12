@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hard-Mines Video Mode — Variant 4: Warning + compromise</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px; background: #f3f3f0; color: #222; max-width: 1200px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .candidate-tag { display: inline-block; background: #1a73e8; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+  h2 { font-size: 14px; margin: 20px 0 8px; color: #333; }
+  p, li { font-size: 13px; line-height: 1.5; }
+  .deconflict-note { background: #d4f0d4; border-left: 4px solid #2da02d; padding: 12px 14px; margin: 12px 0; border-radius: 6px; font-size: 13px; }
+  .stage { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; margin-top: 12px; }
+  .frame { position: relative; width: 280px; aspect-ratio: 9 / 19.5; border-radius: 32px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.18); background: #000; }
+  .frame .bg { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; }
+  .pip-band { position: absolute; top: 0; left: 0; right: 0; height: 22%; background: rgba(60,60,80,0.92); border-bottom: 2px solid #ff3b30; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+  /* Warning banner — small overlay, dismissable, appears once */
+  .warning-banner { position: absolute; top: 24%; left: 4%; right: 4%; padding: 6px 8px; background: rgba(255,200,0,0.95); color: #2a1d00; font-size: 10px; font-weight: 600; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 5; }
+  .warning-banner .dismiss { font-size: 11px; padding: 0 4px; opacity: 0.6; }
+  /* Board at NORMAL cell size — fits as much as it can; the rest is the squeeze */
+  .board-overlay { position: absolute; top: 32%; left: 4%; right: 4%; bottom: 12%; display: grid; grid-template-columns: repeat(16, 1fr); grid-template-rows: repeat(30, 1fr); gap: 1px; padding: 2px; background: rgba(255,255,255,0.18); border-radius: 8px; overflow: hidden; }
+  .board-overlay .cell { background: rgba(170,180,200,0.5); border-radius: 1px; }
+  .board-overlay .cell.r { background: rgba(255,255,255,0.7); }
+  /* Compromise-order compact row: TIME CHIP HIDDEN, settings COLLAPSED */
+  .compact-row { position: absolute; bottom: 0; left: 0; right: 0; height: 9%; background: rgba(40,40,50,0.92); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; color: #fff; font-size: 9px; }
+  .compact-row .slot { padding: 2px 6px; background: rgba(255,255,255,0.12); border-radius: 4px; }
+  .compact-row .picker { background: #d04020; font-weight: 700; }
+  .compact-row .menu { background: rgba(255,255,255,0.18); padding: 2px 4px; border-radius: 4px; }
+  .compact-row .hidden-marker { text-decoration: line-through; opacity: 0.3; }
+  /* PiP-small evidence panel — the natural compromise size */
+  .compromise-evidence { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .compromise-evidence figure { margin: 0; width: 140px; }
+  .compromise-evidence img { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block; }
+  .compromise-evidence figcaption { font-size: 10px; color: #555; text-align: center; margin-top: 4px; }
+  .annotation-list { font-size: 12px; max-width: 480px; }
+  .annotation-list li { margin: 6px 0; }
+  table { border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  td, th { border: 1px solid #ccc; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #e8e8e6; }
+  footer { margin-top: 24px; font-size: 12px; color: #777; border-top: 1px solid #ddd; padding-top: 12px; }
+  a { color: #0a66c2; }
+  code { font-size: 11px; background: #e8e8e6; padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<p><span class="candidate-tag">Candidate variant 4 of 4</span></p>
+<h1>Variant 4: Warning + compromise</h1>
+
+<p>The Hard 16x30 board keeps its <strong>current cell size</strong>. A one-time
+banner tells the user "Video Mode works best with small PiP on Hard." The
+compact row applies the <em>Compromise order</em> from the plan-doc (hide time
+chip, collapse Settings into an overflow menu) to free a few points vertically.
+The user is invited to switch to PiP-small (which the 4-corner Dracula
+screenshots prove is fully playable at current cell size).</p>
+
+<div class="deconflict-note">
+  <strong>A11Y-05 / 06.1-03 deconfliction (ZERO RISK):</strong> no gesture or
+  layout-engine changes. The existing <code>MagnifyGesture</code> + auto-scale
+  <code>cellSize</code> system is untouched. Pinch is still available as a
+  user-driven escape hatch if the user keeps PiP-large. This variant adds one
+  banner UI element and one Compromise-order branch — nothing crosses the
+  cell-gesture boundary.
+</div>
+
+<div class="stage">
+  <div class="frame">
+    <img class="bg" src="../../../Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png" alt="Mines Hard Classic baseline">
+    <div class="pip-band">PiP-large top (reserved)</div>
+    <div class="warning-banner">
+      <span>Video Mode works best with small PiP on Hard.</span>
+      <span class="dismiss">×</span>
+    </div>
+    <div class="board-overlay"></div>
+    <div class="compact-row">
+      <div class="slot">Back</div>
+      <div class="slot">F/M</div>
+      <div class="slot picker">R/F</div>
+      <div class="slot hidden-marker">0:00</div>
+      <div class="slot menu">⋯</div>
+    </div>
+  </div>
+
+  <div class="annotation-list">
+    <h2>Behavior</h2>
+    <ul>
+      <li><strong>Cell size:</strong> unchanged — current 18pt floor preserved. Touch targets identical to non-Video-Mode play.</li>
+      <li><strong>Banner:</strong> appears once per session when Hard + Large-top/Large-bottom PiP combination is detected. Pill-shaped, follows banner-placement rules from <code>08-BANNER-PLACEMENT.md</code>. Dismissable; persists "dismissed" flag in-memory only.</li>
+      <li><strong>Compromise order applied:</strong> step 4 (collapse Settings → overflow ⋯ menu); step 5 (hide time chip). Picker pill + flag/mine count + Back stay (critical info).</li>
+      <li><strong>Squeeze accepted:</strong> the board still doesn't fit fully — bottom rows are clipped by the compact row. User can either: (a) switch to PiP-small via Control Center (the suggested action), or (b) pinch-zoom-out via existing A11Y-05.</li>
+      <li><strong>A11Y-05 unchanged:</strong> pinch-zoom remains available as the user-driven escape hatch.</li>
+    </ul>
+
+    <h2>Pros</h2>
+    <ul>
+      <li>Zero gesture or layout-engine changes — lowest engineering risk.</li>
+      <li>Cell size + touch targets identical to v1.0 Hard play — zero legibility regression.</li>
+      <li>Existing A11Y-05 still available as escape hatch.</li>
+      <li>Honest with the user — concedes that Hard + Large PiP is a constrained case.</li>
+      <li>Ships in a single Phase 11 plan with no research-flag spike.</li>
+    </ul>
+
+    <h2>Cons</h2>
+    <ul>
+      <li>Concedes that Hard + Large PiP isn't a great experience — relies on user heeding the banner.</li>
+      <li>Adds one localized copy string (banner text); copy review needed.</li>
+      <li>If user ignores the banner AND doesn't pinch, the bottom-row squeeze persists for the whole game.</li>
+      <li>Banner display rules need precise wording: "once per session"? "once forever"? "every Hard+Large entry"? (Phase 11 plan locks this.)</li>
+    </ul>
+
+    <h2>Behavior table</h2>
+    <table>
+      <tr><th>Aspect</th><th>v1.0 (non-Video-Mode)</th><th>Variant 4 (Video Mode on)</th></tr>
+      <tr><td>Cell size</td><td>18pt floor (A11Y-05)</td><td>18pt floor (unchanged)</td></tr>
+      <tr><td>Pinch-zoom</td><td>Available</td><td>Available (unchanged)</td></tr>
+      <tr><td>New gesture</td><td>—</td><td>None</td></tr>
+      <tr><td>New UI element</td><td>—</td><td>One dismissable warning banner pill</td></tr>
+      <tr><td>Compromise order</td><td>Not applied</td><td>Steps 4 + 5 (collapse Settings, hide time)</td></tr>
+      <tr><td>Code surface</td><td>—</td><td>One banner view + one boolean state flag</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>Screenshot evidence — the compromise <em>is</em> visible in the canonical 4-corner set</h2>
+<p>The 4-corner Dracula PiP-small set is direct evidence that PiP-small is the
+natural compromise size — the user can move PiP to any of the four corners and
+the board renders unchanged at current cell size (per VIDEO-MODE-LAYOUTS.md
+Hard section). The banner directs the user toward this state.</p>
+
+<div class="compromise-evidence">
+  <figure>
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-dracula-pip-small-tl.png" alt="Hard Dracula Small TL">
+    <figcaption><code>pip-small-tl</code></figcaption>
+  </figure>
+  <figure>
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-dracula-pip-small-tr.png" alt="Hard Dracula Small TR">
+    <figcaption><code>pip-small-tr</code></figcaption>
+  </figure>
+  <figure>
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-dracula-pip-small-bl.png" alt="Hard Dracula Small BL">
+    <figcaption><code>pip-small-bl</code></figcaption>
+  </figure>
+  <figure>
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-dracula-pip-small-br.png" alt="Hard Dracula Small BR">
+    <figcaption><code>pip-small-br</code></figcaption>
+  </figure>
+</div>
+
+<p>Plus the baseline being warned about:</p>
+<ul>
+  <li><code>Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png</code> — what the banner appears on top of.</li>
+  <li><code>Docs/screenshots/v1.2-design/mines-hard-dracula-pip-large.png</code> — same, Dracula §8.12 audit.</li>
+</ul>
+
+<footer>
+  Strategy ADR (Plan 08-05):
+  <a href="../../phases/08-video-mode-design/08-HARD-MINES-ADR.md">08-HARD-MINES-ADR.md</a>
+  · Layout doc:
+  <a href="../../phases/08-video-mode-design/VIDEO-MODE-LAYOUTS.md">VIDEO-MODE-LAYOUTS.md</a>
+  · Pinch-zoom (escape hatch, unchanged):
+  <a href="../../phases/06.1-pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode/06.1-03-PLAN.md">06.1-03 (A11Y-05 / MagnifyGesture)</a>
+</footer>
+
+<script>
+  // Generate the 16x30 grid (current cell size — the squeeze is visible because the grid extends past the compact row clipping)
+  (function () {
+    var board = document.querySelector('.board-overlay');
+    if (!board) return;
+    var total = 16 * 30;
+    var revealed = [11, 12, 13, 27, 28, 43, 44, 59, 73, 89, 152, 168, 184, 200, 215, 231, 256, 272, 288, 304, 320];
+    var set = {};
+    revealed.forEach(function (i) { set[i] = true; });
+    for (var i = 0; i < total; i++) {
+      var d = document.createElement('div');
+      d.className = 'cell' + (set[i] ? ' r' : '');
+      board.appendChild(d);
+    }
+  })();
+</script>
+
+</body>
+</html>

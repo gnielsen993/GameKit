@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hard-Mines Video Mode — Variant 3: Pinch-zoom (reuse A11Y-05)</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px; background: #f3f3f0; color: #222; max-width: 1200px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .candidate-tag { display: inline-block; background: #1a73e8; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+  h2 { font-size: 14px; margin: 20px 0 8px; color: #333; }
+  p, li { font-size: 13px; line-height: 1.5; }
+  .deconflict-note { background: #d4f0d4; border-left: 4px solid #2da02d; padding: 12px 14px; margin: 12px 0; border-radius: 6px; font-size: 13px; }
+  .stage { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; margin-top: 12px; }
+  .frame { position: relative; width: 280px; aspect-ratio: 9 / 19.5; border-radius: 32px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.18); background: #000; }
+  .frame .bg { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; }
+  .pip-band { position: absolute; top: 0; left: 0; right: 0; height: 22%; background: rgba(60,60,80,0.92); border-bottom: 2px solid #ff3b30; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+  /* Auto-fit-on-entry: board renders at scaled-down size matching pinch-out result */
+  .board-overlay { position: absolute; top: 26%; left: 8%; right: 8%; bottom: 14%; display: grid; grid-template-columns: repeat(16, 1fr); grid-template-rows: repeat(30, 1fr); gap: 1px; padding: 2px; background: rgba(255,255,255,0.18); border-radius: 8px; transform-origin: center; }
+  .board-overlay .cell { background: rgba(170,180,200,0.5); border-radius: 1px; }
+  .board-overlay .cell.r { background: rgba(255,255,255,0.7); }
+  /* "Auto-fit" callout pinch indicator */
+  .pinch-callout { position: absolute; right: 12%; top: 38%; width: 60px; height: 60px; border: 2px dashed #2da02d; border-radius: 50%; opacity: 0.85; }
+  .pinch-callout::before { content: "↘"; position: absolute; right: -8px; bottom: -4px; color: #2da02d; font-size: 18px; font-weight: 700; }
+  .pinch-callout::after { content: "↖"; position: absolute; left: -8px; top: -4px; color: #2da02d; font-size: 18px; font-weight: 700; }
+  .pinch-label { position: absolute; right: 10%; top: 60%; color: #2da02d; font-size: 10px; font-weight: 700; background: rgba(255,255,255,0.85); padding: 2px 6px; border-radius: 4px; }
+  .compact-row { position: absolute; bottom: 0; left: 0; right: 0; height: 9%; background: rgba(40,40,50,0.92); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; color: #fff; font-size: 9px; }
+  .compact-row .slot { padding: 2px 6px; background: rgba(255,255,255,0.12); border-radius: 4px; }
+  .compact-row .picker { background: #d04020; font-weight: 700; }
+  .annotation-list { font-size: 12px; max-width: 480px; }
+  .annotation-list li { margin: 6px 0; }
+  table { border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  td, th { border: 1px solid #ccc; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #e8e8e6; }
+  footer { margin-top: 24px; font-size: 12px; color: #777; border-top: 1px solid #ddd; padding-top: 12px; }
+  a { color: #0a66c2; }
+  code { font-size: 11px; background: #e8e8e6; padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<p><span class="candidate-tag">Candidate variant 3 of 4</span></p>
+<h1>Variant 3: Pinch-zoom — reuse A11Y-05</h1>
+
+<p>The Hard 16x30 board reuses the <strong>existing A11Y-05 pinch-zoom</strong>
+from Plan 06.1-03. The only new behavior in Video Mode is an optional one-shot
+auto-fit animation on Video Mode entry — animate <code>zoomScale</code> from 1.0
+to whatever scale fits the 16x30 board between the PiP band and the compact
+row. After that, the user manages the zoom with the existing pinch system.</p>
+
+<div class="deconflict-note">
+  <strong>A11Y-05 / 06.1-03 deconfliction (LOWEST RISK — zero new gestures):</strong>
+  this variant <em>reuses</em> the existing
+  <code>MagnifyGesture</code> + <code>clampZoomScale</code> + <code>.scaleEffect</code>
+  layer verbatim. The only added behavior is a one-shot
+  <code>withAnimation { zoomScale = autoFitScale }</code> when Video Mode toggles
+  on (and Hard is the current difficulty). No gesture composition change. No new
+  state. Cell-level <code>.exclusively(before:)</code> stays byte-identical.
+</div>
+
+<div class="stage">
+  <div class="frame">
+    <img class="bg" src="../../../Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png" alt="Mines Hard Classic baseline">
+    <div class="pip-band">PiP-large top (reserved)</div>
+    <div class="board-overlay"></div>
+    <div class="pinch-callout"></div>
+    <div class="pinch-label">Auto-fit on entry</div>
+    <div class="compact-row">
+      <div class="slot">Back</div>
+      <div class="slot">F/M</div>
+      <div class="slot picker">R/F</div>
+      <div class="slot">0:00</div>
+      <div class="slot">⚙</div>
+    </div>
+  </div>
+
+  <div class="annotation-list">
+    <h2>Behavior</h2>
+    <ul>
+      <li><strong>Cell size:</strong> unchanged at the source level — 18pt floor preserved. Visual size on screen is <code>18pt × zoomScale</code>.</li>
+      <li><strong>Auto-fit:</strong> on Video Mode entry, animate <code>zoomScale</code> from current value to <code>fitScale = (availableHeight - 2*padding) / (rows * (18 + spacing))</code>, clamped to the existing 0.8–2.0 range.</li>
+      <li><strong>If auto-fit can't reach a satisfying fit</strong> (i.e. <code>fitScale &lt; 0.8</code>), zoomScale stops at 0.8 floor and ScrollView fallback engages (06.1-03 D-16 — already shipping).</li>
+      <li><strong>User control:</strong> pinch to expand back to normal size, then scroll to play; or accept the smaller scaled view and play without scrolling.</li>
+      <li><strong>Reduce Motion:</strong> auto-fit animation is gated behind <code>accessibilityReduceMotion</code> — falls back to <code>.identity</code> (instant snap to fitScale).</li>
+    </ul>
+
+    <h2>Pros</h2>
+    <ul>
+      <li>Lowest code surface — only an auto-fit trigger on Video Mode entry.</li>
+      <li>Zero new gesture surface; reuses A11Y-05 verbatim.</li>
+      <li>User already knows how to use pinch from non-Video-Mode play (no new affordance to teach).</li>
+      <li>Easiest to ship; smallest Phase 11 plan footprint.</li>
+    </ul>
+
+    <h2>Cons</h2>
+    <ul>
+      <li><strong>Discoverability:</strong> without auto-fit, Hard + Large PiP renders unplayable at first glance — user must know pinch works.</li>
+      <li>Auto-fit clamps at 0.8x. If <code>fitScale &lt; 0.8</code>, fallback ScrollView engages and user sees a partial board until they pinch or scroll — a worse initial state than Variant 1 (smaller cells, full board visible).</li>
+      <li>Animated auto-fit on entry may collide with the cell reveal-cascade animation from Phase 5 if the user re-enters Video Mode mid-game.</li>
+      <li>Triggers Phase 11 research-flag per ROADMAP §v1.2 Research Flags (composition with cell gestures during the auto-fit animation needs verification).</li>
+    </ul>
+
+    <h2>Composition with A11Y-05</h2>
+    <table>
+      <tr><th>State</th><th>Behavior</th></tr>
+      <tr><td>Video Mode OFF (v1.0 behavior)</td><td><code>zoomScale = 1.0</code> default; pinch [0.8, 2.0] clamp; cells render at 18pt; ScrollView fallback for &lt; floor cases.</td></tr>
+      <tr><td>Video Mode ON, Hard, on entry</td><td>Single <code>withAnimation { zoomScale = clampZoomScale(fitScale) }</code> tween, then identical to v1.0 pinch behavior.</td></tr>
+      <tr><td>Pinch during Video Mode</td><td>Identical to v1.0 — <code>baseZoomScale × magnification</code>, clamped via <code>Self.clampZoomScale</code>.</td></tr>
+      <tr><td>Video Mode OFF mid-game</td><td>Optional symmetric auto-fit back to 1.0; or leave at last user-set zoom (TBD in Phase 11).</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>Screenshot evidence</h2>
+<ul>
+  <li><code>Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png</code> — baseline (Classic): at 1.0x zoom, this is the unplayable state pinch-zoom-out resolves.</li>
+  <li><code>Docs/screenshots/v1.2-design/mines-hard-dracula-pip-large.png</code> — Dracula §8.12 audit: same.</li>
+</ul>
+
+<footer>
+  Strategy ADR (Plan 08-05):
+  <a href="../../phases/08-video-mode-design/08-HARD-MINES-ADR.md">08-HARD-MINES-ADR.md</a>
+  · Layout doc:
+  <a href="../../phases/08-video-mode-design/VIDEO-MODE-LAYOUTS.md">VIDEO-MODE-LAYOUTS.md</a>
+  · Pinch-zoom origin (REUSED):
+  <a href="../../phases/06.1-pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode/06.1-03-PLAN.md">06.1-03 (A11Y-05 / MagnifyGesture)</a>
+</footer>
+
+<script>
+  // Generate the 16x30 grid for the pinch-zoom auto-fit illustration
+  (function () {
+    var board = document.querySelector('.board-overlay');
+    if (!board) return;
+    var total = 16 * 30;
+    var revealed = [11, 12, 13, 27, 28, 43, 44, 59, 73, 89, 152, 168, 184, 200, 215, 231, 256, 272, 288, 304, 320];
+    var set = {};
+    revealed.forEach(function (i) { set[i] = true; });
+    for (var i = 0; i < total; i++) {
+      var d = document.createElement('div');
+      d.className = 'cell' + (set[i] ? ' r' : '');
+      board.appendChild(d);
+    }
+  })();
+</script>
+
+</body>
+</html>

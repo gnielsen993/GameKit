@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hard-Mines Video Mode — Variant 1: Smaller cells</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px; background: #f3f3f0; color: #222; max-width: 1200px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .candidate-tag { display: inline-block; background: #1a73e8; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+  h2 { font-size: 14px; margin: 20px 0 8px; color: #333; }
+  p, li { font-size: 13px; line-height: 1.5; }
+  .deconflict-note { background: #fff8d7; border-left: 4px solid #d4a017; padding: 12px 14px; margin: 12px 0; border-radius: 6px; font-size: 13px; }
+  .stage { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; margin-top: 12px; }
+  .frame { position: relative; width: 280px; aspect-ratio: 9 / 19.5; border-radius: 32px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.18); background: #000; }
+  .frame .bg { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85; }
+  /* PiP-large top band (the worst-case from VIDEO-MODE-LAYOUTS.md) */
+  .pip-band { position: absolute; top: 0; left: 0; right: 0; height: 22%; background: rgba(60,60,80,0.92); border-bottom: 2px solid #ff3b30; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+  /* Smaller-cell board overlay — sits BELOW the PiP band, ABOVE the compact row */
+  .board-overlay { position: absolute; top: 24%; left: 4%; right: 4%; bottom: 12%; display: grid; grid-template-columns: repeat(16, 1fr); grid-template-rows: repeat(30, 1fr); gap: 1px; padding: 2px; background: rgba(255,255,255,0.18); border-radius: 8px; }
+  .board-overlay .cell { background: rgba(170,180,200,0.45); border-radius: 1px; }
+  .board-overlay .cell.r { background: rgba(255,255,255,0.7); }
+  .compact-row { position: absolute; bottom: 0; left: 0; right: 0; height: 9%; background: rgba(40,40,50,0.92); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; color: #fff; font-size: 9px; }
+  .compact-row .slot { padding: 2px 6px; background: rgba(255,255,255,0.12); border-radius: 4px; }
+  .compact-row .picker { background: #d04020; font-weight: 700; }
+  .annotation-list { font-size: 12px; max-width: 480px; }
+  .annotation-list li { margin: 6px 0; }
+  table { border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  td, th { border: 1px solid #ccc; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #e8e8e6; }
+  footer { margin-top: 24px; font-size: 12px; color: #777; border-top: 1px solid #ddd; padding-top: 12px; }
+  a { color: #0a66c2; }
+  code { font-size: 11px; background: #e8e8e6; padding: 1px 4px; border-radius: 3px; }
+  .ruler { position: absolute; right: -28px; top: 24%; bottom: 12%; width: 22px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #d04020; writing-mode: vertical-rl; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<p><span class="candidate-tag">Candidate variant 1 of 4</span></p>
+<h1>Variant 1: Smaller cells in Video Mode</h1>
+
+<p>The Hard 16x30 board renders at a <strong>smaller cell size</strong> when
+Video Mode is on, so the full grid fits between the reserved PiP-large top band
+and the compact control row at the bottom — no scroll, no new gesture.</p>
+
+<div class="deconflict-note">
+  <strong>A11Y-05 / 06.1-03 deconfliction:</strong> the existing
+  <code>MagnifyGesture</code> + auto-scale <code>cellSize</code> system from
+  Plan 06.1-03 is <em>preserved</em>. Implementation: reduce <code>minCellSize</code>
+  constant when Video Mode is on (e.g. 18pt → 12pt) and re-run the existing
+  auto-scale formula against the new available height. Pinch still works to
+  expand the user's view if they want larger cells. No gesture composition change.
+</div>
+
+<div class="stage">
+  <div style="position: relative;">
+    <div class="frame">
+      <img class="bg" src="../../../Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png" alt="Mines Hard Classic baseline">
+      <div class="pip-band">PiP-large top (reserved)</div>
+      <div class="board-overlay">
+        <!-- 16x30 = 480 cells; render a representative subset of small cells -->
+        <script>/* cells generated below via static markup */</script>
+      </div>
+      <div class="compact-row">
+        <div class="slot">Back</div>
+        <div class="slot">F/M</div>
+        <div class="slot picker">R/F</div>
+        <div class="slot">0:00</div>
+        <div class="slot">⚙</div>
+      </div>
+    </div>
+    <div class="ruler">16 cols × 30 rows fit</div>
+  </div>
+
+  <div class="annotation-list">
+    <h2>Behavior</h2>
+    <ul>
+      <li><strong>Cell size:</strong> reduced from current 18pt floor (06.1-03) to ~12pt when Video Mode is on. Re-runs auto-scale.</li>
+      <li><strong>Touch target:</strong> 12pt cell + 1pt spacing ≈ 13pt hit region. Below Apple HIG's 44pt comfortable target — pinch-zoom escape hatch (existing A11Y-05) is the answer.</li>
+      <li><strong>Scroll:</strong> none. Full board visible at all times.</li>
+      <li><strong>Mines/flags icons:</strong> may need a smaller SF Symbol variant; legibility verification on Dracula required.</li>
+      <li><strong>Compromise order:</strong> step 4 (collapse Settings into overflow) may still kick in to free a few points vertically.</li>
+    </ul>
+
+    <h2>Pros</h2>
+    <ul>
+      <li>Full board visible — no new gesture for the user to learn.</li>
+      <li>Auto-scale infrastructure (06.1-03) already exists; this variant tweaks one constant.</li>
+      <li>Lowest user-facing surface change — Hard plays identically, just smaller.</li>
+    </ul>
+
+    <h2>Cons</h2>
+    <ul>
+      <li>Cell taps approach a fat-finger floor (~13pt). Misfire risk on Hard's already-dense board.</li>
+      <li>Legibility of cell numbers (1–8 SF Symbol) on Dracula at 12pt needs explicit audit (CLAUDE.md §8.12).</li>
+      <li>Mines/flag icons need a smaller variant or risk visual collision with adjacent cells.</li>
+    </ul>
+
+    <h2>Behavior table</h2>
+    <table>
+      <tr><th>Aspect</th><th>v1.0 (non-Video-Mode)</th><th>Variant 1 (Video Mode on)</th></tr>
+      <tr><td>Cell size floor</td><td>18pt (A11Y-05)</td><td>~12pt (this variant)</td></tr>
+      <tr><td>Pinch-zoom</td><td>Available (0.8x–2.0x)</td><td>Available (unchanged)</td></tr>
+      <tr><td>Horizontal scroll fallback</td><td>Yes (06.1-03 D-16)</td><td>Eliminated for Pro Max (fits inline)</td></tr>
+      <tr><td>New gesture</td><td>—</td><td>None</td></tr>
+      <tr><td>Code surface</td><td>—</td><td>One constant + Video-Mode-aware branch in cellSize() helper</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>Screenshot evidence</h2>
+<p>Baseline squeeze under current 18pt floor:</p>
+<ul>
+  <li><code>Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png</code> — Classic preset, Large-top PiP applied, current cell size insufficient.</li>
+  <li><code>Docs/screenshots/v1.2-design/mines-hard-dracula-pip-large.png</code> — Dracula preset (CLAUDE.md §8.12 audit), same squeeze.</li>
+</ul>
+<p>Small-PiP corner set (proves Hard already fits at current cell size when PiP is small — Video Mode small PiP does NOT trigger this variant):</p>
+<ul>
+  <li><code>mines-hard-dracula-pip-small-{tl,tr,bl,br}.png</code></li>
+</ul>
+
+<footer>
+  Strategy ADR (Plan 08-05):
+  <a href="../../phases/08-video-mode-design/08-HARD-MINES-ADR.md">08-HARD-MINES-ADR.md</a>
+  · Layout doc:
+  <a href="../../phases/08-video-mode-design/VIDEO-MODE-LAYOUTS.md">VIDEO-MODE-LAYOUTS.md</a>
+  · Pinch-zoom origin:
+  <a href="../../phases/06.1-pre-release-polish-home-cards-2-per-row-grid-mines-flag-mode/06.1-03-PLAN.md">06.1-03 (A11Y-05)</a>
+</footer>
+
+<script>
+  // Generate the 16x30 small-cell grid (no external CSS file allowed; inline only)
+  (function () {
+    var board = document.querySelector('.board-overlay');
+    if (!board) return;
+    var total = 16 * 30;
+    var revealed = [11, 12, 13, 27, 28, 43, 44, 59, 73, 89, 152, 168, 184, 200, 215, 231, 256, 272, 288, 304, 320];
+    var set = {};
+    revealed.forEach(function (i) { set[i] = true; });
+    for (var i = 0; i < total; i++) {
+      var d = document.createElement('div');
+      d.className = 'cell' + (set[i] ? ' r' : '');
+      board.appendChild(d);
+    }
+  })();
+</script>
+
+</body>
+</html>
