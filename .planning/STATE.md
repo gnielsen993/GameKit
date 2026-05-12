@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: Video Mode
 status: planning
 stopped_at: Phase 8 context gathered
-last_updated: "2026-05-12T21:22:24.505Z"
+last_updated: "2026-05-12T21:37:33.091Z"
 last_activity: 2026-05-12 — milestone roadmapped (Phases 8–13)
 progress:
   total_phases: 14
   completed_phases: 7
-  total_plans: 49
+  total_plans: 55
   completed_plans: 46
-  percent: 94
+  percent: 84
 ---
 
 # Project State
@@ -317,4 +317,4 @@ Last session: --stopped-at
 Stopped at: Phase 8 context gathered
 Resume file: --resume-file
 
-**Planned Phase:** 8 (Video Mode Design) — TBD plans — 2026-05-12T00:00:00.000Z
+**Planned Phase:** 8 (video-mode-design) — 6 plans — 2026-05-12T21:37:33.077Z
