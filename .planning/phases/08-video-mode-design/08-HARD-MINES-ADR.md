@@ -2,12 +2,12 @@
 
 ## Status
 
-**Proposed — awaiting decision (Plan 08-05, Task 3).**
+**Accepted 2026-05-12.**
 
 This ADR resolves CONTEXT D-13 — the only intentionally open decision in Phase 8.
-On decision, Status updates to **Decided <date>**. Once decided, this document
-**locks the Hard Minesweeper Video Mode strategy**. Phase 11 SC2 references this
-ADR by name and **MUST NOT re-debate** the rejected alternatives.
+This document **locks the Hard Minesweeper Video Mode strategy**. Phase 11 SC2
+references this ADR by name and **MUST NOT re-debate** the rejected
+alternatives.
 
 Sister phases that consume this ADR:
 
@@ -187,25 +187,71 @@ branch.
 
 ## Decision
 
-**Chosen:** _(awaiting Gabe — Plan 08-05 Task 3)_
+**Chosen: smaller-cells (Variant 1).**
 
-<!--
-  Fill this section with:
-    **Chosen:** <smaller cells | scroll-pan | pinch-zoom | warning+compromise>
-
-  Then a one-paragraph rationale tying the choice to the Pros/Cons above.
-  Phase 11 implements EXACTLY this variant and does NOT re-debate alternatives.
--->
+Smaller-cells preserves the full 16x30 board without introducing a new gesture,
+deconflicts cleanly with A11Y-05 / 06.1-03 (the existing `MagnifyGesture` stays
+untouched — pinch still works as the user's manual fit), and does NOT trigger
+the Phase 11 research-flag per ROADMAP §v1.2 Research Flags. The variant reuses
+the auto-scale infrastructure shipped in 06.1-03: only a single `minCellSize`
+constant changes (gated on `videoModeStore.isOn`), feeding the existing pure
+`cellSize(forWidth:cols:padding:spacing:)` static helper. Trade-off accepted:
+cell-size reduction approaches the fat-finger floor (~12pt) on Hard's already-
+dense board — mitigated by keeping A11Y-05 pinch-zoom as the user-controlled
+escape hatch and by the §8.12 Dracula legibility audit that Phase 11 SC4 will
+run on the produced cell size. Phase 11 implements EXACTLY this variant and
+does NOT re-debate the rejected alternatives.
 
 ## Rejected alternatives
 
-<!--
-  Auto-generated from §Decision on resume. Three of the four candidates above
-  go here, each with a one-sentence "rejected because…" reason and a link to
-  the variant's sketch (the screenshot evidence required by CONTEXT D-13).
--->
+Each rejected variant retains its full Pros/Cons inline above (§Candidates
+considered). The screenshot evidence for each is `mines-hard-classic-pip-large.png`
+and `mines-hard-dracula-pip-large.png` (the baseline squeeze the rejected
+variant attempted to solve); the §8.12 Dracula screenshot is the load-bearing
+piece per CONTEXT D-13 that the chosen approach must survive.
 
-_(populated after the decision)_
+### Rejected: scroll-pan (Variant 2)
+
+- **Sketch:** [`hard-mines-scroll-pan.html`](../../sketches/08-video-mode-design/hard-mines-scroll-pan.html)
+- **Screenshot evidence:** `Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png` ·
+  `mines-hard-dracula-pip-large.png` (baseline squeeze)
+
+**Rejected because:** highest deconfliction risk with the cell-level
+`LongPressGesture(0.25).exclusively(before: TapGesture())` chain locked in
+ROADMAP P3 SC1 — a single-finger pan introduces a drag-vs-tap classification
+problem that puts the 50-tap zero-misfire requirement at risk. It also
+**triggers the Phase 11 research-flag** per ROADMAP §v1.2 Research Flags
+(extra spike before code), while smaller-cells avoids that gate entirely.
+
+### Rejected: pinch-zoom (Variant 3)
+
+- **Sketch:** [`hard-mines-pinch-zoom.html`](../../sketches/08-video-mode-design/hard-mines-pinch-zoom.html)
+- **Screenshot evidence:** `Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png` ·
+  `mines-hard-dracula-pip-large.png` (baseline squeeze)
+
+**Rejected because:** discoverability failure mode is severe — without
+auto-fit, Hard + Large PiP renders unplayable at first glance and the user
+must guess that pinch is the answer. The auto-fit `withAnimation` trigger
+may also collide with the in-flight cell reveal-cascade from Phase 5
+(MINES-08), and it **triggers the Phase 11 research-flag** for that exact
+composition risk. Smaller-cells preserves the same A11Y-05 pinch surface as
+a manual escape hatch without making auto-fit the load-bearing path.
+
+### Rejected: warning-compromise (Variant 4)
+
+- **Sketch:** [`hard-mines-warning-compromise.html`](../../sketches/08-video-mode-design/hard-mines-warning-compromise.html)
+- **Screenshot evidence (the warning surface):**
+  `Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png` ·
+  `mines-hard-dracula-pip-large.png`
+- **Screenshot evidence (the compromise target — PiP-small):**
+  `mines-hard-dracula-pip-small-{tl,tr,bl,br}.png` (4-corner canonical set)
+
+**Rejected because:** concedes that Hard + Large PiP isn't a great
+experience — the variant ships a "this is hard, please change PiP" pill
+rather than a working Hard + Large PiP layout. Held in reserve as the v1.3
+rollback target (see §Rollback condition) because its evidence base (the
+4-corner Dracula PiP-small set) is already documented and it requires zero
+gesture or layout-engine change to ship.
 
 ## Interaction with A11Y-05 / 06.1-03 MagnifyGesture + auto-scale system
 
@@ -222,30 +268,51 @@ that Phase 11 implements against.
 
 **How the chosen variant composes with it:**
 
-_(populated after the decision)_
+Smaller-cells **adds NO new gesture**. The cell-level
+`LongPressGesture(0.25).exclusively(before: TapGesture())` composition in
+`MinesweeperCellView` remains byte-identical. The board-level `MagnifyGesture`
+applied via `.simultaneousGesture(...)` on the ScrollView in `MinesweeperBoardView`
+remains byte-identical. The `.scaleEffect(zoomScale, anchor: .center)` layer
+on the `LazyVGrid` remains byte-identical, as does the `zoomScale` /
+`baseZoomScale` dual-state pattern and the `[0.8, 2.0]` `clampZoomScale(_:)`
+range.
 
-If the chosen variant adds a new gesture, the composition rule is documented
-here in the form: `<new-gesture> = <finger-count>, pinch = two-finger; both
-gestures simultaneous via .simultaneousGesture(...)`. If the chosen variant
-adds no gesture, this paragraph says so explicitly and notes that the cell
-`.exclusively(before:)` chain remains byte-identical (no `MinesweeperCellView`
-modifications).
+The ONLY change to the 06.1-03 system: when `videoModeStore.isOn == true`,
+the auto-scale `cellSize(forWidth:cols:padding:spacing:)` static helper is
+re-invoked with a lower `minCellSize` floor (the v1.0 constant of `18` becomes
+a smaller Video-Mode-aware constant — exact value locked by Phase 11 SC2
+after the §8.12 Dracula legibility audit; the working number is ~12pt). The
+helper signature is unchanged; the existing helper call site in
+`MinesweeperBoardView.body` is unchanged; only the `Self.minCellSize`
+reference becomes a Video-Mode-aware lookup (e.g. a
+`Self.minCellSize(videoModeOn:)` overload or an environment-conditional
+constant). Pinch-zoom remains the user-controlled escape hatch when the
+reduced cell size still feels too dense, and the existing fallback to
+horizontal ScrollView (`scrollAxis(for:)`) still engages on sub-floor cases
+on smaller devices.
+
+No `MinesweeperCellView` modifications. No new gesture surface. No
+`.exclusively(before:)` chain modifications. Phase 11 SC5 (VIDEO-13 byte-
+identical off-path check) is satisfied trivially because the Video-Mode-aware
+`minCellSize` lookup returns the v1.0 `18` constant verbatim when
+`videoModeStore.isOn == false`.
 
 ## Rollback condition
 
-_(populated after the decision)_
-
-<!--
-  Format: "If <observable failure mode> appears during Phase 11 verification
-  or TestFlight feedback, revert this ADR and pick <next-best variant from
-  §Decision>." ONE sentence. The word `rollback` MUST appear above.
--->
+If Phase 11 ships smaller-cells and the reduced cell-size triggers a measurable
+mis-tap rate increase on iPhone 17 Pro Max or a §8.12 Dracula legibility
+regression during Phase 11 verification or TestFlight feedback, **rollback**
+this ADR and switch to warning-compromise (Variant 4) as the v1.3 fallback —
+that variant requires no gesture or layout change and the 4-corner Dracula
+PiP-small set is already documented as its evidence base.
 
 ## Consumed by
 
 - **Phase 11 SC2 (Minesweeper Adoption)** — implements chosen variant exactly. Alternatives are NOT re-debated.
 - **Phase 11 SC3 (Hard validation)** — re-uses the screenshots embedded above (`mines-hard-classic-pip-large.png`, `mines-hard-dracula-pip-large.png`, plus the 4-corner Dracula set if PiP-small testing applies).
-- **ROADMAP §v1.2 Research Flags §Phase 11** — research-phase is CONDITIONAL on the chosen variant. _(populated after the decision: either "triggers Phase 11 research-phase per ROADMAP §v1.2 Research Flags" or "does NOT trigger Phase 11 research-phase per ROADMAP §v1.2 Research Flags; Phase 11 proceeds direct to planning".)_
+- **ROADMAP §v1.2 Research Flags §Phase 11** — **does NOT trigger Phase 11 research-phase per ROADMAP §v1.2 Research Flags; Phase 11 proceeds direct to planning.** The chosen variant (smaller-cells) is one of the two ROADMAP-named "skip research" outcomes; the research-flag explicitly does NOT fire for this ADR.
+
+Phase 11 SC2 implements smaller-cells per this ADR; alternatives are NOT re-debated.
 
 ## Source decisions
 
