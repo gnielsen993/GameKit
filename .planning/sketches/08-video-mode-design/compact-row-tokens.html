@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Compact Control Row — token sketch (Phase 8)</title>
+<style>
+  :root {
+    /* Illustrative px approximations of the DesignKit token names.
+       CSS variable names mirror the token names 1:1. The spec doc
+       (08-COMPACT-ROW-TOKENS.md) is the contract — these pixel
+       values exist only so the browser can render a sketch. */
+    --radii-button: 12px;
+    --radii-chip: 10px;
+    --spacing-s: 8px;
+    --spacing-m: 12px;
+    --spacing-l: 32px;
+    --spacing-xl: 40px;
+
+    /* Neutral surface — illustrative only, not part of the token spec. */
+    --surface: #f4f1ea;
+    --card: #ffffff;
+    --ink: #1d1d1f;
+    --muted: #6e6e73;
+    --bezel: #d8d6cf;
+    --accent: #c8403a;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--surface);
+    color: var(--ink);
+    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-m);
+  }
+
+  h1 { font-size: 20px; margin: 0 0 var(--spacing-s); }
+  h2 { font-size: 15px; margin: var(--spacing-xl) 0 var(--spacing-s); color: var(--muted); }
+  .note { font-size: 12px; color: var(--muted); margin: 0 0 var(--spacing-l); }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-s);                    /* D-07 */
+    background: var(--card);
+    border: 1px solid var(--bezel);
+    border-radius: var(--radii-button);
+    padding: var(--spacing-s) var(--spacing-m);
+    margin-bottom: var(--spacing-m);
+  }
+
+  .icon-btn {
+    width: var(--spacing-xl);
+    height: var(--spacing-xl);
+    border-radius: var(--radii-button);       /* D-05 (consistency) */
+    background: var(--card);
+    border: 1px solid var(--bezel);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  .chip {
+    height: var(--spacing-l);                 /* info chip height — MinesweeperHeaderBar precedent */
+    border-radius: var(--radii-chip);
+    background: var(--surface);
+    border: 1px solid var(--bezel);
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--spacing-m);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .picker {
+    height: var(--spacing-xl);                /* D-06 */
+    border-radius: var(--radii-button);       /* D-05 */
+    background: var(--card);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--spacing-m);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .spacer { flex: 1; }
+
+  table.legend {
+    margin-top: var(--spacing-l);
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.legend th, table.legend td {
+    text-align: left;
+    padding: 4px var(--spacing-m) 4px 0;
+    border-bottom: 1px solid var(--bezel);
+  }
+  table.legend th { color: var(--muted); font-weight: 500; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Compact Control Row — token sketch</h1>
+  <p class="note">
+    Sketch uses illustrative px values for browser rendering; spec doc
+    <code>08-COMPACT-ROW-TOKENS.md</code> is the contract. CSS variable
+    names mirror DesignKit token names 1:1. Slot order from plan-doc:
+    <em>Back | primary info | picker | secondary info | settings</em>.
+  </p>
+
+  <h2>Minesweeper</h2>
+  <div class="row">
+    <span class="icon-btn">&larr;</span>
+    <span class="chip">10 / 40</span>
+    <span class="spacer"></span>
+    <span class="picker">Reveal/Flag</span>
+    <span class="spacer"></span>
+    <span class="chip">01:23</span>
+    <span class="icon-btn">&#9881;</span>
+  </div>
+
+  <h2>Merge</h2>
+  <div class="row">
+    <span class="icon-btn">&larr;</span>
+    <span class="chip">2,048</span>
+    <span class="spacer"></span>
+    <span class="picker">Mode picker</span>
+    <span class="spacer"></span>
+    <span class="chip">Best 4,096</span>
+    <span class="icon-btn">&#9881;</span>
+  </div>
+
+  <h2>Nonogram</h2>
+  <div class="row">
+    <span class="icon-btn">&larr;</span>
+    <span class="chip">3 lives  10x10</span>
+    <span class="spacer"></span>
+    <span class="picker">Fill/Mark</span>
+    <span class="spacer"></span>
+    <span class="chip">02:47</span>
+    <span class="icon-btn">&#9881;</span>
+  </div>
+
+  <h2>Legend — CSS variable to DesignKit token</h2>
+  <table class="legend">
+    <thead>
+      <tr><th>CSS variable</th><th>DesignKit token</th><th>Used by</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>--radii-button</td><td>theme.radii.button</td><td>picker pill (D-05), Back/Settings icon buttons</td></tr>
+      <tr><td>--radii-chip</td><td>theme.radii.chip</td><td>info chips (existing anchor)</td></tr>
+      <tr><td>--spacing-s</td><td>theme.spacing.s</td><td>inter-item gap (D-07)</td></tr>
+      <tr><td>--spacing-l</td><td>theme.spacing.l</td><td>info chip height (MinesweeperHeaderBar precedent)</td></tr>
+      <tr><td>--spacing-xl</td><td>theme.spacing.xl</td><td>picker pill height (D-06), Back/Settings icon button size</td></tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>
