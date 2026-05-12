@@ -97,6 +97,47 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 - [x] **A11Y-05
 **: Pinch-to-zoom on Mines board (any difficulty); scale range 0.8x-2.0x; persists across restart within session (graduates A11Y-V2-02)
 
+## v1.2 Requirements — Video Mode
+
+**Defined:** 2026-05-12
+**Scope:** Optional mode that keeps GameDrawer playable while a PiP video floats on screen. User picks the video location manually; layout adapts.
+
+### Settings & Persistence
+
+- [ ] **VIDEO-01**: Settings exposes Video Mode Off/On toggle (default Off); state persisted across launches
+- [ ] **VIDEO-02**: When Video Mode is On, Settings exposes a video-location picker with exactly 6 options: Large top, Large bottom, Small top-left, Small top-right, Small bottom-left, Small bottom-right
+- [ ] **VIDEO-03**: Selected location persists across launches and is observable by every game screen via a shared store
+- [ ] **VIDEO-14**: Settings copy explains Video Mode in one short paragraph + clarifies that GameDrawer cannot detect another app's PiP automatically (manual selection only)
+
+### Layout Engine
+
+- [ ] **VIDEO-04**: Shared compact control row component used by games in Video Mode — order Back | primary info | picker | secondary info | settings; reads DesignKit tokens only
+- [ ] **VIDEO-05**: Small-PiP layout — game board stays at normal size; back/settings/info chips and the picker are repositioned so the covered corner is empty for the selected Small location
+- [ ] **VIDEO-06**: Large-PiP layout — top or bottom band is reserved per selection; board fits between the reserved band and the compact control row; secondary controls collapse before the board becomes unplayable
+- [ ] **VIDEO-13**: Video Mode adapts only when On — toggling Off restores each game's normal layout with no visual residue
+
+### Per-Game Adoption
+
+- [ ] **VIDEO-07**: Minesweeper adopts Video Mode for Easy + Medium across all 6 locations with no legibility regression on Classic or one Loud preset
+- [ ] **VIDEO-08**: Minesweeper Hard (16×30) Video Mode strategy validated against real screenshots — final approach (smaller cells / scroll / zoom / warning) chosen with rationale recorded in ADR
+- [ ] **VIDEO-09**: Merge adopts Video Mode across all 6 locations with no legibility regression on Classic + one Loud preset
+- [ ] **VIDEO-10**: Nonogram adopts Video Mode across all 6 locations; hints + grid stay readable in Large-top and Large-bottom layouts
+
+### Win/Loss & A11y Gating
+
+- [ ] **VIDEO-11**: Win/loss surfaces use a non-board-covering banner/pill in Video Mode; primary action (Play Again / Continue) reachable without an extra tap; banner placement avoids the selected PiP zone
+- [ ] **VIDEO-12**: All Video-Mode-related haptics, SFX, and animations (including any win banner confetti) respect existing Settings haptics/SFX/animations toggles and `accessibilityReduceMotion`
+
+### Out of Scope for v1.2
+
+| Feature | Reason |
+|---------|--------|
+| Auto-detect of another app's PiP frame | No public iOS API exposes another app's PiP location to third-party apps |
+| Sudoku adoption | Game not built yet; will be designed Video-Mode-aware when added |
+| Vertical / portrait PiP layouts | Rare in practice; reconsider v1.3+ if usage shows it matters |
+| Large left / large right PiP | Current observed PiP positions are top and bottom only |
+| Pinch-to-zoom hard board (if not chosen for VIDEO-08) | Stays a v1.3+ candidate if scroll or smaller cells win |
+
 ## v2 Requirements
 
 Deferred to a post-MVP milestone. Tracked but not in the current roadmap.
@@ -217,6 +258,27 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 - Mapped to phases: 38 ✓
 - Unmapped: 0
 
+### v1.2 Traceability
+
+Filled by roadmapper.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| VIDEO-01 | TBD | Pending |
+| VIDEO-02 | TBD | Pending |
+| VIDEO-03 | TBD | Pending |
+| VIDEO-04 | TBD | Pending |
+| VIDEO-05 | TBD | Pending |
+| VIDEO-06 | TBD | Pending |
+| VIDEO-07 | TBD | Pending |
+| VIDEO-08 | TBD | Pending |
+| VIDEO-09 | TBD | Pending |
+| VIDEO-10 | TBD | Pending |
+| VIDEO-11 | TBD | Pending |
+| VIDEO-12 | TBD | Pending |
+| VIDEO-13 | TBD | Pending |
+| VIDEO-14 | TBD | Pending |
+
 **Notes on placement:**
 - **A11Y-02 (VoiceOver labels) is mapped to Phase 5** but cell-level `accessibilityLabel` is *baked in* at Phase 3 per PITFALLS Pitfall 13 (cheaper to bake in with the cell view than retrofit). Phase 5 polishes the labels on buttons, overlays, and the full VoiceOver navigation pass — Phase 3 ensures cells aren't retrofit.
 - **MINES-03 / MINES-04 / MINES-07 (engine-side) at Phase 2; MINES-07 (UI-side overlay) at Phase 3** — engine detection of win/loss lands at P2 in WinDetector tests; the actual user-visible overlay using `theme.colors.{success,danger}` lands at P3.
@@ -227,3 +289,4 @@ Each v1 requirement maps to exactly one phase. Phase numbers populated 2026-04-2
 ---
 *Requirements defined: 2026-04-24*
 *Traceability populated: 2026-04-24 — all 35 v1 requirements mapped*
+*v1.2 Video Mode requirements added: 2026-05-12 — VIDEO-01..14 (traceability pending roadmapper)*
