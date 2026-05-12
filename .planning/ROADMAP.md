@@ -267,7 +267,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 - [x] 08-01-screenshot-capture-PLAN.md — Capture 10 fresh game screenshots (Mines E/M/H + Merge + Nonogram x Classic + Dracula) on iPhone 17 Pro Max simulator + capture-log README (CONTEXT D-02..D-04)
 - [x] 08-02-compact-row-tokens-PLAN.md — Author 08-COMPACT-ROW-TOKENS.md (radii.button / spacing.xl / spacing.s + per-game slot mappings) + compact-row HTML sketch (CONTEXT D-05..D-08; Phase 8 SC3)
 - [x] 08-03-banner-placement-PLAN.md — Author 08-BANNER-PLACEMENT.md (6-row opposite-of-PiP anchor table + DKButton + dampen-to-identity) + banner-placement HTML sketch (CONTEXT D-09..D-12; Phase 8 SC4)
-- [ ] 08-04-layout-doc-PLAN.md — Author VIDEO-MODE-LAYOUTS.md (5 games x 6 PiP zones x both presets) + 5 per-game overlay HTML sketches (Phase 8 SC1; depends on 08-01)
+- [x] 08-04-layout-doc-PLAN.md — Author VIDEO-MODE-LAYOUTS.md (5 games x 6 PiP zones x both presets) + 5 per-game overlay HTML sketches (Phase 8 SC1; depends on 08-01)
 - [ ] 08-05-hard-mines-adr-PLAN.md — 4 candidate-variant HTML sketches + 08-HARD-MINES-ADR.md with chosen strategy + rollback + 06.1-03 deconfliction (CONTEXT D-13; Phase 8 SC2; depends on 08-01, 08-04)
 - [ ] 08-06-design-lock-PLAN.md — Pre-flight artifact audit + Gabe's design-lock sign-off + 08-DESIGN-LOCK.md (Phase 8 SC5; unblocks Phase 9)
 
@@ -343,7 +343,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 8. Video Mode Design | 0/6 | Not started | - |
+| 8. Video Mode Design | 4/6 | In progress | - |
 | 9. Video Mode Foundation | 0/TBD | Not started | - |
 | 10. Layout Primitives | 0/TBD | Not started | - |
 | 11. Minesweeper Adoption | 0/TBD | Not started | - |
