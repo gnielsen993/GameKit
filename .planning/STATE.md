@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 08-02-compact-row-tokens-PLAN.md
-last_updated: "2026-05-12T21:44:57.666Z"
+stopped_at: Completed 08-03-banner-placement-PLAN.md
+last_updated: "2026-05-12T21:45:59.258Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 14
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 08 (video-mode-design) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-05-12
 
@@ -110,6 +110,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 06.1 P01 | 5 | 3 tasks | 4 files |
 | Phase 06.1 P02 | 12 | 4 tasks | 5 files |
 | Phase 08-video-mode-design P02 | 2 | 2 tasks | 2 files |
+| Phase 08-video-mode-design P03 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -296,6 +297,7 @@ Recent decisions affecting current work:
 - **2026-05-12 (v1.2 roadmap):** Milestone v1.2 (Video Mode) phases 8–13 appended to ROADMAP.md and REQUIREMENTS.md v1.2 traceability populated 14/14. Phase 8 is a design phase (no app code) per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required" — produces screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row design tokens + win/loss banner sketch consumed by Phases 9–13. Phase numbering continues from v1.0's last integer phase (7); no renumbering of existing phases. Next: `/gsd-plan-phase 8`.
 - 08-02: Compact control row tokens locked — picker pill = theme.radii.button (D-05), height = theme.spacing.xl (D-06), gap = theme.spacing.s (D-07); per-game slot mapping for Mines/Merge/Nonogram verbatim from D-08; Sudoku Out of Scope (no game yet); no new radii.pill anchor (CLAUDE.md §2 promotion rule, 1 consumer)
 - 08-02: Design spec docs are token-name-only — 08-COMPACT-ROW-TOKENS.md contains zero pt/px values, grep-gated in acceptance criteria; HTML sketch uses CSS variables (--radii-button, --spacing-xl, etc) that mirror DesignKit token names 1:1 with a legend mapping back
+- 08-03: Banner placement design lock — opposite-of-PiP anchor rule (D-09) as 6-row table; pill shape with radii.button + spacing.m margins (D-10); explicit DKButton inside banner, never tap-anywhere-to-trigger (D-11, VIDEO-11 SC2); Reduce-Motion dampens to identity per v1.0 05-06 D-04 (D-12); banner haptics/SFX guarded by hapticsEnabled/sfxEnabled FIRST inside firing surfaces (v1.0 05-03 D-10 contract). Spec doc + HTML sketch only, zero gamekit/ touches (Phase 8 SC5 holds).
 
 ### Pending Todos
 
@@ -316,8 +318,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-12T21:44:57.659Z
-Stopped at: Completed 08-02-compact-row-tokens-PLAN.md
+Last session: 2026-05-12T21:45:59.252Z
+Stopped at: Completed 08-03-banner-placement-PLAN.md
 Resume file: None
 
 **Planned Phase:** 8 (video-mode-design) — 6 plans — 2026-05-12T21:37:33.077Z
