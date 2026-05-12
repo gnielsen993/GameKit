@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Layout — Minesweeper Hard (6 PiP zones, baseline squeeze)</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px; background: #f3f3f0; color: #222; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  h2 { font-size: 14px; margin: 16px 0 8px; color: #555; }
+  p, li { font-size: 13px; line-height: 1.5; }
+  .strategy-note { background: #ffe1d0; border-left: 4px solid #d04020; padding: 12px 14px; margin: 0 0 16px; border-radius: 6px; font-size: 13px; }
+  .stage { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .frame { position: relative; width: 280px; aspect-ratio: 9 / 19.5; border-radius: 32px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.18); background: #000; }
+  .frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .zone { position: absolute; border: 2px dashed #ff3b30; background: rgba(255,59,48,0.22); color: #fff; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+  .controls { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; font-size: 13px; }
+  .controls label { cursor: pointer; }
+  .frame .zone { display: none; }
+  body[data-zone="lt"]  .frame .zone-lt { display: flex; }
+  body[data-zone="lb"]  .frame .zone-lb { display: flex; }
+  body[data-zone="stl"] .frame .zone-stl { display: flex; }
+  body[data-zone="str"] .frame .zone-str { display: flex; }
+  body[data-zone="sbl"] .frame .zone-sbl { display: flex; }
+  body[data-zone="sbr"] .frame .zone-sbr { display: flex; }
+  body[data-zone="all"] .frame .zone { display: flex; opacity: 0.7; }
+  .zone-lt  { top: 0; left: 0; right: 0; height: 22%; }
+  .zone-lb  { bottom: 0; left: 0; right: 0; height: 22%; }
+  .zone-stl { top: 4%; left: 4%; width: 38%; height: 18%; border-radius: 12px; }
+  .zone-str { top: 4%; right: 4%; width: 38%; height: 18%; border-radius: 12px; }
+  .zone-sbl { bottom: 4%; left: 4%; width: 38%; height: 18%; border-radius: 12px; }
+  .zone-sbr { bottom: 4%; right: 4%; width: 38%; height: 18%; border-radius: 12px; }
+  table { border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  td, th { border: 1px solid #ccc; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #e8e8e6; }
+  .corner-grid { display: grid; grid-template-columns: repeat(2, 140px); gap: 8px; margin-top: 8px; }
+  .corner-grid figure { margin: 0; }
+  .corner-grid img { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block; }
+  .corner-grid figcaption { font-size: 11px; color: #555; text-align: center; margin-top: 4px; }
+  footer { margin-top: 24px; font-size: 12px; color: #777; }
+  a { color: #0a66c2; }
+</style>
+</head>
+<body data-zone="lt">
+<h1>Minesweeper Hard (16x30) — Video Mode PiP zones (baseline squeeze)</h1>
+
+<div class="strategy-note">
+  <strong>Strategy decision deferred to <code>08-HARD-MINES-ADR.md</code> (Plan 08-05).</strong>
+  This sketch shows only the <em>baseline squeeze</em> — the symptom under current
+  fixed cell size at 16x30, with Large-top PiP applied. The choice between
+  smaller cells / scroll-pan / pinch-zoom / warning+compromise is intentionally
+  NOT made here (per CONTEXT D-13). The ADR MUST deconflict with the existing
+  A11Y-05 / 06.1-03 MagnifyGesture + auto-scale system.
+</div>
+
+<p>Background: <code>mines-hard-classic-pip-large.png</code> (real Large-top
+encroachment showing the baseline squeeze). The Small TL/TR/BL/BR zones below
+have <strong>real</strong> screenshot evidence in the canonical 4-corner Hard
+Dracula set — shown below the radio control.</p>
+
+<div class="stage">
+  <div class="frame">
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png" alt="Mines Hard Classic">
+    <div class="zone zone-lt">Large top</div>
+    <div class="zone zone-lb">Large bottom</div>
+    <div class="zone zone-stl">Small TL</div>
+    <div class="zone zone-str">Small TR</div>
+    <div class="zone zone-sbl">Small BL</div>
+    <div class="zone zone-sbr">Small BR</div>
+  </div>
+
+  <div>
+    <div class="controls">
+      <strong>Show zone:</strong>
+      <label><input type="radio" name="z" value="lt"  checked onclick="document.body.dataset.zone=this.value"> Large top (real)</label>
+      <label><input type="radio" name="z" value="lb"  onclick="document.body.dataset.zone=this.value"> Large bottom</label>
+      <label><input type="radio" name="z" value="stl" onclick="document.body.dataset.zone=this.value"> Small TL (real evidence below)</label>
+      <label><input type="radio" name="z" value="str" onclick="document.body.dataset.zone=this.value"> Small TR (real evidence below)</label>
+      <label><input type="radio" name="z" value="sbl" onclick="document.body.dataset.zone=this.value"> Small BL (real evidence below)</label>
+      <label><input type="radio" name="z" value="sbr" onclick="document.body.dataset.zone=this.value"> Small BR (real evidence below)</label>
+      <label><input type="radio" name="z" value="all" onclick="document.body.dataset.zone=this.value"> All 6 overlaid</label>
+    </div>
+
+    <h2>Per-zone behavior (Hard)</h2>
+    <table>
+      <tr><th>Zone</th><th>Controls</th><th>Board</th></tr>
+      <tr><td>Large top</td><td>Compact row bottom; collapse Settings into menu (Compromise step 4–5)</td><td><strong>SQUEEZE — see ADR</strong></td></tr>
+      <tr><td>Large bottom</td><td>Compact row top; same collapses</td><td><strong>SQUEEZE — see ADR</strong></td></tr>
+      <tr><td>Small TL</td><td>Back → top-right</td><td>Unchanged (real evidence)</td></tr>
+      <tr><td>Small TR</td><td>Settings → top-left</td><td>Unchanged (real evidence)</td></tr>
+      <tr><td>Small BL</td><td>BL → BR</td><td>Unchanged (real evidence)</td></tr>
+      <tr><td>Small BR</td><td>Reveal/Flag FAB → BL</td><td>Unchanged (real evidence)</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>Canonical 4-corner Small-PiP evidence (Dracula, Hard 16x30)</h2>
+<p>These four shots prove the Small-PiP rule "controls move, board unchanged"
+holds even at the worst-case Hard board size. They are the inputs the 08-05 ADR
+uses to justify NOT touching the small-PiP layout.</p>
+
+<div class="corner-grid">
+  <figure>
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-dracula-pip-small-tl.png" alt="Hard Dracula Small TL">
+    <figcaption><code>mines-hard-dracula-pip-small-tl.png</code></figcaption>
+  </figure>
+  <figure>
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-dracula-pip-small-tr.png" alt="Hard Dracula Small TR">
+    <figcaption><code>mines-hard-dracula-pip-small-tr.png</code></figcaption>
+  </figure>
+  <figure>
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-dracula-pip-small-bl.png" alt="Hard Dracula Small BL">
+    <figcaption><code>mines-hard-dracula-pip-small-bl.png</code></figcaption>
+  </figure>
+  <figure>
+    <img src="../../../Docs/screenshots/v1.2-design/mines-hard-dracula-pip-small-br.png" alt="Hard Dracula Small BR">
+    <figcaption><code>mines-hard-dracula-pip-small-br.png</code></figcaption>
+  </figure>
+</div>
+
+<h2>Dracula Large-top baseline (for ADR)</h2>
+<p>See <code>mines-hard-dracula-pip-large.png</code> for the Large-top squeeze
+under Dracula preset (CLAUDE.md §8.12 legibility audit). The ADR explores
+strategy variants against this image plus the Classic equivalent.</p>
+
+<footer>
+  Back to layout doc:
+  <a href="../../phases/08-video-mode-design/VIDEO-MODE-LAYOUTS.md">VIDEO-MODE-LAYOUTS.md</a>
+  · Strategy ADR (Plan 08-05):
+  <a href="../../phases/08-video-mode-design/08-HARD-MINES-ADR.md">08-HARD-MINES-ADR.md</a>
+  · Source: <code>Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png</code>
+</footer>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Layout — Minesweeper Medium (6 PiP zones)</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px; background: #f3f3f0; color: #222; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  h2 { font-size: 14px; margin: 16px 0 8px; color: #555; }
+  p, li { font-size: 13px; line-height: 1.5; }
+  .note { background: #fff7d6; border-left: 4px solid #d4a017; padding: 10px 14px; margin: 0 0 16px; border-radius: 6px; }
+  .stage { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .frame { position: relative; width: 280px; aspect-ratio: 9 / 19.5; border-radius: 32px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.18); background: #000; }
+  .frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .zone { position: absolute; border: 2px dashed #ff3b30; background: rgba(255,59,48,0.22); color: #fff; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+  .controls { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; font-size: 13px; }
+  .controls label { cursor: pointer; }
+  .frame .zone { display: none; }
+  body[data-zone="lt"]  .frame .zone-lt { display: flex; }
+  body[data-zone="lb"]  .frame .zone-lb { display: flex; }
+  body[data-zone="stl"] .frame .zone-stl { display: flex; }
+  body[data-zone="str"] .frame .zone-str { display: flex; }
+  body[data-zone="sbl"] .frame .zone-sbl { display: flex; }
+  body[data-zone="sbr"] .frame .zone-sbr { display: flex; }
+  body[data-zone="all"] .frame .zone { display: flex; opacity: 0.7; }
+  .zone-lt  { top: 0; left: 0; right: 0; height: 22%; }
+  .zone-lb  { bottom: 0; left: 0; right: 0; height: 22%; }
+  .zone-stl { top: 4%; left: 4%; width: 38%; height: 18%; border-radius: 12px; }
+  .zone-str { top: 4%; right: 4%; width: 38%; height: 18%; border-radius: 12px; }
+  .zone-sbl { bottom: 4%; left: 4%; width: 38%; height: 18%; border-radius: 12px; }
+  .zone-sbr { bottom: 4%; right: 4%; width: 38%; height: 18%; border-radius: 12px; }
+  table { border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  td, th { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+  th { background: #e8e8e6; }
+  footer { margin-top: 24px; font-size: 12px; color: #777; }
+  a { color: #0a66c2; }
+</style>
+</head>
+<body data-zone="lt">
+<h1>Minesweeper Medium (16x16) — Video Mode PiP zones</h1>
+<p>Background: <code>mines-medium-classic-pip-large.png</code> (real Large-top PiP overlay).
+Six overlays show every PiP zone from REQUIREMENTS VIDEO-02 against the same board.</p>
+
+<div class="note">
+  Medium fits Large top in the screenshot but Compromise order step 4 (collapse
+  Settings into menu) may kick in on Large bottom. Small TL/TR/BL/BR overlays
+  here are synthesized — canonical evidence:
+  <code>mines-hard-dracula-pip-small-{tl,tr,bl,br}.png</code>.
+</div>
+
+<div class="stage">
+  <div class="frame">
+    <img src="../../../Docs/screenshots/v1.2-design/mines-medium-classic-pip-large.png" alt="Mines Medium Classic">
+    <div class="zone zone-lt">Large top</div>
+    <div class="zone zone-lb">Large bottom</div>
+    <div class="zone zone-stl">Small TL</div>
+    <div class="zone zone-str">Small TR</div>
+    <div class="zone zone-sbl">Small BL</div>
+    <div class="zone zone-sbr">Small BR</div>
+  </div>
+
+  <div>
+    <div class="controls">
+      <strong>Show zone:</strong>
+      <label><input type="radio" name="z" value="lt"  checked onclick="document.body.dataset.zone=this.value"> Large top</label>
+      <label><input type="radio" name="z" value="lb"  onclick="document.body.dataset.zone=this.value"> Large bottom</label>
+      <label><input type="radio" name="z" value="stl" onclick="document.body.dataset.zone=this.value"> Small TL</label>
+      <label><input type="radio" name="z" value="str" onclick="document.body.dataset.zone=this.value"> Small TR</label>
+      <label><input type="radio" name="z" value="sbl" onclick="document.body.dataset.zone=this.value"> Small BL</label>
+      <label><input type="radio" name="z" value="sbr" onclick="document.body.dataset.zone=this.value"> Small BR</label>
+      <label><input type="radio" name="z" value="all" onclick="document.body.dataset.zone=this.value"> All 6 overlaid</label>
+    </div>
+
+    <h2>Per-zone behavior (Medium)</h2>
+    <table>
+      <tr><th>Zone</th><th>Controls</th><th>Board</th></tr>
+      <tr><td>Large top</td><td>Compact row bottom edge</td><td>Snug but legible</td></tr>
+      <tr><td>Large bottom</td><td>Compact row top edge; Settings → menu</td><td>Compromise step 4</td></tr>
+      <tr><td>Small TL</td><td>Back → top-right</td><td>Unchanged</td></tr>
+      <tr><td>Small TR</td><td>Settings → top-left</td><td>Unchanged</td></tr>
+      <tr><td>Small BL</td><td>BL controls → BR</td><td>Unchanged</td></tr>
+      <tr><td>Small BR</td><td>Reveal/Flag FAB → BL</td><td>Unchanged</td></tr>
+    </table>
+
+    <h2>Dracula audit</h2>
+    <p>See <code>mines-medium-dracula-pip-large.png</code> for Large-top under Dracula
+       preset (CLAUDE.md §8.12 legibility audit).</p>
+  </div>
+</div>
+
+<footer>
+  Back to layout doc:
+  <a href="../../phases/08-video-mode-design/VIDEO-MODE-LAYOUTS.md">VIDEO-MODE-LAYOUTS.md</a>
+  · Source screenshot: <code>Docs/screenshots/v1.2-design/mines-medium-classic-pip-large.png</code>
+</footer>
+</body>
+</html>
