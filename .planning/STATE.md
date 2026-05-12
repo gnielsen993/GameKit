@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.2
-milestone_name: video-mode
+milestone_name: Video Mode
 status: planning
-stopped_at: "Milestone v1.2 (Video Mode) roadmapped 2026-05-12. ROADMAP.md appended with Phases 8-13 (8 design + 9-13 code); REQUIREMENTS.md v1.2 traceability populated 14/14. Next: /gsd-plan-phase 8 (design phase — produces screenshot-annotated layout doc + Hard-Mines ADR + compact-row tokens + win/loss banner sketch). v1.0 release (PF-05 DNS / PF-06 screenshots / PF-08 ASC / PF-09 nutrition / SC1-SC5 sweep) continues in parallel — non-coding work, not gated by v1.2 code."
-last_updated: "2026-05-12T00:00:00.000Z"
-last_activity: 2026-05-12
+stopped_at: Phase 8 context gathered
+last_updated: "2026-05-12T21:22:24.505Z"
+last_activity: 2026-05-12 — milestone roadmapped (Phases 8–13)
 progress:
-  total_phases: 6
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 14
+  completed_phases: 7
+  total_plans: 49
+  completed_plans: 46
+  percent: 94
 ---
 
 # Project State
@@ -313,8 +313,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-12T00:00:00.000Z
-Stopped at: Milestone v1.2 (Video Mode) roadmapped — ROADMAP.md + REQUIREMENTS.md v1.2 traceability populated. Next: /gsd-plan-phase 8 (Video Mode Design — screenshot-driven, no app code).
-Resume file: None
+Last session: --stopped-at
+Stopped at: Phase 8 context gathered
+Resume file: --resume-file
 
 **Planned Phase:** 8 (Video Mode Design) — TBD plans — 2026-05-12T00:00:00.000Z
