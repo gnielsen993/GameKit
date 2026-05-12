@@ -111,6 +111,11 @@ tweaks, in-flight work that did not ship in that `MARKETING_VERSION`.
 - App must launch instantly. Cold-start latency is a P0 bug.
 - No popups, modals, or push-y UX on first run.
 - Settings stays small — theme · haptics · reset stats · about.
+- Any haptics, confetti, sound, or celebratory animation must respect
+  user settings and accessibility. If a feature adds a delight layer,
+  it must be gated by the existing haptics / SFX / animations settings
+  and Reduce Motion where applicable. Do not ship a new win, loss, or
+  feedback treatment that cannot be turned down/off.
 
 ### Data safety
 - Implement Export/Import JSON with `schemaVersion` for stats.

@@ -4,6 +4,20 @@ Date: 2026-05-12
 Status: draft product/UX plan
 Scope: GameDrawer v1.2 discussion input, no implementation yet
 
+## Design phase required
+
+Before implementation, run a design phase with real screenshots from Gabe.
+
+Goals:
+
+- Mark the six supported PiP positions on current game screenshots.
+- Decide how each board moves or stays put in Video Mode.
+- Decide where compact controls live for each PiP case.
+- Prototype the board-visible win/loss banner treatment.
+- Specifically test hard Minesweeper layouts before committing to a final approach.
+
+Do not skip this and jump straight to code. The design needs to be driven by actual screenshots, especially for large PiP and hard Minesweeper.
+
 ## Goal
 
 Video Mode lets someone play GameDrawer while a floating video/PiP window is on screen. The app should move game UI out of the way when possible without making normal gameplay worse.
@@ -167,6 +181,16 @@ Video Mode should align with that direction:
 - Avoid full-screen end overlays that hide the board.
 - Prefer docked result panels, sheets that leave board context visible, or compact cards that avoid the selected PiP zone.
 - Large PiP layouts should place result actions opposite the video band when possible.
+
+Current direction: hybrid minimal banner.
+
+- Keep the board visible.
+- Use confetti / haptics / sound to make a win feel rewarding.
+- Show a small non-intrusive banner or pill for result info and primary action.
+- Avoid requiring extra taps just to see the result controls.
+- Avoid a large modal/toast that repeats the current board-covering problem.
+
+Important: any haptics, confetti, sound, or animations in this result treatment must respect user settings and accessibility. Confetti must obey the animations setting and Reduce Motion. Haptics must obey the haptics setting. Sound must obey the SFX setting.
 
 ## Open questions
 

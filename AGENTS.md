@@ -108,6 +108,11 @@ doc-only commits.
   aggressive subscriptions.** This is the differentiator — non-negotiable.
 - Cold-start latency is a P0 bug.
 - Settings screen is small: theme · haptics · reset stats · about.
+- Any haptics, confetti, sound, or celebratory animation must respect
+  user settings and accessibility. If a feature adds a delight layer,
+  it must be gated by the existing haptics / SFX / animations settings
+  and Reduce Motion where applicable. Do not ship a new win, loss, or
+  feedback treatment that cannot be turned down/off.
 
 ### Design system
 - **No hard-coded colors / radii / spacing in app UI.**
