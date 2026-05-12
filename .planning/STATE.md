@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: executing
+status: ready_to_plan
 stopped_at: Completed 08-06-design-lock-PLAN.md — Phase 8 complete; Phase 9 unblocked
 last_updated: "2026-05-12T23:45:00Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 14
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 55
   completed_plans: 52
-  percent: 95
+  percent: 64
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 08 (video-mode-design) — **COMPLETE** (2026-05-12); Phase 09 unblocked
-Plan: 6 of 6 (Phase 8 closed)
-Status: Phase 8 complete; ready to plan Phase 9
+Phase: 9
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-05-12
 
 Progress: [█████████▌] 95%
@@ -52,7 +52,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 
 **Velocity:**
 
-- Total plans completed: 16
+- Total plans completed: 22
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -63,6 +63,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | 01 | 8 | - | - |
 | 02 | 1 | 3 min | 3 min |
 | 05 | 7 | - | - |
+| 08 | 6 | - | - |
 
 **Recent Trend:**
 
