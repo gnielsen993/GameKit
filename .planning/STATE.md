@@ -1,36 +1,50 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: "Phase 7 Release pre-flight in progress. ✅ PF-01 doc-drift / PF-02 icon / PF-03 CloudKit Production schema deployed (CD_GameRecord + CD_BestTime + CD_BestScore via Dashboard 2026-05-01) / PF-04 Production schema verified / PF-07 name=GameDrawer / PF-05 code-side (DNS deploy pending) / iCloud + Background Modes capabilities registered / repo health audit clean. ☐ PF-05 DNS go-live for gamedrawer.lauterstar.com / PF-06 12+4 theme screenshots / PF-08 ASC metadata draft / PF-09 nutrition label. Then SC1-SC5 sweep + TestFlight."
-last_updated: "2026-05-01T00:00:00.000Z"
-last_activity: 2026-05-01
+milestone: v1.2
+milestone_name: video-mode
+status: defining_requirements
+stopped_at: "Milestone v1.2 (Video Mode) opened 2026-05-12. PROJECT.md updated with VIDEO-01..14 requirements + v1.2 Out of Scope + Key Decisions. Next: REQUIREMENTS.md + ROADMAP.md. v1.0 release (PF-05 DNS / PF-06 screenshots / PF-08 ASC / PF-09 nutrition / SC1-SC5 sweep) continues in parallel — non-coding work, not gated by v1.2 code."
+last_updated: "2026-05-12T00:00:00.000Z"
+last_activity: 2026-05-12
 progress:
-  total_phases: 8
-  completed_phases: 7
-  total_plans: 49
-  completed_plans: 46
-  percent: 94
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-24)
+See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 07 — Release (pre-flight PF-01..09 + SC1-SC5 sweep before TestFlight upload). v1.0 ships under display name **GameDrawer**.
+**Current focus:** Milestone v1.2 — Video Mode (defining requirements). v1.0 TestFlight pre-flight continues in parallel as non-coding work.
 
 ## Current Position
 
-Phase: 07-release — PRE-FLIGHT
-Plan: pre-flight tasks PF-01..09 (canonical: `.planning/phases/07-release/07-CHECKLIST.md`)
-Status: PF-01 (doc-drift) ✅ · PF-02 (icon) ✅ · PF-07 (name = GameDrawer) ✅ · PF-03/04 (CloudKit Prod schema deploy) ☐ · PF-05 (privacy.md live URL) ☐ · PF-06 (theme-matrix screenshots) ☐ · PF-08 (ASC metadata) ☐ · PF-09 (privacy nutrition label) ☐
-Last activity: 2026-05-01
+Milestone: v1.2 — Video Mode
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-12 — milestone opened
 
-Progress: [█████████░] 94%
+Progress: [░░░░░░░░░░] 0% (v1.2)
+
+## v1.0 Carry-Over
+
+v1.0 verification is paused in `executing` status with these open items, tracked in `.planning/phases/07-release/07-CHECKLIST.md`:
+
+- ☐ PF-05 — DNS go-live for `gamedrawer.lauterstar.com`
+- ☐ PF-06 — 12+4 theme-matrix screenshots
+- ☐ PF-08 — ASC metadata draft
+- ☐ PF-09 — Privacy nutrition label
+- ☐ SC1-SC5 — Final sweep
+- ☐ TestFlight upload
+
+These are non-code tasks. v1.2 code work proceeds on a separate phase set; resume v1.0 wrap-up via the checklist when DNS / assets / ASC are ready.
 
 ## Performance Metrics
 

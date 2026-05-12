@@ -1,5 +1,22 @@
 # GameKit
 
+## Current Milestone: v1.2 Video Mode
+
+**Goal:** Optional mode that keeps GameDrawer playable while a PiP video floats on screen — user picks the video location, app reflows controls and (when needed) the board to stay out of the way.
+
+**Target features:**
+- Settings: Video Mode Off/On + 6-location picker (Large top/bottom, Small TL/TR/BL/BR)
+- Adaptive layout system — small PiP = control-aware, large PiP = board-aware
+- Shared compact control row: Back | primary info | picker | secondary info | settings
+- Per-game adoption: Minesweeper (incl. hard 16×30 prototype), Merge, Nonogram
+- Win/loss banner replacement so end-of-game doesn't cover the board
+
+**Out of scope for v1.2:**
+- Auto-detect of another app's PiP frame (no public iOS API) — deferred
+- Sudoku adoption — game not built yet
+- Vertical/portrait PiP — v1.3+
+- Other v1.2 plans from `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` outside Video Mode itself
+
 ## What This Is
 
 GameKit is a clean, ad-free iOS suite of classic logic games built in Swift /
@@ -68,6 +85,22 @@ everything else fails, this differentiator must not.
 - [ ] **A11Y-02**: VoiceOver labels on cells (state + adjacency), buttons, and overlays
 - [ ] **A11Y-03**: Reduce-motion preference dampens animation pass
 
+#### Video Mode (v1.2)
+- [ ] **VIDEO-01**: Settings exposes Video Mode Off/On toggle (default Off); state persisted across launches
+- [ ] **VIDEO-02**: When Video Mode is On, Settings exposes a video-location picker with exactly 6 options: Large top, Large bottom, Small top-left, Small top-right, Small bottom-left, Small bottom-right
+- [ ] **VIDEO-03**: Selected location persists across launches and is observable by every game screen via a shared store
+- [ ] **VIDEO-04**: Shared compact control row component used by games in Video Mode — order Back | primary info | picker | secondary info | settings; reads DesignKit tokens only
+- [ ] **VIDEO-05**: Small-PiP layout — game board stays at normal size; back/settings/info chips and the picker are repositioned so the covered corner is empty for the selected Small location
+- [ ] **VIDEO-06**: Large-PiP layout — top or bottom band is reserved per selection; board fits between the reserved band and the compact control row; secondary controls collapse before the board becomes unplayable
+- [ ] **VIDEO-07**: Minesweeper adopts Video Mode for Easy + Medium across all 6 locations with no legibility regression on Classic or one Loud preset
+- [ ] **VIDEO-08**: Minesweeper Hard (16×30) Video Mode strategy validated against real screenshots — final approach (smaller cells / scroll / zoom / warning) chosen with rationale recorded in ADR
+- [ ] **VIDEO-09**: Merge adopts Video Mode across all 6 locations with no legibility regression on Classic + one Loud preset
+- [ ] **VIDEO-10**: Nonogram adopts Video Mode across all 6 locations; hints + grid stay readable in Large-top and Large-bottom layouts
+- [ ] **VIDEO-11**: Win/loss surfaces use a non-board-covering banner/pill in Video Mode; primary action (Play Again / Continue) reachable without an extra tap; banner placement avoids the selected PiP zone
+- [ ] **VIDEO-12**: All Video-Mode-related haptics, SFX, and animations (including any win banner confetti) respect existing Settings haptics/SFX/animations toggles and `accessibilityReduceMotion`
+- [ ] **VIDEO-13**: Video Mode adapts only when On — toggling Off restores each game's normal layout with no visual residue
+- [ ] **VIDEO-14**: Settings copy explains Video Mode in one short paragraph + clarifies that GameDrawer cannot detect another app's PiP automatically (manual selection only)
+
 ### Out of Scope
 
 - **Banner ads / interstitials / video ads** — kills the differentiator. Permanent exclusion
@@ -82,6 +115,10 @@ everything else fails, this differentiator must not.
 - **Localization beyond EN at v1 ship** — strings are i18n-ready; actual translations come later
 - **Per-game alt-icon variants** — cool but adds a phase. Not v1
 - **Asset-heavy games (anything requiring custom illustrations)** — DesignKit-only games for the foreseeable suite
+- **Video Mode auto-detect of another app's PiP frame** (v1.2) — no public iOS API exposes another app's PiP; deferred indefinitely
+- **Video Mode for Sudoku** (v1.2) — game not yet built; will be designed Video-Mode-aware when it lands
+- **Vertical/portrait PiP layouts** (v1.2) — rare in practice; reconsider v1.3+ if real usage shows it matters
+- **Large left/right PiP positions** (v1.2) — current observed PiP positions are top and bottom only
 
 ## Context
 
@@ -139,6 +176,10 @@ everything else fails, this differentiator must not.
 | 3-step intro on first launch | Surfaces themes + stats + optional sign-in once, then never again | — Pending |
 | Bundle ID `com.lauterstar.gamekit` | Matches existing FitnessTracker namespace; ecosystem-consistent | — Pending |
 | CloudKit container ID `iCloud.com.lauterstar.gamekit` | Pinned at P1 per D-10 / Pitfall 3 to prevent stranded-TestFlight-data drift; capability provisioning deferred to P6 alongside Sign in with Apple | — Pending |
+| Video Mode location is user-selected, not auto-detected (v1.2) | iOS does not expose another app's PiP frame to third-party apps via public API; manual selection is the reliable path | — Pending |
+| Video Mode = small PiP control-aware, large PiP board-aware (v1.2) | Small PiP usually blocks controls more than the board; large PiP can claim enough screen to force the board itself to reflow | — Pending |
+| Shared compact control row across games (v1.2) | One pattern keeps Video-Mode UI predictable per game and avoids per-game reinvention | — Pending |
+| Win/loss banner replaces full-screen end overlays (v1.2) | Video-Mode rule "board stays visible" extends to end-of-game; haptics/SFX/confetti gated by existing settings + Reduce Motion | — Pending |
 
 ## Evolution
 
@@ -158,4 +199,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-24 after initialization*
+*Last updated: 2026-05-12 — v1.2 Video Mode milestone opened*
