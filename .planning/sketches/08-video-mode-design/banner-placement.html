@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Phase 8 — Banner Placement (opposite-of-PiP)</title>
+<style>
+  :root {
+    --bg: #f4ede2;          /* cream paper */
+    --surface: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --bezel: #c5c5c5;
+    --board: #e8e1d2;
+    --pip: #999;
+    --pip-edge: #6f6f6f;
+    --action: #c8323c;      /* diner red */
+    --action-ink: #fff;
+    --radius-card: 18px;
+    --radius-pill: 14px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 24px; max-width: 720px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1080px;
+  }
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  figure {
+    margin: 0;
+    background: var(--surface);
+    border: 1px solid var(--bezel);
+    border-radius: var(--radius-card);
+    padding: 14px;
+  }
+  figcaption {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+  figcaption .dock {
+    font-weight: 400;
+    color: var(--muted);
+  }
+  /* Device frame (portrait 9:19.5-ish, simplified). */
+  .device {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 19;
+    background: var(--board);
+    border: 2px solid var(--bezel);
+    border-radius: 22px;
+    overflow: hidden;
+  }
+  /* Faint board grid so "board stays visible" reads at a glance. */
+  .board-grid {
+    position: absolute;
+    inset: 8% 6%;
+    background-image:
+      linear-gradient(to right, rgba(0,0,0,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.06) 1px, transparent 1px);
+    background-size: 12% 6%;
+  }
+  /* PiP rectangle. */
+  .pip {
+    position: absolute;
+    background: var(--pip);
+    border: 1px solid var(--pip-edge);
+    color: #fff;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .pip.large-top    { top: 4%; left: 4%; right: 4%; height: 22%; }
+  .pip.large-bottom { bottom: 4%; left: 4%; right: 4%; height: 22%; }
+  .pip.small-tl { top: 4%;    left: 4%;   width: 26%; height: 14%; }
+  .pip.small-tr { top: 4%;    right: 4%;  width: 26%; height: 14%; }
+  .pip.small-bl { bottom: 4%; left: 4%;   width: 26%; height: 14%; }
+  .pip.small-br { bottom: 4%; right: 4%;  width: 26%; height: 14%; }
+  /* Banner pill, with embedded DKButton. */
+  .banner {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--bezel);
+    border-radius: var(--radius-pill);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--ink);
+  }
+  .banner .msg { padding-left: 4px; font-weight: 500; }
+  .banner .btn {
+    background: var(--action);
+    color: var(--action-ink);
+    border-radius: 10px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  /* Full-width edge-docked banners. */
+  .banner.bottom-edge { left: 4%; right: 4%; bottom: 4%; height: 12%; }
+  .banner.top-edge    { left: 4%; right: 4%; top: 4%;    height: 12%; }
+  /* Corner-docked banners. Width-minus-margins from the docked edge inward. */
+  .banner.bottom-right { right: 4%; bottom: 4%; width: 60%; height: 11%; }
+  .banner.bottom-left  { left: 4%;  bottom: 4%; width: 60%; height: 11%; }
+  .banner.top-right    { right: 4%; top: 4%;    width: 60%; height: 11%; }
+  .banner.top-left     { left: 4%;  top: 4%;    width: 60%; height: 11%; }
+  footer {
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  footer code { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <h1>Banner placement — opposite-of-PiP</h1>
+  <p class="lead">
+    Six PiP locations, six banner anchors. Board stays visible behind the banner
+    in every layout. Primary action = explicit <code>DKButton</code> embedded in
+    the banner pill.
+  </p>
+
+  <div class="grid">
+
+    <figure>
+      <figcaption>Large top <span class="dock">→ banner bottom edge</span></figcaption>
+      <div class="device">
+        <div class="board-grid"></div>
+        <div class="pip large-top">PiP</div>
+        <div class="banner bottom-edge">
+          <span class="msg">You win</span>
+          <span class="btn">Play Again</span>
+        </div>
+      </div>
+    </figure>
+
+    <figure>
+      <figcaption>Large bottom <span class="dock">→ banner top edge</span></figcaption>
+      <div class="device">
+        <div class="board-grid"></div>
+        <div class="pip large-bottom">PiP</div>
+        <div class="banner top-edge">
+          <span class="msg">You win</span>
+          <span class="btn">Play Again</span>
+        </div>
+      </div>
+    </figure>
+
+    <figure>
+      <figcaption>Small TL <span class="dock">→ banner bottom-right</span></figcaption>
+      <div class="device">
+        <div class="board-grid"></div>
+        <div class="pip small-tl">PiP</div>
+        <div class="banner bottom-right">
+          <span class="msg">You win</span>
+          <span class="btn">Play Again</span>
+        </div>
+      </div>
+    </figure>
+
+    <figure>
+      <figcaption>Small TR <span class="dock">→ banner bottom-left</span></figcaption>
+      <div class="device">
+        <div class="board-grid"></div>
+        <div class="pip small-tr">PiP</div>
+        <div class="banner bottom-left">
+          <span class="msg">You win</span>
+          <span class="btn">Play Again</span>
+        </div>
+      </div>
+    </figure>
+
+    <figure>
+      <figcaption>Small BL <span class="dock">→ banner top-right</span></figcaption>
+      <div class="device">
+        <div class="board-grid"></div>
+        <div class="pip small-bl">PiP</div>
+        <div class="banner top-right">
+          <span class="msg">You win</span>
+          <span class="btn">Play Again</span>
+        </div>
+      </div>
+    </figure>
+
+    <figure>
+      <figcaption>Small BR <span class="dock">→ banner top-left</span></figcaption>
+      <div class="device">
+        <div class="board-grid"></div>
+        <div class="pip small-br">PiP</div>
+        <div class="banner top-left">
+          <span class="msg">You win</span>
+          <span class="btn">Play Again</span>
+        </div>
+      </div>
+    </figure>
+
+  </div>
+
+  <footer>
+    Source of truth:
+    <a href="../../phases/08-video-mode-design/08-BANNER-PLACEMENT.md">
+      08-BANNER-PLACEMENT.md
+    </a>
+    — anchor table (D-09), shape (D-10), DKButton action (D-11), Reduce-Motion (D-12).
+    Throwaway sketch; not shipped in <code>gamekit/</code>.
+  </footer>
+</body>
+</html>
