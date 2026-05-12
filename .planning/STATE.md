@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: planning
-stopped_at: Phase 8 context gathered
-last_updated: "2026-05-12T21:37:33.091Z"
-last_activity: 2026-05-12 — milestone roadmapped (Phases 8–13)
+status: executing
+stopped_at: Completed 08-02-compact-row-tokens-PLAN.md
+last_updated: "2026-05-12T21:44:57.666Z"
+last_activity: 2026-05-12
 progress:
   total_phases: 14
   completed_phases: 7
   total_plans: 55
-  completed_plans: 46
-  percent: 84
+  completed_plans: 48
+  percent: 87
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Milestone v1.2 — Video Mode (planning Phase 8 — Design). v1.0 TestFlight pre-flight continues in parallel as non-coding work.
+**Current focus:** Phase 08 — video-mode-design
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 8 — Video Mode Design (not started)
-Plan: —
-Status: Planning (roadmap landed; awaiting `/gsd-plan-phase 8`)
-Last activity: 2026-05-12 — milestone roadmapped (Phases 8–13)
+Phase: 08 (video-mode-design) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-05-12
 
-Progress: [░░░░░░░░░░] 0% (0/6 v1.2 phases complete)
+Progress: [█████████░] 87%
 
 **Next action:** Run `/gsd-plan-phase 8` to plan the Video Mode Design phase. Per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required", Phase 8 is screenshot-driven and produces the layout doc + Hard-Mines strategy ADR consumed by Phases 9–13 — it is NOT optional and MUST NOT be skipped to jump straight to code.
 
@@ -109,6 +109,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 06.1 P03 | 25 | 4 tasks | 3 files |
 | Phase 06.1 P01 | 5 | 3 tasks | 4 files |
 | Phase 06.1 P02 | 12 | 4 tasks | 5 files |
+| Phase 08-video-mode-design P02 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -293,6 +294,8 @@ Recent decisions affecting current work:
 - 06.1-02: Four-commit shape (test/feat/feat/docs) — aa81374 RED gate -> 9d824c8 VM GREEN -> 6b166f0 GameView FAB -> 7276556 docs+xcstrings. Same precedent as 06.1-03 four-commit shape. Plan §Success Criteria suggested single atomic commit; the body §Task 1 explicitly required RED -> GREEN gate making the four-commit shape the only correct interpretation. Each commit independently bisectable
 - 06.1-02: Phase 6.1 final REQUIREMENTS.md state — Coverage 38/38 (final target REACHED). Wave 1 (06.1-03) shipped A11Y-05 (graduated A11Y-V2-02 -> v1); Wave 2 plans (06.1-01 SHELL-05, 06.1-02 MINES-12) added two new v1 IDs. Each plan's xcstrings + REQ edits disjoint by section (Accessibility / App Shell / Minesweeper); JSON merge clean across all three
 - **2026-05-12 (v1.2 roadmap):** Milestone v1.2 (Video Mode) phases 8–13 appended to ROADMAP.md and REQUIREMENTS.md v1.2 traceability populated 14/14. Phase 8 is a design phase (no app code) per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required" — produces screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row design tokens + win/loss banner sketch consumed by Phases 9–13. Phase numbering continues from v1.0's last integer phase (7); no renumbering of existing phases. Next: `/gsd-plan-phase 8`.
+- 08-02: Compact control row tokens locked — picker pill = theme.radii.button (D-05), height = theme.spacing.xl (D-06), gap = theme.spacing.s (D-07); per-game slot mapping for Mines/Merge/Nonogram verbatim from D-08; Sudoku Out of Scope (no game yet); no new radii.pill anchor (CLAUDE.md §2 promotion rule, 1 consumer)
+- 08-02: Design spec docs are token-name-only — 08-COMPACT-ROW-TOKENS.md contains zero pt/px values, grep-gated in acceptance criteria; HTML sketch uses CSS variables (--radii-button, --spacing-xl, etc) that mirror DesignKit token names 1:1 with a legend mapping back
 
 ### Pending Todos
 
@@ -313,8 +316,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 8 context gathered
-Resume file: --resume-file
+Last session: 2026-05-12T21:44:57.659Z
+Stopped at: Completed 08-02-compact-row-tokens-PLAN.md
+Resume file: None
 
 **Planned Phase:** 8 (video-mode-design) — 6 plans — 2026-05-12T21:37:33.077Z

@@ -265,7 +265,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   5. No production app code is written in this phase (sketch HTML / Figma / SwiftUI Preview throwaways are acceptable if they accelerate the decision; they do not ship in the `gamekit` target). The phase exit is a "design locked — Phase 9 can begin" sign-off by Gabe.
 **Plans**: 6 plans
 - [ ] 08-01-screenshot-capture-PLAN.md — Capture 10 fresh game screenshots (Mines E/M/H + Merge + Nonogram x Classic + Dracula) on iPhone 17 Pro Max simulator + capture-log README (CONTEXT D-02..D-04)
-- [ ] 08-02-compact-row-tokens-PLAN.md — Author 08-COMPACT-ROW-TOKENS.md (radii.button / spacing.xl / spacing.s + per-game slot mappings) + compact-row HTML sketch (CONTEXT D-05..D-08; Phase 8 SC3)
+- [x] 08-02-compact-row-tokens-PLAN.md — Author 08-COMPACT-ROW-TOKENS.md (radii.button / spacing.xl / spacing.s + per-game slot mappings) + compact-row HTML sketch (CONTEXT D-05..D-08; Phase 8 SC3)
 - [ ] 08-03-banner-placement-PLAN.md — Author 08-BANNER-PLACEMENT.md (6-row opposite-of-PiP anchor table + DKButton + dampen-to-identity) + banner-placement HTML sketch (CONTEXT D-09..D-12; Phase 8 SC4)
 - [ ] 08-04-layout-doc-PLAN.md — Author VIDEO-MODE-LAYOUTS.md (5 games x 6 PiP zones x both presets) + 5 per-game overlay HTML sketches (Phase 8 SC1; depends on 08-01)
 - [ ] 08-05-hard-mines-adr-PLAN.md — 4 candidate-variant HTML sketches + 08-HARD-MINES-ADR.md with chosen strategy + rollback + 06.1-03 deconfliction (CONTEXT D-13; Phase 8 SC2; depends on 08-01, 08-04)
