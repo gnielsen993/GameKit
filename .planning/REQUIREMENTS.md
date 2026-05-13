@@ -114,7 +114,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 
 ### Layout Engine
 
-- [ ] **VIDEO-04**: Shared compact control row component used by games in Video Mode — order Back | primary info | picker | secondary info | settings; reads DesignKit tokens only
+- [x] **VIDEO-04
+**: Shared compact control row component used by games in Video Mode — order Back | primary info | picker | secondary info | settings; reads DesignKit tokens only
 - [ ] **VIDEO-05**: Small-PiP layout — game board stays at normal size; back/settings/info chips and the picker are repositioned so the covered corner is empty for the selected Small location
 - [ ] **VIDEO-06**: Large-PiP layout — top or bottom band is reserved per selection; board fits between the reserved band and the compact control row; secondary controls collapse before the board becomes unplayable
 - [ ] **VIDEO-13**: Video Mode adapts only when On — toggling Off restores each game's normal layout with no visual residue

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: "Completed 09-04-PLAN.md (videoMode.* xcstrings catalog drop; LocalizableCatalogTests GREEN). Next: 09-05 — Settings card UI consuming the new keys."
-last_updated: "2026-05-13T01:25:20.363Z"
+stopped_at: "Completed 09-05-PLAN.md (VideoCompactControlRow shared component shipped to Core/; SC4 satisfied via single in-file #Preview)"
+last_updated: "2026-05-13T02:34:47.362Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 8
   total_plans: 63
-  completed_plans: 56
-  percent: 89
+  completed_plans: 57
+  percent: 90
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 09 (video-mode-foundation) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [█████████░] 89%
+Progress: [█████████░] 90%
 
 **Next action:** Plan Phase 9 (`/gsd-plan-phase 9`) — Video Mode Foundation (`VideoModeStore` + Settings UI toggle + 6-location picker + manual-selection copy + shared compact control row component). Phase 9 consumes `08-COMPACT-ROW-TOKENS.md` (SC4) and `VIDEO-MODE-LAYOUTS.md` 6-zone vocabulary (SC3) from the now-locked Phase 8 design corpus.
 
@@ -119,6 +119,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 09 P02 | 6 min | 2 tasks | 2 files |
 | Phase 09 P03 | 14 | 1 tasks | 2 files |
 | Phase 09 P04 | 3min | 1 task tasks | 2 files files |
+| Phase 09-video-mode-foundation P05 | 8min | 1 task tasks | 1 file files |
 
 ## Accumulated Context
 
@@ -318,6 +319,9 @@ Recent decisions affecting current work:
 - Plan 09-03 Task 1 was a verified no-op — EnvironmentKey extension shipped early in Plan 09-02 commit 8f7d42d (Rule 3 deviation). Skipped re-edit to avoid duplicate-symbol error; documented as deviation in 09-03-SUMMARY.md.
 - VideoModeStore placement in GameKitApp = between SettingsStore and SFXPlayer (property + init + .environment modifier) — canonical 09-PATTERNS.md §6 ordering keeps the two UserDefaults-backed @Observable preference stores adjacent at all three sites.
 - Phase 9 Plan 04: 13 videoMode.* keys added to Localizable.xcstrings atomically — LocalizableCatalogTests flipped RED to GREEN; VIDEO-14 verbatim copy now locked at the resource layer (D-10).
+- VideoCompactControlRow ships as generic @ViewBuilder<Primary, Picker, Secondary> (09-RESEARCH Topic 1 verdict) — NOT AnyView struct, NOT @Environment slot injection; mirrors DKCard<Content: View> shape
+- SC4 (stub call site compiles) satisfied by single in-file #Preview rendering Mines/Merge/Nonogram slot mappings — no DEBUG-only screen, no HomeView dev hook (D-04 lock honored)
+- Internal access (not public DesignKit promotion) per CLAUDE.md §2 promote-on-proof rule — re-evaluate after Phase 12 lands as the 2nd cross-game consumer
 
 ### Pending Todos
 
@@ -338,8 +342,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-13T01:25:20.355Z
-Stopped at: Completed 09-04-PLAN.md (videoMode.* xcstrings catalog drop; LocalizableCatalogTests GREEN). Next: 09-05 — Settings card UI consuming the new keys.
+Last session: 2026-05-13T02:34:47.356Z
+Stopped at: Completed 09-05-PLAN.md (VideoCompactControlRow shared component shipped to Core/; SC4 satisfied via single in-file #Preview)
 Resume file: None
 
 **Planned Phase:** 8 (video-mode-design) — 6/6 plans complete — closed 2026-05-12. Next planning target: Phase 9 (video-mode-foundation).
