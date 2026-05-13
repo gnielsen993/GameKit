@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 09-06-PLAN.md (VIDEO MODE Settings card shipped; Plan 09-01 SettingsViewTests remains GREEN; interim build error pending Plan 09-07 VideoLocationPickerView ship — both Wave 3)
-last_updated: "2026-05-13T02:40:13.315Z"
+stopped_at: "Completed 09-07-PLAN.md (VideoLocationPickerView shipped; Wave 3 closes with Plans 09-06 + 09-07; VideoLocationPickerViewTests RED→GREEN; interim 09-06 build error resolved). Plan 09-08 (final wave: visual theme audit + SC5 regression + release log close) is next."
+last_updated: "2026-05-13T02:51:01.480Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 8
   total_plans: 63
-  completed_plans: 58
-  percent: 92
+  completed_plans: 59
+  percent: 94
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 09 (video-mode-foundation) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [█████████░] 92%
+Progress: [█████████░] 94%
 
 **Next action:** Plan Phase 9 (`/gsd-plan-phase 9`) — Video Mode Foundation (`VideoModeStore` + Settings UI toggle + 6-location picker + manual-selection copy + shared compact control row component). Phase 9 consumes `08-COMPACT-ROW-TOKENS.md` (SC4) and `VIDEO-MODE-LAYOUTS.md` 6-zone vocabulary (SC3) from the now-locked Phase 8 design corpus.
 
@@ -121,6 +121,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 09 P04 | 3min | 1 task tasks | 2 files files |
 | Phase 09-video-mode-foundation P05 | 8min | 1 task tasks | 1 file files |
 | Phase 09-video-mode-foundation P06 | 2min | 1 task tasks | 1 file files |
+| Phase 09 P07 | 3 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -324,6 +325,9 @@ Recent decisions affecting current work:
 - SC4 (stub call site compiles) satisfied by single in-file #Preview rendering Mines/Merge/Nonogram slot mappings — no DEBUG-only screen, no HomeView dev hook (D-04 lock honored)
 - Internal access (not public DesignKit promotion) per CLAUDE.md §2 promote-on-proof rule — re-evaluate after Phase 12 lands as the 2nd cross-game consumer
 - 09-06: SettingsView VIDEO MODE card wires Bindable(videoModeStore).isEnabled Toggle + conditional NavigationLink → VideoLocationPickerView (D-01/D-11); +41 lines (356→397, under §8.5 500 cap, at §8.1 400 soft cap). Plan 09-04 xcstrings keys consumed (sectionHeader/toggleLabel/locationRowTitle); interim build error from undefined VideoLocationPickerView is expected and resolves with Plan 09-07 (same Wave 3).
+- Selected-zone label uses theme.colors.textPrimary against accentPrimary.opacity(0.25) zone fill — Pitfall 5 lock (text-on-accent-fill Loud-preset legibility)
+- VideoLocationPickerView uses GeometryReader + .aspectRatio(9.0/19.5) NOT SwiftUI Grid — zones are irregular (2 full-width bands + 4 corners)
+- Combined Wave-3 release-log entry covers Plans 09-06 + 09-07 — Settings card and picker ship as one user-visible payoff
 
 ### Pending Todos
 
@@ -344,8 +348,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-13T02:40:13.309Z
-Stopped at: Completed 09-06-PLAN.md (VIDEO MODE Settings card shipped; Plan 09-01 SettingsViewTests remains GREEN; interim build error pending Plan 09-07 VideoLocationPickerView ship — both Wave 3)
+Last session: 2026-05-13T02:51:01.474Z
+Stopped at: Completed 09-07-PLAN.md (VideoLocationPickerView shipped; Wave 3 closes with Plans 09-06 + 09-07; VideoLocationPickerViewTests RED→GREEN; interim 09-06 build error resolved). Plan 09-08 (final wave: visual theme audit + SC5 regression + release log close) is next.
 Resume file: None
 
 **Planned Phase:** 8 (video-mode-design) — 6/6 plans complete — closed 2026-05-12. Next planning target: Phase 9 (video-mode-foundation).

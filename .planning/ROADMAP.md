@@ -288,7 +288,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 - [x] 09-04-PLAN.md — Wave 2 — 13 videoMode.* xcstring keys including VIDEO-14 verbatim copy (Pitfall 3 — one atomic edit, D-10); LocalizableCatalogTests GREEN — completed 2026-05-12
 - [x] 09-05-PLAN.md — Wave 2 — VideoCompactControlRow component (generic @ViewBuilder slots, Phase 8 D-13 tokens, 3-game #Preview = SC4) — completed 2026-05-12
 - [x] 09-06-PLAN.md — Wave 3 — SettingsView VIDEO MODE card (D-01 placement, conditional NavigationLink, D-11 no-auto-nav) — completed 2026-05-13
-- [ ] 09-07-PLAN.md — Wave 3 — VideoLocationPickerView (GeometryReader iPhone-outline per RESEARCH Topic 2, D-02/D-08/D-09/D-10)
+- [x] 09-07-PLAN.md — Wave 3 — VideoLocationPickerView (GeometryReader iPhone-outline per RESEARCH Topic 2, D-02/D-08/D-09/D-10) — completed 2026-05-13
 - [ ] 09-08-PLAN.md — Wave 4 — SC5 regression contract test + Docs/releases/v1.2.md opening + theme audit checkpoint (CLAUDE.md §8.12 + §8.14)
 **UI hint**: yes
 
