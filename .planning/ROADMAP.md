@@ -281,7 +281,15 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   3. Settings displays a short explanatory paragraph that includes the "manual selection only" copy from VIDEO-14 verbatim — clarifying that GameDrawer cannot detect another app's PiP automatically. Copy lives in `Localizable.xcstrings`; zero hardcoded strings in source.
   4. A shared `VideoCompactControlRow` (or equivalent) component exists in `Core/` (or `Screens/`) with the design-locked slot order `Back | primary info | picker | secondary info | settings`, reads DesignKit tokens only (zero `Color(...)` / hardcoded `cornerRadius:` / hardcoded `padding(` integers per the cross-cutting invariant), and is consumed by at least one stub call site that compiles.
   5. With Video Mode Off (the default), Minesweeper / Merge / Nonogram render byte-identical to their pre-v1.2 layout — no visual residue from the new system on the off-path. Legibility check passes on Classic preset AND at least one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for the Settings screen's new Video Mode section.
-**Plans**: TBD
+**Plans**: 8 plans
+- [ ] 09-01-PLAN.md — Wave 0 TDD RED — 7 test files (14 @Test funcs) covering VIDEO-01..04 + VIDEO-14 + SC5 contract per 09-VALIDATION.md
+- [ ] 09-02-PLAN.md — Wave 1 — VideoModeLocation enum (6 cases per D-07) + VideoModeStore @Observable @MainActor class (verbatim SettingsStore mirror per D-05/D-06/D-03)
+- [ ] 09-03-PLAN.md — Wave 2 — VideoModeStore EnvironmentKey extension + GameKitApp.swift 5th-store injection (D-05 lock; closes VideoModeEnvironmentTests RED)
+- [ ] 09-04-PLAN.md — Wave 2 — 12 videoMode.* xcstring keys including VIDEO-14 verbatim copy (Pitfall 3 — one atomic edit, D-10)
+- [ ] 09-05-PLAN.md — Wave 2 — VideoCompactControlRow component (generic @ViewBuilder slots, Phase 8 D-13 tokens, 3-game #Preview = SC4)
+- [ ] 09-06-PLAN.md — Wave 3 — SettingsView VIDEO MODE card (D-01 placement, conditional NavigationLink, D-11 no-auto-nav)
+- [ ] 09-07-PLAN.md — Wave 3 — VideoLocationPickerView (GeometryReader iPhone-outline per RESEARCH Topic 2, D-02/D-08/D-09/D-10)
+- [ ] 09-08-PLAN.md — Wave 4 — SC5 regression contract test + Docs/releases/v1.2.md opening + theme audit checkpoint (CLAUDE.md §8.12 + §8.14)
 **UI hint**: yes
 
 ### Phase 10: Layout Primitives
@@ -344,7 +352,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 8. Video Mode Design | 6/6 | Complete | 2026-05-12 |
-| 9. Video Mode Foundation | 0/TBD | Not started | - |
+| 9. Video Mode Foundation | 0/8 | Planned | - |
 | 10. Layout Primitives | 0/TBD | Not started | - |
 | 11. Minesweeper Adoption | 0/TBD | Not started | - |
 | 12. Merge + Nonogram Adoption | 0/TBD | Not started | - |
