@@ -366,7 +366,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 | 8. Video Mode Design | 6/6 | Complete | 2026-05-12 |
 | 9. Video Mode Foundation | 8/8 | Complete | 2026-05-12 |
 | 10. Layout Primitives | 4/4 | Complete | 2026-05-13 |
-| 11. Minesweeper Adoption | 0/8 | Planned | - |
+| 11. Minesweeper Adoption | 1/8 | In progress | - |
 | 12. Merge + Nonogram Adoption | 0/TBD | Not started | - |
 | 13. Win/Loss Banner + A11y Gating | 0/TBD | Not started | - |
 

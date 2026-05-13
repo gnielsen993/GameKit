@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: Ready to discuss / plan Phase 11
-stopped_at: Phase 11 context gathered
-last_updated: "2026-05-13T23:15:00.908Z"
+status: executing
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-05-13T23:22:20.483Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 75
-  completed_plans: 64
-  percent: 85
+  completed_plans: 65
+  percent: 87
 ---
 
 # Project State
@@ -21,17 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 11 — Minesweeper adoption (consumes `.videoModeAware(minBoardHeight:)` + `VideoModeSlotRouter.anchors(for:)` from Phase 10)
+**Current focus:** Phase 11 — mines-adoption
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 10 (layout-primitives) — COMPLETE (4/4 plans, 5/5 SCs PASS, 2026-05-13)
+Phase: 11 (mines-adoption) — EXECUTING
+Plan: 2 of 8
 Next phase: 11 (mines-adoption)
-Status: Ready to discuss / plan Phase 11
+Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [█████████▊] 96%
+Progress: [█████████░] 87%
 
 **Next action:** Discuss Phase 11 (`/gsd-discuss-phase 11`) — Minesweeper adopts the layout primitives. Easy + Medium across all 6 PiP locations on Classic + one Loud preset. Hard 16×30 ships the strategy from `.planning/phases/08-video-mode-design/08-HARD-MINES-ADR.md` (smaller-cells / Variant 1) gated on `videoModeStore.isEnabled` inside `MinesweeperBoardView.Self.minCellSize`. Wraps `MinesweeperGameView` (NOT `MinesweeperBoardView`) at the outermost layer per CONTEXT D-15 untouched contract. A2 (NavigationStack height adjustment) is the open carry-forward from Plan 10-VERIFICATION.md.
 
@@ -126,6 +127,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 09-video-mode-foundation P08 | 45min | 3 tasks (SC5 contract + v1.2 release log + audit) | 2 files (SC5RegressionTests.swift + Docs/releases/v1.2.md) + 4 iter commits on 09-07 picker |
 | Phase 10-layout-primitives P01 | 4 min | 2 tasks tasks | 2 files files |
 | Phase 10-layout-primitives PP02 | 4 min | 1 task tasks | 1 file files |
+| Phase 11 P01 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -339,6 +341,7 @@ Recent decisions affecting current work:
 - 10-01: Wave 0 RED gate locked — VideoModeSlotRouter (24 anchor assertions) + VideoModeAware (off-state + 3 compactness levels) contracts committed before production source. 0.32 band fraction and 0.85x compactness floor scale are now test-source literals; Plans 10-02 + 10-03 must satisfy them to flip GREEN
 - 10-01: renderAndCapture probe pattern established — UIHostingController + Color.clear.onAppear writes into @MainActor CompactnessCaptureBox reference type. No ViewInspector SPM dep (RESEARCH §Example 1 recommendation 1). Replicable for any future @Environment(.foo) publication test
 - 10-02: VideoModeSlotRouter.swift ships as Foundation-only pure helper at gamekit/gamekit/Core/ with three types (SlotAnchor 6-case Sendable+Equatable enum, SlotAnchorMap 4-named-fields Equatable+Sendable struct, VideoModeSlotRouter enum-namespace) and exhaustive 6-case switch returning the locked SlotAnchorMap per zone. Plan 10-01 VideoModeSlotRouterTests GREEN-flipped: 7/7 @Test funcs / 25/25 #expect passing on iPhone 17 Pro. VIDEO-05 contract LOCKED. Plan 10-03 RED preserved as designed. A3 cross-check confirmed all 6 switch arms align with 08-VIDEO-MODE-LAYOUTS.md 'Where controls go' rows. Verification used temp-stash-and-restore of VideoModeAwareTests.swift to bypass whole-test-target compile dependency on Plan 10-03 symbols.
+- Plan 11-01: Working names MinesRemainingChip + TimerChip locked (CONTEXT Discretion accepted); HeaderBar doc-comment trimmed so the file fits ≤ 40 lines (D-05 invariants now documented inside TimerChip).
 
 ### Pending Todos
 
@@ -359,8 +362,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 11 context gathered
-Resume file: --resume-file
+Last session: 2026-05-13T23:22:20.476Z
+Stopped at: Completed 11-01-PLAN.md
+Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
