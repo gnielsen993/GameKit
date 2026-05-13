@@ -291,16 +291,19 @@ private struct StubGame: View {
     }
 
     var body: some View {
-        let theme = Theme.resolve(preset: preset, scheme: .light)
-        StubGameContent(theme: theme)
+        let scheme: ColorScheme = (preset == .dracula) ? .dark : .light
+        let theme = Theme.resolve(preset: preset, scheme: scheme)
+        StubGameContent(theme: theme, zone: zone)
             .videoModeAware(minBoardHeight: 480)
             .environment(\.videoModeStore, store)
             .background(theme.colors.background)
+            .preferredColorScheme(scheme)
     }
 }
 
 private struct StubGameContent: View {
     let theme: Theme
+    let zone: VideoModeLocation
 
     var body: some View {
         VStack(spacing: 0) {
@@ -313,6 +316,14 @@ private struct StubGameContent: View {
                     Text("board placeholder")
                         .foregroundStyle(theme.colors.textSecondary)
                 )
+                // SC5 audit overlay — translucent rectangle shows where the
+                // system PiP would land for the selected zone. Lets the human
+                // auditor confirm the Small-zone passthrough (D-11) and
+                // Large-zone band reservation (D-08) are visually correct.
+                // Preview-only — not part of the modifier's production logic.
+                .overlay(alignment: pipAlignment(for: zone)) {
+                    pipOverlay(for: zone, theme: theme)
+                }
 
             // Compact row at the bottom — uses the P9-shipped component
             // (DO NOT MODIFY).
@@ -324,6 +335,58 @@ private struct StubGameContent: View {
                 picker: { Text("picker").foregroundStyle(theme.colors.textPrimary) },
                 secondaryInfo: { Text("secondary").foregroundStyle(theme.colors.textPrimary) }
             )
+        }
+    }
+
+    // MARK: - Preview-only PiP visualization
+
+    private func pipAlignment(for zone: VideoModeLocation) -> Alignment {
+        switch zone {
+        case .largeTop:          return .top
+        case .largeBottom:       return .bottom
+        case .smallTopLeft:      return .topLeading
+        case .smallTopRight:     return .topTrailing
+        case .smallBottomLeft:   return .bottomLeading
+        case .smallBottomRight:  return .bottomTrailing
+        }
+    }
+
+    @ViewBuilder
+    private func pipOverlay(for zone: VideoModeLocation, theme: Theme) -> some View {
+        switch zone {
+        case .largeTop, .largeBottom:
+            // Large zones already have a reserved band from .safeAreaInset.
+            // Tint that area so it's distinguishable from the board surface.
+            GeometryReader { proxy in
+                Rectangle()
+                    .fill(theme.colors.textPrimary.opacity(0.08))
+                    .frame(height: proxy.size.height * 0.10)
+                    .frame(maxWidth: .infinity)
+                    .overlay(
+                        Text("PiP zone (large \(zone == .largeTop ? "top" : "bottom"))")
+                            .font(.caption2)
+                            .foregroundStyle(theme.colors.textSecondary)
+                    )
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                        alignment: zone == .largeTop ? .top : .bottom
+                    )
+            }
+            .allowsHitTesting(false)
+        case .smallTopLeft, .smallTopRight, .smallBottomLeft, .smallBottomRight:
+            // Small PiP corner indicator — ~108x192pt is iPhone's Small PiP size
+            // at 1x; using fractions keeps it portable across preview devices.
+            Rectangle()
+                .fill(theme.colors.textPrimary.opacity(0.12))
+                .frame(width: 108, height: 192)
+                .overlay(
+                    Text("PiP")
+                        .font(.caption.bold())
+                        .foregroundStyle(theme.colors.textSecondary)
+                )
+                .padding(8)
+                .allowsHitTesting(false)
         }
     }
 }
