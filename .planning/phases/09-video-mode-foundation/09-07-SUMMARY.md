@@ -121,6 +121,56 @@ None — plan executed exactly as written.
 
 The plan's verify block uses `\\\\.videoModeStore` (4-backslash escape in shell grep) which my static-grep verification rewrote as `\\.videoModeStore` (the literal pattern that matches `@Environment(\.videoModeStore)` in the source). The on-disk source matches the plan's specified Swift form verbatim.
 
+## Follow-ups (in-phase gap closure, 2026-05-12)
+
+The Phase 9 human-verify audit during plan 09-08 surfaced two UX failures
+with the iPhone-outline layout shipped here:
+
+1. The full 9:19.5 outline + 6 absolute-positioned zones overflowed the
+   screen on iPhone 17 Pro Max (vertical bands extended past the safe
+   area, forcing scroll).
+2. The 4 corner zones rendered inside the *middle* 50% of the outline
+   suggested the wrong mental model — that a "Small" PiP is its own
+   floating element, distinct from the two Large bands. The locked
+   D-07 vocabulary actually treats `smallTopLeft`/`smallTopRight` as
+   variations *inside* the Top band (and likewise for Bottom).
+
+**In-phase fix (commit lands as `feat(09-07)` follow-on, not a new plan):**
+- Rewrote `VideoLocationPickerView` as a vertical-stack picker:
+  segmented `Large | Small` size toggle at top + two stacked bands
+  (Top / Bottom). Large mode renders each band as a single tappable
+  zone; Small mode places two corner buttons inside each band.
+- Flipping the size toggle preserves the user's Top/Bottom half
+  (`.largeBottom` ↔ `.smallBottomRight` shrink path matches D-03 spirit).
+- Fits without scrolling on iPhone 17 Pro Max and SE — no `GeometryReader`,
+  band heights derived from `theme.spacing.xxl` multipliers (token-only).
+- 3 additive xcstring keys: `videoMode.locationPicker.sizeLarge`,
+  `videoMode.locationPicker.sizeSmall`, `videoMode.locationPicker.sizeA11yLabel`.
+  The six `videoMode.location.*` zone-label keys are unchanged (D-07 lock).
+- `VideoLocationPickerView`'s public surface is unchanged (still
+  push-destination, still reads `@Environment(\.videoModeStore)`, still
+  no NavigationStack wrapper). The 09-06 Settings card NavigationLink
+  destination continues to compile against `VideoLocationPickerView()`.
+- `VideoLocationPickerViewTests` updated: the 2 original tests (`test_zone_tap_updates_location`,
+  `test_zone_a11y_labels`) preserved with broader assertion; 2 new tests
+  added (`test_size_toggle_derivation_matches_store_location`,
+  `test_size_flip_preserves_vertical_half`) pin the size-derivation and
+  half-preservation rules. All 4 GREEN on iPhone 16 Pro / iOS 18.5.
+- `VideoModeLocation` enum LOCKED (D-07): 6 cases, no `largeMiddle`,
+  raw values unchanged — UserDefaults migration not required.
+- Token discipline holds: zero literal `cornerRadius: <int>`, zero
+  literal `padding(<int>)`, zero `foregroundColor`, zero
+  `@EnvironmentObject` references for `VideoModeStore` (negative grep
+  passes). Selected-zone label remains `theme.colors.textPrimary` per
+  Pitfall 5 lock.
+- Release-log entry under `Docs/releases/v1.1.md` Fixes section (the
+  current `MARKETING_VERSION` is still 1.1; Phase 13 ships the bump).
+
+**Net effect on Phase 9:** unblocks the 09-08 visual-audit human-verify
+checkpoint that flagged the original layout. The orchestrator will
+re-present the 09-08 audit checkpoint for re-verification after this
+follow-up lands.
+
 ## Issues Encountered
 
 None.

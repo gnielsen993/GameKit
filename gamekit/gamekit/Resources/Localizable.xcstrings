@@ -1041,6 +1041,42 @@
         }
       }
     },
+    "videoMode.locationPicker.sizeA11yLabel" : {
+      "comment" : "VoiceOver label for the Large/Small segmented control at the top of VideoLocationPickerView",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video size"
+          }
+        }
+      }
+    },
+    "videoMode.locationPicker.sizeLarge" : {
+      "comment" : "Segmented-control option — Large video size (full-width band)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Large"
+          }
+        }
+      }
+    },
+    "videoMode.locationPicker.sizeSmall" : {
+      "comment" : "Segmented-control option — Small video size (corner PiP)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small"
+          }
+        }
+      }
+    },
     "videoMode.locationRowTitle" : {
       "comment" : "Settings NavigationLink row title with selected zone label interpolated",
       "extractionState" : "manual",
