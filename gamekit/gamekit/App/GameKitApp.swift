@@ -37,6 +37,7 @@ import DesignKit
 struct GameKitApp: App {
     @StateObject private var themeManager = ThemeManager()
     @State private var settingsStore: SettingsStore
+    @State private var videoModeStore: VideoModeStore
     @State private var sfxPlayer: SFXPlayer
     @State private var authStore: AuthStore
     @State private var cloudSyncStatusObserver: CloudSyncStatusObserver
@@ -53,6 +54,14 @@ struct GameKitApp: App {
         // cloudSyncEnabled is available for ModelConfiguration (D-08).
         let store = SettingsStore()
         _settingsStore = State(initialValue: store)
+
+        // P9 (D-05): VideoModeStore constructed right after SettingsStore so
+        // user-preference stores are adjacent in construction order, matching
+        // their adjacency in the property declaration block. Constructor has
+        // no dependencies (UserDefaults.standard default) so placement is
+        // flexible; this placement is canonical per 09-PATTERNS.md §6.
+        let videoMode = VideoModeStore()
+        _videoModeStore = State(initialValue: videoMode)
 
         // P5 (D-12): SFXPlayer constructed AFTER SettingsStore so a
         // future cross-flag dependency could be added without re-ordering.
@@ -138,6 +147,7 @@ struct GameKitApp: App {
             RootTabView()
                 .environmentObject(themeManager)
                 .environment(\.settingsStore, settingsStore)
+                .environment(\.videoModeStore, videoModeStore)
                 .environment(\.sfxPlayer, sfxPlayer)
                 .environment(\.authStore, authStore)
                 .environment(\.cloudSyncStatusObserver, cloudSyncStatusObserver)
