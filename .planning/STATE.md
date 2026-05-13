@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 10-01-PLAN.md
-last_updated: "2026-05-13T16:15:57.914Z"
+stopped_at: Completed 10-02-PLAN.md
+last_updated: "2026-05-13T21:48:06.099Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 9
   total_plans: 67
-  completed_plans: 61
-  percent: 91
+  completed_plans: 62
+  percent: 93
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 10 (layout-primitives) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 93%
 
 **Next action:** Plan Phase 10 (`/gsd-plan-phase 10`) — Layout Primitives (small-PiP corner-avoidance + large-PiP reserved-band + Off-restore primitives, verified on a stub game screen). Phase 10 is research-flagged per ROADMAP §v1.2 Research Flags — the SwiftUI adoption surface choice (`@Environment` injection vs. `VideoModeContainer { ... }` view vs. `.videoModeAware()` modifier) deserves a focused spike before plan-writing. Phase 10 consumes `VideoModeStore` + `VideoCompactControlRow` from Phase 9.
 
@@ -125,6 +125,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 09 P07 | 3 | 1 tasks | 1 files |
 | Phase 09-video-mode-foundation P08 | 45min | 3 tasks (SC5 contract + v1.2 release log + audit) | 2 files (SC5RegressionTests.swift + Docs/releases/v1.2.md) + 4 iter commits on 09-07 picker |
 | Phase 10-layout-primitives P01 | 4 min | 2 tasks tasks | 2 files files |
+| Phase 10-layout-primitives PP02 | 4 min | 1 task tasks | 1 file files |
 
 ## Accumulated Context
 
@@ -337,6 +338,7 @@ Recent decisions affecting current work:
 - 09-08: REQUIREMENTS.md table-sync rule locked — `requirements mark-complete` (or its manual equivalent) must update BOTH the `- [x]` canonical checkbox section AND the Status table in a single edit. The 09-08 close-out pass discovered the Status table had drifted "Pending" while checkboxes were already complete; future plan closes verify both surfaces.
 - 10-01: Wave 0 RED gate locked — VideoModeSlotRouter (24 anchor assertions) + VideoModeAware (off-state + 3 compactness levels) contracts committed before production source. 0.32 band fraction and 0.85x compactness floor scale are now test-source literals; Plans 10-02 + 10-03 must satisfy them to flip GREEN
 - 10-01: renderAndCapture probe pattern established — UIHostingController + Color.clear.onAppear writes into @MainActor CompactnessCaptureBox reference type. No ViewInspector SPM dep (RESEARCH §Example 1 recommendation 1). Replicable for any future @Environment(.foo) publication test
+- 10-02: VideoModeSlotRouter.swift ships as Foundation-only pure helper at gamekit/gamekit/Core/ with three types (SlotAnchor 6-case Sendable+Equatable enum, SlotAnchorMap 4-named-fields Equatable+Sendable struct, VideoModeSlotRouter enum-namespace) and exhaustive 6-case switch returning the locked SlotAnchorMap per zone. Plan 10-01 VideoModeSlotRouterTests GREEN-flipped: 7/7 @Test funcs / 25/25 #expect passing on iPhone 17 Pro. VIDEO-05 contract LOCKED. Plan 10-03 RED preserved as designed. A3 cross-check confirmed all 6 switch arms align with 08-VIDEO-MODE-LAYOUTS.md 'Where controls go' rows. Verification used temp-stash-and-restore of VideoModeAwareTests.swift to bypass whole-test-target compile dependency on Plan 10-03 symbols.
 
 ### Pending Todos
 
@@ -357,8 +359,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-13T16:15:50.634Z
-Stopped at: Completed 10-01-PLAN.md
+Last session: 2026-05-13T21:48:06.092Z
+Stopped at: Completed 10-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 10 (Layout Primitives) — 4 plans — 2026-05-13T14:52:52.735Z
