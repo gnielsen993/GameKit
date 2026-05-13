@@ -53,3 +53,23 @@ enum VideoModeLocation: String, CaseIterable, Sendable {
         }
     }
 }
+
+// MARK: - Large vs Small classification (Plan 11-03 / 11-CONTEXT D-01/D-02)
+
+extension VideoModeLocation {
+    /// True for the two large-PiP zones; false for the four small-corner zones.
+    /// Phase 11 Minesweeper adoption uses this to branch between compact-row
+    /// layout (Large) and toolbar-reposition layout (Small) per CONTEXT D-01/D-02.
+    ///
+    /// Exhaustive `switch` (no catch-all fallback) is intentional — adding a
+    /// 7th case to `VideoModeLocation` later fires a compile error in every
+    /// adopter, which is the desired safety net per 11-PATTERNS §"Exhaustive-switch".
+    var isLarge: Bool {
+        switch self {
+        case .largeTop, .largeBottom:
+            return true
+        case .smallTopLeft, .smallTopRight, .smallBottomLeft, .smallBottomRight:
+            return false
+        }
+    }
+}
