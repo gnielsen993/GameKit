@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: "Completed 09-07-PLAN.md (VideoLocationPickerView shipped; Wave 3 closes with Plans 09-06 + 09-07; VideoLocationPickerViewTests RED→GREEN; interim 09-06 build error resolved). Plan 09-08 (final wave: visual theme audit + SC5 regression + release log close) is next."
-last_updated: "2026-05-13T02:51:01.480Z"
-last_activity: 2026-05-13
+stopped_at: "Completed 09-08-PLAN.md (Phase 9 close-out: SC5 contract test + v1.2 release log opened + theme audit signed off after 4-iteration picker gap closure on 09-07; all 5 ROADMAP SCs satisfied; VIDEO-01/02/03/04/14 complete). Phase 9 closed; Phase 10 (Layout Primitives, research-flagged) unblocked."
+last_updated: "2026-05-12T21:00:00.000Z"
+last_activity: 2026-05-12
 progress:
   total_phases: 14
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 63
-  completed_plans: 59
-  percent: 94
+  completed_plans: 60
+  percent: 95
 ---
 
 # Project State
@@ -21,19 +21,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 09 — video-mode-foundation
+**Current focus:** Phase 10 — layout-primitives (ready to plan)
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 09 (video-mode-foundation) — EXECUTING
-Plan: 8 of 8
-Status: Ready to execute
-Last activity: 2026-05-13
+Phase: 09 (video-mode-foundation) — COMPLETE 2026-05-12
+Plan: 8 of 8 (Phase 9 closed)
+Status: Ready to plan Phase 10
+Last activity: 2026-05-12
 
-Progress: [█████████░] 94%
+Progress: [█████████▌] 95%
 
-**Next action:** Plan Phase 9 (`/gsd-plan-phase 9`) — Video Mode Foundation (`VideoModeStore` + Settings UI toggle + 6-location picker + manual-selection copy + shared compact control row component). Phase 9 consumes `08-COMPACT-ROW-TOKENS.md` (SC4) and `VIDEO-MODE-LAYOUTS.md` 6-zone vocabulary (SC3) from the now-locked Phase 8 design corpus.
+**Next action:** Plan Phase 10 (`/gsd-plan-phase 10`) — Layout Primitives (small-PiP corner-avoidance + large-PiP reserved-band + Off-restore primitives, verified on a stub game screen). Phase 10 is research-flagged per ROADMAP §v1.2 Research Flags — the SwiftUI adoption surface choice (`@Environment` injection vs. `VideoModeContainer { ... }` view vs. `.videoModeAware()` modifier) deserves a focused spike before plan-writing. Phase 10 consumes `VideoModeStore` + `VideoCompactControlRow` from Phase 9.
 
 ## v1.0 Carry-Over
 
@@ -122,6 +122,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 09-video-mode-foundation P05 | 8min | 1 task tasks | 1 file files |
 | Phase 09-video-mode-foundation P06 | 2min | 1 task tasks | 1 file files |
 | Phase 09 P07 | 3 | 1 tasks | 1 files |
+| Phase 09-video-mode-foundation P08 | 45min | 3 tasks (SC5 contract + v1.2 release log + audit) | 2 files (SC5RegressionTests.swift + Docs/releases/v1.2.md) + 4 iter commits on 09-07 picker |
 
 ## Accumulated Context
 
@@ -328,15 +329,19 @@ Recent decisions affecting current work:
 - Selected-zone label uses theme.colors.textPrimary against accentPrimary.opacity(0.25) zone fill — Pitfall 5 lock (text-on-accent-fill Loud-preset legibility)
 - VideoLocationPickerView uses GeometryReader + .aspectRatio(9.0/19.5) NOT SwiftUI Grid — zones are irregular (2 full-width bands + 4 corners)
 - Combined Wave-3 release-log entry covers Plans 09-06 + 09-07 — Settings card and picker ship as one user-visible payoff
+- 09-08: Phase 9 CLOSED 2026-05-12 — SC5 regression test body replaced with real default-off contract assertion (`store.isEnabled == false` + `store.location == .largeBottom` + TODO(P11/P12) snapshot upgrade marker; commit `4c9e352`); Docs/releases/v1.2.md opened with Phase 9 foundation entry (commit `2dcc5f8`); MARKETING_VERSION stays 1.1 (1.1→1.2 bump deferred to Phase 13 ship plan). Theme-audit human-verify checkpoint cleared after 4-iteration gap closure routed as `fix(09-07)` commits (11d109a redesign as size-toggle + stacked bands → 2287552 restore iPhone outline frame → 04ed682 size zones to actual video footprint → 5acc80d 25% shrink for realism). User signed off "approved — Phase 9 audit passed" after trusting iteration #4. All 5 ROADMAP SCs satisfied (SC1 default-off + SC2 6-option picker + SC3 VIDEO-14 verbatim copy + SC4 VideoCompactControlRow exists + SC5 D-15 byte-identical off-state). VIDEO-01/02/03/04/14 flipped to Complete in REQUIREMENTS.md (both `- [x]` checkbox section and Status table synced this pass). Phase 9 progress 8/8; v1.2 milestone progress 2/6 phases complete.
+- 09-08: In-phase gap closure pattern locked — when a §8.12 audit on a human-verify checkpoint surfaces UX issues scoped to the prior plan's single deliverable file (here: VideoLocationPickerView.swift + its tests + 3 additive xcstrings keys), route fix commits to the prior plan rather than spinning a new gap-closure plan. The iteration history is captured in the prior plan's SUMMARY's "Follow-ups" section AND in the closing plan's SUMMARY's "Issues Encountered"/"Deviations" section. Locked for future audit cycles.
+- 09-08: SC5 regression contract-test pattern established — when the to-be-verified surface (game-view reads of VideoModeStore) has not landed yet, the SC5 test is a CONTRACT test asserting the code-path invariant (default Off + zero game-view reads = byte-identical baseline by code-path analysis), with an inline TODO marker pointing to the snapshot-diff upgrade in the future plan (P11/P12 here). The test stays as the bottom guard once the snapshot harness lands.
+- 09-08: REQUIREMENTS.md table-sync rule locked — `requirements mark-complete` (or its manual equivalent) must update BOTH the `- [x]` canonical checkbox section AND the Status table in a single edit. The 09-08 close-out pass discovered the Status table had drifted "Pending" while checkboxes were already complete; future plan closes verify both surfaces.
 
 ### Pending Todos
 
-- **v1.2 work queued:** Phase 8 (Video Mode Design) is **complete** as of 2026-05-12 (`08-DESIGN-LOCK.md` signed off). Next: `/gsd-plan-phase 9` (Foundation: `VideoModeStore` + Settings UI + shared compact control row). Then Phase 10 (Layout primitives — research-flagged), Phase 11 (Minesweeper adoption — smaller-cells per 08-HARD-MINES-ADR), Phase 12 (Merge + Nonogram adoption), Phase 13 (Win/loss banner + a11y gating). See `.planning/ROADMAP.md` §Milestone v1.2 for full phase details.
+- **v1.2 work queued:** Phases 8 (Design) and 9 (Foundation) are **complete** as of 2026-05-12. Next: `/gsd-plan-phase 10` (Layout Primitives — research-flagged: SwiftUI adoption-surface choice between `@Environment` injection / `VideoModeContainer { ... }` / `.videoModeAware()` modifier). Then Phase 11 (Minesweeper adoption — smaller-cells per 08-HARD-MINES-ADR), Phase 12 (Merge + Nonogram adoption), Phase 13 (Win/loss banner + a11y gating + final 1.1→1.2 MARKETING_VERSION bump). See `.planning/ROADMAP.md` §Milestone v1.2 for full phase details.
 - **P7 work queued (v1.0 carry-over):** Plans 07-02 (icon production), 07-03 (CloudKit Production schema deploy), 07-04 (App Store metadata + privacy policy + screenshots), 07-05 (release checklist + 07-VERIFICATION.md template), 07-06 (TestFlight upload + SC1-SC5 manual sweep + submit). See `.planning/phases/07-release/` for plan files. v1.0 release work runs in parallel as non-coding tasks (DNS / ASC / nutrition label) and is NOT a blocker for v1.2 code work.
 
 ### Blockers/Concerns
 
-- *(no active v1.2 blockers — Phase 8 design locked 2026-05-12, Phase 9 unblocked and ready to plan. v1.0 Phase 7 release pre-flight items continue in parallel; see §v1.0 Carry-Over for the open checklist.)*
+- *(no active v1.2 blockers — Phase 9 foundation closed 2026-05-12; Phase 10 layout primitives ready to plan (research-flagged). v1.0 Phase 7 release pre-flight items continue in parallel; see §v1.0 Carry-Over for the open checklist.)*
 
 ## Deferred Items
 
@@ -348,8 +353,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-13T02:51:01.474Z
-Stopped at: Completed 09-07-PLAN.md (VideoLocationPickerView shipped; Wave 3 closes with Plans 09-06 + 09-07; VideoLocationPickerViewTests RED→GREEN; interim 09-06 build error resolved). Plan 09-08 (final wave: visual theme audit + SC5 regression + release log close) is next.
+Last session: 2026-05-12T21:00:00.000Z
+Stopped at: Completed 09-08-PLAN.md (Phase 9 close-out — SC5 contract test + v1.2 release log opened + theme audit signed off after 4-iteration picker gap closure on 09-07). All 5 ROADMAP Phase 9 SCs satisfied; VIDEO-01/02/03/04/14 complete; Phase 10 unblocked.
 Resume file: None
 
-**Planned Phase:** 8 (video-mode-design) — 6/6 plans complete — closed 2026-05-12. Next planning target: Phase 9 (video-mode-foundation).
+**Planned Phase:** 9 (video-mode-foundation) — 8/8 plans complete — closed 2026-05-12. Next planning target: Phase 10 (layout-primitives) — research-flagged.

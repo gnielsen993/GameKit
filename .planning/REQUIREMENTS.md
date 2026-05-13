@@ -269,10 +269,10 @@ Populated 2026-05-12 by the roadmapper. Phase numbering continues from v1.0's la
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VIDEO-01 | Phase 9 | Pending |
-| VIDEO-02 | Phase 9 | Pending |
-| VIDEO-03 | Phase 9 | Pending |
-| VIDEO-04 | Phase 9 | Pending |
+| VIDEO-01 | Phase 9 | Complete (09-02 + 09-06) |
+| VIDEO-02 | Phase 9 | Complete (09-02 + 09-07) |
+| VIDEO-03 | Phase 9 | Complete (09-02 + 09-03) |
+| VIDEO-04 | Phase 9 | Complete (09-05) |
 | VIDEO-05 | Phase 10 | Pending |
 | VIDEO-06 | Phase 10 | Pending |
 | VIDEO-07 | Phase 11 | Pending |
@@ -282,7 +282,7 @@ Populated 2026-05-12 by the roadmapper. Phase numbering continues from v1.0's la
 | VIDEO-11 | Phase 13 | Pending |
 | VIDEO-12 | Phase 13 | Pending |
 | VIDEO-13 | Phase 10 | Pending |
-| VIDEO-14 | Phase 9 | Pending |
+| VIDEO-14 | Phase 9 | Complete (09-04 + 09-07) |
 
 **v1.2 Coverage:**
 - v1.2 requirements: 14 total

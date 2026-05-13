@@ -1,7 +1,7 @@
 # Roadmap: GameKit
 
 **Created:** 2026-04-24
-**Last updated:** 2026-05-12 (Phase 8 design locked — v1.2 progress 1/6 phases complete)
+**Last updated:** 2026-05-12 (Phase 9 foundation closed — v1.2 progress 2/6 phases complete)
 **Granularity:** standard (5–8 phases, 3–5 plans each)
 **Coverage:** v1.0 — 38/38 requirements mapped ✓ · v1.2 — 14/14 requirements mapped ✓
 
@@ -12,7 +12,7 @@ GameKit ships in named, append-only milestones. Phase numbering never resets —
 | Milestone | Phases | Status | Scope |
 |-----------|--------|--------|-------|
 | **v1.0** | 1 → 7 (incl. 6.1) | Phase 7 in progress (pre-flight) | MVP — Minesweeper-only ship to TestFlight / App Store |
-| **v1.2** | 8 → 13 | In progress (Phase 8 complete 2026-05-12; 1/6 phases) | Video Mode — optional layout adaptation for PiP video overlays |
+| **v1.2** | 8 → 13 | In progress (Phases 8–9 complete 2026-05-12; 2/6 phases) | Video Mode — optional layout adaptation for PiP video overlays |
 
 v1.1 (Merge / Nonogram graduation) shipped under the v1.0 phase set as a post-MVP follow-up and did not open a new milestone band; both games are in production binary as of 2026-05-12 and become Video-Mode adoption targets in v1.2 Phase 12.
 
@@ -245,7 +245,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 ### v1.2 Phases
 
 - [x] **Phase 8: Video Mode Design** (2026-05-12) - Screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row + win/loss banner sketch (design-only — no app code)
-- [ ] **Phase 9: Video Mode Foundation** - VideoModeStore + Settings UI (toggle + 6-location picker + manual-selection copy) + shared compact control row component + environment plumbing
+- [x] **Phase 9: Video Mode Foundation** (2026-05-12) - VideoModeStore + Settings UI (toggle + 6-location picker + manual-selection copy) + shared compact control row component + environment plumbing
 - [ ] **Phase 10: Layout Primitives** - Small-PiP reposition system + Large-PiP reserved-band system + Off restore; verified end-to-end on a stub game screen
 - [ ] **Phase 11: Minesweeper Adoption** - Easy + Medium across all 6 locations + Hard 16×30 strategy implemented per Phase 8 ADR
 - [ ] **Phase 12: Merge + Nonogram Adoption** - Both grids reflow across all 6 locations with no legibility regression
@@ -289,7 +289,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 - [x] 09-05-PLAN.md — Wave 2 — VideoCompactControlRow component (generic @ViewBuilder slots, Phase 8 D-13 tokens, 3-game #Preview = SC4) — completed 2026-05-12
 - [x] 09-06-PLAN.md — Wave 3 — SettingsView VIDEO MODE card (D-01 placement, conditional NavigationLink, D-11 no-auto-nav) — completed 2026-05-13
 - [x] 09-07-PLAN.md — Wave 3 — VideoLocationPickerView (GeometryReader iPhone-outline per RESEARCH Topic 2, D-02/D-08/D-09/D-10) — completed 2026-05-13
-- [ ] 09-08-PLAN.md — Wave 4 — SC5 regression contract test + Docs/releases/v1.2.md opening + theme audit checkpoint (CLAUDE.md §8.12 + §8.14)
+- [x] 09-08-PLAN.md — Wave 4 — SC5 regression contract test + Docs/releases/v1.2.md opening + theme audit checkpoint (CLAUDE.md §8.12 + §8.14) — completed 2026-05-12 (after 4-iteration picker gap closure on 09-07; user-approved)
 **UI hint**: yes
 
 ### Phase 10: Layout Primitives
@@ -352,7 +352,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 8. Video Mode Design | 6/6 | Complete | 2026-05-12 |
-| 9. Video Mode Foundation | 0/8 | Planned | - |
+| 9. Video Mode Foundation | 8/8 | Complete | 2026-05-12 |
 | 10. Layout Primitives | 0/TBD | Not started | - |
 | 11. Minesweeper Adoption | 0/TBD | Not started | - |
 | 12. Merge + Nonogram Adoption | 0/TBD | Not started | - |
