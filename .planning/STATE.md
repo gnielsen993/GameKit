@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-05-13T23:22:20.483Z"
+stopped_at: Completed 11-02-PLAN.md
+last_updated: "2026-05-13T23:29:57.852Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 75
-  completed_plans: 65
-  percent: 87
+  completed_plans: 66
+  percent: 88
 ---
 
 # Project State
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 11 (mines-adoption) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Next phase: 11 (mines-adoption)
 Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 88%
 
 **Next action:** Discuss Phase 11 (`/gsd-discuss-phase 11`) — Minesweeper adopts the layout primitives. Easy + Medium across all 6 PiP locations on Classic + one Loud preset. Hard 16×30 ships the strategy from `.planning/phases/08-video-mode-design/08-HARD-MINES-ADR.md` (smaller-cells / Variant 1) gated on `videoModeStore.isEnabled` inside `MinesweeperBoardView.Self.minCellSize`. Wraps `MinesweeperGameView` (NOT `MinesweeperBoardView`) at the outermost layer per CONTEXT D-15 untouched contract. A2 (NavigationStack height adjustment) is the open carry-forward from Plan 10-VERIFICATION.md.
 
@@ -128,6 +128,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 10-layout-primitives P01 | 4 min | 2 tasks tasks | 2 files files |
 | Phase 10-layout-primitives PP02 | 4 min | 1 task tasks | 1 file files |
 | Phase 11 P01 | 3 | 2 tasks | 3 files |
+| Phase 11-mines-adoption P02 | 3 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -342,6 +343,8 @@ Recent decisions affecting current work:
 - 10-01: renderAndCapture probe pattern established — UIHostingController + Color.clear.onAppear writes into @MainActor CompactnessCaptureBox reference type. No ViewInspector SPM dep (RESEARCH §Example 1 recommendation 1). Replicable for any future @Environment(.foo) publication test
 - 10-02: VideoModeSlotRouter.swift ships as Foundation-only pure helper at gamekit/gamekit/Core/ with three types (SlotAnchor 6-case Sendable+Equatable enum, SlotAnchorMap 4-named-fields Equatable+Sendable struct, VideoModeSlotRouter enum-namespace) and exhaustive 6-case switch returning the locked SlotAnchorMap per zone. Plan 10-01 VideoModeSlotRouterTests GREEN-flipped: 7/7 @Test funcs / 25/25 #expect passing on iPhone 17 Pro. VIDEO-05 contract LOCKED. Plan 10-03 RED preserved as designed. A3 cross-check confirmed all 6 switch arms align with 08-VIDEO-MODE-LAYOUTS.md 'Where controls go' rows. Verification used temp-stash-and-restore of VideoModeAwareTests.swift to bypass whole-test-target compile dependency on Plan 10-03 symbols.
 - Plan 11-01: Working names MinesRemainingChip + TimerChip locked (CONTEXT Discretion accepted); HeaderBar doc-comment trimmed so the file fits ≤ 40 lines (D-05 invariants now documented inside TimerChip).
+- 11-02: Easy-section supersession note covers Easy/Medium/Hard transitively via existing 'same slot order' backreferences; one note + one Easy-row update propagates the D-05 change without smearing four near-identical edits across three tables.
+- 11-02: Token Anchors table in 08-COMPACT-ROW-TOKENS.md left untouched per acceptance criterion — radii.button / spacing.xl / spacing.s / radii.chip / spacing.l remain Phase 9 D-13 locks and apply unchanged to the revised D-05 slot order.
 
 ### Pending Todos
 
@@ -362,8 +365,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-13T23:22:20.476Z
-Stopped at: Completed 11-01-PLAN.md
+Last session: 2026-05-13T23:29:57.846Z
+Stopped at: Completed 11-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
