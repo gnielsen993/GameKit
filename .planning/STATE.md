@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 10-02-PLAN.md
-last_updated: "2026-05-13T21:48:06.099Z"
+stopped_at: Completed 10-03-PLAN.md
+last_updated: "2026-05-13T22:15:00.000Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 9
   total_plans: 67
-  completed_plans: 62
-  percent: 93
+  completed_plans: 63
+  percent: 94
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 10 (layout-primitives) — EXECUTING
-Plan: 3 of 4
-Status: Ready to execute
+Plan: 4 of 4
+Status: Ready to execute (10-04 closeout)
 Last activity: 2026-05-13
 
-Progress: [█████████░] 93%
+Progress: [█████████▌] 94%
 
 **Next action:** Plan Phase 10 (`/gsd-plan-phase 10`) — Layout Primitives (small-PiP corner-avoidance + large-PiP reserved-band + Off-restore primitives, verified on a stub game screen). Phase 10 is research-flagged per ROADMAP §v1.2 Research Flags — the SwiftUI adoption surface choice (`@Environment` injection vs. `VideoModeContainer { ... }` view vs. `.videoModeAware()` modifier) deserves a focused spike before plan-writing. Phase 10 consumes `VideoModeStore` + `VideoCompactControlRow` from Phase 9.
 

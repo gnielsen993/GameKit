@@ -305,7 +305,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 **Plans**: 4 plans
 - [x] 10-01-PLAN.md — Wave 0 RED gate: VideoModeAwareTests.swift (VIDEO-06 + VIDEO-13 SC3) + VideoModeSlotRouterTests.swift (VIDEO-05 — 24 anchor assertions)
 - [x] 10-02-PLAN.md — Wave 1 GREEN: VideoModeSlotRouter.swift pure helper (Foundation-only; 6-zone exhaustive switch; VIDEO-05)
-- [ ] 10-03-PLAN.md — Wave 1 GREEN: VideoModeAware.swift ViewModifier + extension + VideoModeCompactness enum + EnvironmentKey + 12-tile #Preview matrix (VIDEO-06 + VIDEO-13 + SC4 + SC5 surface)
+- [x] 10-03-PLAN.md — Wave 1 GREEN: VideoModeAware.swift ViewModifier + extension + VideoModeCompactness enum + EnvironmentKey + 12-tile #Preview matrix (VIDEO-06 + VIDEO-13 + SC4 + SC5 surface)
 - [ ] 10-04-PLAN.md — Wave 2: SC5 visual audit checkpoint + 10-VERIFICATION.md sign-off + Docs/releases/v1.2.md Phase 10 entry
 **UI hint**: yes
 
