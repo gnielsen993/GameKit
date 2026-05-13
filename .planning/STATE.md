@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: "Completed 09-03-PLAN.md (GameKitApp scene-root VideoModeStore injection; GameKitAppTests flipped RED -> GREEN). Next: 09-04 — Localizable.xcstrings videoMode.* catalog entries (13 keys per 09-PATTERNS §7)."
-last_updated: "2026-05-13T01:14:59.979Z"
+stopped_at: "Completed 09-04-PLAN.md (videoMode.* xcstrings catalog drop; LocalizableCatalogTests GREEN). Next: 09-05 — Settings card UI consuming the new keys."
+last_updated: "2026-05-13T01:25:20.363Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 8
   total_plans: 63
-  completed_plans: 55
-  percent: 87
+  completed_plans: 56
+  percent: 89
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 09 (video-mode-foundation) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 89%
 
 **Next action:** Plan Phase 9 (`/gsd-plan-phase 9`) — Video Mode Foundation (`VideoModeStore` + Settings UI toggle + 6-location picker + manual-selection copy + shared compact control row component). Phase 9 consumes `08-COMPACT-ROW-TOKENS.md` (SC4) and `VIDEO-MODE-LAYOUTS.md` 6-zone vocabulary (SC3) from the now-locked Phase 8 design corpus.
 
@@ -118,6 +118,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 09-video-mode-foundation P01 | 17 | 2 tasks tasks | 7 files files |
 | Phase 09 P02 | 6 min | 2 tasks | 2 files |
 | Phase 09 P03 | 14 | 1 tasks | 2 files |
+| Phase 09 P04 | 3min | 1 task tasks | 2 files files |
 
 ## Accumulated Context
 
@@ -316,6 +317,7 @@ Recent decisions affecting current work:
 - 09-02: VideoModeStore + VideoModeLocation shipped. EnvironmentKey extension included in 09-02 (deviation from plan's 09-03 split) — the test bundle compile-gate required EnvironmentValues.videoModeStore symbol to exist. Plan 09-03 scope now narrows to GameKitApp scene-root .environment() injection + GameKitAppTests GREEN flip.
 - Plan 09-03 Task 1 was a verified no-op — EnvironmentKey extension shipped early in Plan 09-02 commit 8f7d42d (Rule 3 deviation). Skipped re-edit to avoid duplicate-symbol error; documented as deviation in 09-03-SUMMARY.md.
 - VideoModeStore placement in GameKitApp = between SettingsStore and SFXPlayer (property + init + .environment modifier) — canonical 09-PATTERNS.md §6 ordering keeps the two UserDefaults-backed @Observable preference stores adjacent at all three sites.
+- Phase 9 Plan 04: 13 videoMode.* keys added to Localizable.xcstrings atomically — LocalizableCatalogTests flipped RED to GREEN; VIDEO-14 verbatim copy now locked at the resource layer (D-10).
 
 ### Pending Todos
 
@@ -336,8 +338,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-13T01:14:59.973Z
-Stopped at: Completed 09-03-PLAN.md (GameKitApp scene-root VideoModeStore injection; GameKitAppTests flipped RED -> GREEN). Next: 09-04 — Localizable.xcstrings videoMode.* catalog entries (13 keys per 09-PATTERNS §7).
+Last session: 2026-05-13T01:25:20.355Z
+Stopped at: Completed 09-04-PLAN.md (videoMode.* xcstrings catalog drop; LocalizableCatalogTests GREEN). Next: 09-05 — Settings card UI consuming the new keys.
 Resume file: None
 
 **Planned Phase:** 8 (video-mode-design) — 6/6 plans complete — closed 2026-05-12. Next planning target: Phase 9 (video-mode-foundation).

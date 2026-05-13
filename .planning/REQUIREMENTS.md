@@ -105,10 +105,12 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 ### Settings & Persistence
 
 - [ ] **VIDEO-01**: Settings exposes Video Mode Off/On toggle (default Off); state persisted across launches
-- [ ] **VIDEO-02**: When Video Mode is On, Settings exposes a video-location picker with exactly 6 options: Large top, Large bottom, Small top-left, Small top-right, Small bottom-left, Small bottom-right
+- [x] **VIDEO-02
+**: When Video Mode is On, Settings exposes a video-location picker with exactly 6 options: Large top, Large bottom, Small top-left, Small top-right, Small bottom-left, Small bottom-right
 - [x] **VIDEO-03
 **: Selected location persists across launches and is observable by every game screen via a shared store
-- [ ] **VIDEO-14**: Settings copy explains Video Mode in one short paragraph + clarifies that GameDrawer cannot detect another app's PiP automatically (manual selection only)
+- [x] **VIDEO-14
+**: Settings copy explains Video Mode in one short paragraph + clarifies that GameDrawer cannot detect another app's PiP automatically (manual selection only)
 
 ### Layout Engine
 
