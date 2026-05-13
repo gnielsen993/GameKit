@@ -74,6 +74,8 @@ per-game sections that follow. (Source: `Docs/screenshots/v1.2-design/README.md`
 
 ## Minesweeper — Easy (9x9 / 10 mines)
 
+> **Slot-row supersession (2026-05-13):** the Minesweeper compact-row slot string in the Large-top / Large-bottom rows below has been revised per `11-CONTEXT.md` D-05. The new order is `Back | [Mines⊥Time stacked chip] | Reveal/Flag picker | Settings | Restart`. Restart is rightmost (most-tapped in-flight action under stress); slot 2 is a vertical-stack subview (Mines remaining on top, Time below) so the 5-slot `VideoCompactControlRow` contract (Phase 9 D-12) stays intact. Settings (slot 4) opens `MinesweeperToolbarMenu` (difficulty change menu) per D-08; global app Settings stays reachable from HomeView. Applies to Easy / Medium / Hard alike.
+
 Screenshots: `Docs/screenshots/v1.2-design/mines-easy-classic-pip-large.png` ·
 `mines-easy-dracula-pip-large.png`
 Filename basis: `mines-easy-classic.png` / `mines-easy-dracula.png` (the 08-01
@@ -93,7 +95,7 @@ Evidence map:
 
 | PiP zone | Where controls go | What happens to the board |
 |---|---|---|
-| Large top    | Compact row at bottom edge; slots `Back | Flags/mines | Reveal/Flag picker | Time | Settings` (per `08-COMPACT-ROW-TOKENS.md`). | Board fits between reserved top band and compact row. 9x9 fits with comfortable margin — visible in `mines-easy-classic-pip-large.png`. |
+| Large top    | Compact row at bottom edge; slots `Back | [Mines⊥Time stacked chip] | Reveal/Flag picker | Settings | Restart` (per `08-COMPACT-ROW-TOKENS.md`, revised per `11-CONTEXT.md` D-05). | Board fits between reserved top band and compact row. 9x9 fits with comfortable margin — visible in `mines-easy-classic-pip-large.png`. |
 | Large bottom | Compact row at top edge; same slot order. | Board fits between top row and reserved bottom band. 9x9 fits comfortably (see `home-classic-pip-large-bottom.png` for the band geometry). |
 | Small TL     | Move Back out of top-left into top-right or compact row. | Board unchanged — 9x9 sits well inside the playable region. (Canonical TL: `mines-hard-dracula-pip-small-tl.png`.) |
 | Small TR     | Move Settings out of top-right into top-left or compact row. | Board unchanged. (Canonical TR: `mines-hard-dracula-pip-small-tr.png`.) |
