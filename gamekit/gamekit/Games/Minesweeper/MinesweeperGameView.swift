@@ -39,180 +39,83 @@ import SwiftData
 import DesignKit
 
 struct MinesweeperGameView: View {
-    @State private var viewModel: MinesweeperViewModel
+    @State var viewModel: MinesweeperViewModel
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @State private var didInjectStats = false           // one-shot guard (RESEARCH Pitfall 8)
     @State private var showDifficultyPicker = false      // P7 polish (kink #4)
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismiss) var dismiss
 
     // End-of-game choreography (gated on settingsStore.animationsEnabled).
     // - Loss: mines wave outward from trip cell → wrong flags pop → end card.
     // - Win:  confetti for a beat → end card.
     // When animations are off (or Reduce Motion is on), all flags flip true
     // immediately so the end card lands without a pre-roll.
-    @State private var lossMinesRevealed = false
-    @State private var lossWrongFlagsPopped = false
-    @State private var endCardVisible = false
-    @State private var showConfetti = false
+    @State var lossMinesRevealed = false
+    @State var lossWrongFlagsPopped = false
+    @State var endCardVisible = false
+    @State var showConfetti = false
 
     // P5 (D-04/D-07/D-08) — animation/haptics/SFX environment reads.
     // accessibilityReduceMotion gates ALL animation surfaces per D-04.
     // settingsStore + sfxPlayer flow into the locked Plan 05-03
     // call-site contract: Haptics.playAHAP(named:hapticsEnabled:) +
     // sfxPlayer.play(_:sfxEnabled:) on .onChange(of: viewModel.phase).
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.settingsStore) private var settingsStore
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.settingsStore) var settingsStore
     @Environment(\.sfxPlayer) private var sfxPlayer
 
-    private var theme: Theme { themeManager.theme(using: colorScheme) }
+    // P11 D-01/D-02 (Plan 11-03): three-way layout branch on Video Mode state.
+    // - .isEnabled false → off-path = v1.0 verbatim (SC5 byte-identical).
+    // - .isEnabled true + location.isLarge → Plan 11-04 will swap to
+    //   VideoCompactControlRow (D-05); for now we render existingLayout
+    //   with the toolbar hidden so the wrap site compiles end-to-end.
+    // - .isEnabled true + small zone → existing layout + repositioned
+    //   toolbar via VideoModeSlotRouter.anchors(for:) (D-02).
+    @Environment(\.videoModeStore) var videoModeStore
+    @Environment(\.videoModeCompactness) var videoModeCompactness
+
+    var theme: Theme { themeManager.theme(using: colorScheme) }
 
     init(initialDifficulty: MinesweeperDifficulty? = nil) {
         _viewModel = State(initialValue: MinesweeperViewModel(difficulty: initialDifficulty))
     }
 
     var body: some View {
-        ZStack {
-            theme.colors.background
-                .ignoresSafeArea()
-
-            VStack(spacing: theme.spacing.m) {
-                MinesweeperHeaderBar(
-                    theme: theme,
-                    minesRemaining: viewModel.minesRemaining,
-                    timerAnchor: viewModel.timerAnchor,
-                    pausedElapsed: viewModel.pausedElapsed
-                )
-
-                MinesweeperBoardView(
-                    theme: theme,
-                    board: viewModel.board,
-                    gameState: viewModel.gameState,
-                    phase: viewModel.phase,
-                    hapticsEnabled: settingsStore.hapticsEnabled,
-                    reduceMotion: reduceMotion,
-                    revealCount: viewModel.revealCount,
-                    flagToggleCount: viewModel.flagToggleCount,
-                    lossMinesRevealed: lossMinesRevealed,
-                    lossWrongFlagsPopped: lossWrongFlagsPopped,
-                    lossTripIdx: tripCellIndex,
-                    onTap: { viewModel.handleTap(at: $0) },
-                    onLongPress: { viewModel.handleLongPress(at: $0) }
-                )
-                // P5 D-03: 4-keyframe horizontal loss shake. Magnitude 8pt
-                // locked by CONTEXT D-03 (animation amplitude, not layout
-                // — exempt from FOUND-07 spacing-token rule). Reduce Motion
-                // → trigger `false` so keyframes never fire.
-                .keyframeAnimator(
-                    initialValue: 0.0,
-                    trigger: reduceMotion ? false : viewModel.phase.isLossShake
-                ) { content, value in
-                    content.offset(x: value)
-                } keyframes: { _ in
-                    LinearKeyframe(8.0, duration: 0.1)
-                    LinearKeyframe(-8.0, duration: 0.1)
-                    LinearKeyframe(4.0, duration: 0.1)
-                    LinearKeyframe(0.0, duration: 0.1)
-                }
-
-                // P6.1 (MINES-12) — Reveal/Flag pill flipper.
-                // Two-segment pill, current mode highlighted. Replaces prior
-                // single circular FAB.
-                MinesweeperModePill(
-                    theme: theme,
-                    mode: viewModel.interactionMode,
-                    onSelect: { viewModel.setInteractionMode($0) }
-                )
-                .padding(.top, theme.spacing.s)
-                .opacity(viewModel.terminalOutcome == nil ? 1 : 0)
-                .allowsHitTesting(viewModel.terminalOutcome == nil)
-                .sensoryFeedback(
-                    .impact(weight: .light),
-                    trigger: settingsStore.hapticsEnabled ? viewModel.modeToggleCount : 0
-                )
-            }
-
-            // P5 D-02: full-board win sweep — success-tint wash via
-            // .phaseAnimator. Sits ABOVE the board cells but BELOW the
-            // end-state DKCard so the user can interact with Restart
-            // without the wash blocking taps (.allowsHitTesting(false)
-            // also enforces this). Reduce Motion → single phase [0.0]
-            // emits no fade.
-            Rectangle()
-                .fill(theme.colors.success)
-                .ignoresSafeArea()
-                .allowsHitTesting(false)
-                .phaseAnimator(
-                    reduceMotion ? [0.0] : [0.0, 0.25, 0.0],
-                    trigger: viewModel.phase == .winSweep
-                ) { content, alpha in
-                    content.opacity(alpha)
-                } animation: { _ in
-                    .easeInOut(duration: theme.motion.slow)
-                }
-
-            // Confetti — fires on win for a beat before the end card lands.
-            // Always rendered above the win-sweep wash and below the end card.
-            // Driven by `showConfetti` which the win-orchestration Task flips.
-            if showConfetti {
-                ConfettiView(theme: theme)
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
-                    .transition(.opacity)
-            }
-
-            // End-state overlay — gated on `endCardVisible` so the loss
-            // cascade / win confetti finish their pre-roll first.
-            if let outcome = viewModel.terminalOutcome, endCardVisible {
-                endStateOverlay(outcome: outcome)
-                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+        // P11 D-01/D-02 (Plan 11-03): three-way layout branch.
+        // - Off-path: render existingLayout + v1.0 toolbar (SC5 byte-identical).
+        // - Large-zone: render existingLayout with toolbar hidden (D-09).
+        //   TODO 11-04: render VideoCompactControlRow here per D-05 slot order
+        //   (Back | [Mines⊥Time stacked chip] | Reveal/Flag picker |
+        //    Settings | Restart) ABOVE existingLayout and hide HeaderBar +
+        //   ModePill (D-01). The compact-row composition lands in Plan 11-04.
+        // - Small-zone: render existingLayout with toolbar items repositioned
+        //   per VideoModeSlotRouter.anchors(for:) (D-02). No compact-row swap,
+        //   no HeaderBar/ModePill hiding.
+        Group {
+            if !videoModeStore.isEnabled {
+                existingLayout
+                    .toolbar { existingToolbarContent }
+            } else if videoModeStore.location.isLarge {
+                existingLayout
+                    .toolbar(.hidden, for: .navigationBar)
+            } else {
+                existingLayout
+                    .toolbar { smallZoneToolbarContent }
             }
         }
         .navigationTitle(String(localized: "Minesweeper"))
         .navigationBarTitleDisplayMode(.inline)
         // 2026-05-01: Hide the system back chevron + edge-swipe-to-go-back
         // gesture so cell long-press / pinch-to-zoom interactions near the
-        // left edge don't get hijacked. Custom back ToolbarItem below is
-        // the only path off this screen (besides win/loss → Home from the
-        // end-state card). Matches MergeGameView for cross-game consistency.
+        // left edge don't get hijacked. Custom back ToolbarItem (see
+        // existingToolbarContent / smallZoneToolbarContent in
+        // MinesweeperGameView+VideoMode.swift) is the only path off this
+        // screen (besides win/loss → Home from the end-state card). Matches
+        // MergeGameView for cross-game consistency.
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(theme.colors.textPrimary)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Back to The Drawer"))
-            }
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    viewModel.restart()
-                } label: {
-                    Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(theme.colors.textPrimary)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Restart game"))
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                MinesweeperToolbarMenu(
-                    theme: theme,
-                    currentDifficulty: viewModel.difficulty,
-                    onSelect: { viewModel.requestDifficultyChange($0) }
-                )
-            }
-        }
         .alert(
             String(localized: "Abandon current game?"),
             isPresented: $viewModel.showingAbandonAlert
@@ -287,7 +190,7 @@ struct MinesweeperGameView: View {
     // MARK: - End-state overlay (D-01 + D-02 — no tap-to-dismiss; D-18 — no animation P3)
 
     @ViewBuilder
-    private func endStateOverlay(outcome: GameOutcome) -> some View {
+    func endStateOverlay(outcome: GameOutcome) -> some View {
         ZStack {
             // Backdrop — covers full board AREA but does NOT consume taps
             // (the card itself owns the only tap targets per D-02).
@@ -339,7 +242,7 @@ struct MinesweeperGameView: View {
 
     /// Trip-mine index drives the loss-wave origin (chebyshev distance per
     /// cell). nil outside loss states.
-    private var tripCellIndex: MinesweeperIndex? {
+    var tripCellIndex: MinesweeperIndex? {
         if case .lost(let idx) = viewModel.gameState { return idx }
         return nil
     }
