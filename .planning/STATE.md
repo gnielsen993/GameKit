@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: Video Mode
 status: Ready to discuss / plan Phase 11
 stopped_at: Phase 11 context gathered
-last_updated: "2026-05-13T22:43:01.910Z"
+last_updated: "2026-05-13T23:15:00.908Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 10
-  total_plans: 67
+  total_plans: 75
   completed_plans: 64
-  percent: 96
+  percent: 85
 ---
 
 # Project State
@@ -363,4 +363,4 @@ Last session: --stopped-at
 Stopped at: Phase 11 context gathered
 Resume file: --resume-file
 
-**Planned Phase:** 10 (Layout Primitives) — 4 plans — 2026-05-13T14:52:52.735Z
+**Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
