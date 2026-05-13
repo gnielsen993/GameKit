@@ -4,15 +4,18 @@
 //
 //  Push-destination sub-screen for the VIDEO MODE Settings card's
 //  NavigationLink (D-08). Renders a vertical-stack picker per the Phase 9
-//  human-verify gap-closure redesign:
+//  human-verify gap-closure redesign, wrapped in an iPhone-outline frame so
+//  the bands have spatial meaning ("this is your phone, your video appears
+//  HERE on it") rather than reading as floating cards:
 //
 //    [ Large | Small ]   ← segmented size toggle
-//    ┌──────────────┐
-//    │ Top band     │   ← Large-mode: whole band tappable
-//    └──────────────┘
-//    ┌──────────────┐
-//    │ Bottom band  │
-//    └──────────────┘
+//    ╭──────────────╮   ← iPhone outline (RoundedRectangle stroke,
+//    │ ┌──────────┐ │     theme.radii.sheet, ~9:19.5 aspect)
+//    │ │ Top band │ │   ← Large-mode: whole band tappable
+//    │ ├──────────┤ │
+//    │ │ Bot band │ │
+//    │ └──────────┘ │
+//    ╰──────────────╯
 //
 //  In Small mode each band contains TWO corner buttons (left+right) — the
 //  small video docks to a corner of one of the two large bands, never floats
@@ -58,10 +61,14 @@ struct VideoLocationPickerView: View {
         VStack(alignment: .leading, spacing: theme.spacing.l) {
             sizeToggle
 
-            VStack(spacing: theme.spacing.m) {
-                bandView(for: .top)
-                bandView(for: .bottom)
+            iPhoneOutlineFrame {
+                VStack(spacing: theme.spacing.m) {
+                    bandView(for: .top)
+                    bandView(for: .bottom)
+                }
+                .padding(theme.spacing.m)
             }
+            .frame(maxWidth: .infinity)
             .accessibilityElement(children: .contain)
             .accessibilityLabel(Text(String(localized: "videoMode.pickerContainerA11yLabel")))
 
@@ -128,8 +135,7 @@ struct VideoLocationPickerView: View {
         return zoneButton(location: location) {
             zoneLabel(location: location)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: bandHeight(size: .large))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func smallBand(for half: VerticalHalf) -> some View {
@@ -145,19 +151,35 @@ struct VideoLocationPickerView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .frame(height: bandHeight(size: .small))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func bandHeight(size: VideoSize) -> CGFloat {
-        // Token-derived band heights — both Large (single tall band) and
-        // Small (band-of-two-corners) collapse to the same vertical envelope
-        // so the overall picker fits without scrolling on iPhone 17 Pro Max
-        // and SE alike. Derived from theme.spacing.xxl as the only available
-        // multiplier-friendly token (no literal pixels — CLAUDE.md §2).
-        switch size {
-        case .large: return theme.spacing.xxl * 3
-        case .small: return theme.spacing.xxl * 3
+    // MARK: - iPhone outline frame
+
+    /// Decorative iPhone-outline wrapper that gives the band stack spatial
+    /// meaning — "this is your phone screen, your video appears HERE on it"
+    /// — rather than letting the bands read as floating cards (the gap that
+    /// the post-11d109a redesign accidentally introduced). The outline is
+    /// a stroked `RoundedRectangle` with a ~9:19.5 aspect ratio (modest
+    /// phone shape, matches the original 09-07 picker geometry). All
+    /// chrome reads DesignKit tokens; stroke width is a small visual
+    /// constant (1.5pt) since DesignKit does not surface a stroke-width
+    /// token (CLAUDE.md §2 escape hatch for visual chrome).
+    @ViewBuilder
+    private func iPhoneOutlineFrame<Content: View>(
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        ZStack {
+            content()
         }
+        .aspectRatio(9.0 / 19.5, contentMode: .fit)
+        .frame(maxWidth: theme.spacing.xxl * 7)
+        .overlay(
+            RoundedRectangle(cornerRadius: theme.radii.sheet, style: .continuous)
+                .stroke(theme.colors.border, lineWidth: 1.5)
+                .accessibilityHidden(true)
+        )
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Zone button + label
