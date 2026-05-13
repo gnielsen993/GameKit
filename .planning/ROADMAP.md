@@ -302,7 +302,11 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   3. Off-restore: toggling Video Mode Off in Settings while the stub game screen is open restores the stub to its baseline layout immediately (no relaunch required), with no leftover compact-row chrome, no shrunken board, no reserved bands — verified by view-state diff against a control build with Video Mode never enabled.
   4. The primitives are exposed as parameterless or environment-driven SwiftUI surfaces (e.g. `.videoModeAware()` modifier, `VideoModeContainer { ... }` view) that any game screen can adopt with minimal call-site code — adoption shape locked here so Phase 11 / 12 each become "wrap the existing game view" rather than "redesign the existing game view".
   5. Stub game screen legibility verified on Classic preset AND at least one Loud preset (Voltage or Dracula) across all 6 PiP locations per CLAUDE.md §8.12 — chip / picker / info text stays legible on every preset when controls are repositioned.
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 10-01-PLAN.md — Wave 0 RED gate: VideoModeAwareTests.swift (VIDEO-06 + VIDEO-13 SC3) + VideoModeSlotRouterTests.swift (VIDEO-05 — 24 anchor assertions)
+- [ ] 10-02-PLAN.md — Wave 1 GREEN: VideoModeSlotRouter.swift pure helper (Foundation-only; 6-zone exhaustive switch; VIDEO-05)
+- [ ] 10-03-PLAN.md — Wave 1 GREEN: VideoModeAware.swift ViewModifier + extension + VideoModeCompactness enum + EnvironmentKey + 12-tile #Preview matrix (VIDEO-06 + VIDEO-13 + SC4 + SC5 surface)
+- [ ] 10-04-PLAN.md — Wave 2: SC5 visual audit checkpoint + 10-VERIFICATION.md sign-off + Docs/releases/v1.2.md Phase 10 entry
 **UI hint**: yes
 
 ### Phase 11: Minesweeper Adoption
@@ -353,7 +357,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 |-------|----------------|--------|-----------|
 | 8. Video Mode Design | 6/6 | Complete | 2026-05-12 |
 | 9. Video Mode Foundation | 8/8 | Complete | 2026-05-12 |
-| 10. Layout Primitives | 0/TBD | Not started | - |
+| 10. Layout Primitives | 0/4 | Planned | - |
 | 11. Minesweeper Adoption | 0/TBD | Not started | - |
 | 12. Merge + Nonogram Adoption | 0/TBD | Not started | - |
 | 13. Win/Loss Banner + A11y Gating | 0/TBD | Not started | - |

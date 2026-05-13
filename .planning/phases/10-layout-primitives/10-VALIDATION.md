@@ -1,10 +1,11 @@
 ---
 phase: 10
 slug: layout-primitives
-status: draft
-nyquist_compliant: false
+status: approved
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-05-12
+approved: 2026-05-13
 ---
 
 # Phase 10 — Validation Strategy
@@ -83,4 +84,4 @@ created: 2026-05-12
 - [ ] Feedback latency < 20s
 - [ ] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-05-13 — plan content satisfies all Nyquist checks (every task has `<automated>`, no watch flags, latency <20s, Wave 0 covers all RED-gate references). `wave_0_complete` flips to `true` after 10-01 executes.

@@ -1069,46 +1069,19 @@ Projected line counts (well under §8.5 400-line soft cap, 500-line hard cap):
 out of `VideoModeAware.swift` into `VideoModeCompactness.swift` (Core/). Same flat
 layout; no subdirectory.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`Theme` access inside the modifier** (A1)
-   - What we know: `VideoCompactControlRow` takes `theme:` as constructor parameter
-     (not env-injected).
-   - What's unclear: Whether the modifier should also take `theme:` or read it via
-     env (does DesignKit expose `@Environment(\.theme)`?).
-   - Recommendation: Plan-phase task 1 = check DesignKit env surface. If no env,
-     the modifier hard-codes `24` (theme.spacing.xl value) with a code comment
-     citing the token. Alternative: pass `theme:` at the call site
-     (`.videoModeAware(minBoardHeight: 480, theme: theme)`).
+   - **RESOLVED:** `10-03-PLAN.md` ships `private static let compactRowHeight: CGFloat = 24` with code comment citing `theme.spacing.xl` token (no env-injection of `Theme` introduced). Call-site does NOT pass `theme:` — the modifier hard-codes the spacing token value with documented provenance. CLAUDE.md §2 token-discipline satisfied (value sourced from token, kept private — not promoted to DesignKit).
 
 2. **`geometry.size.height` vs full screen height** (A2)
-   - What we know: GeometryReader reports parent's proposed size.
-   - What's unclear: Whether a NavigationStack-pushed game view gets the full screen
-     height or a reduced height (minus nav-bar).
-   - Recommendation: Plan-phase task spike — add a temporary `print(proxy.size.height)`
-     in the modifier when mounted in a stub `NavigationStack` and compare against
-     screen height. If reduced, add `+ proxy.safeAreaInsets.top` to the available-board-height
-     formula.
+   - **RESOLVED:** `10-03-PLAN.md` uses `.frame(maxWidth: .infinity, maxHeight: .infinity)` on the modifier's content so SwiftUI propagates the full available space to the wrapped game view. The `.safeAreaInset(edge:)` API automatically composes with NavigationStack's existing safe-area; no nav-bar height correction needed. Pitfall 1 (RESEARCH §Pitfall 1) covers the inset-stacking behavior.
 
 3. **Slot router exhaustiveness against banner-placement table** (Phase 13 forward-compat)
-   - What we know: Both `VideoModeSlotRouter.anchors(for:)` and the Phase 13 banner
-     placement table from `08-BANNER-PLACEMENT.md` encode "opposite-of-PiP"
-     geometry.
-   - What's unclear: Whether to refactor `VideoModeSlotRouter` to also expose a
-     "where does the win/loss banner dock?" anchor for Phase 13 to consume.
-   - Recommendation: Plan-phase makes a NOTE in `VideoModeSlotRouter.swift`
-     header — "Phase 13 may extend SlotAnchorMap with a `banner` field; if so,
-     update this switch with banner anchors from `08-BANNER-PLACEMENT.md`." Don't
-     pre-extend now (single-consumer rule).
+   - **RESOLVED:** `10-02-PLAN.md` ships `VideoModeSlotRouter` with 4-field `SlotAnchorMap` (back/settings/picker/fab) — no `banner` field. Header doc-comment in the file notes "Phase 13 may extend `SlotAnchorMap` with a `banner: SlotAnchor` field; update the 6-case switch with anchors from `08-BANNER-PLACEMENT.md` when adding." Single-consumer rule honored — no speculative extension.
 
 4. **Compactness threshold value** (A4)
-   - What we know: D-14 says "≥ floor → .normal; lower → some level; very low →
-     .reducedTime."
-   - What's unclear: Exact threshold for the middle case. This research proposed
-     0.85×; CONTEXT D-14 doesn't specify.
-   - Recommendation: Plan-phase locks the threshold by running the `#Preview`
-     matrix and visually picking the cutoff that produces useful differentiation
-     across the 6 zones.
+   - **RESOLVED:** `10-03-PLAN.md` locks `private static let collapsedSettingsRatio: CGFloat = 0.85` (line ~289) as the threshold for `.collapsedSettings` (≥ floor → `.normal`; ≥ 0.85×floor → `.collapsedSettings`; < 0.85×floor → `.reducedTime`). Final value confirmed during Wave 2 `#Preview` matrix audit (10-04 Task 1) — tunable as a one-line edit if the audit surfaces a different cutoff.
 
 ## Environment Availability
 
