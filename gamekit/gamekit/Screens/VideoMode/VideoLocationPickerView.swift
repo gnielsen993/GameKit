@@ -3,30 +3,39 @@
 //  gamekit
 //
 //  Push-destination sub-screen for the VIDEO MODE Settings card's
-//  NavigationLink (D-08). Renders a vertical-stack picker per the Phase 9
-//  human-verify gap-closure redesign, wrapped in an iPhone-outline frame so
-//  the bands have spatial meaning ("this is your phone, your video appears
-//  HERE on it") rather than reading as floating cards:
+//  NavigationLink (D-08). Renders a footprint-accurate picker: each
+//  highlighted zone inside the iPhone outline represents the ACTUAL
+//  rectangle the video will occupy on the player's screen — not a full-band
+//  card. The empty area between zones is the gameplay surface.
 //
 //    [ Large | Small ]   ← segmented size toggle
 //    ╭──────────────╮   ← iPhone outline (RoundedRectangle stroke,
 //    │ ┌──────────┐ │     theme.radii.sheet, ~9:19.5 aspect)
-//    │ │ Top band │ │   ← Large-mode: whole band tappable
-//    │ ├──────────┤ │
-//    │ │ Bot band │ │
+//    │ │ video    │ │   ← Large-mode: top footprint (~37% height)
+//    │ └──────────┘ │
+//    │              │   ← empty gameplay gap (~26% height)
+//    │ ┌──────────┐ │
+//    │ │ video    │ │   ← Large-mode: bottom footprint (~37% height)
 //    │ └──────────┘ │
 //    ╰──────────────╯
 //
-//  In Small mode each band contains TWO corner buttons (left+right) — the
-//  small video docks to a corner of one of the two large bands, never floats
-//  independently. Switching the toggle preserves the user's Top/Bottom
-//  vertical half so the change feels like a size swap, not a re-selection.
+//  In Small mode the outline shows four corner thumbnails (~32% × ~20% of
+//  the inner area) anchored to each corner — the small video docks to one
+//  of the four corners, with empty space everywhere else. Switching the
+//  toggle preserves the user's Top/Bottom vertical half so the change feels
+//  like a size swap, not a re-selection.
+//
+//  Layout uses GeometryReader inside the fixed-aspect outline so the
+//  zones scale proportionally with the outline regardless of device width
+//  — exactly the use case GeometryReader is intended for (proportional
+//  placement inside a fixed-aspect-ratio container).
 //
 //  Phase 9 invariants (still in force):
 //    - Push destination only — no own NavigationStack (Settings owns it).
 //    - @Environment(\.videoModeStore) — NEVER @EnvironmentObject (Pitfall 2).
-//    - All dimensions read DesignKit tokens; no literal cornerRadius/padding
-//      integers (CLAUDE.md §2 / Pitfall 4).
+//    - All literal-pt dimensions read DesignKit tokens; ratios used inside
+//      GeometryReader proportional math are acceptable as Double literals
+//      (they're aspect ratios, not pixel values) per CLAUDE.md §2.
 //    - Selected-zone label uses theme.colors.textPrimary, NOT accentPrimary
 //      (Pitfall 5 lock — Loud presets remain legible).
 //    - A11Y per D-09: per-zone .accessibilityLabel matching localized
@@ -62,9 +71,8 @@ struct VideoLocationPickerView: View {
             sizeToggle
 
             iPhoneOutlineFrame {
-                VStack(spacing: theme.spacing.m) {
-                    bandView(for: .top)
-                    bandView(for: .bottom)
+                GeometryReader { proxy in
+                    zoneFootprintLayer(in: proxy.size)
                 }
                 .padding(theme.spacing.m)
             }
@@ -118,40 +126,90 @@ struct VideoLocationPickerView: View {
         .accessibilityLabel(Text(String(localized: "videoMode.locationPicker.sizeA11yLabel")))
     }
 
-    // MARK: - Band
+    // MARK: - Footprint layer
 
+    /// Footprint ratios (Double literals are aspect ratios, not pixel values —
+    /// see header note on the CLAUDE.md §2 escape hatch). These describe what
+    /// fraction of the iPhone outline's INNER area each video footprint
+    /// occupies, so the user reads each highlighted zone as "the video goes
+    /// HERE on this part of the screen" instead of as a full-band card.
+    ///
+    /// Large mode: two rectangles, full inner width, each ~37% of inner
+    /// height — leaves a ~26% gap in the middle (the gameplay area).
+    ///
+    /// Small mode: four rectangles, each ~32% × ~20% of inner area, pinned
+    /// to each corner with a small inset — the rest of the screen stays
+    /// empty (no full-band background).
+    private static let largeFootprintHeightRatio: CGFloat = 0.37
+    private static let smallFootprintWidthRatio:  CGFloat = 0.32
+    private static let smallFootprintHeightRatio: CGFloat = 0.20
+
+    /// Renders the appropriate set of footprint zones for the current size
+    /// inside the supplied inner-geometry size (after the outline's inner
+    /// padding has been applied by the GeometryReader's frame).
     @ViewBuilder
-    private func bandView(for half: VerticalHalf) -> some View {
-        switch size {
+    private func zoneFootprintLayer(in size: CGSize) -> some View {
+        switch self.size {
         case .large:
-            largeBand(for: half)
+            largeFootprints(in: size)
         case .small:
-            smallBand(for: half)
+            smallFootprints(in: size)
         }
     }
 
-    private func largeBand(for half: VerticalHalf) -> some View {
-        let location: VideoModeLocation = (half == .top) ? .largeTop : .largeBottom
-        return zoneButton(location: location) {
-            zoneLabel(location: location)
+    private func largeFootprints(in size: CGSize) -> some View {
+        let zoneHeight = size.height * Self.largeFootprintHeightRatio
+        return ZStack(alignment: .top) {
+            // Top footprint — anchored to outline top
+            zoneButton(location: .largeTop) {
+                zoneLabel(location: .largeTop)
+            }
+            .frame(width: size.width, height: zoneHeight)
+            .frame(maxHeight: .infinity, alignment: .top)
+
+            // Bottom footprint — anchored to outline bottom
+            zoneButton(location: .largeBottom) {
+                zoneLabel(location: .largeBottom)
+            }
+            .frame(width: size.width, height: zoneHeight)
+            .frame(maxHeight: .infinity, alignment: .bottom)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(width: size.width, height: size.height)
     }
 
-    private func smallBand(for half: VerticalHalf) -> some View {
-        let leftLocation: VideoModeLocation = (half == .top) ? .smallTopLeft : .smallBottomLeft
-        let rightLocation: VideoModeLocation = (half == .top) ? .smallTopRight : .smallBottomRight
-        return HStack(spacing: theme.spacing.m) {
-            zoneButton(location: leftLocation) {
-                zoneLabel(location: leftLocation)
+    private func smallFootprints(in size: CGSize) -> some View {
+        let zoneWidth  = size.width  * Self.smallFootprintWidthRatio
+        let zoneHeight = size.height * Self.smallFootprintHeightRatio
+        return ZStack {
+            // Top-left corner
+            zoneButton(location: .smallTopLeft) {
+                zoneLabel(location: .smallTopLeft)
             }
-            .frame(maxWidth: .infinity)
-            zoneButton(location: rightLocation) {
-                zoneLabel(location: rightLocation)
+            .frame(width: zoneWidth, height: zoneHeight)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+
+            // Top-right corner
+            zoneButton(location: .smallTopRight) {
+                zoneLabel(location: .smallTopRight)
             }
-            .frame(maxWidth: .infinity)
+            .frame(width: zoneWidth, height: zoneHeight)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+
+            // Bottom-left corner
+            zoneButton(location: .smallBottomLeft) {
+                zoneLabel(location: .smallBottomLeft)
+            }
+            .frame(width: zoneWidth, height: zoneHeight)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+
+            // Bottom-right corner
+            zoneButton(location: .smallBottomRight) {
+                zoneLabel(location: .smallBottomRight)
+            }
+            .frame(width: zoneWidth, height: zoneHeight)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(width: size.width, height: size.height)
     }
 
     // MARK: - iPhone outline frame
@@ -190,24 +248,27 @@ struct VideoLocationPickerView: View {
         @ViewBuilder label: () -> Label
     ) -> some View {
         let isSelected = (videoModeStore.location == location)
+        // Both selected and non-selected zones read as highlighted footprints
+        // (per the patch spec — "all four visible simultaneously as highlighted
+        // tap targets"). Selected = bolder fill + thicker accent stroke;
+        // non-selected = lighter fill + thin accent stroke so the empty space
+        // between zones still reads as the empty gameplay area.
         Button {
             videoModeStore.location = location
         } label: {
             ZStack {
-                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                    .fill(theme.colors.accentPrimary.opacity(0.15))
+                RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
+                    .fill(theme.colors.accentPrimary.opacity(isSelected ? 0.28 : 0.12))
                     .overlay(
-                        RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                        RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
                             .stroke(
-                                isSelected
-                                    ? theme.colors.accentPrimary
-                                    : theme.colors.border,
+                                theme.colors.accentPrimary.opacity(isSelected ? 1.0 : 0.45),
                                 lineWidth: isSelected ? 2 : 1
                             )
                     )
                 label()
             }
-            .contentShape(RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(location.localizedLabel))
@@ -220,10 +281,17 @@ struct VideoLocationPickerView: View {
     private func zoneLabel(location: VideoModeLocation) -> some View {
         let isSelected = (videoModeStore.location == location)
         if isSelected {
+            // Small zones are ~32%×20% of inner outline → ~64×92pt on the
+            // capped iPhone-outline width. Use caption + minimumScaleFactor so
+            // the "Your video will go here" copy fits without truncation, and
+            // allow up to 3 lines for the smaller footprint.
+            let isSmallZone = (self.size == .small)
             Text(String(localized: "videoMode.zoneFillLabel"))
-                .font(theme.typography.body.weight(.bold))
+                .font((isSmallZone ? theme.typography.caption : theme.typography.body).weight(.bold))
                 .foregroundStyle(theme.colors.textPrimary)
                 .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.6)
+                .lineLimit(isSmallZone ? 3 : 2)
                 .padding(theme.spacing.xs)
         }
     }
