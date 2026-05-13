@@ -969,6 +969,162 @@
     "Version" : {
 
     },
+    "videoMode.location.largeBottom" : {
+      "comment" : "Zone label — full-width band at bottom of screen",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Large bottom"
+          }
+        }
+      }
+    },
+    "videoMode.location.largeTop" : {
+      "comment" : "Zone label — full-width band at top of screen",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Large top"
+          }
+        }
+      }
+    },
+    "videoMode.location.smallBottomLeft" : {
+      "comment" : "Zone label — small PiP in bottom-left corner",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small bottom-left"
+          }
+        }
+      }
+    },
+    "videoMode.location.smallBottomRight" : {
+      "comment" : "Zone label — small PiP in bottom-right corner",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small bottom-right"
+          }
+        }
+      }
+    },
+    "videoMode.location.smallTopLeft" : {
+      "comment" : "Zone label — small PiP in top-left corner",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small top-left"
+          }
+        }
+      }
+    },
+    "videoMode.location.smallTopRight" : {
+      "comment" : "Zone label — small PiP in top-right corner",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small top-right"
+          }
+        }
+      }
+    },
+    "videoMode.locationRowTitle" : {
+      "comment" : "Settings NavigationLink row title with selected zone label interpolated",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video location: %@"
+          }
+        }
+      }
+    },
+    "videoMode.manualSelectionExplanation" : {
+      "comment" : "VIDEO-14 verbatim copy (D-10) — paragraph below the iPhone outline in VideoLocationPickerView",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick where your video is on screen — GameDrawer can't detect it automatically. Choose the zone closest to your video to keep the board and controls clear."
+          }
+        }
+      }
+    },
+    "videoMode.pickerContainerA11yLabel" : {
+      "comment" : "VoiceOver container label for the iPhone-outline picker (Claude's Discretion lock per CONTEXT line 138)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video location picker, choose where your video will appear"
+          }
+        }
+      }
+    },
+    "videoMode.pickerTitle" : {
+      "comment" : "Navigation title for VideoLocationPickerView",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video location"
+          }
+        }
+      }
+    },
+    "videoMode.sectionHeader" : {
+      "comment" : "Settings section header for the Video Mode card (matches APPEARANCE / FEEL / DATA / ABOUT casing)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VIDEO MODE"
+          }
+        }
+      }
+    },
+    "videoMode.toggleLabel" : {
+      "comment" : "Settings toggle row label (sentence case)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video Mode"
+          }
+        }
+      }
+    },
+    "videoMode.zoneFillLabel" : {
+      "comment" : "Label inside the currently-selected zone in VideoLocationPickerView (D-02)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your video will go here"
+          }
+        }
+      }
+    },
     "Win" : {
 
     },
