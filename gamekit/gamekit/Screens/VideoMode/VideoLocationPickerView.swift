@@ -11,15 +11,15 @@
 //    [ Large | Small ]   ← segmented size toggle
 //    ╭──────────────╮   ← iPhone outline (RoundedRectangle stroke,
 //    │ ┌──────────┐ │     theme.radii.sheet, ~9:19.5 aspect)
-//    │ │ video    │ │   ← Large-mode: top footprint (~37% height)
+//    │ │ video    │ │   ← Large-mode: top footprint (~28% height)
 //    │ └──────────┘ │
-//    │              │   ← empty gameplay gap (~26% height)
+//    │              │   ← empty gameplay gap (~44% height)
 //    │ ┌──────────┐ │
-//    │ │ video    │ │   ← Large-mode: bottom footprint (~37% height)
+//    │ │ video    │ │   ← Large-mode: bottom footprint (~28% height)
 //    │ └──────────┘ │
 //    ╰──────────────╯
 //
-//  In Small mode the outline shows four corner thumbnails (~32% × ~20% of
+//  In Small mode the outline shows four corner thumbnails (~32% × ~15% of
 //  the inner area) anchored to each corner — the small video docks to one
 //  of the four corners, with empty space everywhere else. Switching the
 //  toggle preserves the user's Top/Bottom vertical half so the change feels
@@ -134,15 +134,15 @@ struct VideoLocationPickerView: View {
     /// occupies, so the user reads each highlighted zone as "the video goes
     /// HERE on this part of the screen" instead of as a full-band card.
     ///
-    /// Large mode: two rectangles, full inner width, each ~37% of inner
-    /// height — leaves a ~26% gap in the middle (the gameplay area).
+    /// Large mode: two rectangles, full inner width, each ~28% of inner
+    /// height — leaves a ~44% gap in the middle (the gameplay area).
     ///
-    /// Small mode: four rectangles, each ~32% × ~20% of inner area, pinned
+    /// Small mode: four rectangles, each ~32% × ~15% of inner area, pinned
     /// to each corner with a small inset — the rest of the screen stays
     /// empty (no full-band background).
-    private static let largeFootprintHeightRatio: CGFloat = 0.37
+    private static let largeFootprintHeightRatio: CGFloat = 0.28
     private static let smallFootprintWidthRatio:  CGFloat = 0.32
-    private static let smallFootprintHeightRatio: CGFloat = 0.20
+    private static let smallFootprintHeightRatio: CGFloat = 0.15
 
     /// Renders the appropriate set of footprint zones for the current size
     /// inside the supplied inner-geometry size (after the outline's inner
@@ -281,7 +281,7 @@ struct VideoLocationPickerView: View {
     private func zoneLabel(location: VideoModeLocation) -> some View {
         let isSelected = (videoModeStore.location == location)
         if isSelected {
-            // Small zones are ~32%×20% of inner outline → ~64×92pt on the
+            // Small zones are ~32%×15% of inner outline → ~64×69pt on the
             // capped iPhone-outline width. Use caption + minimumScaleFactor so
             // the "Your video will go here" copy fits without truncation, and
             // allow up to 3 lines for the smaller footprint.
