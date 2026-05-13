@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: executing
+status: ready_to_plan
 stopped_at: "Completed 09-08-PLAN.md (Phase 9 close-out: SC5 contract test + v1.2 release log opened + theme audit signed off after 4-iteration picker gap closure on 09-07; all 5 ROADMAP SCs satisfied; VIDEO-01/02/03/04/14 complete). Phase 9 closed; Phase 10 (Layout Primitives, research-flagged) unblocked."
 last_updated: "2026-05-12T21:00:00.000Z"
 last_activity: 2026-05-12
 progress:
   total_phases: 14
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 63
   completed_plans: 60
-  percent: 95
+  percent: 71
 ---
 
 # Project State
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 09 (video-mode-foundation) — COMPLETE 2026-05-12
-Plan: 8 of 8 (Phase 9 closed)
-Status: Ready to plan Phase 10
-Last activity: 2026-05-12
+Phase: 10
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-05-13
 
 Progress: [█████████▌] 95%
 
@@ -52,7 +52,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 
 **Velocity:**
 
-- Total plans completed: 22
+- Total plans completed: 30
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -64,6 +64,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | 02 | 1 | 3 min | 3 min |
 | 05 | 7 | - | - |
 | 08 | 6 | - | - |
+| 09 | 8 | - | - |
 
 **Recent Trend:**
 
