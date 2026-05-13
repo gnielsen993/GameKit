@@ -29,7 +29,9 @@ Labels read verbatim from CONTEXT D-08. Each label maps to existing game state �
 
 ### Minesweeper
 
-`Back | Flags/mines | Reveal/Flag picker | Time | Settings`
+> **Supersedes 2026-05-13** (per `11-CONTEXT.md` D-05). Restart is the most-tapped in-flight action under stress and joins the compact row at slot 5 (rightmost). Slot 2 becomes a vertical-stack subview hosting both `MinesRemainingChip` (top) and `TimerChip` (bottom) so the 5-slot `VideoCompactControlRow` contract from Phase 9 D-12 is preserved unchanged. Slot 4 (Settings) opens `MinesweeperToolbarMenu` (difficulty change menu only) per D-08; global app Settings stays reachable from HomeView. Token anchors above are unchanged.
+
+`Back | [Mines⊥Time stacked chip] | Reveal/Flag picker | Settings | Restart`
 
 ### Merge
 
@@ -58,5 +60,5 @@ Full text in `.planning/phases/08-video-mode-design/08-CONTEXT.md` §Compact Con
 ## Consumed by
 
 - Phase 9 SC4 — `VideoCompactControlRow` component. The view reads `theme.radii.button` / `theme.spacing.xl` / `theme.spacing.s` / `theme.radii.chip` / `theme.spacing.l` directly; no derived constants, no hardcoded points.
-- Phase 11 — Minesweeper adoption uses the Minesweeper slot mapping (Back | Flags/mines | Reveal/Flag picker | Time | Settings).
+- Phase 11 — Minesweeper adoption uses the Minesweeper slot mapping (revised 2026-05-13 per `11-CONTEXT.md` D-05): `Back | [Mines⊥Time stacked chip] | Reveal/Flag picker | Settings | Restart`.
 - Phase 12 — Merge + Nonogram adoption use their respective slot mappings from §Per-Game Slot Mapping.
