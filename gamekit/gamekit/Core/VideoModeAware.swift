@@ -213,3 +213,117 @@ extension EnvironmentValues {
         set { self[VideoModeCompactnessKey.self] = newValue }
     }
 }
+
+// MARK: - #Preview matrix (CONTEXT D-16 — SC5 stub; 6 zones × Classic + Dracula = 12 tiles)
+//
+// SC5 (CLAUDE.md §8.12 theme legibility audit): manually inspect each tile in
+// Xcode canvas, confirm chips / picker / info text are legible on every preset,
+// confirm the reserved band appears on Large zones and not on Small zones.
+// Sign-off in 10-VERIFICATION.md.
+//
+// Per CONTEXT D-16 + P9 D-04 precedent: NO DEBUG screen, NO HomeView dev hook.
+// #Preview only — Phases 11/12 ship the real per-game adoption.
+
+#Preview("Classic — Large top") {
+    StubGame(zone: .largeTop, preset: .classicMuted)
+}
+
+#Preview("Classic — Large bottom") {
+    StubGame(zone: .largeBottom, preset: .classicMuted)
+}
+
+#Preview("Classic — Small TL") {
+    StubGame(zone: .smallTopLeft, preset: .classicMuted)
+}
+
+#Preview("Classic — Small TR") {
+    StubGame(zone: .smallTopRight, preset: .classicMuted)
+}
+
+#Preview("Classic — Small BL") {
+    StubGame(zone: .smallBottomLeft, preset: .classicMuted)
+}
+
+#Preview("Classic — Small BR") {
+    StubGame(zone: .smallBottomRight, preset: .classicMuted)
+}
+
+#Preview("Dracula — Large top") {
+    StubGame(zone: .largeTop, preset: .dracula)
+}
+
+#Preview("Dracula — Large bottom") {
+    StubGame(zone: .largeBottom, preset: .dracula)
+}
+
+#Preview("Dracula — Small TL") {
+    StubGame(zone: .smallTopLeft, preset: .dracula)
+}
+
+#Preview("Dracula — Small TR") {
+    StubGame(zone: .smallTopRight, preset: .dracula)
+}
+
+#Preview("Dracula — Small BL") {
+    StubGame(zone: .smallBottomLeft, preset: .dracula)
+}
+
+#Preview("Dracula — Small BR") {
+    StubGame(zone: .smallBottomRight, preset: .dracula)
+}
+
+// MARK: - Preview helpers (private — not exported, used only by #Preview blocks)
+
+private struct StubGame: View {
+    let zone: VideoModeLocation
+    let preset: ThemePreset
+    @State private var store: VideoModeStore
+
+    init(zone: VideoModeLocation, preset: ThemePreset) {
+        self.zone = zone
+        self.preset = preset
+        let store = VideoModeStore(
+            userDefaults: UserDefaults(suiteName: "preview-\(UUID().uuidString)")!
+        )
+        store.isEnabled = true
+        store.location = zone
+        _store = State(initialValue: store)
+    }
+
+    var body: some View {
+        let theme = Theme.resolve(preset: preset, scheme: .light)
+        StubGameContent(theme: theme)
+            .videoModeAware(minBoardHeight: 480)
+            .environment(\.videoModeStore, store)
+            .background(theme.colors.background)
+    }
+}
+
+private struct StubGameContent: View {
+    let theme: Theme
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Board placeholder — fills available space above the compact row.
+            // In real adoption (P11/P12), this is MinesweeperBoardView / etc.
+            Rectangle()
+                .fill(theme.colors.surface)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(
+                    Text("board placeholder")
+                        .foregroundStyle(theme.colors.textSecondary)
+                )
+
+            // Compact row at the bottom — uses the P9-shipped component
+            // (DO NOT MODIFY).
+            VideoCompactControlRow(
+                theme: theme,
+                onBack: {},
+                onSettings: {},
+                primaryInfo: { Text("primary").foregroundStyle(theme.colors.textPrimary) },
+                picker: { Text("picker").foregroundStyle(theme.colors.textPrimary) },
+                secondaryInfo: { Text("secondary").foregroundStyle(theme.colors.textPrimary) }
+            )
+        }
+    }
+}
