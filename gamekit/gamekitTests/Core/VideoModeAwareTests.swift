@@ -91,10 +91,21 @@ struct VideoModeAwareTests {
 
         let vc = UIHostingController(rootView: rootView)
         vc.view.frame = CGRect(x: 0, y: 0, width: 375, height: forcedHeight)
+
+        // 10-03 Rule-3 fix: SwiftUI's .onAppear does NOT fire on a UIHostingController
+        // whose view is not attached to a UIWindow. Attach to a transient off-screen
+        // window so onAppear fires and the env-capture probe actually captures the
+        // value the modifier publishes (rather than the env default).
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 375, height: forcedHeight))
+        window.rootViewController = vc
+        window.isHidden = false
         vc.view.setNeedsLayout()
         vc.view.layoutIfNeeded()
-        // SwiftUI may defer onAppear; force one runloop pass.
+        // SwiftUI may defer onAppear to next runloop tick.
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.05))
+        // Detach to release the window after capture.
+        window.isHidden = true
+        window.rootViewController = nil
 
         return captureBox.value ?? .normal
     }
