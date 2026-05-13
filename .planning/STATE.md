@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 11-02-PLAN.md
-last_updated: "2026-05-13T23:29:57.852Z"
+stopped_at: Completed 11-03-PLAN.md
+last_updated: "2026-05-13T23:44:03.311Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 75
-  completed_plans: 66
-  percent: 88
+  completed_plans: 67
+  percent: 89
 ---
 
 # Project State
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 11 (mines-adoption) — EXECUTING
-Plan: 3 of 8
+Plan: 4 of 8
 Next phase: 11 (mines-adoption)
 Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 89%
 
 **Next action:** Discuss Phase 11 (`/gsd-discuss-phase 11`) — Minesweeper adopts the layout primitives. Easy + Medium across all 6 PiP locations on Classic + one Loud preset. Hard 16×30 ships the strategy from `.planning/phases/08-video-mode-design/08-HARD-MINES-ADR.md` (smaller-cells / Variant 1) gated on `videoModeStore.isEnabled` inside `MinesweeperBoardView.Self.minCellSize`. Wraps `MinesweeperGameView` (NOT `MinesweeperBoardView`) at the outermost layer per CONTEXT D-15 untouched contract. A2 (NavigationStack height adjustment) is the open carry-forward from Plan 10-VERIFICATION.md.
 
@@ -129,6 +129,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 10-layout-primitives PP02 | 4 min | 1 task tasks | 1 file files |
 | Phase 11 P01 | 3 | 2 tasks | 3 files |
 | Phase 11-mines-adoption P02 | 3 | 2 tasks | 2 files |
+| Phase 11-mines-adoption P03 | 8 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -345,6 +346,9 @@ Recent decisions affecting current work:
 - Plan 11-01: Working names MinesRemainingChip + TimerChip locked (CONTEXT Discretion accepted); HeaderBar doc-comment trimmed so the file fits ≤ 40 lines (D-05 invariants now documented inside TimerChip).
 - 11-02: Easy-section supersession note covers Easy/Medium/Hard transitively via existing 'same slot order' backreferences; one note + one Easy-row update propagates the D-05 change without smearing four near-identical edits across three tables.
 - 11-02: Token Anchors table in 08-COMPACT-ROW-TOKENS.md left untouched per acceptance criterion — radii.button / spacing.xl / spacing.s / radii.chip / spacing.l remain Phase 9 D-13 locks and apply unchanged to the revised D-05 slot order.
+- Plan 11-03: split MinesweeperGameView into a sibling-file extension (MinesweeperGameView+VideoMode.swift) to stay under the CLAUDE.md §8.5 ≤500-line cap; dropped private modifier from properties consumed by the extension (Rule 3 deviation — Swift file-scoped private is incompatible with separate-file extensions).
+- Plan 11-03: Large-zone branch ships as a TODO-11-04 stub that hides the toolbar; Plan 11-04 fills in the VideoCompactControlRow composition per D-05 slot order.
+- Plan 11-03: SlotAnchor → ToolbarItemPlacement mapping is defensively exhaustive (6-case switch) — bottom anchors map to .bottomBar (forward-compat for future Small-zone refinements); inCompactRow/hidden map defensively to .topBarLeading (unreachable on Small zones today).
 
 ### Pending Todos
 
@@ -365,8 +369,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-13T23:29:57.846Z
-Stopped at: Completed 11-02-PLAN.md
+Last session: 2026-05-13T23:44:03.304Z
+Stopped at: Completed 11-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
