@@ -283,7 +283,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   5. With Video Mode Off (the default), Minesweeper / Merge / Nonogram render byte-identical to their pre-v1.2 layout — no visual residue from the new system on the off-path. Legibility check passes on Classic preset AND at least one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for the Settings screen's new Video Mode section.
 **Plans**: 8 plans
 - [x] 09-01-PLAN.md — Wave 0 TDD RED — 7 test files (14 @Test funcs) covering VIDEO-01..04 + VIDEO-14 + SC5 contract per 09-VALIDATION.md — completed 2026-05-12
-- [ ] 09-02-PLAN.md — Wave 1 — VideoModeLocation enum (6 cases per D-07) + VideoModeStore @Observable @MainActor class (verbatim SettingsStore mirror per D-05/D-06/D-03)
+- [x] 09-02-PLAN.md — Wave 1 — VideoModeLocation enum (6 cases per D-07) + VideoModeStore @Observable @MainActor class (verbatim SettingsStore mirror per D-05/D-06/D-03); EnvironmentKey extension also shipped here to unblock test-bundle compile (deviation — see 09-02-SUMMARY.md) — completed 2026-05-13
 - [ ] 09-03-PLAN.md — Wave 2 — VideoModeStore EnvironmentKey extension + GameKitApp.swift 5th-store injection (D-05 lock; closes VideoModeEnvironmentTests RED)
 - [ ] 09-04-PLAN.md — Wave 2 — 12 videoMode.* xcstring keys including VIDEO-14 verbatim copy (Pitfall 3 — one atomic edit, D-10)
 - [ ] 09-05-PLAN.md — Wave 2 — VideoCompactControlRow component (generic @ViewBuilder slots, Phase 8 D-13 tokens, 3-game #Preview = SC4)

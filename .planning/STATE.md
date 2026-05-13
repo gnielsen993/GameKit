@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: "Completed 09-01-PLAN.md (Wave 0 RED gate — 7 test files / 14 @Test funcs); next: 09-02 (Wave 1) ships VideoModeStore + VideoModeLocation production code to flip Task 1 tests GREEN"
-last_updated: "2026-05-13T00:48:19.864Z"
+stopped_at: "Completed 09-02-PLAN.md (VideoModeStore + VideoModeLocation foundation; 7 RED tests flipped GREEN). Next: 09-03 — GameKitApp scene-root environment injection (smaller scope now that EnvironmentKey shipped early)."
+last_updated: "2026-05-13T00:57:48.744Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 8
   total_plans: 63
-  completed_plans: 53
-  percent: 84
+  completed_plans: 54
+  percent: 86
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 09 (video-mode-foundation) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [████████░░] 84%
+Progress: [█████████░] 86%
 
 **Next action:** Plan Phase 9 (`/gsd-plan-phase 9`) — Video Mode Foundation (`VideoModeStore` + Settings UI toggle + 6-location picker + manual-selection copy + shared compact control row component). Phase 9 consumes `08-COMPACT-ROW-TOKENS.md` (SC4) and `VIDEO-MODE-LAYOUTS.md` 6-zone vocabulary (SC3) from the now-locked Phase 8 design corpus.
 
@@ -116,6 +116,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 08 P05 | continuation | 3 tasks (Task 1 + 2 prior agent; Task 3 this agent) | 5 files (4 sketches + 1 ADR) |
 | Phase 08 P06 | continuation | 3 tasks (1 audit + 1 checkpoint:human-verify + 1 doc author) | 2 files (08-DESIGN-LOCK.md + 08-06-SUMMARY.md) |
 | Phase 09-video-mode-foundation P01 | 17 | 2 tasks tasks | 7 files files |
+| Phase 09 P02 | 6 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -311,6 +312,7 @@ Recent decisions affecting current work:
 - 09-01: Wave 0 RED gate locked — 7 test files / 14 @Test funcs reference VideoModeStore + VideoModeLocation + EnvironmentValues.videoModeStore + videoMode.* xcstrings keys (all Wave 1-3 ships); xcodebuild test build fails on undefined-symbol as designed (CONTEXT D-15 + 09-PATTERNS.md §8)
 - 09-01: Per-file (not shared) makeIsolatedDefaults() helper across all 7 Wave-0 test files — Swift Testing parallel execution makes cross-file shared helpers risky (pattern propagated verbatim from SettingsStoreFlagsTests.swift:36-39)
 - 09-01: LocalizableCatalogTests uses Bundle.main → #filePath source-tree fallback to keep test runnable in RED state before Wave 2 plan 09-03 recompiles the xcstrings catalog with videoMode.* keys
+- 09-02: VideoModeStore + VideoModeLocation shipped. EnvironmentKey extension included in 09-02 (deviation from plan's 09-03 split) — the test bundle compile-gate required EnvironmentValues.videoModeStore symbol to exist. Plan 09-03 scope now narrows to GameKitApp scene-root .environment() injection + GameKitAppTests GREEN flip.
 
 ### Pending Todos
 
@@ -331,8 +333,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-13T00:48:19.858Z
-Stopped at: Completed 09-01-PLAN.md (Wave 0 RED gate — 7 test files / 14 @Test funcs); next: 09-02 (Wave 1) ships VideoModeStore + VideoModeLocation production code to flip Task 1 tests GREEN
+Last session: 2026-05-13T00:57:48.738Z
+Stopped at: Completed 09-02-PLAN.md (VideoModeStore + VideoModeLocation foundation; 7 RED tests flipped GREEN). Next: 09-03 — GameKitApp scene-root environment injection (smaller scope now that EnvironmentKey shipped early).
 Resume file: None
 
 **Planned Phase:** 8 (video-mode-design) — 6/6 plans complete — closed 2026-05-12. Next planning target: Phase 9 (video-mode-foundation).
