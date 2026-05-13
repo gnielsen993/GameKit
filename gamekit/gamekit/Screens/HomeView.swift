@@ -158,6 +158,7 @@ struct HomeView: View {
         switch route {
         case .minesweeper(let difficulty):
             MinesweeperGameView(initialDifficulty: difficulty)
+                .videoModeAware(minBoardHeight: 480)
         case .merge(let mode):
             MergeGameView(initialMode: mode)
         case .nonogram(let difficulty):
