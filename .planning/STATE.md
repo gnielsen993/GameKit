@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: executing
-stopped_at: Completed 10-03-PLAN.md
-last_updated: "2026-05-13T22:15:00.000Z"
+status: phase_complete
+stopped_at: Phase 10 complete (4/4 plans, 5/5 SCs PASS)
+last_updated: "2026-05-13T22:35:00.000Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 67
-  completed_plans: 63
-  percent: 94
+  completed_plans: 64
+  percent: 96
 ---
 
 # Project State
@@ -21,19 +21,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 10 — layout-primitives
+**Current focus:** Phase 11 — Minesweeper adoption (consumes `.videoModeAware(minBoardHeight:)` + `VideoModeSlotRouter.anchors(for:)` from Phase 10)
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 10 (layout-primitives) — EXECUTING
-Plan: 4 of 4
-Status: Ready to execute (10-04 closeout)
+Phase: 10 (layout-primitives) — COMPLETE (4/4 plans, 5/5 SCs PASS, 2026-05-13)
+Next phase: 11 (mines-adoption)
+Status: Ready to discuss / plan Phase 11
 Last activity: 2026-05-13
 
-Progress: [█████████▌] 94%
+Progress: [█████████▊] 96%
 
-**Next action:** Plan Phase 10 (`/gsd-plan-phase 10`) — Layout Primitives (small-PiP corner-avoidance + large-PiP reserved-band + Off-restore primitives, verified on a stub game screen). Phase 10 is research-flagged per ROADMAP §v1.2 Research Flags — the SwiftUI adoption surface choice (`@Environment` injection vs. `VideoModeContainer { ... }` view vs. `.videoModeAware()` modifier) deserves a focused spike before plan-writing. Phase 10 consumes `VideoModeStore` + `VideoCompactControlRow` from Phase 9.
+**Next action:** Discuss Phase 11 (`/gsd-discuss-phase 11`) — Minesweeper adopts the layout primitives. Easy + Medium across all 6 PiP locations on Classic + one Loud preset. Hard 16×30 ships the strategy from `.planning/phases/08-video-mode-design/08-HARD-MINES-ADR.md` (smaller-cells / Variant 1) gated on `videoModeStore.isEnabled` inside `MinesweeperBoardView.Self.minCellSize`. Wraps `MinesweeperGameView` (NOT `MinesweeperBoardView`) at the outermost layer per CONTEXT D-15 untouched contract. A2 (NavigationStack height adjustment) is the open carry-forward from Plan 10-VERIFICATION.md.
 
 ## v1.0 Carry-Over
 
