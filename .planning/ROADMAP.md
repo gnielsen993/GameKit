@@ -303,7 +303,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   4. The primitives are exposed as parameterless or environment-driven SwiftUI surfaces (e.g. `.videoModeAware()` modifier, `VideoModeContainer { ... }` view) that any game screen can adopt with minimal call-site code — adoption shape locked here so Phase 11 / 12 each become "wrap the existing game view" rather than "redesign the existing game view".
   5. Stub game screen legibility verified on Classic preset AND at least one Loud preset (Voltage or Dracula) across all 6 PiP locations per CLAUDE.md §8.12 — chip / picker / info text stays legible on every preset when controls are repositioned.
 **Plans**: 4 plans
-- [ ] 10-01-PLAN.md — Wave 0 RED gate: VideoModeAwareTests.swift (VIDEO-06 + VIDEO-13 SC3) + VideoModeSlotRouterTests.swift (VIDEO-05 — 24 anchor assertions)
+- [x] 10-01-PLAN.md — Wave 0 RED gate: VideoModeAwareTests.swift (VIDEO-06 + VIDEO-13 SC3) + VideoModeSlotRouterTests.swift (VIDEO-05 — 24 anchor assertions)
 - [ ] 10-02-PLAN.md — Wave 1 GREEN: VideoModeSlotRouter.swift pure helper (Foundation-only; 6-zone exhaustive switch; VIDEO-05)
 - [ ] 10-03-PLAN.md — Wave 1 GREEN: VideoModeAware.swift ViewModifier + extension + VideoModeCompactness enum + EnvironmentKey + 12-tile #Preview matrix (VIDEO-06 + VIDEO-13 + SC4 + SC5 surface)
 - [ ] 10-04-PLAN.md — Wave 2: SC5 visual audit checkpoint + 10-VERIFICATION.md sign-off + Docs/releases/v1.2.md Phase 10 entry

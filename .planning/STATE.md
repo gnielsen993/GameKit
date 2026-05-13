@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: planning
-stopped_at: Phase 10 context gathered
-last_updated: "2026-05-13T14:52:52.745Z"
+status: executing
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-05-13T16:15:57.914Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 14
   completed_phases: 9
   total_plans: 67
-  completed_plans: 60
-  percent: 90
+  completed_plans: 61
+  percent: 91
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 10 — layout-primitives (ready to plan)
+**Current focus:** Phase 10 — layout-primitives
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 10
-Plan: Not started
-Status: Ready to plan
+Phase: 10 (layout-primitives) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-05-13
 
-Progress: [█████████▌] 95%
+Progress: [█████████░] 91%
 
 **Next action:** Plan Phase 10 (`/gsd-plan-phase 10`) — Layout Primitives (small-PiP corner-avoidance + large-PiP reserved-band + Off-restore primitives, verified on a stub game screen). Phase 10 is research-flagged per ROADMAP §v1.2 Research Flags — the SwiftUI adoption surface choice (`@Environment` injection vs. `VideoModeContainer { ... }` view vs. `.videoModeAware()` modifier) deserves a focused spike before plan-writing. Phase 10 consumes `VideoModeStore` + `VideoCompactControlRow` from Phase 9.
 
@@ -124,6 +124,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 09-video-mode-foundation P06 | 2min | 1 task tasks | 1 file files |
 | Phase 09 P07 | 3 | 1 tasks | 1 files |
 | Phase 09-video-mode-foundation P08 | 45min | 3 tasks (SC5 contract + v1.2 release log + audit) | 2 files (SC5RegressionTests.swift + Docs/releases/v1.2.md) + 4 iter commits on 09-07 picker |
+| Phase 10-layout-primitives P01 | 4 min | 2 tasks tasks | 2 files files |
 
 ## Accumulated Context
 
@@ -334,6 +335,8 @@ Recent decisions affecting current work:
 - 09-08: In-phase gap closure pattern locked — when a §8.12 audit on a human-verify checkpoint surfaces UX issues scoped to the prior plan's single deliverable file (here: VideoLocationPickerView.swift + its tests + 3 additive xcstrings keys), route fix commits to the prior plan rather than spinning a new gap-closure plan. The iteration history is captured in the prior plan's SUMMARY's "Follow-ups" section AND in the closing plan's SUMMARY's "Issues Encountered"/"Deviations" section. Locked for future audit cycles.
 - 09-08: SC5 regression contract-test pattern established — when the to-be-verified surface (game-view reads of VideoModeStore) has not landed yet, the SC5 test is a CONTRACT test asserting the code-path invariant (default Off + zero game-view reads = byte-identical baseline by code-path analysis), with an inline TODO marker pointing to the snapshot-diff upgrade in the future plan (P11/P12 here). The test stays as the bottom guard once the snapshot harness lands.
 - 09-08: REQUIREMENTS.md table-sync rule locked — `requirements mark-complete` (or its manual equivalent) must update BOTH the `- [x]` canonical checkbox section AND the Status table in a single edit. The 09-08 close-out pass discovered the Status table had drifted "Pending" while checkboxes were already complete; future plan closes verify both surfaces.
+- 10-01: Wave 0 RED gate locked — VideoModeSlotRouter (24 anchor assertions) + VideoModeAware (off-state + 3 compactness levels) contracts committed before production source. 0.32 band fraction and 0.85x compactness floor scale are now test-source literals; Plans 10-02 + 10-03 must satisfy them to flip GREEN
+- 10-01: renderAndCapture probe pattern established — UIHostingController + Color.clear.onAppear writes into @MainActor CompactnessCaptureBox reference type. No ViewInspector SPM dep (RESEARCH §Example 1 recommendation 1). Replicable for any future @Environment(.foo) publication test
 
 ### Pending Todos
 
@@ -354,8 +357,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 10 context gathered
-Resume file: --resume-file
+Last session: 2026-05-13T16:15:50.634Z
+Stopped at: Completed 10-01-PLAN.md
+Resume file: None
 
 **Planned Phase:** 10 (Layout Primitives) — 4 plans — 2026-05-13T14:52:52.735Z
