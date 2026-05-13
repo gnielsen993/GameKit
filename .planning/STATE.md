@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: ready_to_plan
-stopped_at: Completed 08-06-design-lock-PLAN.md — Phase 8 complete; Phase 9 unblocked
-last_updated: "2026-05-12T23:45:00Z"
-last_activity: 2026-05-12
+status: executing
+stopped_at: "Completed 09-01-PLAN.md (Wave 0 RED gate — 7 test files / 14 @Test funcs); next: 09-02 (Wave 1) ships VideoModeStore + VideoModeLocation production code to flip Task 1 tests GREEN"
+last_updated: "2026-05-13T00:48:19.864Z"
+last_activity: 2026-05-13
 progress:
   total_phases: 14
-  completed_phases: 9
-  total_plans: 55
-  completed_plans: 52
-  percent: 64
+  completed_phases: 8
+  total_plans: 63
+  completed_plans: 53
+  percent: 84
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 09 — video-mode-foundation (ready to plan)
+**Current focus:** Phase 09 — video-mode-foundation
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 9
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-12
+Phase: 09 (video-mode-foundation) — EXECUTING
+Plan: 2 of 8
+Status: Ready to execute
+Last activity: 2026-05-13
 
-Progress: [█████████▌] 95%
+Progress: [████████░░] 84%
 
 **Next action:** Plan Phase 9 (`/gsd-plan-phase 9`) — Video Mode Foundation (`VideoModeStore` + Settings UI toggle + 6-location picker + manual-selection copy + shared compact control row component). Phase 9 consumes `08-COMPACT-ROW-TOKENS.md` (SC4) and `VIDEO-MODE-LAYOUTS.md` 6-zone vocabulary (SC3) from the now-locked Phase 8 design corpus.
 
@@ -115,6 +115,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 08 P04 | 8 | 2 tasks | 6 files |
 | Phase 08 P05 | continuation | 3 tasks (Task 1 + 2 prior agent; Task 3 this agent) | 5 files (4 sketches + 1 ADR) |
 | Phase 08 P06 | continuation | 3 tasks (1 audit + 1 checkpoint:human-verify + 1 doc author) | 2 files (08-DESIGN-LOCK.md + 08-06-SUMMARY.md) |
+| Phase 09-video-mode-foundation P01 | 17 | 2 tasks tasks | 7 files files |
 
 ## Accumulated Context
 
@@ -307,6 +308,9 @@ Recent decisions affecting current work:
 - Mines Hard strategy deferred to 08-HARD-MINES-ADR.md (Plan 08-05) — NO pre-decision per CONTEXT D-13
 - Canonical 4-corner Hard Dracula set chosen as evidence anchor for Small-PiP placement across all games
 - **Phase 8 / Plan 06 (2026-05-12):** Phase 8 design locked; Phase 9 unblocked. `08-DESIGN-LOCK.md` records Gabe's verbatim sign-off ("design locked") and indexes all 4 artifacts by SC (SC1→LAYOUTS, SC2→ADR, SC3→TOKENS, SC4→BANNER). SC5 confirmed: zero `gamekit/` files modified during the entire phase. 08-01 17-PNG set adopted as v1.2 design baseline; PNG-count audit relaxed `== 10` → `>= 10` per Rule 1 (deviation accepted upstream in 08-01). v1.2 milestone progress 0/6 → 1/6 phases complete.
+- 09-01: Wave 0 RED gate locked — 7 test files / 14 @Test funcs reference VideoModeStore + VideoModeLocation + EnvironmentValues.videoModeStore + videoMode.* xcstrings keys (all Wave 1-3 ships); xcodebuild test build fails on undefined-symbol as designed (CONTEXT D-15 + 09-PATTERNS.md §8)
+- 09-01: Per-file (not shared) makeIsolatedDefaults() helper across all 7 Wave-0 test files — Swift Testing parallel execution makes cross-file shared helpers risky (pattern propagated verbatim from SettingsStoreFlagsTests.swift:36-39)
+- 09-01: LocalizableCatalogTests uses Bundle.main → #filePath source-tree fallback to keep test runnable in RED state before Wave 2 plan 09-03 recompiles the xcstrings catalog with videoMode.* keys
 
 ### Pending Todos
 
@@ -327,8 +331,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-12T23:45:00Z
-Stopped at: Completed 08-06-design-lock-PLAN.md — Phase 8 closed; v1.2 milestone 1/6 phases complete
+Last session: 2026-05-13T00:48:19.858Z
+Stopped at: Completed 09-01-PLAN.md (Wave 0 RED gate — 7 test files / 14 @Test funcs); next: 09-02 (Wave 1) ships VideoModeStore + VideoModeLocation production code to flip Task 1 tests GREEN
 Resume file: None
 
 **Planned Phase:** 8 (video-mode-design) — 6/6 plans complete — closed 2026-05-12. Next planning target: Phase 9 (video-mode-foundation).
