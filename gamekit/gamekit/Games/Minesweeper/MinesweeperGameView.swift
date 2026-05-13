@@ -84,13 +84,13 @@ struct MinesweeperGameView: View {
     }
 
     var body: some View {
-        // P11 D-01/D-02 (Plan 11-03): three-way layout branch.
+        // P11 D-01/D-02 (Plan 11-03 + 11-04): three-way layout branch.
         // - Off-path: render existingLayout + v1.0 toolbar (SC5 byte-identical).
-        // - Large-zone: render existingLayout with toolbar hidden (D-09).
-        //   TODO 11-04: render VideoCompactControlRow here per D-05 slot order
-        //   (Back | [Mines⊥Time stacked chip] | Reveal/Flag picker |
-        //    Settings | Restart) ABOVE existingLayout and hide HeaderBar +
-        //   ModePill (D-01). The compact-row composition lands in Plan 11-04.
+        // - Large-zone (D-01/D-05/D-06/D-08/D-18): render `largeZoneLayout`
+        //   with toolbar hidden (D-09). HeaderBar + ModePill from the off-path
+        //   are NOT rendered — both roles migrate into VideoCompactControlRow
+        //   (HeaderBar's chips → slot 2 stack; ModePill → slot 3). Compactness
+        //   reactions per D-18 happen inside `compactRowComposed`.
         // - Small-zone: render existingLayout with toolbar items repositioned
         //   per VideoModeSlotRouter.anchors(for:) (D-02). No compact-row swap,
         //   no HeaderBar/ModePill hiding.
@@ -99,7 +99,7 @@ struct MinesweeperGameView: View {
                 existingLayout
                     .toolbar { existingToolbarContent }
             } else if videoModeStore.location.isLarge {
-                existingLayout
+                largeZoneLayout
                     .toolbar(.hidden, for: .navigationBar)
             } else {
                 existingLayout

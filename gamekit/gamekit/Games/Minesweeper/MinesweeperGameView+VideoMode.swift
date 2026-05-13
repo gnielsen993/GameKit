@@ -242,4 +242,226 @@ extension MinesweeperGameView {
              .hidden:            return .topBarLeading      // defensive — unreachable on Small zones
         }
     }
+
+    // MARK: - Plan 11-04 — Large-zone layout (D-01/D-05/D-06/D-08/D-18)
+
+    /// D-01/D-05/D-06/D-08/D-18 — Large-zone branch view tree. HeaderBar +
+    /// ModePill are NOT rendered (D-01); they migrate into the compact row.
+    /// The compact row sits at the edge OPPOSITE the reserved video band:
+    /// `.largeTop` (band reserved at top) → row at bottom; `.largeBottom`
+    /// (band reserved at bottom) → row at top. The `.videoModeAware` modifier
+    /// already reserves the band via `.safeAreaInset(.top/.bottom)`; this
+    /// view places the compact row at the OTHER edge via VStack ordering.
+    ///
+    /// Animation surfaces (win-sweep wash + confetti + end-state overlay)
+    /// are preserved verbatim from `existingLayout` so Phase 5 D-02 / D-03
+    /// behavior carries through unchanged.
+    @ViewBuilder
+    var largeZoneLayout: some View {
+        ZStack {
+            theme.colors.background
+                .ignoresSafeArea()
+
+            // Board column — VStack hugs the compact row to one edge and
+            // lets the board fill the rest. `.largeTop` (band on top) → row
+            // at bottom; `.largeBottom` (band on bottom) → row at top.
+            VStack(spacing: theme.spacing.m) {
+                if videoModeStore.location == .largeBottom {
+                    compactRowComposed
+                }
+
+                // Board ZStack with Phase 5 D-03 loss-shake surface preserved
+                // verbatim. HeaderBar + ModePill are NOT rendered here per
+                // D-01 — the compact row hosts those roles.
+                MinesweeperBoardView(
+                    theme: theme,
+                    board: viewModel.board,
+                    gameState: viewModel.gameState,
+                    phase: viewModel.phase,
+                    hapticsEnabled: settingsStore.hapticsEnabled,
+                    reduceMotion: reduceMotion,
+                    revealCount: viewModel.revealCount,
+                    flagToggleCount: viewModel.flagToggleCount,
+                    lossMinesRevealed: lossMinesRevealed,
+                    lossWrongFlagsPopped: lossWrongFlagsPopped,
+                    lossTripIdx: tripCellIndex,
+                    onTap: { viewModel.handleTap(at: $0) },
+                    onLongPress: { viewModel.handleLongPress(at: $0) }
+                )
+                .keyframeAnimator(
+                    initialValue: 0.0,
+                    trigger: reduceMotion ? false : viewModel.phase.isLossShake
+                ) { content, value in
+                    content.offset(x: value)
+                } keyframes: { _ in
+                    LinearKeyframe(8.0, duration: 0.1)
+                    LinearKeyframe(-8.0, duration: 0.1)
+                    LinearKeyframe(4.0, duration: 0.1)
+                    LinearKeyframe(0.0, duration: 0.1)
+                }
+
+                if videoModeStore.location == .largeTop {
+                    compactRowComposed
+                }
+            }
+
+            // P5 D-02 win-sweep wash — preserved verbatim from existingLayout.
+            // Sits ABOVE the board cells but BELOW the end-state card so the
+            // wash doesn't block taps (.allowsHitTesting(false) also enforces).
+            Rectangle()
+                .fill(theme.colors.success)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+                .phaseAnimator(
+                    reduceMotion ? [0.0] : [0.0, 0.25, 0.0],
+                    trigger: viewModel.phase == .winSweep
+                ) { content, alpha in
+                    content.opacity(alpha)
+                } animation: { _ in
+                    .easeInOut(duration: theme.motion.slow)
+                }
+
+            // Confetti — fires on win for a beat before the end card lands.
+            // Same gate as existingLayout (showConfetti @State on the host
+            // struct, flipped by runWinChoreography in MinesweeperGameView).
+            if showConfetti {
+                ConfettiView(theme: theme)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
+            }
+
+            // End-state overlay — same gate as existingLayout so the loss
+            // cascade / win confetti finish their pre-roll first.
+            if let outcome = viewModel.terminalOutcome, endCardVisible {
+                endStateOverlay(outcome: outcome)
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+            }
+        }
+    }
+
+    /// D-05/D-06/D-07/D-08/D-18 — the actual compact-row composition.
+    /// Preserves Phase 9 D-12 5-slot contract (`VideoCompactControlRow.swift`
+    /// is byte-identical, see plan acceptance criteria); slot 2 hosts a
+    /// VStack stack (Mines remaining on top, Time below per D-06); slot 3
+    /// hosts MinesweeperModePill (Reveal/Flag, D-05 slot 3); the
+    /// `secondaryInfo` closure of the component hosts BOTH slot 4 (Settings
+    /// menu via MinesweeperToolbarMenu, D-08) AND slot 5 (Restart button,
+    /// rightmost per D-05). The component's `onSettings` closure is unused
+    /// — slot 4 lives in secondaryInfo per the ad-hoc Mines slot-5 pattern
+    /// described in the plan body.
+    @ViewBuilder
+    var compactRowComposed: some View {
+        VideoCompactControlRow(
+            theme: theme,
+            onBack: { dismiss() },
+            onSettings: { /* unused — slot 4 lives in secondaryInfo per D-05+D-08 ad-hoc */ }
+        ) {
+            // Slot 2 — stacked chip (D-06). VStack hosts Mines/Time;
+            // D-18 .reducedTime drops the TimerChip half.
+            VStack(spacing: theme.spacing.xs) {
+                MinesRemainingChip(theme: theme, minesRemaining: viewModel.minesRemaining)
+                if videoModeCompactness != .reducedTime {
+                    TimerChip(
+                        theme: theme,
+                        timerAnchor: viewModel.timerAnchor,
+                        pausedElapsed: viewModel.pausedElapsed
+                    )
+                }
+            }
+        } picker: {
+            // Slot 3 — Reveal/Flag mode pill (D-05 slot 3; reused verbatim
+            // from off-path so the VM closure is identical).
+            MinesweeperModePill(
+                theme: theme,
+                mode: viewModel.interactionMode,
+                onSelect: { viewModel.setInteractionMode($0) }
+            )
+        } secondaryInfo: {
+            // Slots 4 + 5 composite per D-05 + D-18.
+            // .normal:            Menu (slot 4) + Restart (slot 5) side-by-side.
+            // .collapsedSettings: Slot 4 folds into slot 5 — Restart hosts a
+            //                     primary-action Menu (tap = restart, menu =
+            //                     Change-difficulty list).
+            // .reducedTime:       Same as .normal at slots 4/5; the reduction
+            //                     happens at slot 2 above.
+            HStack(spacing: theme.spacing.s) {
+                if videoModeCompactness == .collapsedSettings {
+                    restartWithOverflowMenu
+                } else {
+                    MinesweeperToolbarMenu(
+                        theme: theme,
+                        currentDifficulty: viewModel.difficulty,
+                        onSelect: { viewModel.requestDifficultyChange($0) }
+                    )
+                    compactRestartButton
+                }
+            }
+        }
+    }
+
+    /// D-05 slot 5 — Restart button sized to match the compact row's
+    /// backButton / settingsButton chrome (`theme.spacing.xl` square +
+    /// `theme.radii.button` corner + `theme.colors.surface` background).
+    /// Distinct from the toolbar `restartButton` shape (44×44 chevron
+    /// styling) because the compact row uses a tighter visual rhythm.
+    @ViewBuilder
+    var compactRestartButton: some View {
+        Button {
+            viewModel.restart()
+        } label: {
+            Image(systemName: "arrow.counterclockwise")
+                .foregroundStyle(theme.colors.textPrimary)
+                .frame(width: theme.spacing.xl, height: theme.spacing.xl)
+                .background(theme.colors.surface)
+                .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
+        }
+        .accessibilityLabel(Text(String(localized: "Restart game")))
+    }
+
+    /// D-18 `.collapsedSettings` — Settings (slot 4) folds into Restart
+    /// (slot 5) as a primary-action Menu. Tap = restart (common case);
+    /// long-press / chevron tap surfaces Change-difficulty. The menu list
+    /// shape (radio-style checkmark on current difficulty) mirrors
+    /// `MinesweeperToolbarMenu` so VoiceOver navigation feels identical.
+    @ViewBuilder
+    var restartWithOverflowMenu: some View {
+        Menu {
+            Section(String(localized: "Change difficulty")) {
+                ForEach(MinesweeperDifficulty.allCases, id: \.self) { difficulty in
+                    Button {
+                        viewModel.requestDifficultyChange(difficulty)
+                    } label: {
+                        if difficulty == viewModel.difficulty {
+                            Label(difficultyLabel(difficulty), systemImage: "checkmark")
+                        } else {
+                            Text(difficultyLabel(difficulty))
+                        }
+                    }
+                }
+            }
+        } label: {
+            Image(systemName: "arrow.counterclockwise")
+                .foregroundStyle(theme.colors.textPrimary)
+                .frame(width: theme.spacing.xl, height: theme.spacing.xl)
+                .background(theme.colors.surface)
+                .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
+        } primaryAction: {
+            viewModel.restart()
+        }
+        .accessibilityLabel(Text(String(localized: "Restart game")))
+    }
+
+    /// Difficulty display-name mapping (engine D-03 — view layer owns
+    /// localization). Duplicated from `MinesweeperToolbarMenu.displayName`
+    /// because that function is `private` to the menu component; the strings
+    /// themselves ("Easy"/"Medium"/"Hard") are already in
+    /// `Localizable.xcstrings` from Phase 3 onward.
+    private func difficultyLabel(_ d: MinesweeperDifficulty) -> String {
+        switch d {
+        case .easy:   return String(localized: "Easy")
+        case .medium: return String(localized: "Medium")
+        case .hard:   return String(localized: "Hard")
+        }
+    }
 }
