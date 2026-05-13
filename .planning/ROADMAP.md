@@ -1,7 +1,7 @@
 # Roadmap: GameKit
 
 **Created:** 2026-04-24
-**Last updated:** 2026-05-13 (Phase 10 layout primitives closed — v1.2 progress 3/6 phases complete)
+**Last updated:** 2026-05-13 (Phase 11 planned — 8 plans; v1.2 progress 3/6 phases complete, P11 planning ready to execute)
 **Granularity:** standard (5–8 phases, 3–5 plans each)
 **Coverage:** v1.0 — 38/38 requirements mapped ✓ · v1.2 — 14/14 requirements mapped ✓
 
@@ -319,7 +319,15 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   3. Hard Minesweeper Video Mode is validated against Gabe's real screenshots (the same screenshots that drove the Phase 8 ADR) — final render parity confirmed for at least Large-top, Large-bottom, and one Small location.
   4. Legibility regression check passes on Classic preset AND one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for Easy, Medium, AND Hard play state — mines / flags / adjacency numbers stay readable across all 6 PiP locations on both presets.
   5. Video Mode Off restores the v1.0 / v1.0.6.1 Minesweeper layout byte-identical — pinch-zoom (A11Y-05), Reveal/Flag interaction-mode toggle (MINES-12), and the existing animation pass (MINES-08) all behave unchanged with the toggle Off (VIDEO-13 spot-check on Minesweeper).
-**Plans**: TBD
+**Plans**: 8 plans
+- [ ] 11-01-PLAN.md — Chip extraction: MinesRemainingChip + TimerChip from MinesweeperHeaderBar (CONTEXT D-03)
+- [ ] 11-02-PLAN.md — Doc supersession: VIDEO-MODE-LAYOUTS.md + 08-COMPACT-ROW-TOKENS.md Mines slot rows updated to D-05 revised order
+- [ ] 11-03-PLAN.md — Wrap site + three-way layout branch: HomeView `.videoModeAware(minBoardHeight: 480)` + MinesweeperGameView off/Large/Small branch + VideoModeLocation.isLarge (CONTEXT D-01/D-02/D-04/D-09)
+- [ ] 11-04-PLAN.md — Large-zone compact-row composition: VideoCompactControlRow with D-05 slot order + slot-2 stacked chip + D-18 compactness reactions (CONTEXT D-05/D-06/D-07/D-08/D-18)
+- [ ] 11-05-PLAN.md — Hard cell-size floor: MinesweeperBoardView.minCellSizeVideoMode locked by audit on Dracula + Voltage; D-12 single-gate; D-17 byte-identical gesture stack preserved (CONTEXT D-10/D-11/D-12/D-17; 08-HARD-MINES-ADR.md)
+- [ ] 11-06-PLAN.md — A2 NavigationStack safeArea measurement + adjustment (empirical; CONTEXT D-16; 10-VERIFICATION.md carry-forward)
+- [ ] 11-07-PLAN.md — Author 11-VIDEO-MANUAL-CHECK.md 18-row matrix (3 difficulties × 6 zones) for SC1 + SC3 verification (CONTEXT D-13/D-14/D-15)
+- [ ] 11-08-PLAN.md — SC4 legibility audit (Classic + Loud × E/M/H × 6 zones) + SC5 Off-restore spot-check + release-log append per CLAUDE.md §8.12 + §8.14
 **UI hint**: yes
 
 ### Phase 12: Merge + Nonogram Adoption
@@ -357,8 +365,8 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 |-------|----------------|--------|-----------|
 | 8. Video Mode Design | 6/6 | Complete | 2026-05-12 |
 | 9. Video Mode Foundation | 8/8 | Complete | 2026-05-12 |
-| 10. Layout Primitives | 0/4 | Planned | - |
-| 11. Minesweeper Adoption | 0/TBD | Not started | - |
+| 10. Layout Primitives | 4/4 | Complete | 2026-05-13 |
+| 11. Minesweeper Adoption | 0/8 | Planned | - |
 | 12. Merge + Nonogram Adoption | 0/TBD | Not started | - |
 | 13. Win/Loss Banner + A11y Gating | 0/TBD | Not started | - |
 
