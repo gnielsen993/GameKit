@@ -3,7 +3,9 @@
 //  gamekit
 //
 //  Two-segment pill flipper for winMode / infinite. Props-only. Mirrors
-//  MinesweeperModePill at MinesweeperModePill.swift:12 in structure.
+//  MinesweeperModePill at MinesweeperModePill.swift:12 in structure +
+//  compact-variant API (P11-04 round 2 polish 2026-05-13; carried to P12
+//  per CONTEXT D-12-CHIPS).
 //
 
 import SwiftUI
@@ -13,6 +15,15 @@ struct MergeModePill: View {
     let theme: Theme
     let mode: MergeMode
     let onSelect: (MergeMode) -> Void
+    /// Compact variant for Video Mode slot 3 (P12 D-12-CHIPS mirror of
+    /// MinesweeperModePill compact API). When `true`, drops one Dynamic
+    /// Type step (body instead of headline), reduces horizontal segment
+    /// padding (s instead of l), and constrains Text via `.lineLimit(1)`
+    /// + `.minimumScaleFactor(0.7)` so both "Win" + "Infinite" labels
+    /// survive without truncating in the narrow center-anchored slot.
+    /// Off-path callers (existingLayout) leave this defaulted to `false`
+    /// and get the v1.1 pill byte-identical (D-12-OFFRESTORE).
+    var compact: Bool = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -36,14 +47,16 @@ struct MergeModePill: View {
         } label: {
             HStack(spacing: theme.spacing.xs) {
                 Image(systemName: glyph)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: compact ? 13 : 16, weight: .semibold))
                 Text(label)
-                    .font(theme.typography.headline)
+                    .font(compact ? theme.typography.body : theme.typography.headline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(compact ? 0.7 : 1.0)
             }
             .foregroundStyle(isActive ? theme.colors.background : theme.colors.textPrimary)
-            .padding(.horizontal, theme.spacing.l)
-            .padding(.vertical, theme.spacing.s)
-            .frame(minHeight: 44)
+            .padding(.horizontal, compact ? theme.spacing.s : theme.spacing.l)
+            .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
+            .frame(minHeight: compact ? theme.spacing.l : 44)
             .background(
                 Capsule().fill(isActive ? theme.colors.accentPrimary : Color.clear)
             )
