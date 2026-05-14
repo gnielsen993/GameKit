@@ -161,6 +161,7 @@ struct HomeView: View {
                 .videoModeAware(minBoardHeight: 480)
         case .merge(let mode):
             MergeGameView(initialMode: mode)
+                .videoModeAware(minBoardHeight: 480)
         case .nonogram(let difficulty):
             NonogramGameView(initialDifficulty: difficulty)
         }
