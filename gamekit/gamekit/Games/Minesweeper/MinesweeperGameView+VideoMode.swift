@@ -383,12 +383,17 @@ extension MinesweeperGameView {
                 }
             }
         } picker: {
-            // Slot 3 — Reveal/Flag mode pill (D-05 slot 3; reused verbatim
-            // from off-path so the VM closure is identical).
+            // Slot 3 — Reveal/Flag mode pill (D-05 slot 3). `compact: true`
+            // shrinks the pill (smaller text + tighter padding + minHeight
+            // dropped from 44pt to `theme.spacing.l`) and forces
+            // `.lineLimit(1) + .minimumScaleFactor(0.7)` so both "Reveal"
+            // and "Flag" labels render without truncating to "I" / "F" —
+            // user feedback 2026-05-13 — see memory: feedback-video-mode-compact-row.
             MinesweeperModePill(
                 theme: theme,
                 mode: viewModel.interactionMode,
-                onSelect: { viewModel.setInteractionMode($0) }
+                onSelect: { viewModel.setInteractionMode($0) },
+                compact: true
             )
         } secondaryInfo: {
             // Slot 4+5 composite — ALWAYS-COLLAPSED on Large zones.
