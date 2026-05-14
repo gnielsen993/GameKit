@@ -324,7 +324,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 - [ ] 11-02-PLAN.md — Doc supersession: VIDEO-MODE-LAYOUTS.md + 08-COMPACT-ROW-TOKENS.md Mines slot rows updated to D-05 revised order
 - [x] 11-03-PLAN.md — Wrap site + three-way layout branch: HomeView `.videoModeAware(minBoardHeight: 480)` + MinesweeperGameView off/Large/Small branch + VideoModeLocation.isLarge (CONTEXT D-01/D-02/D-04/D-09)
 - [ ] 11-04-PLAN.md — Large-zone compact-row composition: VideoCompactControlRow with D-05 slot order + slot-2 stacked chip + D-18 compactness reactions (CONTEXT D-05/D-06/D-07/D-08/D-18)
-- [ ] 11-05-PLAN.md — Hard cell-size floor: MinesweeperBoardView.minCellSizeVideoMode locked by audit on Dracula + Voltage; D-12 single-gate; D-17 byte-identical gesture stack preserved (CONTEXT D-10/D-11/D-12/D-17; 08-HARD-MINES-ADR.md)
+- [x] 11-05-PLAN.md — Hard cell-size floor: MinesweeperBoardView.minCellSizeVideoMode locked by audit on Dracula + Voltage; D-12 single-gate; D-17 byte-identical gesture stack preserved (CONTEXT D-10/D-11/D-12/D-17; 08-HARD-MINES-ADR.md)
 - [ ] 11-06-PLAN.md — A2 NavigationStack safeArea measurement + adjustment (empirical; CONTEXT D-16; 10-VERIFICATION.md carry-forward)
 - [ ] 11-07-PLAN.md — Author 11-VIDEO-MANUAL-CHECK.md 18-row matrix (3 difficulties × 6 zones) for SC1 + SC3 verification (CONTEXT D-13/D-14/D-15)
 - [ ] 11-08-PLAN.md — SC4 legibility audit (Classic + Loud × E/M/H × 6 zones) + SC5 Off-restore spot-check + release-log append per CLAUDE.md §8.12 + §8.14

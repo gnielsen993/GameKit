@@ -126,7 +126,8 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 
 - [x] **VIDEO-07
 **: Minesweeper adopts Video Mode for Easy + Medium across all 6 locations with no legibility regression on Classic or one Loud preset
-- [ ] **VIDEO-08**: Minesweeper Hard (16×30) Video Mode strategy validated against real screenshots — final approach (smaller cells / scroll / zoom / warning) chosen with rationale recorded in ADR
+- [x] **VIDEO-08
+**: Minesweeper Hard (16×30) Video Mode strategy validated against real screenshots — final approach (smaller cells / scroll / zoom / warning) chosen with rationale recorded in ADR
 - [ ] **VIDEO-09**: Merge adopts Video Mode across all 6 locations with no legibility regression on Classic + one Loud preset
 - [ ] **VIDEO-10**: Nonogram adopts Video Mode across all 6 locations; hints + grid stay readable in Large-top and Large-bottom layouts
 
