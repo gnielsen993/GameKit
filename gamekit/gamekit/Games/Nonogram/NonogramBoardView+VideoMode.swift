@@ -40,10 +40,7 @@ extension NonogramBoardView {
     /// Rollback condition (mirror of P11-05 ADR §Rollback): if hint
     /// legibility fails §8.12 audit at every candidate floor, fall back
     /// to existingLayout on Large zones (instead of dropping the floor).
-    ///
-    /// TODO 12-05 audit: replace placeholder with the locked value before
-    /// the human-verify checkpoint (Task 2) closes.
-    static let minCellSizeVideoMode: CGFloat = 12   // PLACEHOLDER — locked at Task 2
+    static let minCellSizeVideoMode: CGFloat = 12   // Locked 2026-05-13; audit passed on Dracula + Voltage at 12pt (Large-zone worst-case only; Small zones inherit the same single-gate floor per D-NG-15 — full Small-zone matrix audit deferred to Plan 12-06 manual-check doc)
 
     /// Returns the appropriate floor for the current Video Mode state.
     /// Off → minCellSize (v1.0 = 14). On → minCellSizeVideoMode.
