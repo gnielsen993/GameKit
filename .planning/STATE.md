@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: unknown
-stopped_at: Completed 12-04-PLAN.md
-last_updated: "2026-05-14T03:59:22.735Z"
+stopped_at: Completed 12-05-PLAN.md
+last_updated: "2026-05-14T04:10:00.000Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 14
   completed_phases: 11
   total_plans: 81
-  completed_plans: 76
-  percent: 94
+  completed_plans: 77
+  percent: 95
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 12 (merge-nonogram-adoption) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Next action: `/gsd-execute-phase 12`
 Last activity: 2026-05-14
 
-Progress: [█████████░] 94%
+Progress: [█████████░] 95%
 
 **Next action:** `/gsd-execute-phase 12` — drives 6 plans across 5 waves: Merge chip extract + TimerChip MOVE → Merge wrap+branch+compose → Nonogram chip extract → Nonogram wrap+branch+compose → Nonogram cell-size floor audit (checkpoint) → Phase close + 24-row manual matrix + v1.2 release log (checkpoint). Inherits the locked Phase 11 Mines compact-row pattern verbatim (symmetric two-chip, center-anchored picker, no gear, always-collapsed menu). VIDEO-09 + VIDEO-10 covered.
 
@@ -136,6 +136,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 12 P02 | 404 | 4 tasks | 4 files |
 | Phase 12 P03 | 251 | 2 tasks | 3 files |
 | Phase 12 P04 | 261 | 4 tasks | 4 files |
+| Phase 12 P05 | 360 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -370,6 +371,9 @@ Recent decisions affecting current work:
 - 12-03: NonogramBoardView SHA fa6c2c0 unchanged across plan; D-NG-17 untouched contract preserved (floor seam deferred to 12-05)
 - D-NG-17 proven: NonogramBoardView.swift SHA fa6c2c0... byte-identical from plan start to plan end across Plan 12-04 (commits 77e02bd→a327935). Slide gesture / super-cell rules / hint geometry / fill+X-mark rendering all bit-for-bit unchanged. Plan 12-05 will modify BoardView for the first time in Phase 12 on this known-clean baseline.
 - D-NG-01 shipped verbatim: Slot 1 backButton + onBack closure / Slot 2 single-slot Size↔Lives swap on viewModel.gameMode == .lives (NOT a stacked composite — D-06 stays superseded) / Slot 3 NonogramModePill(compact:true) center-anchored / Slot 4+5 HStack(VideoModeTimerChip(compact:true) gated on != .reducedTime + restartWithOverflowMenu folding Change-size+Change-mode 2-section menu) / Slot 6 onSettings:nil (Fill/Mark picker covers settings).
+- Plan 12-05: minCellSizeVideoMode locked at 12pt after §8.12 audit on Dracula + Voltage @ Hard 15×15 largeBottom (worst-case zone). D-NG-15 single-gate held (0 grep matches for location.isLarge / difficulty conditioning); D-NG-17 byte-identity proven vs git HEAD~2 (gesture/geometry/drag-state grep counts unchanged: 4 / 22 / 42). D-NG-15 rollback NOT fired. Off-path returns 14pt verbatim (SC4 preserved).
+- Plan 12-05: Sibling-extension split mandatory (Option B). NonogramBoardView pre-plan was 512 LOC — already 12 LOC past §8.5's 500-line cap (pre-existing drift). Static constants + helper extracted to NonogramBoardView+VideoMode.swift (55 lines); host growth limited to +6 LOC (env read + access promotion comment + computeLayout call-site update). minCellSize access promoted from private → internal so the extension can read it (literal `14` byte-identical). Pre-existing 12-LOC over-cap drift on host remains as a deferred item.
+- Plan 12-05: §8.12 audit screenshots NOT persisted to disk — auditor evaluated on running simulator and confirmed pass; Plan 12-06's manual-check doc will capture the final-render parity matrix including the locked Hard rows.
 
 ### Pending Todos
 
@@ -390,8 +394,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T03:59:14.666Z
-Stopped at: Completed 12-04-PLAN.md
+Last session: 2026-05-14T04:10:00.000Z
+Stopped at: Completed 12-05-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
