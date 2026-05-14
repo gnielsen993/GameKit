@@ -16,14 +16,16 @@
 //    - End-state overlay sits in a ZStack with a backdrop dim — NOT a sheet
 //      (mirrors MinesweeperGameView D-02 / no tap-to-dismiss)
 //
-//  Phase 12 Plan 12-02 (D-MG-01 + D-MG-17):
+//  Phase 12 Plan 12-02 (D-MG-01 + D-MG-17), updated by Phase 12.1 Plan 12.1-03:
 //    - body is a three-way Group branch on Video Mode state:
 //        • off-path (!videoModeStore.isEnabled): existingLayout + existingToolbarContent
 //          — v1.1 render byte-identical (SC4 / D-12-OFFRESTORE)
 //        • Large-zone: largeZoneLayout, nav-bar toolbar hidden — compact row
 //          hosts Back/Score/Mode/Best/Restart-w-menu per D-MG-01
-//        • Small-zone: existingLayout + smallZoneToolbarContent — toolbar
-//          items repositioned via VideoModeSlotRouter.anchors(for:)
+//        • Small-zone: `smallZoneLayout` (Phase 12.1) + `smallZoneToolbarContent`
+//          — HeaderBar / ModePill ordering inside the VStack flips per
+//          `anchors.headerBar`, and toolbar items reposition via the existing
+//          `smallZoneToolbarContent`.
 //    - All extension members live in MergeGameView+VideoMode.swift (§8.5
 //      file-size cap split). Env reads, viewModel, theme, dismiss, and
 //      settingsStore are internal access so the extension can read them.
@@ -42,10 +44,12 @@ struct MergeGameView: View {
     @Environment(\.dismiss) var dismiss
     @State private var didInjectStats = false
 
-    // P12 D-MG-01 (Plan 12-02): three-way layout branch on Video Mode state.
+    // P12 D-MG-01 (Plan 12-02) + P12.1 Plan 12.1-03: three-way layout branch on Video Mode state.
     // - .isEnabled false → off-path = v1.1 verbatim (SC4 / D-12-OFFRESTORE byte-identical).
     // - .isEnabled true + location.isLarge → compactRowComposed swap (D-MG-01).
-    // - .isEnabled true + small zone → existing layout + repositioned toolbar (D-MG-02).
+    // - .isEnabled true + small zone → `smallZoneLayout` (Phase 12.1, Plan 12.1-03) —
+    //   chips/picker reposition away from PiP overlay corners + repositioned toolbar
+    //   (D-MG-02 + CONTEXT D-04).
     @Environment(\.videoModeStore) var videoModeStore
     @Environment(\.videoModeCompactness) var videoModeCompactness
 
@@ -64,7 +68,7 @@ struct MergeGameView: View {
                 largeZoneLayout
                     .toolbar(.hidden, for: .navigationBar)
             } else {
-                existingLayout
+                smallZoneLayout
                     .toolbar { smallZoneToolbarContent }
             }
         }

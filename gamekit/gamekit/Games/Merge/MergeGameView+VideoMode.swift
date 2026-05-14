@@ -85,6 +85,97 @@ extension MergeGameView {
         }
     }
 
+    // MARK: - Small-zone layout (Phase 12.1 / Plan 12.1-03)
+
+    /// Phase 12.1 (Plan 12.1-03) — Small-zone branch consuming
+    /// `anchors.headerBar` + `anchors.picker` per CONTEXT D-04 / D-05 / D-07 /
+    /// D-08 / D-09. VStack ordering of HeaderBar / Board / ModePill flips on
+    /// `headerBarAtBottom`. The three sub-view properties below are the single
+    /// source-of-truth shared between both orderings — `MergeBoardView` call
+    /// site stays byte-identical to `existingLayout` per D-MG-10
+    /// (SHA `4aec14161b00ac2dbd1ea00e3bebb696bea6fc26` unchanged).
+    ///
+    /// - Top L/R (headerBar=bottom*, picker=bottom*): Board → HeaderBar →
+    ///   ModePill. Top edge clear for top-PiP (D-07).
+    /// - Bot L/R (headerBar=top*, picker=bottom*): HeaderBar → ModePill →
+    ///   Board. Bottom edge clear for bottom-PiP (D-08 / D-09).
+    ///
+    /// `anchors.picker` is consumed via `headerBarAtBottom` — the boolean
+    /// unifies the 4 small zones into 2 orderings; the cross-product is
+    /// already encoded in the router's D-08 + D-09 anchor values.
+    @ViewBuilder
+    var smallZoneLayout: some View {
+        let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
+        let headerBarAtBottom = (anchors.headerBar == .bottomLeading
+                                 || anchors.headerBar == .bottomTrailing)
+        let _ = anchors.picker  // D-05: consumed indirectly via headerBarAtBottom unification
+
+        ZStack {
+            theme.colors.background.ignoresSafeArea()
+
+            VStack(spacing: theme.spacing.m) {
+                if headerBarAtBottom {
+                    // Top L/R: board first, HeaderBar + ModePill pushed down.
+                    smallZoneBoard
+                    smallZoneHeaderBar
+                    smallZoneModePill
+                } else {
+                    // Bot L/R: HeaderBar + ModePill at top, board below.
+                    smallZoneHeaderBar
+                    smallZoneModePill
+                    smallZoneBoard
+                }
+            }
+
+            if let endState = endStateForOverlay {
+                endStateOverlay(state: endState)
+            }
+        }
+    }
+
+    /// D-MG-10 byte-identical board: shared by `smallZoneLayout` orderings.
+    @ViewBuilder
+    private var smallZoneBoard: some View {
+        MergeBoardView(
+            theme: theme,
+            board: viewModel.board,
+            onSwipe: { viewModel.handleSwipe($0) }
+        )
+        .padding(.horizontal, theme.spacing.l)
+        .sensoryFeedback(
+            .impact(weight: .light),
+            trigger: settingsStore.hapticsEnabled ? viewModel.mergeCount : 0
+        )
+        .sensoryFeedback(
+            .success,
+            trigger: settingsStore.hapticsEnabled ? viewModel.terminalCount : 0
+        )
+    }
+
+    /// HeaderBar byte-identical to `existingLayout`.
+    @ViewBuilder
+    private var smallZoneHeaderBar: some View {
+        MergeHeaderBar(
+            theme: theme,
+            score: viewModel.score,
+            bestScore: viewModel.bestScore,
+            mode: viewModel.mode
+        )
+    }
+
+    /// ModePill + modifier chain byte-identical to `existingLayout`.
+    @ViewBuilder
+    private var smallZoneModePill: some View {
+        MergeModePill(
+            theme: theme,
+            mode: viewModel.mode,
+            onSelect: { viewModel.requestModeChange($0) }
+        )
+        .padding(.top, theme.spacing.s)
+        .opacity(isTerminal ? 0 : 1)
+        .allowsHitTesting(!isTerminal)
+    }
+
     // MARK: - Toolbar items (shared button bodies)
 
     /// Back chevron — dismiss the NavigationStack push. Body byte-identical
