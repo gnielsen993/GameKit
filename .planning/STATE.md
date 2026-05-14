@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: unknown
-stopped_at: Completed 12-01-PLAN.md
-last_updated: "2026-05-14T03:28:26.963Z"
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-05-14T03:40:36.708Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 14
   completed_phases: 11
   total_plans: 81
-  completed_plans: 73
-  percent: 90
+  completed_plans: 74
+  percent: 91
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 12 (merge-nonogram-adoption) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Next action: `/gsd-execute-phase 12`
 Last activity: 2026-05-14
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 91%
 
 **Next action:** `/gsd-execute-phase 12` — drives 6 plans across 5 waves: Merge chip extract + TimerChip MOVE → Merge wrap+branch+compose → Nonogram chip extract → Nonogram wrap+branch+compose → Nonogram cell-size floor audit (checkpoint) → Phase close + 24-row manual matrix + v1.2 release log (checkpoint). Inherits the locked Phase 11 Mines compact-row pattern verbatim (symmetric two-chip, center-anchored picker, no gear, always-collapsed menu). VIDEO-09 + VIDEO-10 covered.
 
@@ -133,6 +133,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 11-mines-adoption P05 | 15m | 2 tasks | 1 files |
 | Phase 11 P07 | 4min | 1 tasks | 1 files |
 | Phase 12 P01 | 323 | 3 tasks | 6 files |
+| Phase 12 P02 | 404 | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -359,6 +360,9 @@ Recent decisions affecting current work:
 - Plan 11-07: Hard rows reference locked 12pt floor (Plan 11-05) + ADR screenshots in dual-citation Notes column
 - Plan 11-07: 11-VIDEO-MANUAL-CHECK.md ships blank per CONTEXT D-15; Plan 11-08 fills SC1 + SC3 rows during the manual sweep
 - Phase 12 Plan 01: TimerChip moved from Games/Minesweeper/ to Core/VideoModeTimerChip.swift — shared primitive across Mines + Merge + Nonogram (D-12-CHIPS); MergeScoreChip + MergeBestChip extracted with compact:Bool=false API preserving v1.1 off-path byte-identity (D-12-OFFRESTORE).
+- P12-02: D-MG-17 PROVEN — MergeBoardView.swift SHA 4aec1416 byte-identical across plan (verified git rev-parse pre/post).
+- P12-02: D-MG-01 slot mapping shipped verbatim — VideoCompactControlRow consumed without per-game fork (onSettings:nil, MergeScoreChip slot 2, MergeModePill slot 3, MergeBestChip + restartWithOverflowMenu slot 4+5).
+- P12-02: sibling-extension pattern adopted up front (MergeGameView 148 + MergeGameView+VideoMode 308) — both well under §8.5 500-line cap; mirrors P11-03 split-from-the-start lesson.
 
 ### Pending Todos
 
@@ -379,8 +383,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T03:28:26.956Z
-Stopped at: Completed 12-01-PLAN.md
+Last session: 2026-05-14T03:40:36.702Z
+Stopped at: Completed 12-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
