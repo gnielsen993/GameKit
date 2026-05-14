@@ -24,6 +24,10 @@ struct MinesweeperToolbarMenu: View {
     let theme: Theme
     let currentDifficulty: MinesweeperDifficulty
     let onSelect: (MinesweeperDifficulty) -> Void
+    /// Phase 12.1 (Plan 12.1-06 round 3): when true, the menu label drops
+    /// the inline difficulty text and renders icon-only. Small Video-Mode
+    /// zones use `compact: true` so the toolbar fits next to PiP overlays.
+    var compact: Bool = false
 
     var body: some View {
         Menu {
@@ -39,12 +43,17 @@ struct MinesweeperToolbarMenu: View {
                 }
             }
         } label: {
-            HStack(spacing: theme.spacing.xs) {
-                Text(displayName(for: currentDifficulty))
-                    .font(theme.typography.headline)
+            if compact {
                 Image(systemName: "slider.horizontal.3")
+                    .foregroundStyle(theme.colors.textPrimary)
+            } else {
+                HStack(spacing: theme.spacing.xs) {
+                    Text(displayName(for: currentDifficulty))
+                        .font(theme.typography.headline)
+                    Image(systemName: "slider.horizontal.3")
+                }
+                .foregroundStyle(theme.colors.textPrimary)
             }
-            .foregroundStyle(theme.colors.textPrimary)
         }
         .accessibilityLabel(Text("Difficulty"))
         .accessibilityValue(Text(displayName(for: currentDifficulty)))

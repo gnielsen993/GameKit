@@ -92,93 +92,13 @@ extension NonogramGameView {
 
     // MARK: - Small-zone layout (Phase 12.1, Plan 12.1-04)
 
-    /// Phase 12.1 (Plan 12.1-04) — Small-zone branch consuming `anchors.headerBar`
-    /// + `anchors.picker` per CONTEXT D-04 / D-05 / D-07 / D-08 / D-09. Ordering
-    /// of HeaderBar / `nonogramBoard` / ModePill flips based on whether
-    /// `anchors.headerBar` is a top or bottom anchor. `nonogramBoard` helper is
-    /// reused from `existingLayout` — `NonogramBoardView.computeLayout` floor
-    /// seam (12pt when On) is untouched per D-NG-10.
-    ///
-    /// Top L/R zones (`headerBar` = bottom anchor) → Board → HeaderBar → ModePill
-    /// (top edge clear for top-PiP). Bot L/R zones (`headerBar` = top anchor) →
-    /// HeaderBar → ModePill → Board (bottom edge clear for bottom-PiP).
-    @ViewBuilder
-    var smallZoneLayout: some View {
-        let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
-        let headerBarAtBottom = (anchors.headerBar == .bottomLeading
-                                 || anchors.headerBar == .bottomTrailing)
-
-        ZStack {
-            theme.colors.background.ignoresSafeArea()
-
-            VStack(spacing: theme.spacing.m) {
-                if headerBarAtBottom {
-                    // Top L/R Small zone: board first, then HeaderBar + ModePill at bottom.
-                    smallZonePuzzleBlock
-                    smallZoneHeaderBar
-                    smallZoneModePill
-                } else {
-                    // Bot L/R Small zone: HeaderBar + ModePill at top, then board.
-                    smallZoneHeaderBar
-                    smallZoneModePill
-                    smallZonePuzzleBlock
-                }
-            }
-            .padding(.bottom, theme.spacing.l)
-
-            confettiOverlay
-
-            if isTerminal && endCardVisible {
-                endStateOverlay
-                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
-            }
-        }
-    }
-
-    /// Puzzle-conditional block — board if a puzzle is loaded, otherwise the
-    /// "No puzzles bundled yet" placeholder. Re-uses the existing `nonogramBoard`
-    /// helper so the board call site stays byte-identical to `existingLayout` /
-    /// `largeZoneLayout` per D-NG-10 / D-NG-17.
-    @ViewBuilder
-    private var smallZonePuzzleBlock: some View {
-        if viewModel.currentPuzzle != nil {
-            nonogramBoard
-        } else {
-            Spacer()
-            Text(String(localized: "No puzzles bundled yet"))
-                .font(.callout)
-                .foregroundStyle(theme.colors.textSecondary)
-            Spacer()
-        }
-    }
-
-    /// NonogramHeaderBar with the same argument shape used in `existingLayout`
-    /// (lines 54–60). Off-path call site is byte-identical per D-11.
-    @ViewBuilder
-    private var smallZoneHeaderBar: some View {
-        NonogramHeaderBar(
-            theme: theme,
-            sizeLabel: "\(viewModel.difficulty.size) × \(viewModel.difficulty.size)",
-            timerAnchor: viewModel.timerAnchor,
-            pausedElapsed: viewModel.pausedElapsed,
-            livesRemaining: viewModel.gameMode == .lives ? viewModel.livesRemaining : nil
-        )
-    }
-
-    /// NonogramModePill with the full modifier chain (.padding / .opacity /
-    /// .allowsHitTesting) used in `existingLayout` (lines 72–80).
-    @ViewBuilder
-    private var smallZoneModePill: some View {
-        NonogramModePill(
-            theme: theme,
-            mode: viewModel.interactionMode,
-            isInteractive: isInteractive,
-            onSelect: { viewModel.setInteractionMode($0) }
-        )
-        .padding(.top, theme.spacing.s)
-        .opacity(isInteractive ? 1 : 0)
-        .allowsHitTesting(isInteractive)
-    }
+    // Phase 12.1 small-zone layout views moved to
+    // `NonogramGameView+SmallZone.swift` (Plan 12.1-06 redesign — split per
+    // CLAUDE.md §8.5 ≤500-line cap):
+    //   - `smallTopZoneLayout`   — Top L/R Small zones (compact row at bottom)
+    //   - `smallBottomZoneLayout` — Bot L/R Small zones (HeaderBar + overlay)
+    //   - `smallZonePuzzleBlock` / `smallZoneHeaderBar` — shared sub-views
+    //   - `Self.pickerOverlayAlignment(for:)` — anchor → SwiftUI Alignment
 
     // MARK: - Toolbar items (shared button bodies)
 

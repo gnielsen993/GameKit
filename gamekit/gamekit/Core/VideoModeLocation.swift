@@ -72,4 +72,19 @@ extension VideoModeLocation {
             return false
         }
     }
+
+    /// True for the two Small zones whose PiP overlay covers the TOP corners
+    /// (`.smallTopLeft` / `.smallTopRight`). Phase 12.1 Plan 12.1-06 redesign:
+    /// these zones reuse the Large-zone `compactRowComposed` pattern at the
+    /// bottom edge (HeaderBar + ModePill consolidate into one row) rather than
+    /// stacking chrome vertically. Bot L/R zones keep HeaderBar at the top
+    /// and float ModePill as a side-anchored overlay.
+    var isTopSmall: Bool {
+        switch self {
+        case .smallTopLeft, .smallTopRight:
+            return true
+        case .largeTop, .largeBottom, .smallBottomLeft, .smallBottomRight:
+            return false
+        }
+    }
 }

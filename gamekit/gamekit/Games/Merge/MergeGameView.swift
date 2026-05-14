@@ -67,8 +67,19 @@ struct MergeGameView: View {
             } else if videoModeStore.location.isLarge {
                 largeZoneLayout
                     .toolbar(.hidden, for: .navigationBar)
+            } else if videoModeStore.location.isTopSmall {
+                // Phase 12.1, Plan 12.1-06 round 2 — Top L/R Small zones use
+                // v1.1 existingLayout shape (HeaderBar top → Board → ModePill
+                // bottom) rendered compact. Toolbar reposition still applies.
+                smallTopZoneLayout
+                    .toolbar { smallZoneToolbarContent }
             } else {
-                smallZoneLayout
+                // Phase 12.1, Plan 12.1-06 round 2 — Bot L/R Small zones use
+                // HeaderBar (compact) top → Board → HStack picker row at the
+                // bottom, ModePill (compact) slid to the side opposite the
+                // covered PiP corner. Picker is a SIBLING row, never an
+                // overlay on board tiles.
+                smallBottomZoneLayout
                     .toolbar { smallZoneToolbarContent }
             }
         }

@@ -95,36 +95,39 @@ extension MergeGameView {
     /// site stays byte-identical to `existingLayout` per D-MG-10
     /// (SHA `4aec14161b00ac2dbd1ea00e3bebb696bea6fc26` unchanged).
     ///
-    /// - Top L/R (headerBar=bottom*, picker=bottom*): Board → HeaderBar →
-    ///   ModePill. Top edge clear for top-PiP (D-07).
-    /// - Bot L/R (headerBar=top*, picker=bottom*): HeaderBar → ModePill →
-    ///   Board. Bottom edge clear for bottom-PiP (D-08 / D-09).
+    /// Phase 12.1, Plan 12.1-06 round 2 (final per user feedback 2026-05-14):
     ///
-    /// `anchors.picker` is consumed via `headerBarAtBottom` — the boolean
-    /// unifies the 4 small zones into 2 orderings; the cross-product is
-    /// already encoded in the router's D-08 + D-09 anchor values.
-    @ViewBuilder
-    var smallZoneLayout: some View {
-        let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
-        let headerBarAtBottom = (anchors.headerBar == .bottomLeading
-                                 || anchors.headerBar == .bottomTrailing)
-        let _ = anchors.picker  // D-05: consumed indirectly via headerBarAtBottom unification
+    /// - **Top L/R** (`smallTopZoneLayout`): v1.1 existingLayout shape
+    ///   (HeaderBar top → Board → ModePill bottom) rendered COMPACT — chips
+    ///   with `compact: true`, ModePill with `compact: true`, tight VStack
+    ///   spacing.
+    /// - **Bot L/R** (`smallBottomZoneLayout`): compact HeaderBar at top →
+    ///   Board → HStack picker row at the bottom, ModePill (compact) slid to
+    ///   the side OPPOSITE the covered PiP corner per `anchors.picker`.
+    ///   Picker is a SIBLING row below the board (NOT an overlay on board
+    ///   cells — the overlay attempt placed the pill on the tiles per the
+    ///   2026-05-14 user feedback).
+    ///
+    /// `MergeBoardView` constructor call site stays byte-identical to
+    /// `existingLayout` per D-MG-10 (SHA `4aec14161b00ac2dbd1ea00e3bebb696bea6fc26`
+    /// unchanged).
 
+    // MARK: - Top L/R Small zones — original shape, compact chrome
+
+    @ViewBuilder
+    var smallTopZoneLayout: some View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
 
+            // User feedback 2026-05-14 round 3 — Merge top zones: "no need
+            // to shrink toggle, toggle too close to board". Pill renders at
+            // full size; VStack spacing widens to `theme.spacing.m` between
+            // board and pill (vs `s` for Mines / Nonogram, which want a
+            // tighter pill).
             VStack(spacing: theme.spacing.m) {
-                if headerBarAtBottom {
-                    // Top L/R: board first, HeaderBar + ModePill pushed down.
-                    smallZoneBoard
-                    smallZoneHeaderBar
-                    smallZoneModePill
-                } else {
-                    // Bot L/R: HeaderBar + ModePill at top, board below.
-                    smallZoneHeaderBar
-                    smallZoneModePill
-                    smallZoneBoard
-                }
+                smallZoneCompactHeader
+                smallZoneBoard
+                smallZoneFullSizePicker
             }
 
             if let endState = endStateForOverlay {
@@ -133,7 +136,65 @@ extension MergeGameView {
         }
     }
 
-    /// D-MG-10 byte-identical board: shared by `smallZoneLayout` orderings.
+    // MARK: - Bot L/R Small zones — board top, chrome bottom-opposite-PiP
+
+    /// Bot L/R Small-zone layout (Plan 12.1-06 round 6 — mirrors Mines).
+    /// Board fills the upper area. Below the board, a Spacer-centered
+    /// chrome cluster (compact chips only — ModePill dropped per user
+    /// feedback; toolbar menu picks Win/Infinite instead) anchors in the
+    /// bottom corner OPPOSITE the covered PiP corner.
+    ///
+    ///   `.smallBottomLeft`  (PiP at BL) → cluster at BR (trailing)
+    ///   `.smallBottomRight` (PiP at BR) → cluster at BL (leading)
+    @ViewBuilder
+    var smallBottomZoneLayout: some View {
+        let chromeAtTrailing = (videoModeStore.location == .smallBottomLeft)
+
+        ZStack {
+            theme.colors.background.ignoresSafeArea()
+
+            VStack(spacing: theme.spacing.s) {
+                // User feedback 2026-05-14 round 7 — "board should be
+                // brought down a tad from the top of screen".
+                Spacer().frame(height: theme.spacing.l)
+
+                smallZoneBoard
+
+                // User feedback 2026-05-14 round 7 — "score/best should be
+                // sticky to the board, looks better". Chips render
+                // immediately below the board (no Spacer in between).
+                HStack(spacing: 0) {
+                    if chromeAtTrailing {
+                        Spacer(minLength: 0)
+                        bottomChromeCluster
+                    } else {
+                        bottomChromeCluster
+                        Spacer(minLength: 0)
+                    }
+                }
+                .padding(.horizontal, theme.spacing.m)
+
+                Spacer(minLength: 0)
+            }
+
+            if let endState = endStateForOverlay {
+                endStateOverlay(state: endState)
+            }
+        }
+    }
+
+    /// Compact chips packed together (Score + Best). No ModePill — Merge
+    /// mode is "settings-ish", handled by the toolbar menu.
+    @ViewBuilder
+    private var bottomChromeCluster: some View {
+        HStack(spacing: theme.spacing.s) {
+            MergeScoreChip(theme: theme, score: viewModel.score, compact: true)
+            MergeBestChip(theme: theme, bestScore: viewModel.bestScore, compact: true)
+        }
+    }
+
+    /// D-MG-10 byte-identical board — shared by `smallTopZoneLayout` /
+    /// `smallBottomZoneLayout` / `existingLayout`.
     @ViewBuilder
     private var smallZoneBoard: some View {
         MergeBoardView(
@@ -152,28 +213,69 @@ extension MergeGameView {
         )
     }
 
-    /// HeaderBar byte-identical to `existingLayout`.
+    /// Compact HeaderBar — chips rendered inline with `compact: true` and
+    /// PACKED on the side OPPOSITE the covered PiP corner (per user feedback
+    /// 2026-05-14 round 3).
     @ViewBuilder
-    private var smallZoneHeaderBar: some View {
-        MergeHeaderBar(
-            theme: theme,
-            score: viewModel.score,
-            bestScore: viewModel.bestScore,
-            mode: viewModel.mode
-        )
+    private var smallZoneCompactHeader: some View {
+        let chipsTrailing = (videoModeStore.location == .smallTopLeft
+                             || videoModeStore.location == .smallBottomLeft)
+
+        HStack(spacing: theme.spacing.s) {
+            if chipsTrailing {
+                Spacer()
+            }
+            MergeScoreChip(theme: theme, score: viewModel.score, compact: true)
+            MergeBestChip(theme: theme, bestScore: viewModel.bestScore, compact: true)
+            if !chipsTrailing {
+                Spacer()
+            }
+        }
+        .padding(.horizontal, theme.spacing.m)
     }
 
-    /// ModePill + modifier chain byte-identical to `existingLayout`.
+    /// Compact ModePill — used by Bot L/R Small zones (slid-to-side row).
+    /// `compact: true` so the side-anchored pill stays small enough to not
+    /// crowd the PiP overlay in the opposite bottom corner.
     @ViewBuilder
-    private var smallZoneModePill: some View {
+    private var smallZoneCompactPicker: some View {
+        MergeModePill(
+            theme: theme,
+            mode: viewModel.mode,
+            onSelect: { viewModel.requestModeChange($0) },
+            compact: true
+        )
+        .opacity(isTerminal ? 0 : 1)
+        .allowsHitTesting(!isTerminal)
+    }
+
+    /// Full-size ModePill — used by Top L/R Small zones per user feedback
+    /// 2026-05-14 round 3 ("no need to shrink toggle"). The Top-zone layout
+    /// has more vertical room than Bot zones (HStack-sided picker row), so
+    /// the pill renders at default v1.1 size.
+    @ViewBuilder
+    private var smallZoneFullSizePicker: some View {
         MergeModePill(
             theme: theme,
             mode: viewModel.mode,
             onSelect: { viewModel.requestModeChange($0) }
         )
-        .padding(.top, theme.spacing.s)
         .opacity(isTerminal ? 0 : 1)
         .allowsHitTesting(!isTerminal)
+    }
+
+    /// Returns `true` when `anchors.picker` indicates the picker should
+    /// render on the LEADING side of the HStack picker row (Bot L/R only).
+    ///
+    /// Router contract for Bot L/R zones (P10 D-02 — UNCHANGED in 12.1):
+    ///   `.smallBottomLeft`  → picker = `.bottomTrailing` → trailing (FALSE)
+    ///   `.smallBottomRight` → picker = `.bottomLeading`  → leading  (TRUE)
+    static func pickerOnLeading(for anchor: SlotAnchor) -> Bool {
+        switch anchor {
+        case .bottomLeading, .topLeading:   return true
+        case .bottomTrailing, .topTrailing: return false
+        case .inCompactRow, .hidden:        return false      // defensive
+        }
     }
 
     // MARK: - Toolbar items (shared button bodies)

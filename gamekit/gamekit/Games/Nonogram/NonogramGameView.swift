@@ -78,8 +78,17 @@ struct NonogramGameView: View {
             } else if videoModeStore.location.isLarge {
                 largeZoneLayout
                     .toolbar(.hidden, for: .navigationBar)
+            } else if videoModeStore.location.isTopSmall {
+                // Phase 12.1, Plan 12.1-06 round 2 — Top L/R Small zones use
+                // v1.1 existingLayout shape (compact). Toolbar reposition
+                // applies — back + difficulty menu live there.
+                smallTopZoneLayout
+                    .toolbar { smallZoneToolbarContent }
             } else {
-                smallZoneLayout
+                // Phase 12.1, Plan 12.1-06 round 2 — Bot L/R Small zones use
+                // HeaderBar (compact) top → Board → HStack picker row at the
+                // bottom, ModePill slid to the side opposite covered PiP.
+                smallBottomZoneLayout
                     .toolbar { smallZoneToolbarContent }
             }
         }

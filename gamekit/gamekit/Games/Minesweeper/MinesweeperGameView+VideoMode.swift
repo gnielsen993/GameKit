@@ -220,7 +220,8 @@ extension MinesweeperGameView {
             MinesweeperToolbarMenu(
                 theme: theme,
                 currentDifficulty: viewModel.difficulty,
-                onSelect: { viewModel.requestDifficultyChange($0) }
+                onSelect: { viewModel.requestDifficultyChange($0) },
+                compact: true        // Plan 12.1-06 round 3 — icon-only menu
             )
         }
     }

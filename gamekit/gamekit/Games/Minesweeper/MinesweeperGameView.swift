@@ -103,13 +103,20 @@ struct MinesweeperGameView: View {
             } else if videoModeStore.location.isLarge {
                 largeZoneLayout
                     .toolbar(.hidden, for: .navigationBar)
+            } else if videoModeStore.location.isTopSmall {
+                // Top L/R Small-zone (Phase 12.1, Plan 12.1-06 round 2):
+                // v1.x existingLayout shape (HeaderBar top → Board → ModePill
+                // bottom) but rendered compact. Toolbar reposition still
+                // applies — back + settings live there, not in the body.
+                smallTopZoneLayout
+                    .toolbar { smallZoneToolbarContent }
             } else {
-                // Small-zone: render `smallZoneLayout` (Phase 12.1, Plan 12.1-02)
-                // — consumes `anchors.headerBar` + `anchors.picker` to reposition
-                // `MinesweeperHeaderBar` and `MinesweeperModePill` away from PiP
-                // overlay zones. Toolbar items continue to reposition via
-                // `smallZoneToolbarContent`.
-                smallZoneLayout
+                // Bot L/R Small-zone (Phase 12.1, Plan 12.1-06 round 2):
+                // HeaderBar (compact) at top → Board → HStack picker row at
+                // the bottom, ModePill slid to the side opposite the covered
+                // PiP corner per `anchors.picker`. Picker is a SIBLING row
+                // below the board, never an overlay on board cells.
+                smallBottomZoneLayout
                     .toolbar { smallZoneToolbarContent }
             }
         }
