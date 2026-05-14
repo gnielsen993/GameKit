@@ -344,7 +344,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 - [x] 12-01-PLAN.md — Merge chip extraction (MergeScoreChip + MergeBestChip) + TimerChip MOVE to Core/VideoModeTimerChip.swift; Mines's 2 call sites updated (D-12-CHIPS)
 - [x] 12-02-PLAN.md — Merge HomeView wrap + MergeGameView three-way layout branch + Large-zone compactRowComposed (D-MG-01) + MergeModePill compact API; MergeGameView+VideoMode.swift sibling extension
 - [x] 12-03-PLAN.md — Nonogram chip extraction (NonogramSizeChip + NonogramLivesChip); HeaderBar consumes shared VideoModeTimerChip (D-12-CHIPS / D-12-OFFRESTORE)
-- [ ] 12-04-PLAN.md — Nonogram HomeView wrap + NonogramGameView three-way layout branch + Large-zone compactRowComposed (D-NG-01 single-slot Size↔Lives swap) + NonogramModePill compact API; NonogramGameView+VideoMode.swift sibling extension
+- [x] 12-04-PLAN.md — Nonogram HomeView wrap + NonogramGameView three-way layout branch + Large-zone compactRowComposed (D-NG-01 single-slot Size↔Lives swap) + NonogramModePill compact API; NonogramGameView+VideoMode.swift sibling extension
 - [ ] 12-05-PLAN.md — Nonogram VM-aware cell-size floor seam in NonogramBoardView (D-NG-15) + human-verify audit checkpoint locking the floor value on Dracula + Voltage; D-NG-17 untouched contract
 - [ ] 12-06-PLAN.md — Phase close: 12-VIDEO-MANUAL-CHECK.md 24-row matrix authoring + manual SC1/SC2/SC3/SC4/SC5 sweep + Phase 12 entries in Docs/releases/v1.2.md
 **UI hint**: yes
