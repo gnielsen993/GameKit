@@ -30,7 +30,12 @@ import DesignKit
 struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: View {
     let theme: Theme
     let onBack: () -> Void
-    let onSettings: () -> Void
+    /// Slot 6 (rightmost gear). Pass `nil` to drop slot 6 — useful for games
+    /// whose picker already covers the settings role (P11 Mines Video Mode
+    /// adoption — see 11-04-SUMMARY addendum 2026-05-13 for the user-feedback
+    /// trigger). Phase 9 D-12 5-slot contract is intentionally softened to
+    /// 5-or-4 slots; Merge + Nonogram continue to pass a non-nil closure.
+    let onSettings: (() -> Void)?
     @ViewBuilder let primaryInfo: () -> Primary
     @ViewBuilder let picker: () -> Picker
     @ViewBuilder let secondaryInfo: () -> Secondary
@@ -41,7 +46,9 @@ struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: Vie
             primaryInfo()
             picker()
             secondaryInfo()
-            settingsButton
+            if onSettings != nil {
+                settingsButton
+            }
         }
         .frame(height: theme.spacing.xl)             // D-13 pill height anchor
     }
@@ -60,7 +67,7 @@ struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: Vie
 
     @ViewBuilder
     private var settingsButton: some View {
-        Button(action: onSettings) {
+        Button(action: { onSettings?() }) {
             Image(systemName: "gearshape")
                 .foregroundStyle(theme.colors.textPrimary)
                 .frame(width: theme.spacing.xl, height: theme.spacing.xl)
