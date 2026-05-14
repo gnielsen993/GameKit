@@ -341,20 +341,26 @@ extension MinesweeperGameView {
     }
 
     /// D-05/D-06/D-07/D-08/D-18 — the actual compact-row composition.
-    /// User feedback 2026-05-13 — see memory: feedback-video-mode-compact-row.
-    /// Slot 6 (settings gear) is DROPPED via a nil `onSettings` — the ModePill
-    /// picker already covers the settings role, so the standalone gear was
-    /// redundant on Mines's Large-zone path. Phase 9 D-12 5-slot contract
-    /// softened to 4 visible slots for Mines (Commit 1 of this polish pass
-    /// made `onSettings` optional on the shared component).
+    /// User feedback 2026-05-13 (round 2) — see memory: feedback-video-mode-compact-row.
     ///
-    /// Slot 2 hosts a VStack stack (Mines remaining on top, Time below per
-    /// D-06); slot 3 hosts MinesweeperModePill (Reveal/Flag, D-05 slot 3);
-    /// the `secondaryInfo` closure ALWAYS renders `restartWithOverflowMenu`
-    /// on Large zones — the difficulty menu always folds into Restart per
-    /// user feedback (the `videoModeCompactness == .collapsedSettings`
-    /// threshold didn't fire reliably at the 12pt cell floor, so the fold
-    /// is now unconditional on Large zones).
+    /// Symmetric two-chip layout (Mines-left / pill-center / Time+Restart-right):
+    ///   Back | MinesRemainingChip | <Spacer> ModePill <Spacer> | TimerChip · restartWithOverflowMenu
+    ///
+    /// Diverges from Phase 8 D-06 (stacked chip in slot 2): user feedback
+    /// reported that the slot-2 VStack stack carried more vertical weight
+    /// than the right-side restart button, throwing off the visual balance
+    /// of the Reveal/Flag picker. Slot 2 is now a single MinesRemainingChip
+    /// (no stack); slot 4+5 hosts TimerChip + restartWithOverflowMenu side
+    /// by side. The ModePill (slot 3) anchors to the center via the
+    /// Spacer-flanked picker slot landed in Commit 1 of this polish round.
+    /// D-18 `.reducedTime` continues to drop the TimerChip half (now in
+    /// secondaryInfo, not slot 2).
+    ///
+    /// Slot 6 (settings gear) stays DROPPED via `onSettings: nil` — the
+    /// ModePill picker already covers the settings role. `secondaryInfo`
+    /// unconditionally folds the difficulty menu into Restart per the
+    /// prior polish pass (the `.collapsedSettings` threshold didn't fire
+    /// reliably at the 12pt cell floor).
     @ViewBuilder
     var compactRowComposed: some View {
         VideoCompactControlRow(
@@ -362,17 +368,43 @@ extension MinesweeperGameView {
             onBack: { dismiss() },
             onSettings: nil      // User feedback 2026-05-13 — gear redundant with ModePill
         ) {
-            // Slot 2 — stacked chip (D-06). VStack hosts Mines/Time;
-            // D-18 .reducedTime drops the TimerChip half. `compact: true`
-            // shrinks both chips so they stack inside `theme.spacing.xl`
-            // (the row's pill-height anchor) without vertical overflow —
+            // Slot 2 — Mines remaining chip ALONE (no stack). The stacked
+            // VStack(MinesRemaining + Timer) carried more vertical weight
+            // than the right-side restart button and threw off the
+            // Reveal/Flag pill's perceived center. Mines is the load-bearing
+            // chip during play (per CONTEXT D-18 priority) — Time moves to
+            // the right side so each side hosts one chip + one button.
+            // User feedback 2026-05-13 (round 2) — see memory: feedback-video-mode-compact-row.
+            MinesRemainingChip(
+                theme: theme,
+                minesRemaining: viewModel.minesRemaining,
+                compact: true
+            )
+        } picker: {
+            // Slot 3 — Reveal/Flag mode pill (D-05 slot 3). `compact: true`
+            // shrinks the pill (smaller text + tighter padding + minHeight
+            // dropped from 44pt to `theme.spacing.l`) and forces
+            // `.lineLimit(1) + .minimumScaleFactor(0.7)` so both "Reveal"
+            // and "Flag" labels render without truncating to "I" / "F" —
             // user feedback 2026-05-13 — see memory: feedback-video-mode-compact-row.
-            VStack(spacing: theme.spacing.xs) {
-                MinesRemainingChip(
-                    theme: theme,
-                    minesRemaining: viewModel.minesRemaining,
-                    compact: true
-                )
+            // Center-anchored via Spacer flanking in VideoCompactControlRow
+            // (Commit 1 of this polish round).
+            MinesweeperModePill(
+                theme: theme,
+                mode: viewModel.interactionMode,
+                onSelect: { viewModel.setInteractionMode($0) },
+                compact: true
+            )
+        } secondaryInfo: {
+            // Slots 4+5 — Time chip + Restart-with-overflow-menu, side by
+            // side. TimerChip migrated here from the prior slot-2 stack so
+            // the row reads symmetrically (one chip + one button on each
+            // side of the centered pill). D-18 `.reducedTime` drops the
+            // TimerChip half (Mines remaining stays visible on the left).
+            // restartWithOverflowMenu folds the difficulty menu into the
+            // Restart button per the prior polish pass.
+            // User feedback 2026-05-13 (round 2) — see memory: feedback-video-mode-compact-row.
+            HStack(spacing: theme.spacing.s) {
                 if videoModeCompactness != .reducedTime {
                     TimerChip(
                         theme: theme,
@@ -381,28 +413,8 @@ extension MinesweeperGameView {
                         compact: true
                     )
                 }
+                restartWithOverflowMenu
             }
-        } picker: {
-            // Slot 3 — Reveal/Flag mode pill (D-05 slot 3). `compact: true`
-            // shrinks the pill (smaller text + tighter padding + minHeight
-            // dropped from 44pt to `theme.spacing.l`) and forces
-            // `.lineLimit(1) + .minimumScaleFactor(0.7)` so both "Reveal"
-            // and "Flag" labels render without truncating to "I" / "F" —
-            // user feedback 2026-05-13 — see memory: feedback-video-mode-compact-row.
-            MinesweeperModePill(
-                theme: theme,
-                mode: viewModel.interactionMode,
-                onSelect: { viewModel.setInteractionMode($0) },
-                compact: true
-            )
-        } secondaryInfo: {
-            // Slot 4+5 composite — ALWAYS-COLLAPSED on Large zones.
-            // User feedback 2026-05-13 — see memory: feedback-video-mode-compact-row
-            //   The `videoModeCompactness == .collapsedSettings` branch was
-            //   unreliable at the 12pt cell floor. Mines Large now always
-            //   folds the difficulty menu into Restart (primary-action Menu);
-            //   tap = restart, menu = Change-difficulty list.
-            restartWithOverflowMenu
         }
     }
 
