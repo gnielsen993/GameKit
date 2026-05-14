@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: executing
-stopped_at: Completed 11-05-PLAN.md
-last_updated: "2026-05-14T00:17:31.076Z"
+stopped_at: Completed 11-07-PLAN.md
+last_updated: "2026-05-14T00:23:14.046Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 75
-  completed_plans: 69
-  percent: 92
+  completed_plans: 70
+  percent: 93
 ---
 
 # Project State
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 11 (mines-adoption) — EXECUTING
-Plan: 6 of 8
+Plan: 7 of 8
 Next phase: 11 (mines-adoption)
 Status: Ready to execute
 Last activity: 2026-05-14
 
-Progress: [█████████░] 92%
+Progress: [█████████░] 93%
 
 **Next action:** Discuss Phase 11 (`/gsd-discuss-phase 11`) — Minesweeper adopts the layout primitives. Easy + Medium across all 6 PiP locations on Classic + one Loud preset. Hard 16×30 ships the strategy from `.planning/phases/08-video-mode-design/08-HARD-MINES-ADR.md` (smaller-cells / Variant 1) gated on `videoModeStore.isEnabled` inside `MinesweeperBoardView.Self.minCellSize`. Wraps `MinesweeperGameView` (NOT `MinesweeperBoardView`) at the outermost layer per CONTEXT D-15 untouched contract. A2 (NavigationStack height adjustment) is the open carry-forward from Plan 10-VERIFICATION.md.
 
@@ -132,6 +132,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 11-mines-adoption P03 | 8 | 3 tasks | 4 files |
 | Phase 11-mines-adoption P04 | 11min | 1 tasks tasks | 2 files files |
 | Phase 11-mines-adoption P05 | 15m | 2 tasks | 1 files |
+| Phase 11 P07 | 4min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -355,6 +356,8 @@ Recent decisions affecting current work:
 - 11-04: Slot 4+5 composite via secondaryInfo closure. VideoCompactControlRow's secondaryInfo @ViewBuilder hosts BOTH MinesweeperToolbarMenu (slot 4, D-08) AND compactRestartButton (slot 5, D-05). VideoCompactControlRow.onSettings is unused on Mines Large-zone path. No API change to the shared component.
 - 11-04: D-18 .collapsedSettings uses Menu(primaryAction: viewModel.restart) attached to Restart icon. Tap = restart; long-press / chevron = surface Change-difficulty Section. A11Y label Restart game preserved across both compactness levels.
 - Plan 11-05: minCellSizeVideoMode locked at 12pt after §8.12 audit on Dracula + Voltage (Hard 16×30). ADR §Rollback did NOT fire. D-12 single-gate + D-17 untouched contract preserved.
+- Plan 11-07: Hard rows reference locked 12pt floor (Plan 11-05) + ADR screenshots in dual-citation Notes column
+- Plan 11-07: 11-VIDEO-MANUAL-CHECK.md ships blank per CONTEXT D-15; Plan 11-08 fills SC1 + SC3 rows during the manual sweep
 
 ### Pending Todos
 
@@ -375,8 +378,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T00:17:31.070Z
-Stopped at: Completed 11-05-PLAN.md
+Last session: 2026-05-14T00:23:11.564Z
+Stopped at: Completed 11-07-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
