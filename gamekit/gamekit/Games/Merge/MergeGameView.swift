@@ -16,65 +16,56 @@
 //    - End-state overlay sits in a ZStack with a backdrop dim — NOT a sheet
 //      (mirrors MinesweeperGameView D-02 / no tap-to-dismiss)
 //
+//  Phase 12 Plan 12-02 (D-MG-01 + D-MG-17):
+//    - body is a three-way Group branch on Video Mode state:
+//        • off-path (!videoModeStore.isEnabled): existingLayout + existingToolbarContent
+//          — v1.1 render byte-identical (SC4 / D-12-OFFRESTORE)
+//        • Large-zone: largeZoneLayout, nav-bar toolbar hidden — compact row
+//          hosts Back/Score/Mode/Best/Restart-w-menu per D-MG-01
+//        • Small-zone: existingLayout + smallZoneToolbarContent — toolbar
+//          items repositioned via VideoModeSlotRouter.anchors(for:)
+//    - All extension members live in MergeGameView+VideoMode.swift (§8.5
+//      file-size cap split). Env reads, viewModel, theme, dismiss, and
+//      settingsStore are internal access so the extension can read them.
+//
 
 import SwiftUI
 import SwiftData
 import DesignKit
 
 struct MergeGameView: View {
-    @State private var viewModel: MergeViewModel
+    @State var viewModel: MergeViewModel
     @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.settingsStore) private var settingsStore
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.settingsStore) var settingsStore
+    @Environment(\.dismiss) var dismiss
     @State private var didInjectStats = false
 
-    private var theme: Theme { themeManager.theme(using: colorScheme) }
+    // P12 D-MG-01 (Plan 12-02): three-way layout branch on Video Mode state.
+    // - .isEnabled false → off-path = v1.1 verbatim (SC4 / D-12-OFFRESTORE byte-identical).
+    // - .isEnabled true + location.isLarge → compactRowComposed swap (D-MG-01).
+    // - .isEnabled true + small zone → existing layout + repositioned toolbar (D-MG-02).
+    @Environment(\.videoModeStore) var videoModeStore
+    @Environment(\.videoModeCompactness) var videoModeCompactness
+
+    var theme: Theme { themeManager.theme(using: colorScheme) }
 
     init(initialMode: MergeMode? = nil) {
         _viewModel = State(initialValue: MergeViewModel(mode: initialMode))
     }
 
     var body: some View {
-        ZStack {
-            theme.colors.background.ignoresSafeArea()
-
-            VStack(spacing: theme.spacing.m) {
-                MergeHeaderBar(
-                    theme: theme,
-                    score: viewModel.score,
-                    bestScore: viewModel.bestScore,
-                    mode: viewModel.mode
-                )
-
-                MergeBoardView(
-                    theme: theme,
-                    board: viewModel.board,
-                    onSwipe: { viewModel.handleSwipe($0) }
-                )
-                .padding(.horizontal, theme.spacing.l)
-                .sensoryFeedback(
-                    .impact(weight: .light),
-                    trigger: settingsStore.hapticsEnabled ? viewModel.mergeCount : 0
-                )
-                .sensoryFeedback(
-                    .success,
-                    trigger: settingsStore.hapticsEnabled ? viewModel.terminalCount : 0
-                )
-
-                MergeModePill(
-                    theme: theme,
-                    mode: viewModel.mode,
-                    onSelect: { viewModel.requestModeChange($0) }
-                )
-                .padding(.top, theme.spacing.s)
-                .opacity(isTerminal ? 0 : 1)
-                .allowsHitTesting(!isTerminal)
-            }
-
-            if let endState = endStateForOverlay {
-                endStateOverlay(state: endState)
+        Group {
+            if !videoModeStore.isEnabled {
+                existingLayout
+                    .toolbar { existingToolbarContent }
+            } else if videoModeStore.location.isLarge {
+                largeZoneLayout
+                    .toolbar(.hidden, for: .navigationBar)
+            } else {
+                existingLayout
+                    .toolbar { smallZoneToolbarContent }
             }
         }
         .navigationTitle(String(localized: "Merge"))
@@ -82,46 +73,11 @@ struct MergeGameView: View {
         // 2026-05-01: Hide the system back chevron + edge-swipe-to-go-back
         // gesture. Merge's tile interaction is swipe-driven, so the iOS
         // edge-swipe-back gesture was hijacking play swipes near the left
-        // edge. The custom back ToolbarItem below replaces the chevron and
+        // edge. The custom back ToolbarItem (in MergeGameView+VideoMode.swift)
         // is the only path off this screen (besides win/loss → Home from
         // the end-state card). Same treatment applied to MinesweeperGameView
         // for consistency across game screens.
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(theme.colors.textPrimary)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Back to The Drawer"))
-            }
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    viewModel.restart()
-                } label: {
-                    Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(theme.colors.textPrimary)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Restart game"))
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                MergeToolbarMenu(
-                    theme: theme,
-                    currentMode: viewModel.mode,
-                    onSelect: { viewModel.requestModeChange($0) }
-                )
-            }
-        }
         .alert(
             String(localized: "Abandon current game?"),
             isPresented: $viewModel.showingAbandonAlert
@@ -145,7 +101,7 @@ struct MergeGameView: View {
 
     // MARK: - End-state derivation
 
-    private var isTerminal: Bool {
+    var isTerminal: Bool {
         switch viewModel.state {
         case .gameOver: return true
         case .won where !viewModel.hasContinuedPastWin: return true
@@ -153,7 +109,7 @@ struct MergeGameView: View {
         }
     }
 
-    private var endStateForOverlay: MergeEndState? {
+    var endStateForOverlay: MergeEndState? {
         switch viewModel.state {
         case .gameOver: return .gameOver
         case .won where !viewModel.hasContinuedPastWin: return .won
@@ -162,7 +118,7 @@ struct MergeGameView: View {
     }
 
     @ViewBuilder
-    private func endStateOverlay(state: MergeEndState) -> some View {
+    func endStateOverlay(state: MergeEndState) -> some View {
         ZStack {
             Rectangle()
                 .fill(theme.colors.background.opacity(0.85))
