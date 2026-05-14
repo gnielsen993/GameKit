@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: unknown
-stopped_at: Completed 12-06-PLAN.md — Phase 12 closes PARTIAL (gaps_found)
-last_updated: "2026-05-14T04:27:53.524Z"
-last_activity: 2026-05-13
+status: planned
+stopped_at: Planned Phase 12.1 — 5 plans authored, plan-checker PASS (11/11 gates)
+last_updated: "2026-05-14T13:10:00.000Z"
+last_activity: 2026-05-14
 progress:
-  total_phases: 14
+  total_phases: 15
   completed_phases: 12
-  total_plans: 81
+  total_plans: 86
   completed_plans: 78
-  percent: 96
+  percent: 91
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 12 — merge-nonogram-adoption
+**Current focus:** Phase 12.1 — small-zone-routing-gap-closure (planned, ready to execute)
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 12 (merge-nonogram-adoption) — CLOSED PARTIAL (gaps_found)
-Plan: 6 of 6 (12-06 executed; SC1 + SC3 FAIL on small-zone routing)
-Next action: `/gsd-plan-phase 12.1 --gaps`
-Last activity: 2026-05-13
+Phase: 12.1 (small-zone-routing-gap-closure) — PLANNED (5 plans authored 2026-05-14, plan-checker PASS 11/11 gates)
+Plan: 0 of 5 executed
+Next action: `/gsd-execute-phase 12.1`
+Last activity: 2026-05-14
 
-Progress: [█████████░] 96%
+Progress: [█████████░] 91%
 
 **Next action:** `/gsd-plan-phase 12.1 --gaps` — author Phase 12.1 to close the SC1 + SC3 small-zone picker (ModePill) + HeaderBar chip routing gap that surfaced during 12-06's manual-check audit. P11 carryforward defect — `VideoModeSlotRouter.anchors(for:)` returns correct `anchors.picker` values but none of the 3 adopter games (Mines, Merge, Nonogram) wire it into the Small-zone `existingLayout` branch. Bot L/R PiP zones cover the bottom-center ModePill; Top L/R PiP zones cover the top-center HeaderBar chips. Phase 12.1 closes both seams across all 3 games + re-audits the 4 small-zone rows per game.
 
