@@ -406,7 +406,7 @@ extension MinesweeperGameView {
             // User feedback 2026-05-13 (round 2) — see memory: feedback-video-mode-compact-row.
             HStack(spacing: theme.spacing.s) {
                 if videoModeCompactness != .reducedTime {
-                    TimerChip(
+                    VideoModeTimerChip(
                         theme: theme,
                         timerAnchor: viewModel.timerAnchor,
                         pausedElapsed: viewModel.pausedElapsed,

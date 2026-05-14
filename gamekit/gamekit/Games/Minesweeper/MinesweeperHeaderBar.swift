@@ -27,7 +27,7 @@ struct MinesweeperHeaderBar: View {
         HStack(spacing: theme.spacing.s) {
             MinesRemainingChip(theme: theme, minesRemaining: minesRemaining)
             Spacer()
-            TimerChip(theme: theme, timerAnchor: timerAnchor, pausedElapsed: pausedElapsed)
+            VideoModeTimerChip(theme: theme, timerAnchor: timerAnchor, pausedElapsed: pausedElapsed)
         }
         .padding(.horizontal, theme.spacing.m)
         .padding(.vertical, theme.spacing.s)

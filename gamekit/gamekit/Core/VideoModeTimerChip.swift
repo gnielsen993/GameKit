@@ -1,34 +1,39 @@
 //
-//  TimerChip.swift
+//  VideoModeTimerChip.swift
 //  gamekit
 //
-//  Props-only elapsed-timer chip extracted from MinesweeperHeaderBar
-//  (Plan 11-01 / D-03). Preserves Phase 3 D-05 timer rendering
-//  invariants verbatim:
+//  Shared elapsed-timer chip for Video Mode games (P12 D-12-CHIPS — moved
+//  from Games/Minesweeper/TimerChip.swift to Core/ so Nonogram + Merge
+//  can consume the same primitive without duplicating the TimelineView
+//  logic). Renamed in Plan 12-01.
+//
+//  Preserves Phase 3 D-05 timer rendering invariants verbatim:
 //    - TimelineView(.periodic(from: timerAnchor ?? .distantPast, by: 1))
 //    - When timerAnchor is nil, .distantPast anchor stops the tick;
 //      displayedElapsed(at:) returns pausedElapsed unchanged.
 //    - NO Timer.publish, NO Combine, NO Task { while … sleep }.
 //    - monospaced digits via theme.typography.monoNumber so digits do
 //      NOT jitter on every second tick.
-//  Consumed by MinesweeperHeaderBar + MinesweeperGameView Large-zone
-//  branch (Plan 11-04 / D-06 slot 2 stack).
+//
+//  Consumers:
+//    - MinesweeperHeaderBar (off-path / Small PiP zones) with compact: false
+//    - MinesweeperGameView+VideoMode.compactRowComposed (Large zones) with compact: true
+//    - NonogramHeaderBar (Plan 12-03 refactor) with compact: false
+//    - NonogramGameView Large zones (Plan 12-04) with compact: true
 //
 
 import SwiftUI
 import DesignKit
 
-struct TimerChip: View {
+struct VideoModeTimerChip: View {
     let theme: Theme
     let timerAnchor: Date?
     let pausedElapsed: TimeInterval
-    /// Compact variant for Video Mode slot 2's stacked-chip slot (P11 11-04
-    /// user-feedback polish 2026-05-13). When `true`, the chip drops one
-    /// Dynamic Type step (caption instead of monoNumber/body), reduces
-    /// horizontal padding (xs instead of m), and reduces vertical padding
-    /// (xs instead of s) so two chips can stack inside `theme.spacing.xl`
-    /// (the row's pill-height anchor). Off-path callers (HeaderBar) leave
-    /// this defaulted to `false` and get the v1.0 chip byte-identical.
+    /// Compact variant for Video Mode Large-zone compact row (P12 D-12-CHIPS).
+    /// When `true`, drops one Dynamic Type step (caption instead of monoNumber)
+    /// and tightens padding to `theme.spacing.xs` so the chip fits inside
+    /// `theme.spacing.xl` (the compact-row's pill-height anchor). Off-path
+    /// callers leave defaulted to `false` and get the v1.1 chip byte-identical.
     var compact: Bool = false
 
     var body: some View {
