@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: planned
-stopped_at: Planned Phase 12.1 — 5 plans authored, plan-checker PASS (11/11 gates)
-last_updated: "2026-05-14T13:10:00.000Z"
+status: unknown
+stopped_at: Completed 12.1-01-PLAN.md
+last_updated: "2026-05-14T19:20:12.071Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 15
   completed_phases: 12
   total_plans: 86
-  completed_plans: 78
-  percent: 91
+  completed_plans: 79
+  percent: 92
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 12.1 — small-zone-routing-gap-closure (planned, ready to execute)
+**Current focus:** Phase 12.1 — small-zone-routing-gap-closure
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 12.1 (small-zone-routing-gap-closure) — PLANNED (5 plans authored 2026-05-14, plan-checker PASS 11/11 gates)
-Plan: 0 of 5 executed
+Phase: 12.1 (small-zone-routing-gap-closure) — EXECUTING
+Plan: 2 of 5
 Next action: `/gsd-execute-phase 12.1`
 Last activity: 2026-05-14
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 92%
 
 **Next action:** `/gsd-plan-phase 12.1 --gaps` — author Phase 12.1 to close the SC1 + SC3 small-zone picker (ModePill) + HeaderBar chip routing gap that surfaced during 12-06's manual-check audit. P11 carryforward defect — `VideoModeSlotRouter.anchors(for:)` returns correct `anchors.picker` values but none of the 3 adopter games (Mines, Merge, Nonogram) wire it into the Small-zone `existingLayout` branch. Bot L/R PiP zones cover the bottom-center ModePill; Top L/R PiP zones cover the top-center HeaderBar chips. Phase 12.1 closes both seams across all 3 games + re-audits the 4 small-zone rows per game.
 
@@ -142,6 +142,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 12 P04 | 261 | 4 tasks | 4 files |
 | Phase 12 P05 | 360 | 2 tasks | 2 files |
 | Phase 12-merge-nonogram-adoption P06 | 25 | 4 tasks tasks | 2 files files |
+| Phase 12.1 P01 | 10m | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -380,6 +381,7 @@ Recent decisions affecting current work:
 - Plan 12-05: Sibling-extension split mandatory (Option B). NonogramBoardView pre-plan was 512 LOC — already 12 LOC past §8.5's 500-line cap (pre-existing drift). Static constants + helper extracted to NonogramBoardView+VideoMode.swift (55 lines); host growth limited to +6 LOC (env read + access promotion comment + computeLayout call-site update). minCellSize access promoted from private → internal so the extension can read it (literal `14` byte-identical). Pre-existing 12-LOC over-cap drift on host remains as a deferred item.
 - Plan 12-05: §8.12 audit screenshots NOT persisted to disk — auditor evaluated on running simulator and confirmed pass; Plan 12-06's manual-check doc will capture the final-render parity matrix including the locked Hard rows.
 - Phase 12 closes PARTIAL (gaps_found) — SC1 + SC3 FAIL on small-zone picker/chip routing; P11 carryforward defect, closure via Phase 12.1
+- Phase 12.1-01: SlotAnchorMap extended with headerBar field (D-01 LOCKED) — named-fields shape preserves compile-time exhaustiveness; 6 per-zone values match D-02 matrix; back/settings/picker/fab byte-identical (D-03 lock).
 
 ### Pending Todos
 
@@ -401,8 +403,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T04:27:53.518Z
-Stopped at: Completed 12-06-PLAN.md — Phase 12 closes PARTIAL (gaps_found)
-Resume file: Phase 12.1 required for SC1+SC3 small-zone routing closure
+Last session: 2026-05-14T19:20:06.879Z
+Stopped at: Completed 12.1-01-PLAN.md
+Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
