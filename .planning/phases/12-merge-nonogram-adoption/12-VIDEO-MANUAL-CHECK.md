@@ -100,3 +100,42 @@ For Nonogram Hard row 20 (`largeBottom`): additionally compare the rendered Hard
 1. Add a Small-zone ModePill reposition seam in each game's `+VideoMode.swift` extension that reads `anchors.picker` and overlays the ModePill at that anchor (or hides bottom-center / shows at top per zone).
 2. Add a Small-zone HeaderBar chip reposition seam (or hide / re-anchor the HeaderBar entirely on Top L/R zones).
 3. Re-audit the 4 small-zone rows per game (Rows 3-6, 9-12 for Merge; Rows 15-18, 21-24 for Nonogram; plus the equivalent Mines rows from `11-VIDEO-MANUAL-CHECK.md`).
+
+---
+
+## Phase 12.1 Closure Re-audit (2026-05-14)
+
+**Closure commits:** `95bed8c` (router contract) → `78434bc` (Mines) → `e46f193` (Merge) → `cf87f59` (Nonogram) → `6d6d0b7` (round-7 redesign per user audit rounds 1–7)
+
+**Approach:** The original Plan 12.1-02/03/04 implementation (chrome stacked in VStack with inverted bottom-zone picker placement) failed live sim audit. After 7 rounds of user-driven iteration, the small-zone layout settled on two distinct shapes — Top L/R uses the v1.x existingLayout shape rendered compact; Bot L/R uses a Spacer-centered chrome cluster (chips above picker) in the bottom corner opposite the covered PiP corner.
+
+**Re-audit Matrix — 12 Small-zone rows on iPhone 17 Pro Max simulator (Classic preset; sticky design — theme-invariant per CLAUDE.md §2):**
+
+| Row | Game | Zone | Outcome | Notes |
+|-----|------|------|---------|-------|
+| 1 | Minesweeper | smallTopLeft | PASS | Difficulty menu icon-only, chips packed trailing, ModePill compact at bottom |
+| 2 | Minesweeper | smallTopRight | PASS | Mirrored — chips packed leading, ModePill compact at bottom |
+| 3 | Minesweeper | smallBottomLeft | PASS | Board fills top, chrome cluster (chips above ModePill) anchored BR, Spacer-centered between board and screen bottom |
+| 4 | Minesweeper | smallBottomRight | PASS | Mirrored — cluster anchored BL |
+| 5 | Merge | smallTopLeft | PASS | Chips compact packed trailing, board, full-size ModePill below (wider `m` spacing per round 3) |
+| 6 | Merge | smallTopRight | PASS | Mirrored |
+| 7 | Merge | smallBottomLeft | PASS | Board pushed down `spacing.l` from top, chips sticky immediately below board at BR (no body ModePill — `MergeToolbarMenu` covers Win/Infinite per user) |
+| 8 | Merge | smallBottomRight | PASS | Mirrored — chips at BL |
+| 9 | Nonogram | smallTopLeft | PASS | Chips compact packed trailing, board, FULL-SIZE Fill/Mark ModePill below (frequent tap target — user feedback) |
+| 10 | Nonogram | smallTopRight | PASS | Mirrored |
+| 11 | Nonogram | smallBottomLeft | PASS | Board fills top, chrome cluster (chips above compact ModePill matching Mines size) anchored BR, Spacer-centered |
+| 12 | Nonogram | smallBottomRight | PASS | Mirrored |
+
+**Dracula spot-check (CLAUDE.md §8.12 — Classic + one Loud preset):** Layout is theme-invariant (positioning + sizing only, no theme-dependent overlap). Spot-checked Mines smallBottomLeft + Nonogram smallTopRight on Dracula — both render identically to Classic in geometry; legibility intact.
+
+### Updated Success Criteria Sign-off
+
+- [x] **SC1** (Merge plays across all 6 PiP locations) — PASS · Bot L/R routing closed; Top L/R chrome compactified
+- [x] **SC2** (Nonogram hint legibility @ Large worst-case) — PASS (unchanged from 2026-05-13)
+- [x] **SC3** (Legibility regression on Classic + Loud × both games × 6 zones) — PASS · 12 small-zone rows verified Classic + Dracula spot-check
+- [x] **SC4** (Off-path byte-identity) — PASS (unchanged — D-11 lock preserved across rounds 1–7)
+- [x] **SC5** (Compact control row consumed verbatim for Large zones) — PASS (unchanged — Large zone path never touched)
+
+**Closure status:** Phase 12 + Phase 12.1 = ALL SUCCESS CRITERIA PASS. v1.2 unblocked for Phase 13 (Win/Loss Banner + A11y Gating).
+
+**Closed:** 2026-05-14 by user verification on iPhone 17 Pro Max simulator

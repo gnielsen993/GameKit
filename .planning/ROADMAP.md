@@ -386,8 +386,8 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 | 9. Video Mode Foundation | 8/8 | Complete | 2026-05-12 |
 | 10. Layout Primitives | 4/4 | Complete | 2026-05-13 |
 | 11. Minesweeper Adoption | 8/8 | Complete | 2026-05-13 |
-| 12. Merge + Nonogram Adoption | 6/6 | Closed PARTIAL (gaps_found — 12.1 required) | 2026-05-13 |
-| 12.1. Small-Zone Routing Gap Closure | 0/TBD | Planning | - |
+| 12. Merge + Nonogram Adoption | 6/6 | Closed (gaps closed by Phase 12.1) | 2026-05-13 |
+| 12.1. Small-Zone Routing Gap Closure | redesigned (audit rounds 1–7) | Complete | 2026-05-14 |
 | 13. Win/Loss Banner + A11y Gating | 0/TBD | Not started | - |
 
 ### v1.2 Research Flags

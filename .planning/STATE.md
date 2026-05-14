@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: unknown
-stopped_at: Completed 12.1-01-PLAN.md
-last_updated: "2026-05-14T19:20:12.071Z"
+status: complete
+stopped_at: Phase 12.1 closed — small-zone layout redesigned through 7 audit rounds, all 12 small-zone rows PASS
+last_updated: "2026-05-14T20:30:00.000Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 15
-  completed_phases: 12
+  completed_phases: 13
   total_plans: 86
-  completed_plans: 79
-  percent: 92
+  completed_plans: 84
+  percent: 98
 ---
 
 # Project State
@@ -21,23 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 12.1 — small-zone-routing-gap-closure
+**Current focus:** Phase 13 — Win/Loss Banner + A11y Gating (ready to plan)
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 12.1 (small-zone-routing-gap-closure) — EXECUTING
-Plan: 2 of 5
-Next action: `/gsd-execute-phase 12.1`
+Phase: 12.1 (small-zone-routing-gap-closure) — COMPLETE (12 of 12 small-zone matrix rows PASS on iPhone 17 Pro Max sim, user verified 2026-05-14)
+Plan: redesigned through audit rounds 1–7 (commit `6d6d0b7` final)
+Next action: `/gsd-plan-phase 13` — Win/Loss Banner + A11y Gating
 Last activity: 2026-05-14
 
-Progress: [█████████░] 92%
+Progress: [█████████░] 98%
 
-**Next action:** `/gsd-plan-phase 12.1 --gaps` — author Phase 12.1 to close the SC1 + SC3 small-zone picker (ModePill) + HeaderBar chip routing gap that surfaced during 12-06's manual-check audit. P11 carryforward defect — `VideoModeSlotRouter.anchors(for:)` returns correct `anchors.picker` values but none of the 3 adopter games (Mines, Merge, Nonogram) wire it into the Small-zone `existingLayout` branch. Bot L/R PiP zones cover the bottom-center ModePill; Top L/R PiP zones cover the top-center HeaderBar chips. Phase 12.1 closes both seams across all 3 games + re-audits the 4 small-zone rows per game.
+**Next action:** `/gsd-plan-phase 13` — last phase of the v1.2 Video Mode milestone. Replaces full-screen win/loss overlays with a non-board-covering banner/pill that avoids the selected PiP zone, with haptics / SFX / animations routed through Settings toggles + `accessibilityReduceMotion`.
 
-**Phase 12 — what shipped:** Plans 12-01..12-05 landed the Merge + Nonogram adoption code; SC2 (Nonogram Hard hint legibility @ 12pt floor on Classic + Dracula + Voltage), SC4 (Off-restore byte-identity for both games), SC5 (VideoCompactControlRow consumed verbatim — zero diff across phase) all PASS.
-
-**Phase 13 (Win/Loss Banner + A11y Gating)** can begin planning in parallel — the 12.1 gap is layout-routing-only and doesn't affect 13's compositional surface.
+**Phase 12 + 12.1 closed:** All 5 ROADMAP success criteria PASS. SC1 + SC3 small-zone routing closed via the 12.1 redesign (Top L/R = compact existingLayout shape; Bot L/R = Spacer-centered chrome cluster anchored opposite covered PiP corner). Off-path byte-identity, Large-zone path, board-view byte-identity all preserved (D-11, D-MS-10, D-MG-10, D-NG-10 locks intact).
 
 ## v1.0 Carry-Over
 
