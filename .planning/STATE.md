@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: unknown
-stopped_at: Completed 12-02-PLAN.md
-last_updated: "2026-05-14T03:40:36.708Z"
+stopped_at: Completed 12-03-PLAN.md
+last_updated: "2026-05-14T03:48:28.211Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 14
   completed_phases: 11
   total_plans: 81
-  completed_plans: 74
-  percent: 91
+  completed_plans: 75
+  percent: 93
 ---
 
 # Project State
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Milestone: v1.2 — Video Mode
 Phase: 12 (merge-nonogram-adoption) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Next action: `/gsd-execute-phase 12`
 Last activity: 2026-05-14
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 93%
 
 **Next action:** `/gsd-execute-phase 12` — drives 6 plans across 5 waves: Merge chip extract + TimerChip MOVE → Merge wrap+branch+compose → Nonogram chip extract → Nonogram wrap+branch+compose → Nonogram cell-size floor audit (checkpoint) → Phase close + 24-row manual matrix + v1.2 release log (checkpoint). Inherits the locked Phase 11 Mines compact-row pattern verbatim (symmetric two-chip, center-anchored picker, no gear, always-collapsed menu). VIDEO-09 + VIDEO-10 covered.
 
@@ -134,6 +134,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 11 P07 | 4min | 1 tasks | 1 files |
 | Phase 12 P01 | 323 | 3 tasks | 6 files |
 | Phase 12 P02 | 404 | 4 tasks | 4 files |
+| Phase 12 P03 | 251 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -363,6 +364,9 @@ Recent decisions affecting current work:
 - P12-02: D-MG-17 PROVEN — MergeBoardView.swift SHA 4aec1416 byte-identical across plan (verified git rev-parse pre/post).
 - P12-02: D-MG-01 slot mapping shipped verbatim — VideoCompactControlRow consumed without per-game fork (onSettings:nil, MergeScoreChip slot 2, MergeModePill slot 3, MergeBestChip + restartWithOverflowMenu slot 4+5).
 - P12-02: sibling-extension pattern adopted up front (MergeGameView 148 + MergeGameView+VideoMode 308) — both well under §8.5 500-line cap; mirrors P11-03 split-from-the-start lesson.
+- Plan 12-03: NonogramHeaderBar collapsed to thin composer (128 → 44 lines); NonogramSizeChip + NonogramLivesChip extracted with compact:Bool = false API; D-12-OFFRESTORE preserved (grep 'compact:' inside HeaderBar = 0); NonogramBoardView SHA unchanged (D-NG-17 untouched until Plan 12-05)
+- 12-03: D-12-OFFRESTORE preserved for Nonogram off-path — HeaderBar consumes all 3 chips with compact defaulted
+- 12-03: NonogramBoardView SHA fa6c2c0 unchanged across plan; D-NG-17 untouched contract preserved (floor seam deferred to 12-05)
 
 ### Pending Todos
 
@@ -383,8 +387,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T03:40:36.702Z
-Stopped at: Completed 12-02-PLAN.md
+Last session: 2026-05-14T03:48:28.205Z
+Stopped at: Completed 12-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
