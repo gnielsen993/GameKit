@@ -1,7 +1,7 @@
 # Roadmap: GameKit
 
 **Created:** 2026-04-24
-**Last updated:** 2026-05-13 (Phase 12 closes PARTIAL — 6/6 plans, gaps_found on SC1+SC3 small-zone routing; Phase 12.1 required for v1.2 ship; v1.2 progress 5/6 phases complete)
+**Last updated:** 2026-05-14 (Phase 13 planned — 5 plans; v1.2 progress 6/7 phases complete with Phase 13 in flight)
 **Granularity:** standard (5–8 phases, 3–5 plans each)
 **Coverage:** v1.0 — 38/38 requirements mapped ✓ · v1.2 — 14/14 requirements mapped ✓
 
@@ -372,7 +372,15 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   3. Haptics gating: any win-banner haptic (success cue, optional arpeggio) is silenced when `settingsStore.hapticsEnabled == false`, gated at the source per the v1.0 05-03 D-10 contract (`hapticsEnabled` is the FIRST guard inside any haptic-firing surface). Verified by a Swift Testing unit test mirroring the v1.0 HapticsTests shape.
   4. SFX gating: any win/loss banner sound is silenced when `settingsStore.sfxEnabled == false` (default false, matching MINES-10 / v1.0 05-03 lock); plays on `AVAudioSession.ambient` (does not duck user music) when enabled, mirroring the SFXPlayer construction lock from v1.0 05-03.
   5. Animation + Reduce Motion gating: any banner confetti / sweep / spring animation is dampened to near-zero when `accessibilityReduceMotion` is on (per the v1.0 05-06 D-04 per-surface lock — `.identity` transition, `.symbolEffect` value=0, `.keyframeAnimator` trigger=false patterns); legibility regression check passes on Classic preset AND one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for play, win, AND loss states in all three games across all 6 PiP locations.
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — Shared `VideoModeBanner` view + `VideoModeBannerContent` PoD struct + `VideoModeBannerAnchor` router + 6-zone exhaustive router tests + haptics FIRST-guard test (Wave 1; C-01/C-02/C-03 LOCKED at UI-SPEC time)
+- [ ] 13-02-PLAN.md — Minesweeper banner adoption — `MinesweeperGameView+EndBanner.swift` sibling + replace `endStateOverlay` on Video Mode path only (Wave 2)
+- [ ] 13-03-PLAN.md — Merge banner adoption — `MergeGameView+EndBanner.swift` sibling + replace 4 `endStateOverlay(state:)` call sites in `+VideoMode.swift` (Wave 2)
+- [ ] 13-04-PLAN.md — Nonogram banner adoption — `NonogramGameView+EndBanner.swift` sibling + replace `endStateOverlay` in `+VideoMode.swift` (Wave 2)
+- [ ] 13-05-PLAN.md — Manual audit on iPhone 17 Pro Max sim (Classic + Dracula) + append Phase 13 entries to `Docs/releases/v1.2.md` + flip STATE/ROADMAP/REQUIREMENTS to v1.2 closed (Wave 3; autonomous=false)
+
 **UI hint**: yes
 
 ### v1.2 Progress
@@ -388,7 +396,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 | 11. Minesweeper Adoption | 8/8 | Complete | 2026-05-13 |
 | 12. Merge + Nonogram Adoption | 6/6 | Closed (gaps closed by Phase 12.1) | 2026-05-13 |
 | 12.1. Small-Zone Routing Gap Closure | redesigned (audit rounds 1–7) | Complete | 2026-05-14 |
-| 13. Win/Loss Banner + A11y Gating | 0/TBD | Not started | - |
+| 13. Win/Loss Banner + A11y Gating | 0/5 | Planned | - |
 
 ### v1.2 Research Flags
 
