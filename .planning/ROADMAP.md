@@ -341,7 +341,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   4. Video Mode Off restores both games' baseline layouts byte-identical — Merge's swipe interaction, score persistence, and current end-of-game overlay all unchanged with the toggle Off (VIDEO-13 spot-check on Merge); Nonogram's swipe-fill / X-mark interactions and current overlays unchanged with the toggle Off (VIDEO-13 spot-check on Nonogram).
   5. The compact control row shape from Phase 9 is consumed verbatim for both games — Merge slots `Back | Score | Mode picker | Best/time | Settings`, Nonogram slots `Back | Lives/size | Fill/Mark picker | Time | Settings` per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §Compact control row; no per-game forking of the shared component.
 **Plans**: 6 plans
-- [ ] 12-01-PLAN.md — Merge chip extraction (MergeScoreChip + MergeBestChip) + TimerChip MOVE to Core/VideoModeTimerChip.swift; Mines's 2 call sites updated (D-12-CHIPS)
+- [x] 12-01-PLAN.md — Merge chip extraction (MergeScoreChip + MergeBestChip) + TimerChip MOVE to Core/VideoModeTimerChip.swift; Mines's 2 call sites updated (D-12-CHIPS)
 - [ ] 12-02-PLAN.md — Merge HomeView wrap + MergeGameView three-way layout branch + Large-zone compactRowComposed (D-MG-01) + MergeModePill compact API; MergeGameView+VideoMode.swift sibling extension
 - [ ] 12-03-PLAN.md — Nonogram chip extraction (NonogramSizeChip + NonogramLivesChip); HeaderBar consumes shared VideoModeTimerChip (D-12-CHIPS / D-12-OFFRESTORE)
 - [ ] 12-04-PLAN.md — Nonogram HomeView wrap + NonogramGameView three-way layout branch + Large-zone compactRowComposed (D-NG-01 single-slot Size↔Lives swap) + NonogramModePill compact API; NonogramGameView+VideoMode.swift sibling extension

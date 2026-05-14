@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: Ready to execute Phase 12
-stopped_at: Phase 12 planned (6 plans, plan-checker VERIFIED)
-last_updated: "2026-05-14T04:15:00.000Z"
+status: unknown
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-05-14T03:28:26.963Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 14
   completed_phases: 11
   total_plans: 81
-  completed_plans: 75
-  percent: 93
+  completed_plans: 73
+  percent: 90
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 12 — Merge + Nonogram adoption. 6 plans drafted + verified (2026-05-13); ready to execute.
+**Current focus:** Phase 12 — merge-nonogram-adoption
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 12 (merge-nonogram-adoption) — PLANNED (6 plans, plan-checker VERIFICATION PASSED)
-Plan: 0 of 6
+Phase: 12 (merge-nonogram-adoption) — EXECUTING
+Plan: 2 of 6
 Next action: `/gsd-execute-phase 12`
 Last activity: 2026-05-14
 
-Progress: [█████████░] 93% (75/81 plans across v1.0 + v1.2; Phase 11 closed, Phase 12 ready)
+Progress: [█████████░] 90%
 
 **Next action:** `/gsd-execute-phase 12` — drives 6 plans across 5 waves: Merge chip extract + TimerChip MOVE → Merge wrap+branch+compose → Nonogram chip extract → Nonogram wrap+branch+compose → Nonogram cell-size floor audit (checkpoint) → Phase close + 24-row manual matrix + v1.2 release log (checkpoint). Inherits the locked Phase 11 Mines compact-row pattern verbatim (symmetric two-chip, center-anchored picker, no gear, always-collapsed menu). VIDEO-09 + VIDEO-10 covered.
 
@@ -132,6 +132,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 11-mines-adoption P04 | 11min | 1 tasks tasks | 2 files files |
 | Phase 11-mines-adoption P05 | 15m | 2 tasks | 1 files |
 | Phase 11 P07 | 4min | 1 tasks | 1 files |
+| Phase 12 P01 | 323 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -357,6 +358,7 @@ Recent decisions affecting current work:
 - Plan 11-05: minCellSizeVideoMode locked at 12pt after §8.12 audit on Dracula + Voltage (Hard 16×30). ADR §Rollback did NOT fire. D-12 single-gate + D-17 untouched contract preserved.
 - Plan 11-07: Hard rows reference locked 12pt floor (Plan 11-05) + ADR screenshots in dual-citation Notes column
 - Plan 11-07: 11-VIDEO-MANUAL-CHECK.md ships blank per CONTEXT D-15; Plan 11-08 fills SC1 + SC3 rows during the manual sweep
+- Phase 12 Plan 01: TimerChip moved from Games/Minesweeper/ to Core/VideoModeTimerChip.swift — shared primitive across Mines + Merge + Nonogram (D-12-CHIPS); MergeScoreChip + MergeBestChip extracted with compact:Bool=false API preserving v1.1 off-path byte-identity (D-12-OFFRESTORE).
 
 ### Pending Todos
 
@@ -377,8 +379,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T00:23:11.564Z
-Stopped at: Completed 11-07-PLAN.md
+Last session: 2026-05-14T03:28:26.956Z
+Stopped at: Completed 12-01-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
