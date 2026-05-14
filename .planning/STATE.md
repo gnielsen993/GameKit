@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: phase-complete
-stopped_at: Phase 11 mines-adoption COMPLETE (8/8 plans)
-last_updated: "2026-05-14T02:45:00.000Z"
+status: Ready to execute Phase 12
+stopped_at: Phase 12 planned (6 plans, plan-checker VERIFIED)
+last_updated: "2026-05-14T04:15:00.000Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 14
   completed_phases: 11
-  total_plans: 75
+  total_plans: 81
   completed_plans: 75
-  percent: 100
+  percent: 93
 ---
 
 # Project State
@@ -21,19 +21,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 11 — mines-adoption COMPLETE (2026-05-13). Next: Phase 12 (Merge + Nonogram Adoption).
+**Current focus:** Phase 12 — Merge + Nonogram adoption. 6 plans drafted + verified (2026-05-13); ready to execute.
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 11 (mines-adoption) — COMPLETE (8/8 plans, 2026-05-13)
-Next phase: 12 (merge-nonogram-adoption)
-Status: Ready to discuss / plan Phase 12
+Phase: 12 (merge-nonogram-adoption) — PLANNED (6 plans, plan-checker VERIFICATION PASSED)
+Plan: 0 of 6
+Next action: `/gsd-execute-phase 12`
 Last activity: 2026-05-14
 
-Progress: [██████████] 100% (v1.2 phases 11/14 closed; SC4 + SC5 full sweep DEFERRED to TestFlight build per 11-VIDEO-MANUAL-CHECK.md)
+Progress: [█████████░] 93% (75/81 plans across v1.0 + v1.2; Phase 11 closed, Phase 12 ready)
 
-**Next action:** Discuss Phase 11 (`/gsd-discuss-phase 11`) — Minesweeper adopts the layout primitives. Easy + Medium across all 6 PiP locations on Classic + one Loud preset. Hard 16×30 ships the strategy from `.planning/phases/08-video-mode-design/08-HARD-MINES-ADR.md` (smaller-cells / Variant 1) gated on `videoModeStore.isEnabled` inside `MinesweeperBoardView.Self.minCellSize`. Wraps `MinesweeperGameView` (NOT `MinesweeperBoardView`) at the outermost layer per CONTEXT D-15 untouched contract. A2 (NavigationStack height adjustment) is the open carry-forward from Plan 10-VERIFICATION.md.
+**Next action:** `/gsd-execute-phase 12` — drives 6 plans across 5 waves: Merge chip extract + TimerChip MOVE → Merge wrap+branch+compose → Nonogram chip extract → Nonogram wrap+branch+compose → Nonogram cell-size floor audit (checkpoint) → Phase close + 24-row manual matrix + v1.2 release log (checkpoint). Inherits the locked Phase 11 Mines compact-row pattern verbatim (symmetric two-chip, center-anchored picker, no gear, always-collapsed menu). VIDEO-09 + VIDEO-10 covered.
 
 ## v1.0 Carry-Over
 
