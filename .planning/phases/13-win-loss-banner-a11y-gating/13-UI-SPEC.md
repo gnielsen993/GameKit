@@ -1,7 +1,7 @@
 ---
 phase: 13
 slug: win-loss-banner-a11y-gating
-status: draft
+status: approved
 shadcn_initialized: false
 preset: not applicable (Swift/SwiftUI + DesignKit project)
 created: 2026-05-14
