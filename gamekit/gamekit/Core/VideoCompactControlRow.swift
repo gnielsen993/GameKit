@@ -22,6 +22,14 @@
 //    - Preview block at bottom shows all 3 game slot mappings (Mines /
 //      Merge / Nonogram per Phase 8 D-08) — SC4 satisfaction (D-04).
 //      No DEBUG-only standalone screen, no HomeView dev hook — D-04 lock.
+//    - Picker slot is center-anchored via `Spacer(minLength: theme.spacing.s)`
+//      flanking the `picker()` closure. The primary/secondary info chips
+//      hug the outer edges; the picker (typically a Reveal/Flag-style mode
+//      pill) sits visually centered between them regardless of chip width
+//      asymmetry. Adopters that want a symmetric chip-on-each-side layout
+//      (P11-04 round 2 — Mines's Time-on-right slot) inherit the centering
+//      for free; adopters with chips of similar width (Merge / Nonogram)
+//      see no visual change beyond a small horizontal stretch.
 //
 
 import SwiftUI
@@ -44,7 +52,9 @@ struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: Vie
         HStack(spacing: theme.spacing.s) {           // D-13 inter-item gap
             backButton
             primaryInfo()
+            Spacer(minLength: theme.spacing.s)       // center-anchor picker
             picker()
+            Spacer(minLength: theme.spacing.s)       // center-anchor picker
             secondaryInfo()
             if onSettings != nil {
                 settingsButton
