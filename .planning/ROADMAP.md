@@ -340,7 +340,13 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   3. Legibility regression check passes on Classic preset AND one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for BOTH games across all 6 PiP locations — Merge tile gradients + Nonogram hint digits + filled/marked cell states all stay readable.
   4. Video Mode Off restores both games' baseline layouts byte-identical — Merge's swipe interaction, score persistence, and current end-of-game overlay all unchanged with the toggle Off (VIDEO-13 spot-check on Merge); Nonogram's swipe-fill / X-mark interactions and current overlays unchanged with the toggle Off (VIDEO-13 spot-check on Nonogram).
   5. The compact control row shape from Phase 9 is consumed verbatim for both games — Merge slots `Back | Score | Mode picker | Best/time | Settings`, Nonogram slots `Back | Lives/size | Fill/Mark picker | Time | Settings` per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §Compact control row; no per-game forking of the shared component.
-**Plans**: TBD
+**Plans**: 6 plans
+- [ ] 12-01-PLAN.md — Merge chip extraction (MergeScoreChip + MergeBestChip) + TimerChip MOVE to Core/VideoModeTimerChip.swift; Mines's 2 call sites updated (D-12-CHIPS)
+- [ ] 12-02-PLAN.md — Merge HomeView wrap + MergeGameView three-way layout branch + Large-zone compactRowComposed (D-MG-01) + MergeModePill compact API; MergeGameView+VideoMode.swift sibling extension
+- [ ] 12-03-PLAN.md — Nonogram chip extraction (NonogramSizeChip + NonogramLivesChip); HeaderBar consumes shared VideoModeTimerChip (D-12-CHIPS / D-12-OFFRESTORE)
+- [ ] 12-04-PLAN.md — Nonogram HomeView wrap + NonogramGameView three-way layout branch + Large-zone compactRowComposed (D-NG-01 single-slot Size↔Lives swap) + NonogramModePill compact API; NonogramGameView+VideoMode.swift sibling extension
+- [ ] 12-05-PLAN.md — Nonogram VM-aware cell-size floor seam in NonogramBoardView (D-NG-15) + human-verify audit checkpoint locking the floor value on Dracula + Voltage; D-NG-17 untouched contract
+- [ ] 12-06-PLAN.md — Phase close: 12-VIDEO-MANUAL-CHECK.md 24-row matrix authoring + manual SC1/SC2/SC3/SC4/SC5 sweep + Phase 12 entries in Docs/releases/v1.2.md
 **UI hint**: yes
 
 ### Phase 13: Win/Loss Banner + A11y Gating
@@ -367,7 +373,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 | 9. Video Mode Foundation | 8/8 | Complete | 2026-05-12 |
 | 10. Layout Primitives | 4/4 | Complete | 2026-05-13 |
 | 11. Minesweeper Adoption | 1/8 | In progress | - |
-| 12. Merge + Nonogram Adoption | 0/TBD | Not started | - |
+| 12. Merge + Nonogram Adoption | 0/6 | In progress | - |
 | 13. Win/Loss Banner + A11y Gating | 0/TBD | Not started | - |
 
 ### v1.2 Research Flags
