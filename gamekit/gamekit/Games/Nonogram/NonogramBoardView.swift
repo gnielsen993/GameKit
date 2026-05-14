@@ -80,9 +80,14 @@ struct NonogramBoardView: View {
     /// far enough for SwiftUI to disambiguate horizontal vs vertical.
     @State private var dragAxis: SlideAxis? = nil
 
+    // P12 D-NG-15 (Plan 12-05): gates floor in computeLayout only.
+    // D-NG-17 untouched; seam constants in NonogramBoardView+VideoMode.swift.
+    @Environment(\.videoModeStore) private var videoModeStore
+
     private enum SlideAxis { case horizontal, vertical }
 
-    private static let minCellSize: CGFloat = 14
+    // P12 D-NG-15: internal access for NonogramBoardView+VideoMode.swift; value 14 unchanged.
+    static let minCellSize: CGFloat = 14
     private static let minHintFont: CGFloat = 7
     /// Target board edge as a fraction of container width. Pinned so
     /// the grid stays the same size across difficulties — only the
@@ -476,7 +481,8 @@ struct NonogramBoardView: View {
         let pad = Self.hintPaddingOuter + Self.hintPaddingInner
         let maxByHeight = size.height - Self.minColHintHeight
         let preferredEdge = size.width * Self.gridEdgeFraction
-        let gridEdge = max(Self.minCellSize * n,
+        let floor = Self.minCellSize(videoModeOn: videoModeStore.isEnabled)
+        let gridEdge = max(floor * n,
                            min(preferredEdge, maxByHeight))
         let cs = gridEdge / n
 
