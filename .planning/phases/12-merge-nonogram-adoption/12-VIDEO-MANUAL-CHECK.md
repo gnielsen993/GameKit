@@ -2,9 +2,10 @@
 phase: 12-merge-nonogram-adoption
 type: video-manual-check
 canonical: true
-status: pending
-signed_off_by: ""
-signed_off_date: ""
+status: partial
+signed_off_by: gabrielnielsen
+signed_off_at: 2026-05-13
+gaps: [SC1-small-zone-picker-routing, SC3-small-zone-headerbar-chip-routing]
 ---
 
 # Phase 12 — Merge + Nonogram Video Mode Manual Verification
@@ -46,7 +47,7 @@ For Nonogram Hard row 20 (`largeBottom`): additionally compare the rendered Hard
 | # | Game | Difficulty/Mode | Zone | First action | Restart | Mode/Diff change | Win/Loss completes | Pass/Fail | Notes |
 |---|------|-----------------|------|--------------|---------|------------------|--------------------|-----------|-------|
 | 1 | Merge | winMode | largeTop | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — TestFlight sweep — inherits compactRowComposed shape verified at row 2 (symmetric, compact row at top instead of bottom). |
-| 2 | Merge | winMode | largeBottom | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | **VERIFY** — worst-case squeeze for Merge swipe gesture; SC1 acceptance row. Run on Classic + Dracula. |
+| 2 | Merge | winMode | largeBottom | ☑ | ☑ | ☑ | ☑ | ☑ PASS / ☐ FAIL | **VERIFIED 2026-05-13** — Classic + Dracula. Swipe gestures clean across both presets (no edge-swipe-back hijack — `.navigationBarBackButtonHidden(true)` preserved). Restart fires fresh board. Mode-change abandon-alert fires mid-game. End-state overlay appears on 2048 reach. SC1 acceptance row PASS on largeBottom worst-case squeeze. |
 | 3 | Merge | winMode | smallTopLeft | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — Small zones use existingLayout (P10 D-11 passthrough); only toolbar items reposition. |
 | 4 | Merge | winMode | smallTopRight | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — Small zones passthrough. |
 | 5 | Merge | winMode | smallBottomLeft | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — Small zones passthrough. |
@@ -64,7 +65,7 @@ For Nonogram Hard row 20 (`largeBottom`): additionally compare the rendered Hard
 | 17 | Nonogram | Tiny 5×5 | smallBottomLeft | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — Small zones passthrough. |
 | 18 | Nonogram | Tiny 5×5 | smallBottomRight | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — Small zones passthrough. |
 | 19 | Nonogram | Medium 15×15 Hard | largeTop | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — mirrors row 20 shape (vertically); 12pt floor verified to fit on largeBottom in row 20. |
-| 20 | Nonogram | Medium 15×15 Hard | largeBottom | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | **VERIFY (SC2 acceptance row)** — Plan 12-05 floor lock target at 12pt; compare against `Docs/screenshots/v1.2-phase-12/nonogram-hard-{classic,dracula,voltage}-largeBottom-locked.png`. Run on Classic + Dracula + Voltage. |
+| 20 | Nonogram | Medium 15×15 Hard | largeBottom | ☑ | ☑ | ☑ | ☑ | ☑ PASS / ☐ FAIL | **VERIFIED 2026-05-13 (SC2 acceptance row)** — Classic + Dracula + Voltage. Hint digits 1–9 legible WITHOUT pinch-zoom at the 12pt floor. Fill marks + X marks distinguishable. Super-cell rules (bold 5×5 grid lines) visible. Final renders match Plan 12-05 locked screenshots at `Docs/screenshots/v1.2-phase-12/nonogram-hard-{classic,dracula,voltage}-largeBottom-locked.png`. |
 | 21 | Nonogram | Medium 15×15 Hard | smallTopLeft | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — Small zones passthrough (BoardView uses 14pt off-path floor). |
 | 22 | Nonogram | Medium 15×15 Hard | smallTopRight | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — Small zones passthrough. |
 | 23 | Nonogram | Medium 15×15 Hard | smallBottomLeft | ☐ | ☐ | ☐ | ☐ | ☐ PASS / ☐ FAIL | DEFERRED — Small zones passthrough. |
@@ -74,9 +75,28 @@ For Nonogram Hard row 20 (`largeBottom`): additionally compare the rendered Hard
 
 | Success criterion | Verifier | Date | Status |
 |-------------------|----------|------|--------|
-| SC1 — Merge plays across 6 zones | | | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| SC2 — Nonogram Hard hint legibility in Large zones | | | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| SC3 — Classic + Loud × both games × 6 zones legibility | | | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| SC4 — Off-restore byte-identity (Merge + Nonogram) | | | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| SC5 — Compact row consumed verbatim (no per-game forking) | | | ☐ PASS / ☐ FAIL / ☐ DEFERRED |
-| **Top-level** | | | ☐ PASS / ☐ FAIL / ☐ PARTIAL |
+| SC1 — Merge plays across 6 zones | gabrielnielsen | 2026-05-13 | ☐ PASS / ☑ FAIL / ☐ DEFERRED |
+| SC2 — Nonogram Hard hint legibility in Large zones | gabrielnielsen | 2026-05-13 | ☑ PASS / ☐ FAIL / ☐ DEFERRED |
+| SC3 — Classic + Loud × both games × 6 zones legibility | gabrielnielsen | 2026-05-13 | ☐ PASS / ☑ FAIL / ☐ DEFERRED |
+| SC4 — Off-restore byte-identity (Merge + Nonogram) | gabrielnielsen | 2026-05-13 | ☑ PASS / ☐ FAIL / ☐ DEFERRED |
+| SC5 — Compact row consumed verbatim (no per-game forking) | gabrielnielsen | 2026-05-13 | ☑ PASS / ☐ FAIL / ☐ DEFERRED |
+| **Top-level** | gabrielnielsen | 2026-05-13 | ☐ PASS / ☐ FAIL / ☑ PARTIAL |
+
+## Gap Description (SC1 + SC3 FAIL)
+
+**P11 carryforward defect — small-zone picker (ModePill) + HeaderBar chip routing.**
+
+`VideoModeSlotRouter.anchors(for:)` correctly returns per-zone anchor positions for `picker`, but the Small-zone branches in all three adopter games (Mines, Merge, Nonogram) consume only the toolbar-item anchors (`back` / `settings` / `fab`) — the `anchors.picker` value is never wired into the existing layout, leaving the ModePill at its default bottom-center position. The same omission applies to the HeaderBar chips on Top L/R PiP zones:
+
+- **Bottom L/R PiP zones:** Small PiP overlay covers the bottom-center ModePill on Mines (Reveal/Flag), Merge (Win/Infinite), Nonogram (Place/Mark).
+- **Top L/R PiP zones:** Small PiP overlay covers the top-center HeaderBar chips on Mines (MinesRemaining + Timer), Merge (Score + Best), Nonogram (Size/Lives + Timer).
+
+**Severity:** SC1 + SC3 fail on 4 of 6 zones for each of the 3 games. SC2 + SC4 + SC5 unaffected (those operate on Large zones / Off-path / shared-component identity).
+
+**Surfaced by:** 12-06 small-zone audit (after 12-05 closed at 12pt floor).
+**Origin:** Carryforward from Phase 11 — the Mines adoption had the same gap but it was not caught at 11-08 sign-off because the P11 matrix worst-case row (Hard × largeBottom) is a Large-zone row that did not exercise the Small-zone branch.
+
+**Gap-closure plan:** `/gsd-plan-phase 12.1 --gaps` — author Phase 12.1 to:
+1. Add a Small-zone ModePill reposition seam in each game's `+VideoMode.swift` extension that reads `anchors.picker` and overlays the ModePill at that anchor (or hides bottom-center / shows at top per zone).
+2. Add a Small-zone HeaderBar chip reposition seam (or hide / re-anchor the HeaderBar entirely on Top L/R zones).
+3. Re-audit the 4 small-zone rows per game (Rows 3-6, 9-12 for Merge; Rows 15-18, 21-24 for Nonogram; plus the equivalent Mines rows from `11-VIDEO-MANUAL-CHECK.md`).
