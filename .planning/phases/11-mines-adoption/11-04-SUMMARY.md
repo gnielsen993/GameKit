@@ -494,7 +494,95 @@ Build SUCCEEDED on iPhone 17 sim (iOS 26.2) after each of the 4 commits.
 `MinesweeperViewModelTests` TEST SUCCEEDED after each commit (view-layer
 compact variants don't change VM behavior).
 
+### Round 2 — center pill + split chip stack
+
+User feedback after running Round 1 (verbatim, 2026-05-13):
+> *"The flag time bar looks visually off as it carries more vertical weight"*
+> *"the reveal/flag needs to be anchored to the center, because that what
+> should be centered, adding the difficulty picker back to the side may
+> center it. If no difficulty picker, we can integrate it into the
+> 'restart' and put the time on the right so it is completely visually
+> balanced"*
+
+Two atomic commits landed on Phase 11 inline (no new plan file — these
+extend the 11-04 audit trail):
+
+1. **`c5c15ea`** `refactor(11-04): center-anchor picker slot via Spacers in VideoCompactControlRow`
+   — Inserted `Spacer(minLength: theme.spacing.s)` on both sides of the
+   `picker()` closure inside the shared component's HStack body. Slot 3
+   (the picker) is now visually centered between the two info slots
+   regardless of chip-width asymmetry. Doc-comment header updated. Merge
+   + Nonogram (Phase 12) inherit the centering for free; this is
+   intentional per the user-feedback memory note. `VideoCompactControlRow.swift`
+   is **no longer byte-identical to its Round-1 state** (Round 1 had
+   already softened the D-12 5-slot contract; Round 2 adds the
+   Spacer-anchored picker behavior).
+2. **`0f546b7`** `feat(11-04): symmetric two-chip layout for Mines compact row (Mines-left, Time-right, pill-center)`
+   — `compactRowComposed` reshape: slot 2 is now `MinesRemainingChip`
+   alone (no VStack stack); slots 4+5 host `TimerChip` +
+   `restartWithOverflowMenu` side-by-side in an HStack under
+   `secondaryInfo`. The stacked-chip VStack from Round 1 is **gone**.
+   D-18 `.reducedTime` still drops `TimerChip` (now in `secondaryInfo`
+   rather than slot 2's stack); `MinesRemainingChip` stays visible on the
+   left at every compactness level. Off-path byte-identity preserved
+   (`MinesweeperBoardView.swift` + `MinesweeperHeaderBar.swift` git diff
+   vs HEAD = 0 lines).
+
+### Round-2 verification grep counts
+
+- `grep -c "Spacer(minLength: theme.spacing.s)" VideoCompactControlRow.swift`
+  → `3` (2 in HStack body — left + right of picker — + 1 in doc-comment).
+- `grep -c "VStack(spacing: theme.spacing.xs)" MinesweeperGameView+VideoMode.swift`
+  → `0` (the stacked-chip VStack is gone).
+- `grep -c "TimerChip(" MinesweeperGameView+VideoMode.swift`
+  → `1` (single call inside the `secondaryInfo` HStack, guarded by
+  `.reducedTime` check).
+- `git diff HEAD -- MinesweeperBoardView.swift` → empty (D-17 preserved).
+- `git diff HEAD -- MinesweeperHeaderBar.swift` → empty (off-path
+  byte-identity preserved).
+
+### Round-2 design-doc divergence
+
+- **Phase 8 D-05 slot order [Mines, Timer, Flag, New, Difficulty, Back]
+  still holds at the slot-IDENTITY level.** Mines (slot 2) and Timer are
+  both present; they are simply no longer stacked into the same slot.
+  Timer now occupies the right side alongside Restart-with-overflow-menu.
+  No slot identity changed; the row reads with the same content set, just
+  spatially redistributed for symmetric visual balance.
+- **Phase 8 D-06 (stacked chip in slot 2) is intentionally SUPERSEDED for
+  Mines per user feedback.** Round 1 added the stacked VStack; Round 2
+  removes it. The "stacked chip in slot 2" pattern is no longer canonical
+  for Mines. Merge + Nonogram (Phase 12) adoptions may revisit the
+  stacked pattern if their slot 2 hosts two chips, but the default
+  recommendation is now "one chip per side, picker in the center."
+- **Phase 9 D-12 5-slot contract — backward-compatible Spacer
+  flexibility added.** The row body now hosts
+  `Spacer(minLength: theme.spacing.s)` on both sides of the picker
+  closure. No slot identity changed; Merge + Nonogram inherit
+  center-anchoring of their picker for free. The contract is now
+  "5-or-4 slots with center-anchored picker via Spacer flanking" —
+  strictly additive vs Round 1's "5-or-4 slots" softening.
+
+### Round-2 D-17 / off-path / shared-file contracts
+
+- `MinesweeperBoardView.swift` UNTOUCHED in both Round-2 commits
+  (D-17 preserved; git hash `53a13658bac5363f626d42041d1b9a96078bad2b`
+  carried forward from Plan 11-05).
+- `MinesweeperHeaderBar.swift` UNTOUCHED in both Round-2 commits
+  (off-path byte-identity preserved; consumes default `compact: false`
+  on `MinesRemainingChip` + `TimerChip`).
+- `existingLayout` call sites in `MinesweeperGameView+VideoMode.swift`
+  UNTOUCHED — off-path remains v1.0 byte-identical at the call-site
+  level. Only `compactRowComposed` changed.
+
+### Round-2 build + tests
+
+- `xcodebuild build -scheme gamekit -destination 'platform=iOS Simulator,id=82FBCB79-5A7B-4627-8CFD-F72BBF7A3C81'`
+  → **BUILD SUCCEEDED** after Commit 1 and after Commit 2.
+- `xcodebuild test -only-testing:gamekitTests/MinesweeperViewModelTests`
+  → **TEST SUCCEEDED** after Commit 2 (no VM behavior change).
+
 ---
 *Phase: 11-mines-adoption*
 *Completed: 2026-05-13*
-*Polish addendum: 2026-05-13*
+*Polish addendum: 2026-05-13 (round 1 + round 2)*
