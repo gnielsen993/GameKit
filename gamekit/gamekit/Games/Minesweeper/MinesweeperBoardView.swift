@@ -88,9 +88,7 @@ struct MinesweeperBoardView: View {
     /// iPhone 17 Pro Max OR §8.12 Dracula legibility regresses, switch to
     /// warning-compromise (Variant 4) as the v1.3 fallback.
     ///
-    /// TODO 11-05 audit: replace placeholder with the locked value before
-    /// the human-verify checkpoint (Task 2) closes.
-    static let minCellSizeVideoMode: CGFloat = 12   // PLACEHOLDER — locked at Task 2
+    static let minCellSizeVideoMode: CGFloat = 12   // Locked 2026-05-13; audit passed on Dracula + Voltage at 12pt
 
     /// Returns the appropriate floor for the current Video Mode state.
     /// Off → minCellSize (v1.0 = 18). On → minCellSizeVideoMode.
