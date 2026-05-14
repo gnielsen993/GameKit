@@ -1,7 +1,7 @@
 # Roadmap: GameKit
 
 **Created:** 2026-04-24
-**Last updated:** 2026-05-13 (Phase 11 planned — 8 plans; v1.2 progress 3/6 phases complete, P11 planning ready to execute)
+**Last updated:** 2026-05-13 (Phase 12 closes PARTIAL — 6/6 plans, gaps_found on SC1+SC3 small-zone routing; Phase 12.1 required for v1.2 ship; v1.2 progress 5/6 phases complete)
 **Granularity:** standard (5–8 phases, 3–5 plans each)
 **Coverage:** v1.0 — 38/38 requirements mapped ✓ · v1.2 — 14/14 requirements mapped ✓
 
@@ -346,7 +346,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 - [x] 12-03-PLAN.md — Nonogram chip extraction (NonogramSizeChip + NonogramLivesChip); HeaderBar consumes shared VideoModeTimerChip (D-12-CHIPS / D-12-OFFRESTORE)
 - [x] 12-04-PLAN.md — Nonogram HomeView wrap + NonogramGameView three-way layout branch + Large-zone compactRowComposed (D-NG-01 single-slot Size↔Lives swap) + NonogramModePill compact API; NonogramGameView+VideoMode.swift sibling extension
 - [x] 12-05-PLAN.md — Nonogram VM-aware cell-size floor seam in NonogramBoardView (D-NG-15) + human-verify audit locked minCellSizeVideoMode = 12pt on Dracula + Voltage @ Hard 15×15 largeBottom; D-NG-17 untouched contract; sibling-extension split per §8.5
-- [ ] 12-06-PLAN.md — Phase close: 12-VIDEO-MANUAL-CHECK.md 24-row matrix authoring + manual SC1/SC2/SC3/SC4/SC5 sweep + Phase 12 entries in Docs/releases/v1.2.md
+- [x] 12-06-PLAN.md — Phase close: 12-VIDEO-MANUAL-CHECK.md 24-row matrix + manual SC1/SC2/SC3/SC4/SC5 sweep + Phase 12 entries in Docs/releases/v1.2.md (closes PARTIAL — SC2 + SC4 + SC5 PASS; SC1 + SC3 FAIL on small-zone routing — gap-closure via Phase 12.1)
 **UI hint**: yes
 
 ### Phase 13: Win/Loss Banner + A11y Gating
@@ -372,8 +372,8 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 | 8. Video Mode Design | 6/6 | Complete | 2026-05-12 |
 | 9. Video Mode Foundation | 8/8 | Complete | 2026-05-12 |
 | 10. Layout Primitives | 4/4 | Complete | 2026-05-13 |
-| 11. Minesweeper Adoption | 1/8 | In progress | - |
-| 12. Merge + Nonogram Adoption | 0/6 | In progress | - |
+| 11. Minesweeper Adoption | 8/8 | Complete | 2026-05-13 |
+| 12. Merge + Nonogram Adoption | 6/6 | Closed PARTIAL (gaps_found — 12.1 required) | 2026-05-13 |
 | 13. Win/Loss Banner + A11y Gating | 0/TBD | Not started | - |
 
 ### v1.2 Research Flags

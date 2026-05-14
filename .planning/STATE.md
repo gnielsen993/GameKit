@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: unknown
-stopped_at: Completed 12-05-PLAN.md
-last_updated: "2026-05-14T04:10:00.000Z"
-last_activity: 2026-05-14
+stopped_at: Completed 12-06-PLAN.md — Phase 12 closes PARTIAL (gaps_found)
+last_updated: "2026-05-14T04:27:53.524Z"
+last_activity: 2026-05-13
 progress:
   total_phases: 14
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 81
-  completed_plans: 77
-  percent: 95
+  completed_plans: 78
+  percent: 96
 ---
 
 # Project State
@@ -26,14 +26,18 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 12 (merge-nonogram-adoption) — EXECUTING
-Plan: 6 of 6
-Next action: `/gsd-execute-phase 12`
-Last activity: 2026-05-14
+Phase: 12 (merge-nonogram-adoption) — CLOSED PARTIAL (gaps_found)
+Plan: 6 of 6 (12-06 executed; SC1 + SC3 FAIL on small-zone routing)
+Next action: `/gsd-plan-phase 12.1 --gaps`
+Last activity: 2026-05-13
 
-Progress: [█████████░] 95%
+Progress: [█████████░] 96%
 
-**Next action:** `/gsd-execute-phase 12` — drives 6 plans across 5 waves: Merge chip extract + TimerChip MOVE → Merge wrap+branch+compose → Nonogram chip extract → Nonogram wrap+branch+compose → Nonogram cell-size floor audit (checkpoint) → Phase close + 24-row manual matrix + v1.2 release log (checkpoint). Inherits the locked Phase 11 Mines compact-row pattern verbatim (symmetric two-chip, center-anchored picker, no gear, always-collapsed menu). VIDEO-09 + VIDEO-10 covered.
+**Next action:** `/gsd-plan-phase 12.1 --gaps` — author Phase 12.1 to close the SC1 + SC3 small-zone picker (ModePill) + HeaderBar chip routing gap that surfaced during 12-06's manual-check audit. P11 carryforward defect — `VideoModeSlotRouter.anchors(for:)` returns correct `anchors.picker` values but none of the 3 adopter games (Mines, Merge, Nonogram) wire it into the Small-zone `existingLayout` branch. Bot L/R PiP zones cover the bottom-center ModePill; Top L/R PiP zones cover the top-center HeaderBar chips. Phase 12.1 closes both seams across all 3 games + re-audits the 4 small-zone rows per game.
+
+**Phase 12 — what shipped:** Plans 12-01..12-05 landed the Merge + Nonogram adoption code; SC2 (Nonogram Hard hint legibility @ 12pt floor on Classic + Dracula + Voltage), SC4 (Off-restore byte-identity for both games), SC5 (VideoCompactControlRow consumed verbatim — zero diff across phase) all PASS.
+
+**Phase 13 (Win/Loss Banner + A11y Gating)** can begin planning in parallel — the 12.1 gap is layout-routing-only and doesn't affect 13's compositional surface.
 
 ## v1.0 Carry-Over
 
@@ -137,6 +141,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 12 P03 | 251 | 2 tasks | 3 files |
 | Phase 12 P04 | 261 | 4 tasks | 4 files |
 | Phase 12 P05 | 360 | 2 tasks | 2 files |
+| Phase 12-merge-nonogram-adoption P06 | 25 | 4 tasks tasks | 2 files files |
 
 ## Accumulated Context
 
@@ -374,6 +379,7 @@ Recent decisions affecting current work:
 - Plan 12-05: minCellSizeVideoMode locked at 12pt after §8.12 audit on Dracula + Voltage @ Hard 15×15 largeBottom (worst-case zone). D-NG-15 single-gate held (0 grep matches for location.isLarge / difficulty conditioning); D-NG-17 byte-identity proven vs git HEAD~2 (gesture/geometry/drag-state grep counts unchanged: 4 / 22 / 42). D-NG-15 rollback NOT fired. Off-path returns 14pt verbatim (SC4 preserved).
 - Plan 12-05: Sibling-extension split mandatory (Option B). NonogramBoardView pre-plan was 512 LOC — already 12 LOC past §8.5's 500-line cap (pre-existing drift). Static constants + helper extracted to NonogramBoardView+VideoMode.swift (55 lines); host growth limited to +6 LOC (env read + access promotion comment + computeLayout call-site update). minCellSize access promoted from private → internal so the extension can read it (literal `14` byte-identical). Pre-existing 12-LOC over-cap drift on host remains as a deferred item.
 - Plan 12-05: §8.12 audit screenshots NOT persisted to disk — auditor evaluated on running simulator and confirmed pass; Plan 12-06's manual-check doc will capture the final-render parity matrix including the locked Hard rows.
+- Phase 12 closes PARTIAL (gaps_found) — SC1 + SC3 FAIL on small-zone picker/chip routing; P11 carryforward defect, closure via Phase 12.1
 
 ### Pending Todos
 
@@ -383,6 +389,7 @@ Recent decisions affecting current work:
 ### Blockers/Concerns
 
 - *(no active v1.2 blockers — Phase 9 foundation closed 2026-05-12; Phase 10 layout primitives ready to plan (research-flagged). v1.0 Phase 7 release pre-flight items continue in parallel; see §v1.0 Carry-Over for the open checklist.)*
+- Phase 12.1 required — small-zone ModePill + HeaderBar chip routing across all 3 adopter games (Mines, Merge, Nonogram). VideoModeSlotRouter.anchors(for:).picker not wired into existingLayout on Small zones.
 
 ## Deferred Items
 
@@ -394,8 +401,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T04:10:00.000Z
-Stopped at: Completed 12-05-PLAN.md
-Resume file: None
+Last session: 2026-05-14T04:27:53.518Z
+Stopped at: Completed 12-06-PLAN.md — Phase 12 closes PARTIAL (gaps_found)
+Resume file: Phase 12.1 required for SC1+SC3 small-zone routing closure
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
