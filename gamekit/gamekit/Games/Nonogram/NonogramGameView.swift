@@ -8,19 +8,34 @@
 //  VStack(header / board / mode pill) + conditional end-state overlay,
 //  toolbar with back chevron + restart + size picker.
 //
+//  Phase 12 Plan 12-04 (D-NG-01 + D-NG-17):
+//    - body is a three-way Group branch on Video Mode state:
+//        • off-path (!videoModeStore.isEnabled): existingLayout + existingToolbarContent
+//          — v1.1 render byte-identical (SC4 / D-12-OFFRESTORE)
+//        • Large-zone: largeZoneLayout, nav-bar toolbar hidden — compact row
+//          hosts Back / Size↔Lives / Fill-Mark / Time / Restart-w-menu per D-NG-01
+//        • Small-zone: existingLayout + smallZoneToolbarContent — toolbar
+//          items repositioned via VideoModeSlotRouter.anchors(for:)
+//    - All extension members live in NonogramGameView+VideoMode.swift (§8.5
+//      file-size cap split). Env reads, viewModel, theme, dismiss, settingsStore,
+//      reduceMotion, endCardVisible, isInteractive, isTerminal, endStateOverlay
+//      are internal access so the extension can read them.
+//    - D-NG-17: NonogramBoardView untouched in this plan; Plan 12-05 handles
+//      the cell-size floor seam.
+//
 
 import SwiftUI
 import SwiftData
 import DesignKit
 
 struct NonogramGameView: View {
-    @State private var viewModel: NonogramViewModel
+    @State var viewModel: NonogramViewModel
     @EnvironmentObject private var themeManager: ThemeManager
-    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.settingsStore) private var settingsStore
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.settingsStore) var settingsStore
+    @Environment(\.dismiss) var dismiss
     @State private var didInjectStats = false
     @State private var showDifficultyPicker = false
 
@@ -30,110 +45,37 @@ struct NonogramGameView: View {
     /// Gates the end-state card so the player gets a beat to admire the
     /// completed picture before the overlay covers it. Flipped true by a
     /// Task that runs on `state == .won`.
-    @State private var endCardVisible = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State var endCardVisible = false
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
 
-    private var theme: Theme { themeManager.theme(using: colorScheme) }
+    // P12 D-NG-01 (Plan 12-04): three-way layout branch on Video Mode state.
+    // - .isEnabled false → off-path = v1.1 verbatim (SC4 / D-12-OFFRESTORE byte-identical).
+    // - .isEnabled true + location.isLarge → compactRowComposed swap (D-NG-01).
+    // - .isEnabled true + small zone → existing layout + repositioned toolbar (D-NG-02).
+    @Environment(\.videoModeStore) var videoModeStore
+    @Environment(\.videoModeCompactness) var videoModeCompactness
 
-    private var isInteractive: Bool {
+    var theme: Theme { themeManager.theme(using: colorScheme) }
+
+    var isInteractive: Bool {
         viewModel.state != .won && viewModel.state != .gameOver
     }
 
-    private var isTerminal: Bool {
+    var isTerminal: Bool {
         viewModel.state == .won || viewModel.state == .gameOver
     }
 
     var body: some View {
-        ZStack {
-            theme.colors.background.ignoresSafeArea()
-
-            VStack(spacing: theme.spacing.m) {
-                NonogramHeaderBar(
-                    theme: theme,
-                    sizeLabel: "\(viewModel.difficulty.size) × \(viewModel.difficulty.size)",
-                    timerAnchor: viewModel.timerAnchor,
-                    pausedElapsed: viewModel.pausedElapsed,
-                    livesRemaining: viewModel.gameMode == .lives ? viewModel.livesRemaining : nil
-                )
-
-                if viewModel.currentPuzzle != nil {
-                    NonogramBoardView(
-                        board: viewModel.board,
-                        rowHints: viewModel.rowHints,
-                        columnHints: viewModel.columnHints,
-                        rowsCrossOff: viewModel.rowsCrossOff,
-                        columnsCrossOff: viewModel.columnsCrossOff,
-                        theme: theme,
-                        isInteractive: isInteractive,
-                        interactionMode: viewModel.interactionMode,
-                        wrongFlashIdx: viewModel.lastWrongAttemptIdx,
-                        flashRow: viewModel.flashRow,
-                        flashCol: viewModel.flashCol,
-                        onTap: { row, col in viewModel.handleTap(at: row, col: col) },
-                        onLongPress: { row, col in viewModel.handleLongPress(at: row, col: col) },
-                        onSlide: { row, col, next in viewModel.setCell(at: row, col: col, to: next) }
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.horizontal, theme.spacing.m)
-                    .layoutPriority(1)
-                    .sensoryFeedback(
-                        .error,
-                        trigger: settingsStore.hapticsEnabled ? viewModel.wrongAttemptCount : 0
-                    )
-                    // Per-block tap: light click on placing/erasing a fill,
-                    // softer selection on toggling a mark. Mode-aware via
-                    // separate counters on the VM.
-                    .sensoryFeedback(
-                        .impact(weight: .light, intensity: 0.7),
-                        trigger: settingsStore.hapticsEnabled ? viewModel.placeCount : 0
-                    )
-                    .sensoryFeedback(
-                        .selection,
-                        trigger: settingsStore.hapticsEnabled ? viewModel.markCount : 0
-                    )
-                    // Heavier "snap" when a row OR column completes — the
-                    // dopamine beat for a solved line. Distinct from
-                    // per-cell taps so the player feels progress.
-                    .sensoryFeedback(
-                        .impact(weight: .medium, intensity: 1.0),
-                        trigger: settingsStore.hapticsEnabled ? viewModel.lineCompletionCount : 0
-                    )
-                } else {
-                    Spacer()
-                    Text(String(localized: "No puzzles bundled yet"))
-                        .font(.callout)
-                        .foregroundStyle(theme.colors.textSecondary)
-                    Spacer()
-                }
-
-                NonogramModePill(
-                    theme: theme,
-                    mode: viewModel.interactionMode,
-                    isInteractive: isInteractive,
-                    onSelect: { viewModel.setInteractionMode($0) }
-                )
-                .padding(.top, theme.spacing.s)
-                .opacity(isInteractive ? 1 : 0)
-                .allowsHitTesting(isInteractive)
-            }
-            .padding(.bottom, theme.spacing.l)
-
-            // Celebratory confetti for the 2s pause between win and end-
-            // card. Reuses the Minesweeper ConfettiView (TimelineView-
-            // driven Canvas particles, theme-aware colors). Animations
-            // toggle / Reduce Motion still gate it.
-            if viewModel.state == .won
-               && settingsStore.animationsEnabled
-               && !reduceMotion {
-                ConfettiView(theme: theme)
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
-                    .transition(.opacity)
-            }
-
-            if isTerminal && endCardVisible {
-                endStateOverlay
-                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+        Group {
+            if !videoModeStore.isEnabled {
+                existingLayout
+                    .toolbar { existingToolbarContent }
+            } else if videoModeStore.location.isLarge {
+                largeZoneLayout
+                    .toolbar(.hidden, for: .navigationBar)
+            } else {
+                existingLayout
+                    .toolbar { smallZoneToolbarContent }
             }
         }
         .onChange(of: viewModel.state) { _, newState in
@@ -176,43 +118,6 @@ struct NonogramGameView: View {
         .navigationTitle(String(localized: "Nonogram"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(theme.colors.textPrimary)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Back to The Drawer"))
-            }
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    viewModel.restart()
-                } label: {
-                    Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(theme.colors.textPrimary)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text("Restart game"))
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                NonogramToolbarMenu(
-                    theme: theme,
-                    currentDifficulty: viewModel.difficulty,
-                    currentGameMode: viewModel.gameMode,
-                    onSelectDifficulty: { viewModel.setDifficulty($0) },
-                    onSelectGameMode: { viewModel.setGameMode($0) }
-                )
-            }
-        }
         .confirmationDialog(
             String(localized: "Choose size"),
             isPresented: $showDifficultyPicker,
@@ -242,7 +147,7 @@ struct NonogramGameView: View {
     }
 
     @ViewBuilder
-    private var endStateOverlay: some View {
+    var endStateOverlay: some View {
         ZStack {
             Rectangle()
                 .fill(theme.colors.background.opacity(0.85))
