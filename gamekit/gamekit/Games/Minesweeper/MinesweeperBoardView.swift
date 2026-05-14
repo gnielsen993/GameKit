@@ -54,6 +54,12 @@ struct MinesweeperBoardView: View {
     let onTap: (MinesweeperIndex) -> Void
     let onLongPress: (MinesweeperIndex) -> Void
 
+    // P11 D-10/D-12 (Plan 11-05): Video Mode env read. ONLY used to gate
+    // the cellSize floor lookup; no other branches in this view. D-17
+    // untouched contract: MagnifyGesture / scaleEffect / clampZoomScale /
+    // cell-level LongPressGesture composition stay byte-identical.
+    @Environment(\.videoModeStore) private var videoModeStore
+
     // 18pt floor (CONTEXT D-13). With Hard reshaped to 24×16 the formula
     // never clamps at this floor on iPhone-class widths.
     //
@@ -65,6 +71,37 @@ struct MinesweeperBoardView: View {
     // width and never shrinks back. GeometryReader reports the parent's
     // *proposed* width every layout pass and is rotation-stable.
     static let minCellSize: CGFloat = 18
+
+    /// Video-Mode-aware floor for Hard 16×30 on Large PiP zones.
+    /// Locked from the Plan 11-05 audit:
+    ///   - render Hard at 10/11/12/13pt on Dracula + Voltage presets
+    ///   - measure mine icon + 1–8 SF Symbol legibility per CLAUDE.md §8.12
+    ///   - pick the value that survives §8.12 cleanly
+    /// Working number per `.planning/phases/08-video-mode-design/08-HARD-MINES-ADR.md`
+    /// §"How it composes with the existing 06.1-03 system" is ~12pt.
+    ///
+    /// Audit screenshots:
+    ///   - Docs/screenshots/v1.2-design/mines-hard-classic-pip-large.png
+    ///   - Docs/screenshots/v1.2-design/mines-hard-dracula-pip-large.png
+    ///
+    /// Rollback condition (ADR §Rollback): if mis-tap rate regresses on
+    /// iPhone 17 Pro Max OR §8.12 Dracula legibility regresses, switch to
+    /// warning-compromise (Variant 4) as the v1.3 fallback.
+    ///
+    /// TODO 11-05 audit: replace placeholder with the locked value before
+    /// the human-verify checkpoint (Task 2) closes.
+    static let minCellSizeVideoMode: CGFloat = 12   // PLACEHOLDER — locked at Task 2
+
+    /// Returns the appropriate floor for the current Video Mode state.
+    /// Off → minCellSize (v1.0 = 18). On → minCellSizeVideoMode.
+    /// Single gate per ADR §How-it-composes + CONTEXT D-12:
+    /// the floor depends ONLY on `videoModeOn`. PiP location (Large vs
+    /// Small) is NOT a factor; game difficulty is NOT a factor. Easy +
+    /// Medium auto-scale above the lowered floor at iPhone-class widths,
+    /// so only the Hard squeeze case actually consumes the new floor.
+    static func minCellSize(videoModeOn: Bool) -> CGFloat {
+        videoModeOn ? minCellSizeVideoMode : minCellSize
+    }
 
     /// Pure formula extracted for unit testing (Plan 06.1-03 Wave 0).
     /// Returns the per-cell side length given the available container
@@ -78,13 +115,19 @@ struct MinesweeperBoardView: View {
     /// Sub-floor cases (e.g. Hard 30-col on iPhone SE 320pt) clamp to
     /// `minCellSize` and rely on the horizontal-scroll fallback
     /// (`scrollAxis(for:)`) plus pinch-zoom-out for the accessibility path.
-    static func cellSize(forWidth width: CGFloat, cols: Int, padding: CGFloat, spacing: CGFloat) -> CGFloat {
-        guard cols > 0 else { return minCellSize }
+    static func cellSize(
+        forWidth width: CGFloat,
+        cols: Int,
+        padding: CGFloat,
+        spacing: CGFloat,
+        floor: CGFloat = minCellSize
+    ) -> CGFloat {
+        guard cols > 0 else { return floor }
         let colsF = CGFloat(cols)
         let usable = max(0, width - 2 * padding)
         let spacingTotal = max(0, colsF - 1) * spacing
         let computed = (usable - spacingTotal) / colsF
-        return max(minCellSize, computed)
+        return max(floor, computed)
     }
 
     /// 2026-05-02 — iPad fix. Width-only sizing was correct for iPhone
@@ -103,15 +146,16 @@ struct MinesweeperBoardView: View {
         cols: Int,
         rows: Int,
         padding: CGFloat,
-        spacing: CGFloat
+        spacing: CGFloat,
+        floor: CGFloat = minCellSize
     ) -> CGFloat {
-        let widthBound = cellSize(forWidth: width, cols: cols, padding: padding, spacing: spacing)
+        let widthBound = cellSize(forWidth: width, cols: cols, padding: padding, spacing: spacing, floor: floor)
         guard rows > 0 else { return widthBound }
         let rowsF = CGFloat(rows)
         let usableHeight = max(0, height - 2 * padding)
         let spacingTotalH = max(0, rowsF - 1) * spacing
         let heightBound = (usableHeight - spacingTotalH) / rowsF
-        return max(minCellSize, min(widthBound, heightBound))
+        return max(floor, min(widthBound, heightBound))
     }
 
     var body: some View {
@@ -130,7 +174,8 @@ struct MinesweeperBoardView: View {
                 cols: board.cols,
                 rows: board.rows,
                 padding: theme.spacing.s,
-                spacing: 0
+                spacing: 0,
+                floor: Self.minCellSize(videoModeOn: videoModeStore.isEnabled)
             )
             let columns = Array(
                 repeating: GridItem(.fixed(cs), spacing: 0),
