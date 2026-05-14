@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: executing
-stopped_at: Completed 11-07-PLAN.md
-last_updated: "2026-05-14T00:23:14.046Z"
+status: phase-complete
+stopped_at: Phase 11 mines-adoption COMPLETE (8/8 plans)
+last_updated: "2026-05-14T02:45:00.000Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 14
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 75
-  completed_plans: 70
-  percent: 93
+  completed_plans: 75
+  percent: 100
 ---
 
 # Project State
@@ -21,18 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 11 — mines-adoption
+**Current focus:** Phase 11 — mines-adoption COMPLETE (2026-05-13). Next: Phase 12 (Merge + Nonogram Adoption).
 
 ## Current Position
 
 Milestone: v1.2 — Video Mode
-Phase: 11 (mines-adoption) — EXECUTING
-Plan: 7 of 8
-Next phase: 11 (mines-adoption)
-Status: Ready to execute
+Phase: 11 (mines-adoption) — COMPLETE (8/8 plans, 2026-05-13)
+Next phase: 12 (merge-nonogram-adoption)
+Status: Ready to discuss / plan Phase 12
 Last activity: 2026-05-14
 
-Progress: [█████████░] 93%
+Progress: [██████████] 100% (v1.2 phases 11/14 closed; SC4 + SC5 full sweep DEFERRED to TestFlight build per 11-VIDEO-MANUAL-CHECK.md)
 
 **Next action:** Discuss Phase 11 (`/gsd-discuss-phase 11`) — Minesweeper adopts the layout primitives. Easy + Medium across all 6 PiP locations on Classic + one Loud preset. Hard 16×30 ships the strategy from `.planning/phases/08-video-mode-design/08-HARD-MINES-ADR.md` (smaller-cells / Variant 1) gated on `videoModeStore.isEnabled` inside `MinesweeperBoardView.Self.minCellSize`. Wraps `MinesweeperGameView` (NOT `MinesweeperBoardView`) at the outermost layer per CONTEXT D-15 untouched contract. A2 (NavigationStack height adjustment) is the open carry-forward from Plan 10-VERIFICATION.md.
 

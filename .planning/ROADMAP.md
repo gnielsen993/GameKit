@@ -247,7 +247,7 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
 - [x] **Phase 8: Video Mode Design** (2026-05-12) - Screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row + win/loss banner sketch (design-only — no app code)
 - [x] **Phase 9: Video Mode Foundation** (2026-05-12) - VideoModeStore + Settings UI (toggle + 6-location picker + manual-selection copy) + shared compact control row component + environment plumbing
 - [x] **Phase 10: Layout Primitives** - Small-PiP reposition system + Large-PiP reserved-band system + Off restore; verified end-to-end on a stub game screen
-- [ ] **Phase 11: Minesweeper Adoption** - Easy + Medium across all 6 locations + Hard 16×30 strategy implemented per Phase 8 ADR
+- [x] **Phase 11: Minesweeper Adoption** (2026-05-13) - Easy + Medium across all 6 locations + Hard 16×30 strategy implemented per Phase 8 ADR (locked 12pt floor; SC1/SC3/SC4 PARTIAL — full sweep DEFERRED to TestFlight per 11-VIDEO-MANUAL-CHECK.md)
 - [ ] **Phase 12: Merge + Nonogram Adoption** - Both grids reflow across all 6 locations with no legibility regression
 - [ ] **Phase 13: Win/Loss Banner + A11y Gating** - Non-board-covering banner replaces full-screen overlays; haptics/SFX/animations gated by Settings + Reduce Motion
 
@@ -320,14 +320,14 @@ The non-negotiable upstream gate is documented in `Docs/GameDrawer-v1.2-Video-Mo
   4. Legibility regression check passes on Classic preset AND one Loud preset (Voltage or Dracula) per CLAUDE.md §8.12 for Easy, Medium, AND Hard play state — mines / flags / adjacency numbers stay readable across all 6 PiP locations on both presets.
   5. Video Mode Off restores the v1.0 / v1.0.6.1 Minesweeper layout byte-identical — pinch-zoom (A11Y-05), Reveal/Flag interaction-mode toggle (MINES-12), and the existing animation pass (MINES-08) all behave unchanged with the toggle Off (VIDEO-13 spot-check on Minesweeper).
 **Plans**: 8 plans
-- [ ] 11-01-PLAN.md — Chip extraction: MinesRemainingChip + TimerChip from MinesweeperHeaderBar (CONTEXT D-03)
-- [ ] 11-02-PLAN.md — Doc supersession: VIDEO-MODE-LAYOUTS.md + 08-COMPACT-ROW-TOKENS.md Mines slot rows updated to D-05 revised order
+- [x] 11-01-PLAN.md — Chip extraction: MinesRemainingChip + TimerChip from MinesweeperHeaderBar (CONTEXT D-03)
+- [x] 11-02-PLAN.md — Doc supersession: VIDEO-MODE-LAYOUTS.md + 08-COMPACT-ROW-TOKENS.md Mines slot rows updated to D-05 revised order
 - [x] 11-03-PLAN.md — Wrap site + three-way layout branch: HomeView `.videoModeAware(minBoardHeight: 480)` + MinesweeperGameView off/Large/Small branch + VideoModeLocation.isLarge (CONTEXT D-01/D-02/D-04/D-09)
-- [ ] 11-04-PLAN.md — Large-zone compact-row composition: VideoCompactControlRow with D-05 slot order + slot-2 stacked chip + D-18 compactness reactions (CONTEXT D-05/D-06/D-07/D-08/D-18)
+- [x] 11-04-PLAN.md — Large-zone compact-row composition: VideoCompactControlRow with D-05 slot order + slot-2 stacked chip + D-18 compactness reactions (CONTEXT D-05/D-06/D-07/D-08/D-18) — 4 rounds of user-feedback polish amended trail (drop gear, compact variants, symmetric chip layout, tightened picker spacers)
 - [x] 11-05-PLAN.md — Hard cell-size floor: MinesweeperBoardView.minCellSizeVideoMode locked by audit on Dracula + Voltage; D-12 single-gate; D-17 byte-identical gesture stack preserved (CONTEXT D-10/D-11/D-12/D-17; 08-HARD-MINES-ADR.md)
-- [ ] 11-06-PLAN.md — A2 NavigationStack safeArea measurement + adjustment (empirical; CONTEXT D-16; 10-VERIFICATION.md carry-forward)
+- [x] 11-06-PLAN.md — A2 NavigationStack safeArea measurement + adjustment (empirical; CONTEXT D-16; 10-VERIFICATION.md carry-forward) — A2 PASSED, no code change
 - [x] 11-07-PLAN.md — Author 11-VIDEO-MANUAL-CHECK.md 18-row matrix (3 difficulties × 6 zones) for SC1 + SC3 verification (CONTEXT D-13/D-14/D-15)
-- [ ] 11-08-PLAN.md — SC4 legibility audit (Classic + Loud × E/M/H × 6 zones) + SC5 Off-restore spot-check + release-log append per CLAUDE.md §8.12 + §8.14
+- [x] 11-08-PLAN.md — SC4 legibility audit (Classic + Loud × E/M/H × 6 zones) + SC5 Off-restore spot-check + release-log append per CLAUDE.md §8.12 + §8.14 — matrix row 14 PASS, 17 rows DEFERRED to TestFlight; v1.2.md release log appended
 **UI hint**: yes
 
 ### Phase 12: Merge + Nonogram Adoption

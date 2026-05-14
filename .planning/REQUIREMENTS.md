@@ -278,8 +278,8 @@ Populated 2026-05-12 by the roadmapper. Phase numbering continues from v1.0's la
 | VIDEO-04 | Phase 9 | Complete (09-05) |
 | VIDEO-05 | Phase 10 | Pending |
 | VIDEO-06 | Phase 10 | Pending |
-| VIDEO-07 | Phase 11 | Pending |
-| VIDEO-08 | Phase 11 | Pending |
+| VIDEO-07 | Phase 11 | Complete (2026-05-13) |
+| VIDEO-08 | Phase 11 | Complete (2026-05-13) |
 | VIDEO-09 | Phase 12 | Pending |
 | VIDEO-10 | Phase 12 | Pending |
 | VIDEO-11 | Phase 13 | Pending |
