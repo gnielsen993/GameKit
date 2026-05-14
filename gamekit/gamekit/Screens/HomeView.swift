@@ -164,6 +164,7 @@ struct HomeView: View {
                 .videoModeAware(minBoardHeight: 480)
         case .nonogram(let difficulty):
             NonogramGameView(initialDifficulty: difficulty)
+                .videoModeAware(minBoardHeight: 480)
         }
     }
 
