@@ -341,21 +341,26 @@ extension MinesweeperGameView {
     }
 
     /// D-05/D-06/D-07/D-08/D-18 — the actual compact-row composition.
-    /// Preserves Phase 9 D-12 5-slot contract (`VideoCompactControlRow.swift`
-    /// is byte-identical, see plan acceptance criteria); slot 2 hosts a
-    /// VStack stack (Mines remaining on top, Time below per D-06); slot 3
-    /// hosts MinesweeperModePill (Reveal/Flag, D-05 slot 3); the
-    /// `secondaryInfo` closure of the component hosts BOTH slot 4 (Settings
-    /// menu via MinesweeperToolbarMenu, D-08) AND slot 5 (Restart button,
-    /// rightmost per D-05). The component's `onSettings` closure is unused
-    /// — slot 4 lives in secondaryInfo per the ad-hoc Mines slot-5 pattern
-    /// described in the plan body.
+    /// User feedback 2026-05-13 — see memory: feedback-video-mode-compact-row.
+    /// Slot 6 (settings gear) is DROPPED via a nil `onSettings` — the ModePill
+    /// picker already covers the settings role, so the standalone gear was
+    /// redundant on Mines's Large-zone path. Phase 9 D-12 5-slot contract
+    /// softened to 4 visible slots for Mines (Commit 1 of this polish pass
+    /// made `onSettings` optional on the shared component).
+    ///
+    /// Slot 2 hosts a VStack stack (Mines remaining on top, Time below per
+    /// D-06); slot 3 hosts MinesweeperModePill (Reveal/Flag, D-05 slot 3);
+    /// the `secondaryInfo` closure ALWAYS renders `restartWithOverflowMenu`
+    /// on Large zones — the difficulty menu always folds into Restart per
+    /// user feedback (the `videoModeCompactness == .collapsedSettings`
+    /// threshold didn't fire reliably at the 12pt cell floor, so the fold
+    /// is now unconditional on Large zones).
     @ViewBuilder
     var compactRowComposed: some View {
         VideoCompactControlRow(
             theme: theme,
             onBack: { dismiss() },
-            onSettings: { /* unused — slot 4 lives in secondaryInfo per D-05+D-08 ad-hoc */ }
+            onSettings: nil      // User feedback 2026-05-13 — gear redundant with ModePill
         ) {
             // Slot 2 — stacked chip (D-06). VStack hosts Mines/Time;
             // D-18 .reducedTime drops the TimerChip half.
@@ -378,25 +383,13 @@ extension MinesweeperGameView {
                 onSelect: { viewModel.setInteractionMode($0) }
             )
         } secondaryInfo: {
-            // Slots 4 + 5 composite per D-05 + D-18.
-            // .normal:            Menu (slot 4) + Restart (slot 5) side-by-side.
-            // .collapsedSettings: Slot 4 folds into slot 5 — Restart hosts a
-            //                     primary-action Menu (tap = restart, menu =
-            //                     Change-difficulty list).
-            // .reducedTime:       Same as .normal at slots 4/5; the reduction
-            //                     happens at slot 2 above.
-            HStack(spacing: theme.spacing.s) {
-                if videoModeCompactness == .collapsedSettings {
-                    restartWithOverflowMenu
-                } else {
-                    MinesweeperToolbarMenu(
-                        theme: theme,
-                        currentDifficulty: viewModel.difficulty,
-                        onSelect: { viewModel.requestDifficultyChange($0) }
-                    )
-                    compactRestartButton
-                }
-            }
+            // Slot 4+5 composite — ALWAYS-COLLAPSED on Large zones.
+            // User feedback 2026-05-13 — see memory: feedback-video-mode-compact-row
+            //   The `videoModeCompactness == .collapsedSettings` branch was
+            //   unreliable at the 12pt cell floor. Mines Large now always
+            //   folds the difficulty menu into Restart (primary-action Menu);
+            //   tap = restart, menu = Change-difficulty list.
+            restartWithOverflowMenu
         }
     }
 
