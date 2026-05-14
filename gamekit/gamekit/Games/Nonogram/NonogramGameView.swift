@@ -8,14 +8,16 @@
 //  VStack(header / board / mode pill) + conditional end-state overlay,
 //  toolbar with back chevron + restart + size picker.
 //
-//  Phase 12 Plan 12-04 (D-NG-01 + D-NG-17):
+//  Phase 12 Plan 12-04 (D-NG-01 + D-NG-17) + Phase 12.1 Plan 12.1-04 (D-04):
 //    - body is a three-way Group branch on Video Mode state:
 //        • off-path (!videoModeStore.isEnabled): existingLayout + existingToolbarContent
 //          — v1.1 render byte-identical (SC4 / D-12-OFFRESTORE)
 //        • Large-zone: largeZoneLayout, nav-bar toolbar hidden — compact row
 //          hosts Back / Size↔Lives / Fill-Mark / Time / Restart-w-menu per D-NG-01
-//        • Small-zone: existingLayout + smallZoneToolbarContent — toolbar
-//          items repositioned via VideoModeSlotRouter.anchors(for:)
+//        • Small-zone: `smallZoneLayout` (Phase 12.1) + `smallZoneToolbarContent`
+//          — HeaderBar/ModePill ordering inside the VStack flips per
+//          `anchors.headerBar`, and toolbar items reposition via the existing
+//          `smallZoneToolbarContent`.
 //    - All extension members live in NonogramGameView+VideoMode.swift (§8.5
 //      file-size cap split). Env reads, viewModel, theme, dismiss, settingsStore,
 //      reduceMotion, endCardVisible, isInteractive, isTerminal, endStateOverlay
@@ -48,10 +50,13 @@ struct NonogramGameView: View {
     @State var endCardVisible = false
     @Environment(\.accessibilityReduceMotion) var reduceMotion
 
-    // P12 D-NG-01 (Plan 12-04): three-way layout branch on Video Mode state.
+    // P12 D-NG-01 (Plan 12-04) + P12.1 D-04 (Plan 12.1-04): three-way layout
+    // branch on Video Mode state.
     // - .isEnabled false → off-path = v1.1 verbatim (SC4 / D-12-OFFRESTORE byte-identical).
     // - .isEnabled true + location.isLarge → compactRowComposed swap (D-NG-01).
-    // - .isEnabled true + small zone → existing layout + repositioned toolbar (D-NG-02).
+    // - .isEnabled true + small zone → `smallZoneLayout` (Phase 12.1, Plan
+    //   12.1-04) — chips/picker reposition away from PiP overlay corners +
+    //   repositioned toolbar (D-NG-02 + CONTEXT D-04).
     @Environment(\.videoModeStore) var videoModeStore
     @Environment(\.videoModeCompactness) var videoModeCompactness
 
@@ -74,7 +79,7 @@ struct NonogramGameView: View {
                 largeZoneLayout
                     .toolbar(.hidden, for: .navigationBar)
             } else {
-                existingLayout
+                smallZoneLayout
                     .toolbar { smallZoneToolbarContent }
             }
         }
