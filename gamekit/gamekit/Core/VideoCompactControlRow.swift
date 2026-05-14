@@ -52,9 +52,16 @@ struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: Vie
         HStack(spacing: theme.spacing.s) {           // D-13 inter-item gap
             backButton
             primaryInfo()
-            Spacer(minLength: theme.spacing.s)       // center-anchor picker
+            // User feedback 2026-05-13 (round 3): cap spacer max-width so
+            // info slots stay close to the centered picker. Uncapped Spacer
+            // expansion left the picker visually floating mid-row at wider
+            // widths. min-length floors the spacer at one inter-item gap
+            // even at narrow widths.
+            Spacer(minLength: theme.spacing.s)
+                .frame(maxWidth: theme.spacing.m)
             picker()
-            Spacer(minLength: theme.spacing.s)       // center-anchor picker
+            Spacer(minLength: theme.spacing.s)
+                .frame(maxWidth: theme.spacing.m)
             secondaryInfo()
             if onSettings != nil {
                 settingsButton
