@@ -363,14 +363,22 @@ extension MinesweeperGameView {
             onSettings: nil      // User feedback 2026-05-13 — gear redundant with ModePill
         ) {
             // Slot 2 — stacked chip (D-06). VStack hosts Mines/Time;
-            // D-18 .reducedTime drops the TimerChip half.
+            // D-18 .reducedTime drops the TimerChip half. `compact: true`
+            // shrinks both chips so they stack inside `theme.spacing.xl`
+            // (the row's pill-height anchor) without vertical overflow —
+            // user feedback 2026-05-13 — see memory: feedback-video-mode-compact-row.
             VStack(spacing: theme.spacing.xs) {
-                MinesRemainingChip(theme: theme, minesRemaining: viewModel.minesRemaining)
+                MinesRemainingChip(
+                    theme: theme,
+                    minesRemaining: viewModel.minesRemaining,
+                    compact: true
+                )
                 if videoModeCompactness != .reducedTime {
                     TimerChip(
                         theme: theme,
                         timerAnchor: viewModel.timerAnchor,
-                        pausedElapsed: viewModel.pausedElapsed
+                        pausedElapsed: viewModel.pausedElapsed,
+                        compact: true
                     )
                 }
             }

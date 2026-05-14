@@ -22,6 +22,14 @@ struct TimerChip: View {
     let theme: Theme
     let timerAnchor: Date?
     let pausedElapsed: TimeInterval
+    /// Compact variant for Video Mode slot 2's stacked-chip slot (P11 11-04
+    /// user-feedback polish 2026-05-13). When `true`, the chip drops one
+    /// Dynamic Type step (caption instead of monoNumber/body), reduces
+    /// horizontal padding (xs instead of m), and reduces vertical padding
+    /// (xs instead of s) so two chips can stack inside `theme.spacing.xl`
+    /// (the row's pill-height anchor). Off-path callers (HeaderBar) leave
+    /// this defaulted to `false` and get the v1.0 chip byte-identical.
+    var compact: Bool = false
 
     var body: some View {
         TimelineView(.periodic(from: timerAnchor ?? .distantPast, by: 1)) { context in
@@ -29,12 +37,12 @@ struct TimerChip: View {
                 Image(systemName: "clock")
                     .foregroundStyle(theme.colors.textPrimary)
                 Text(formatElapsed(displayedElapsed(at: context.date)))
-                    .font(theme.typography.monoNumber)
+                    .font(compact ? theme.typography.caption : theme.typography.monoNumber)
                     .foregroundStyle(theme.colors.textPrimary)
                     .monospacedDigit()
             }
-            .padding(.horizontal, theme.spacing.m)
-            .padding(.vertical, theme.spacing.s)
+            .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.m)
+            .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
             .background(theme.colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
             .overlay(
