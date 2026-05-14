@@ -277,6 +277,19 @@ step 7 was not exercised.
   `<objective>` block: "the release-log entry in Plan 11-08 (Internal
   changes bullet)").
 
+## Self-Check: PASSED
+
+- `gamekit/gamekit/Games/Minesweeper/MinesweeperBoardView.swift`: FOUND (225 lines, modified — adds `minCellSizeVideoMode = 12` with `// Locked 2026-05-13` comment).
+- `.planning/phases/11-mines-adoption/11-05-SUMMARY.md`: FOUND.
+- Commit `587713c`: FOUND (Task 1 — Video-Mode-aware cell-size floor seam).
+- Commit `420104e`: FOUND (Task 2 — lock to 12pt after §8.12 audit).
+- Commit `c5d656a`: FOUND (plan-tracking metadata).
+- Build: green (BUILD SUCCEEDED on iPhone 17 Pro Max simulator).
+- D-17 contract: byte-identical grep counts vs HEAD~2 (1 match in both).
+- D-12 single-gate: 0 matches for `location.isLarge|difficulty == .hard|difficulty.*hard`.
+- No Finder dupes.
+- No deletions in any of the 3 plan commits (`git diff --diff-filter=D --name-only HEAD~N HEAD` → empty).
+
 ---
 *Phase: 11-mines-adoption*
 *Completed: 2026-05-13*
