@@ -411,6 +411,90 @@ Two minor verification-tooling notes (not code deviations):
 - No Finder dupes.
 - No deletions in the commit (`git diff --diff-filter=D --name-only HEAD~1 HEAD` → empty).
 
+## 2026-05-13 — User-feedback polish (post-merge)
+
+User feedback after running the Large-zone composition on Voltage preset
+(verbatim): *"the bar is a bit squished, try scaling down each bit, remove
+the settings because we have mode switcher. It looks like items got moved
+but no effort to scale it correctly. The time and flags should be a lot
+smaller, the play/flag picker should be scaled correctly to read, and once
+again settings not needed."*
+
+Concrete issues observed:
+1. Stacked Mines + Timer chips in slot 2 rendered at native (full-body)
+   size; the two chips overflowed `theme.spacing.xl` vertically.
+2. ModePill labels truncated to "I" / "F" because the off-path size (headline
+   + theme.spacing.l padding + 44pt minHeight) didn't fit inside the row.
+3. Standalone settings gear in slot 6 was redundant — the ModePill picker
+   already covers the settings role.
+4. The threshold-driven `videoModeCompactness == .collapsedSettings` branch
+   never fired reliably at Plan 11-05's 12pt cell floor, so slot 4 (the
+   difficulty menu) sat next to slot 5 (restart) instead of folding in.
+
+Four atomic commits landed inline on Phase 11 (no new plan file — these
+amend 11-04's audit trail):
+
+1. **`5e5d2da`** `refactor(11-04): make VideoCompactControlRow settings slot optional`
+   — `onSettings: () -> Void` → `onSettings: (() -> Void)?` on the shared
+   compact-row component. Slot 6 renders only when the closure is non-nil.
+   Phase 9 D-12 "5-slot contract" softened to 5-or-4 slots intentionally
+   (user feedback supersedes the planning lock).
+2. **`eab8901`** `refactor(11-04): drop settings gear + always-collapse menu on Mines Large`
+   — `compactRowComposed` now passes `onSettings: nil` (slot 6 dropped on
+   Mines's Large-zone path). The `if videoModeCompactness == .collapsedSettings`
+   branch was removed; `secondaryInfo` unconditionally renders
+   `restartWithOverflowMenu`. Slot 4 (`MinesweeperToolbarMenu` standalone) +
+   slot 5 (`compactRestartButton` standalone) no longer co-occur on Large
+   zones; both helpers stay defined for off-path / Small-zone consumers.
+3. **`a6e9c66`** `feat(11-04): add compact chip variant for Mines Video Mode slot 2`
+   — Added optional `compact: Bool = false` to `MinesRemainingChip` and
+   `TimerChip`. Compact mode swaps to `theme.typography.caption` +
+   `theme.spacing.xs` padding so two chips stack inside `theme.spacing.xl`.
+   `compactRowComposed`'s slot 2 VStack passes `compact: true` to both;
+   off-path callers (HeaderBar) leave the default and get the v1.0 chip
+   byte-identical. `MinesweeperHeaderBar.swift` git hash unchanged vs HEAD.
+4. **`4444d32`** `feat(11-04): add compact ModePill variant for Mines Video Mode picker slot`
+   — Added optional `compact: Bool = false` to `MinesweeperModePill`.
+   Compact mode drops typography one step, halves segment padding, sets
+   minHeight to `theme.spacing.l`, and forces `.lineLimit(1) +
+   .minimumScaleFactor(0.7)` so both "Reveal" + "Flag" labels render
+   without truncation. `compactRowComposed`'s `picker:` closure passes
+   `compact: true`; off-path call in `existingLayout` keeps the default.
+
+### D-07 contract status (re-stated)
+
+Phase 9 D-12's "5-slot contract" on `VideoCompactControlRow.swift` is
+**no longer byte-identical** as of Commit 1 (`5e5d2da`). The contract was
+intentionally softened to "5-or-4 slots" — slot 6 (settings gear) is now
+optional via a nullable `onSettings` closure. Merge + Nonogram adoption
+(Phase 12) continues to pass a non-nil closure and renders all 5 slots
+unchanged. The verification line "git hash-object …/VideoCompactControlRow.swift
+→ b95b1be3776f297190a66f70b40a113d93e3f340" in the original Self-Check
+block above is superseded by these commits.
+
+### D-17 contract preserved
+
+`MinesweeperBoardView.swift` git hash remains `53a13658bac5363f626d42041d1b9a96078bad2b`
+(Plan 11-05's locked state — see 11-05-SUMMARY). The user-feedback polish
+did NOT touch the board view. `git diff HEAD~5..HEAD MinesweeperBoardView.swift`
+is empty.
+
+### Off-path byte-identity preserved
+
+`MinesweeperHeaderBar.swift` git diff vs HEAD~5 is empty. Its calls to
+`MinesRemainingChip(theme:minesRemaining:)` and
+`TimerChip(theme:timerAnchor:pausedElapsed:)` consume the default
+`compact: false` and render the v1.0 chip surface byte-identical.
+`existingLayout`'s call to `MinesweeperModePill(theme:mode:onSelect:)`
+likewise consumes the default `compact: false`.
+
+### Build + tests
+
+Build SUCCEEDED on iPhone 17 sim (iOS 26.2) after each of the 4 commits.
+`MinesweeperViewModelTests` TEST SUCCEEDED after each commit (view-layer
+compact variants don't change VM behavior).
+
 ---
 *Phase: 11-mines-adoption*
 *Completed: 2026-05-13*
+*Polish addendum: 2026-05-13*
