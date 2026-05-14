@@ -24,6 +24,7 @@
 //  Foundation-only — no SwiftUI import keeps this helper reusable from any
 //  context (engine layer, tests, snapshot rigs).
 //
+//  Phase 12.1 update: `headerBar` added per CONTEXT D-01 for Small-zone chip reposition.
 //  Phase 13 forward-compat NOTE: the future banner-placement table in
 //  .planning/phases/08-video-mode-design/08-BANNER-PLACEMENT.md encodes the
 //  same "opposite-of-PiP" geometry. If Phase 13 chooses to share, extend
@@ -57,17 +58,21 @@ enum SlotAnchor: Sendable, Equatable {
 /// named-fields shape based on call-site ergonomics; this is the locked choice.
 ///
 /// Slot semantics:
-/// - `back`     — Back / dismiss affordance (every game has one)
-/// - `settings` — Settings / overflow menu affordance (every game has one)
-/// - `picker`   — Mines: Reveal/Flag mode picker · Merge: difficulty picker ·
-///                Nonogram: Fill/Mark mode picker
-/// - `fab`      — Mines: Reveal/Flag FAB (06.1-02 / MINES-12) · Merge: (none;
-///                games without a FAB still receive an anchor — game view simply
-///                does not render at that anchor) · Nonogram: (none)
+/// - `back`      — Back / dismiss affordance (every game has one)
+/// - `settings`  — Settings / overflow menu affordance (every game has one)
+/// - `picker`    — Mines: Reveal/Flag mode picker · Merge: difficulty picker ·
+///                 Nonogram: Fill/Mark mode picker
+/// - `headerBar` — Per-game HeaderBar (Score/Best/Timer/Mines/Lives/Size chips).
+///                 Phase 12.1 reposition seam (CONTEXT D-01) so the chip row
+///                 moves away from the top-PiP overlay on Top L/R Small zones.
+/// - `fab`       — Mines: Reveal/Flag FAB (06.1-02 / MINES-12) · Merge: (none;
+///                 games without a FAB still receive an anchor — game view simply
+///                 does not render at that anchor) · Nonogram: (none)
 struct SlotAnchorMap: Equatable, Sendable {
     let back: SlotAnchor
     let settings: SlotAnchor
     let picker: SlotAnchor
+    let headerBar: SlotAnchor
     let fab: SlotAnchor
 }
 
@@ -89,53 +94,68 @@ enum VideoModeSlotRouter {
         switch location {
         case .largeTop:
             // Compact row at bottom edge; all slots move INTO the compact row.
+            // HeaderBar also consolidates into the compact row (D-02).
             return SlotAnchorMap(
                 back: .inCompactRow,
                 settings: .inCompactRow,
                 picker: .inCompactRow,
+                headerBar: .inCompactRow,
                 fab: .inCompactRow
             )
         case .largeBottom:
             // Compact row at top edge; same slot consolidation.
+            // HeaderBar also consolidates into the compact row (D-02).
             return SlotAnchorMap(
                 back: .inCompactRow,
                 settings: .inCompactRow,
                 picker: .inCompactRow,
+                headerBar: .inCompactRow,
                 fab: .inCompactRow
             )
         case .smallTopLeft:
             // PiP covers TL → move all affordances toward trailing edge.
+            // HeaderBar moves to bottom-leading (away from top-PiP overlay;
+            // lean leading) per CONTEXT D-02 + D-07.
             return SlotAnchorMap(
                 back: .topTrailing,
                 settings: .topTrailing,
                 picker: .bottomTrailing,
+                headerBar: .bottomLeading,
                 fab: .bottomTrailing
             )
         case .smallTopRight:
             // PiP covers TR → move all affordances toward leading edge.
+            // HeaderBar moves to bottom-trailing (away from top-PiP overlay;
+            // lean trailing) per CONTEXT D-02 + D-07.
             return SlotAnchorMap(
                 back: .topLeading,
                 settings: .topLeading,
                 picker: .bottomLeading,
+                headerBar: .bottomTrailing,
                 fab: .bottomLeading
             )
         case .smallBottomLeft:
             // PiP covers BL → top row distributes (back leading / settings
             // trailing); bottom-right keeps picker + fab clear of the covered
-            // corner.
+            // corner. HeaderBar stays at top-leading per D-02 (already away
+            // from bottom-PiP; lean leading).
             return SlotAnchorMap(
                 back: .topLeading,
                 settings: .topTrailing,
                 picker: .bottomTrailing,
+                headerBar: .topLeading,
                 fab: .bottomTrailing
             )
         case .smallBottomRight:
             // PiP covers BR → top row distributes; bottom-left keeps picker
-            // + fab clear of the covered corner.
+            // + fab clear of the covered corner. HeaderBar stays at
+            // top-trailing per D-02 (already away from bottom-PiP; lean
+            // trailing).
             return SlotAnchorMap(
                 back: .topLeading,
                 settings: .topTrailing,
                 picker: .bottomLeading,
+                headerBar: .topTrailing,
                 fab: .bottomLeading
             )
         }

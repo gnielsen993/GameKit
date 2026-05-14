@@ -4,11 +4,14 @@
 //
 //  Phase 10 Wave 0 RED gate — locks the VIDEO-05 contract that
 //  VideoModeSlotRouter.anchors(for:) MUST satisfy in Plan 10-02:
-//    - 6 VideoModeLocation cases × 4 SlotAnchorMap fields = 24 anchor assertions
+//    - 6 VideoModeLocation cases × 5 SlotAnchorMap fields = 30 anchor assertions
 //    - Large zones (.largeTop / .largeBottom) → all 4 slots consolidate into
 //      .inCompactRow (CONTEXT D-02 + D-08; data from VIDEO-MODE-LAYOUTS.md)
 //    - Small zones (.smallTL / .smallTR / .smallBL / .smallBR) → slots place
 //      opposite the covered corner (CONTEXT D-11)
+//
+//  Phase 12.1 update: `headerBar` field added (Plan 12.1-01) — repositions
+//  per-game HeaderBar away from top-PiP overlay on Small zones per CONTEXT D-02.
 //
 //  Pattern source: VideoModeStoreTests.swift:1-29 (header doc-comment shape) +
 //  VideoModeStoreTests.swift:85-95 (loop over VideoModeLocation.allCases for
@@ -38,6 +41,7 @@ struct VideoModeSlotRouterTests {
         #expect(map.settings == .inCompactRow)
         #expect(map.picker == .inCompactRow)
         #expect(map.fab == .inCompactRow)
+        #expect(map.headerBar == .inCompactRow)
     }
 
     @Test("Large bottom — all 4 slots consolidate into compact row (VIDEO-05 / D-08)")
@@ -47,6 +51,7 @@ struct VideoModeSlotRouterTests {
         #expect(map.settings == .inCompactRow)
         #expect(map.picker == .inCompactRow)
         #expect(map.fab == .inCompactRow)
+        #expect(map.headerBar == .inCompactRow)
     }
 
     @Test("Small top-left — slots move to trailing edge (VIDEO-05 / D-11)")
@@ -56,6 +61,7 @@ struct VideoModeSlotRouterTests {
         #expect(map.settings == .topTrailing)
         #expect(map.picker == .bottomTrailing)
         #expect(map.fab == .bottomTrailing)
+        #expect(map.headerBar == .bottomLeading)
     }
 
     @Test("Small top-right — slots move to leading edge (VIDEO-05 / D-11)")
@@ -65,6 +71,7 @@ struct VideoModeSlotRouterTests {
         #expect(map.settings == .topLeading)
         #expect(map.picker == .bottomLeading)
         #expect(map.fab == .bottomLeading)
+        #expect(map.headerBar == .bottomTrailing)
     }
 
     @Test("Small bottom-left — slots split top + bottom-trailing (VIDEO-05 / D-11)")
@@ -74,6 +81,7 @@ struct VideoModeSlotRouterTests {
         #expect(map.settings == .topTrailing)
         #expect(map.picker == .bottomTrailing)
         #expect(map.fab == .bottomTrailing)
+        #expect(map.headerBar == .topLeading)
     }
 
     @Test("Small bottom-right — slots split top + bottom-leading (VIDEO-05 / D-11)")
@@ -83,6 +91,7 @@ struct VideoModeSlotRouterTests {
         #expect(map.settings == .topTrailing)
         #expect(map.picker == .bottomLeading)
         #expect(map.fab == .bottomLeading)
+        #expect(map.headerBar == .topTrailing)
     }
 
     @Test("All 6 locations switch exhaustively without crash (VIDEO-05 compile-time guarantee)")
