@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
-status: complete
-stopped_at: Phase 13 closed — v1.2 Video Mode milestone complete (banner approved by user 2026-05-14)
-last_updated: "2026-05-14T22:00:00.000Z"
+status: in_progress
+stopped_at: Phase 13 (banner) shipped — Sudoku phases pending (outside party designing, awaiting deliverables)
+last_updated: "2026-05-14T22:30:00.000Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 15
   completed_phases: 14
   total_plans: 86
   completed_plans: 86
-  percent: 100
+  percent: 93
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** v1.2 Video Mode milestone — COMPLETE. Next: TestFlight ship or v1.3 planning.
+**Current focus:** v1.2 Video Mode milestone — Phases 8–13 SHIPPED. Sudoku phases pending (outside party designing).
 
 ## Current Position
 
-Milestone: v1.2 — Video Mode — **COMPLETE 2026-05-14**
-Phase: 13 (win-loss-banner-a11y-gating) — COMPLETE (banner approved by user on iPhone 17 Pro Max sim)
+Milestone: v1.2 — Video Mode + Sudoku (Sudoku added 2026-05-14)
+Phase 13 (banner) complete; next Sudoku phases blocked on outside-party design deliverables.
 Last activity: 2026-05-14
 
-Progress: [██████████] 100%
+Progress: [█████████░] 93% (v1.2 reopened with Sudoku scope addition)
 
 **Phase 13 — what shipped:** Shared `VideoModeBanner` primitive (Core/) consumed by Mines + Merge + Nonogram. Banner is a centered card with 2-1 button layout (primary CTA + change-X on top row, "View board" dismiss below). Ships on BOTH Video Mode On AND Off (user override during execution — deprecates the v1.x full-screen EndStateCard from the render path). Haptics / SFX / animation gating routes through existing SettingsStore toggles + accessibilityReduceMotion per v1.0 05-03 + 05-06 locks.
 
