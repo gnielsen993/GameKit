@@ -1,18 +1,6 @@
 # GameKit
 
-## Current State
-
-**Shipped:** v1.2 Video Mode (2026-05-14) — see `.planning/milestones/v1.2-ROADMAP.md` for archive.
-**MARKETING_VERSION:** 1.2
-
-## Next Milestone: v1.3 Sudoku
-
-**Focus:** Sudoku — the next classic logic game in the GameDrawer suite. Brings the engine + UI + stats integration the suite has used since v1.0 and adds Sudoku-specific surfaces (number pad, pencil marks, conflict highlighting). Adopts Video Mode from v1.2 once playable.
-
-Detailed scope locked via `/gsd-new-milestone v1.3` (next).
-
-<details>
-<summary>v1.2 Video Mode (archived)</summary>
+## Current Milestone: v1.2 Video Mode
 
 **Goal:** Optional mode that keeps GameDrawer playable while a PiP video floats on screen — user picks the video location, app reflows controls and (when needed) the board to stay out of the way.
 
@@ -28,8 +16,6 @@ Detailed scope locked via `/gsd-new-milestone v1.3` (next).
 - Sudoku adoption — game not built yet
 - Vertical/portrait PiP — v1.3+
 - Other v1.2 plans from `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` outside Video Mode itself
-
-</details>
 
 ## What This Is
 
