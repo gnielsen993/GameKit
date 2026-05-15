@@ -396,7 +396,7 @@ Phases execute in numeric order within the milestone: 8 (design) → 9 → 10 �
 | 11. Minesweeper Adoption | 8/8 | Complete | 2026-05-13 |
 | 12. Merge + Nonogram Adoption | 6/6 | Closed (gaps closed by Phase 12.1) | 2026-05-13 |
 | 12.1. Small-Zone Routing Gap Closure | redesigned (audit rounds 1–7) | Complete | 2026-05-14 |
-| 13. Win/Loss Banner + A11y Gating | 0/5 | Planned | - |
+| 13. Win/Loss Banner + A11y Gating | shipped (centered card, 2-1 layout, all modes — design diverged from plan via live-sim iteration) | Complete | 2026-05-14 |
 
 ### v1.2 Research Flags
 
