@@ -59,4 +59,45 @@ struct VideoModeBannerContent: Sendable {
 
     /// Primary CTA closure — invoked when the DKButton is tapped.
     let onPrimary: () -> Void
+
+    /// Optional secondary "View board" label — user feedback 2026-05-14:
+    /// banner needs a way to dismiss temporarily so the user can inspect
+    /// the completed solution behind it. `nil` = no secondary button.
+    let secondaryButtonLabel: String?
+
+    /// Optional secondary CTA closure — typically wired to `bannerDismissed = true`
+    /// in the per-game adopter.
+    let secondaryAction: (() -> Void)?
+
+    /// Optional tertiary button label — per-game change-X action
+    /// ("Change difficulty" / "Change mode" / "Change size") shown on the
+    /// same row as the primary action in the 2-1 card layout.
+    let tertiaryButtonLabel: String?
+
+    /// Optional tertiary CTA closure.
+    let tertiaryAction: (() -> Void)?
+
+    init(
+        outcome: Outcome,
+        title: String,
+        subtitle: String?,
+        primaryButtonLabel: String,
+        accessibilityLabel: String,
+        onPrimary: @escaping () -> Void,
+        secondaryButtonLabel: String? = nil,
+        secondaryAction: (() -> Void)? = nil,
+        tertiaryButtonLabel: String? = nil,
+        tertiaryAction: (() -> Void)? = nil
+    ) {
+        self.outcome = outcome
+        self.title = title
+        self.subtitle = subtitle
+        self.primaryButtonLabel = primaryButtonLabel
+        self.accessibilityLabel = accessibilityLabel
+        self.onPrimary = onPrimary
+        self.secondaryButtonLabel = secondaryButtonLabel
+        self.secondaryAction = secondaryAction
+        self.tertiaryButtonLabel = tertiaryButtonLabel
+        self.tertiaryAction = tertiaryAction
+    }
 }

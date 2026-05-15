@@ -45,7 +45,8 @@ struct MinesweeperGameView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @State private var didInjectStats = false           // one-shot guard (RESEARCH Pitfall 8)
-    @State private var showDifficultyPicker = false      // P7 polish (kink #4)
+    @State var showDifficultyPicker = false               // P7 polish (kink #4) — internal so banner extension can write
+    @State var bannerDismissed = false                    // P13 "View board" toggle
     @Environment(\.dismiss) var dismiss
 
     // End-of-game choreography (gated on settingsStore.animationsEnabled).
@@ -205,9 +206,18 @@ struct MinesweeperGameView: View {
 
     @ViewBuilder
     func endStateOverlay(outcome: GameOutcome) -> some View {
+        // P13 user override 2026-05-14: banner is the win/loss surface in
+        // ALL modes (Video Mode On AND Off). EndStateCard is no longer
+        // rendered from the body — kept on disk for now but unreferenced.
+        videoModeEndBanner(outcome: outcome)
+    }
+
+    /// Legacy v1.0 full-screen end-state overlay. Retained for reference /
+    /// rollback only — no longer rendered from `body` after the P13 user
+    /// override moved all paths to the banner.
+    @ViewBuilder
+    private func offPathEndStateOverlay(outcome: GameOutcome) -> some View {
         ZStack {
-            // Backdrop — covers full board AREA but does NOT consume taps
-            // (the card itself owns the only tap targets per D-02).
             Rectangle()
                 .fill(theme.colors.background.opacity(0.85))
                 .ignoresSafeArea()
@@ -220,12 +230,6 @@ struct MinesweeperGameView: View {
                 lossContext: viewModel.lossContext,
                 onRestart: { viewModel.restart() },
                 onChangeDifficulty: {
-                    // P7 polish (kink #4): the original D-03 W-02 path called
-                    // restart() and required the user to find the toolbar menu
-                    // to actually change difficulty — confusing because the
-                    // button literally says "Change difficulty". Now we surface
-                    // the same difficulty list the toolbar menu uses, via a
-                    // native confirmationDialog (declared on the GameView body).
                     showDifficultyPicker = true
                 }
             )

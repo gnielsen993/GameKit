@@ -51,44 +51,76 @@ struct VideoModeBanner: View {
     let animationsEnabled: Bool     // settingsStore.animationsEnabled
 
     var body: some View {
-        HStack(spacing: theme.spacing.s) {
-            VStack(alignment: .leading, spacing: theme.spacing.xs) {
+        // User override 2026-05-14 round 3: vertical card with 2-1 button
+        // layout (primary + tertiary on one row, secondary below).
+        // Replaces the original pill shape.
+        VStack(spacing: theme.spacing.l) {
+            VStack(spacing: theme.spacing.xs) {
                 Text(content.title)
-                    .font(theme.typography.title)
+                    .font(theme.typography.titleLarge)
                     .foregroundStyle(titleColor)
                     .accessibilityAddTraits(.isHeader)
+                    .multilineTextAlignment(.center)
 
                 if let subtitle = content.subtitle, !subtitle.isEmpty {
                     Text(subtitle)
                         .font(theme.typography.body)
                         .foregroundStyle(theme.colors.textSecondary)
+                        .multilineTextAlignment(.center)
                 }
             }
 
-            Spacer(minLength: theme.spacing.s)
+            // Primary row — primary CTA + optional tertiary change-X side
+            // by side (the "2" in the 2-1 layout). When no tertiary action,
+            // primary renders full-width alone.
+            if let tertiaryLabel = content.tertiaryButtonLabel,
+               let tertiaryAction = content.tertiaryAction {
+                HStack(spacing: theme.spacing.s) {
+                    DKButton(
+                        content.primaryButtonLabel,
+                        style: .primary,
+                        theme: theme,
+                        action: content.onPrimary
+                    )
+                    DKButton(
+                        tertiaryLabel,
+                        style: .secondary,
+                        theme: theme,
+                        action: tertiaryAction
+                    )
+                }
+            } else {
+                DKButton(
+                    content.primaryButtonLabel,
+                    style: .primary,
+                    theme: theme,
+                    action: content.onPrimary
+                )
+            }
 
-            // D-11 LOCKED: exactly ONE DKButton — tap-anywhere-on-banner
-            // FORBIDDEN. `.fixedSize()` keeps the CTA at its natural width
-            // (DKButton internally uses `maxWidth: .infinity` for full-row
-            // contexts; here the title needs room on the leading side).
-            DKButton(
-                content.primaryButtonLabel,
-                style: .primary,
-                theme: theme,
-                action: content.onPrimary
-            )
-            .fixedSize()
+            // Secondary "View board" — the "1" in 2-1. Lower weight so
+            // primary stays dominant.
+            if let secondaryLabel = content.secondaryButtonLabel,
+               let secondaryAction = content.secondaryAction {
+                Button(action: secondaryAction) {
+                    Text(secondaryLabel)
+                        .font(theme.typography.body)
+                        .foregroundStyle(theme.colors.textSecondary)
+                }
+                .buttonStyle(.plain)
+            }
         }
         .padding(theme.spacing.l)
+        .frame(maxWidth: 360)
         .background(
-            RoundedRectangle(cornerRadius: theme.radii.button)
+            RoundedRectangle(cornerRadius: theme.radii.card)
                 .fill(theme.colors.surface)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: theme.radii.button)
+            RoundedRectangle(cornerRadius: theme.radii.card)
                 .stroke(theme.colors.border, lineWidth: 1)
         )
-        .padding(.horizontal, theme.spacing.m)
+        .padding(.horizontal, theme.spacing.l)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text(content.accessibilityLabel))
         .sensoryFeedback(

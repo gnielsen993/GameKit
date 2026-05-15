@@ -52,6 +52,8 @@ struct MergeGameView: View {
     //   (D-MG-02 + CONTEXT D-04).
     @Environment(\.videoModeStore) var videoModeStore
     @Environment(\.videoModeCompactness) var videoModeCompactness
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @State var bannerDismissed = false                    // P13 "View board" toggle
 
     var theme: Theme { themeManager.theme(using: colorScheme) }
 
@@ -134,6 +136,13 @@ struct MergeGameView: View {
 
     @ViewBuilder
     func endStateOverlay(state: MergeEndState) -> some View {
+        // P13 user override 2026-05-14: banner = win/loss surface ALWAYS.
+        videoModeEndBanner(state: state)
+    }
+
+    /// Legacy v1.1 EndStateCard overlay — retained for reference/rollback only.
+    @ViewBuilder
+    private func offPathEndStateOverlay(state: MergeEndState) -> some View {
         ZStack {
             Rectangle()
                 .fill(theme.colors.background.opacity(0.85))

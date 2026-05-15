@@ -39,7 +39,8 @@ struct NonogramGameView: View {
     @Environment(\.settingsStore) var settingsStore
     @Environment(\.dismiss) var dismiss
     @State private var didInjectStats = false
-    @State private var showDifficultyPicker = false
+    @State var showDifficultyPicker = false               // internal so banner extension can write
+    @State var bannerDismissed = false                    // P13 "View board" toggle
 
     init(initialDifficulty: NonogramDifficulty? = nil) {
         _viewModel = State(initialValue: NonogramViewModel(difficulty: initialDifficulty))
@@ -162,6 +163,13 @@ struct NonogramGameView: View {
 
     @ViewBuilder
     var endStateOverlay: some View {
+        // P13 user override 2026-05-14: banner = win/loss surface ALWAYS.
+        videoModeEndBanner
+    }
+
+    /// Legacy v1.1 EndStateCard overlay — retained for reference/rollback only.
+    @ViewBuilder
+    private var offPathEndStateOverlay: some View {
         ZStack {
             Rectangle()
                 .fill(theme.colors.background.opacity(0.85))
