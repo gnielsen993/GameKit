@@ -143,6 +143,20 @@ extension GameDescriptor {
                 GameModeChip(id: "medium", labelKey: "15×15", detailKey: "Medium", route: .nonogram(.medium)),
                 GameModeChip(id: "large",  labelKey: "20×20", detailKey: "Large",  route: .nonogram(.large))
             ]
+        ),
+        GameDescriptor(
+            kind: .sudoku,
+            titleKey: "Sudoku",
+            captionKey: "Tap to play",
+            symbol: "square.grid.3x3.fill",
+            accent: .slot4,
+            route: .sudoku(nil),
+            modes: [
+                GameModeChip(id: "easy",    labelKey: "Easy",    detailKey: "9×9", route: .sudoku(.easy)),
+                GameModeChip(id: "medium",  labelKey: "Medium",  detailKey: "9×9", route: .sudoku(.medium)),
+                GameModeChip(id: "hard",    labelKey: "Hard",    detailKey: "9×9", route: .sudoku(.hard)),
+                GameModeChip(id: "extreme", labelKey: "Extreme", detailKey: "9×9", route: .sudoku(.extreme))
+            ]
         )
     ]
 }

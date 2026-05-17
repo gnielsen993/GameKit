@@ -27,4 +27,5 @@ enum GameRoute: Hashable, Sendable {
     case minesweeper(MinesweeperDifficulty?)
     case merge(MergeMode?)
     case nonogram(NonogramDifficulty?)
+    case sudoku(SudokuDifficulty?)
 }
