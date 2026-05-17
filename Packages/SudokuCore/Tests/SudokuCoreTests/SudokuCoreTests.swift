@@ -277,10 +277,6 @@ final class SudokuCoreTests: XCTestCase {
     )
   }
 
-  private func tempDBURL() -> URL {
-    FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".sqlite")
-  }
-
   private func replacingCharacter(in text: String, at offset: Int, with character: Character)
     -> String
   {

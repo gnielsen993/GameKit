@@ -40,7 +40,7 @@ implementation removed.
 ## Re-sync workflow
 
 1. Pick a new upstream SHA (`gh api repos/cxnielsen/sudokuplus/commits/main --jq '.sha'`).
-2. Diff each vendored file against the new upstream version:
+2. Diff each vendored file against the new upstream version (macOS shell; on Linux replace `base64 -d` with `base64 --decode`):
    ```
    gh api "repos/cxnielsen/sudokuplus/contents/SudokuCore/Sources/SudokuCore/<file>?ref=<sha>" --jq '.content' | base64 -d | diff - Packages/SudokuCore/Sources/SudokuCore/<file>
    ```
@@ -71,3 +71,19 @@ and SQLite-only beginner-puzzle extensions).
 
 To re-enable: restore `SQLitePuzzleRepository.swift` from upstream + add
 SQLite3 linker setting to Package.swift.
+
+## §8.5 file-size cap — vendored exemption
+
+The project constitution (`CLAUDE.md` §8.5) caps Swift files at 500 lines:
+"Never generate a single Swift file over 500 lines. Split by view /
+component / extension from the start."
+
+`Tests/SudokuCoreTests/SudokuCoreTests.swift` is 528 lines after our
+vendor edits (XCTSkip shims + 3 cleanups). The file is vendored verbatim
+from upstream — we do not author or maintain its structure. Splitting it
+locally would diverge from upstream and complicate every future re-sync's
+diff workflow.
+
+Vendored files in `Packages/SudokuCore/` are exempt from §8.5. The rule
+applies to code we author, not to upstream files we re-sync. If/when
+upstream splits the test file, our copy will follow.

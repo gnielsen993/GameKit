@@ -21,6 +21,12 @@ public actor InMemoryPuzzleRepository: PuzzleRepository {
 
     public init() {}
 
+    // MARK: - Actor-specific helpers (NOT on PuzzleRepository protocol)
+    // The next three methods are conveniences for the CLI tool's pack-
+    // generation workflow. They are intentionally not part of
+    // `PuzzleRepository` — call them on a concrete `InMemoryPuzzleRepository`
+    // only. Do not promote to the protocol without updating all conformers.
+
     /// All saved puzzles, in insertion order is NOT guaranteed — the
     /// caller should sort if order matters.
     public func allPuzzles() -> [Puzzle] {
