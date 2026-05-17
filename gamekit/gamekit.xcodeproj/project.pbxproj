@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5F7F353D2F9D3B3800BA99BA /* DesignKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5F7F353C2F9D3B3800BA99BA /* DesignKit */; };
+		5FF708E62FB9541A009C2E9B /* SudokuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5FF708E52FB9541A009C2E9B /* SudokuCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FF708E62FB9541A009C2E9B /* SudokuCore in Frameworks */,
 				5F7F353D2F9D3B3800BA99BA /* DesignKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -96,6 +98,7 @@
 				5F7F31992F9C707900BA99BA /* gamekit */,
 				5F7F31A72F9C707B00BA99BA /* gamekitTests */,
 				5F7F31B12F9C707B00BA99BA /* gamekitUITests */,
+				5FF708E42FB9541A009C2E9B /* Frameworks */,
 				5F7F31982F9C707900BA99BA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -108,6 +111,13 @@
 				5F7F31AE2F9C707B00BA99BA /* gamekitUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		5FF708E42FB9541A009C2E9B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -131,6 +141,7 @@
 			name = gamekit;
 			packageProductDependencies = (
 				5F7F353C2F9D3B3800BA99BA /* DesignKit */,
+				5FF708E52FB9541A009C2E9B /* SudokuCore */,
 			);
 			productName = gamekit;
 			productReference = 5F7F31972F9C707900BA99BA /* gamekit.app */;
@@ -216,6 +227,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				5F7F353B2F9D3B3800BA99BA /* XCLocalSwiftPackageReference "../../DesignKit" */,
+				5FF708E32FB952B0009C2E9B /* XCLocalSwiftPackageReference "../Packages/SudokuCore" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5F7F31982F9C707900BA99BA /* Products */;
@@ -620,12 +632,21 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../DesignKit;
 		};
+		5FF708E32FB952B0009C2E9B /* XCLocalSwiftPackageReference "../Packages/SudokuCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/SudokuCore;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		5F7F353C2F9D3B3800BA99BA /* DesignKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DesignKit;
+		};
+		5FF708E52FB9541A009C2E9B /* SudokuCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5FF708E32FB952B0009C2E9B /* XCLocalSwiftPackageReference "../Packages/SudokuCore" */;
+			productName = SudokuCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
