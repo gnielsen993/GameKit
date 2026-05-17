@@ -76,10 +76,13 @@ func parseArgs() -> Args {
             print("""
             GenerateSudokuPack — generate a JSON Sudoku puzzle pack.
 
+            Run from: tools/GenerateSudokuPack/ (relative paths resolve from there).
+
             Flags:
               --per-difficulty <N>   Target count per difficulty (default 1500)
               --difficulties <csv>   Subset, e.g. hard,extreme (default = all)
               --output <path>        Output JSON path
+                                     (default: ../../gamekit/gamekit/Resources/SudokuPuzzles.json)
               --append               Read existing JSON and top up
               --time-budget <min>    Soft cap in minutes; clean exit when exceeded
             """)
@@ -103,6 +106,8 @@ func loadExistingPack(at path: String) -> PuzzlePack? {
 func writePackAtomically(_ pack: PuzzlePack, to path: String) throws {
     let url = URL(fileURLWithPath: path)
     let tmp = url.appendingPathExtension("tmp")
+    // Best-effort cleanup if a previous run was killed mid-write.
+    defer { try? FileManager.default.removeItem(at: tmp) }
     let enc = JSONEncoder()
     enc.outputFormatting = [.prettyPrinted, .sortedKeys]
     let data = try enc.encode(pack)
@@ -191,7 +196,7 @@ struct GenerateSudokuPackMain {
             let mm = Int(elapsed) / 60
             let ss = Int(elapsed) % 60
             print("---")
-            for d in Difficulty.allCases {
+            for d in args.difficulties {
                 let have = pack.puzzles[d.rawValue]?.count ?? 0
                 let pct = args.perDifficulty == 0 ? 0 : (have * 100 / args.perDifficulty)
                 let label = d.rawValue.padding(toLength: 8, withPad: " ", startingAt: 0)
@@ -227,8 +232,18 @@ struct GenerateSudokuPackMain {
                     )
                 } catch SudokuCoreError.hashAlreadyExists {
                     continue   // duplicate of an already-saved puzzle; skip
+                } catch let err as SudokuCoreError {
+                    // Expected engine-side rejection (difficultyMismatch,
+                    // nonUniqueSolution, unableToRateDifficulty, etc.) —
+                    // try next seed silently.
+                    _ = err
+                    continue
                 } catch {
-                    continue   // generator/solver/rater rejection; try next seed
+                    // Unexpected error (not from SudokuCoreError). Log to
+                    // stderr so long --time-budget runs don't silently mask
+                    // real failures, then keep going.
+                    fputs("⚠️  unexpected error at seed \(seed) (\(difficulty.rawValue)): \(error)\n", stderr)
+                    continue
                 }
 
                 // Accept only puzzles whose rated difficulty matches the target.
