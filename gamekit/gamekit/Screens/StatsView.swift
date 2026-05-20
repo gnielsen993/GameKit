@@ -71,6 +71,16 @@ struct StatsView: View {
     @Query(filter: #Predicate<BestTime> { $0.gameKindRaw == "nonogram" })
     private var nonogramBestTimes: [BestTime]
 
+    @Query(
+        filter: #Predicate<GameRecord> { $0.gameKindRaw == "sudoku" },
+        sort: \.playedAt,
+        order: .reverse
+    )
+    private var sudokuRecords: [GameRecord]
+
+    @Query(filter: #Predicate<BestTime> { $0.gameKindRaw == "sudoku" })
+    private var sudokuBestTimes: [BestTime]
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
@@ -105,6 +115,16 @@ struct StatsView: View {
                             theme: theme,
                             records: nonogramRecords,
                             bestTimes: nonogramBestTimes
+                        )
+                    }
+
+                    settingsSectionHeader(theme: theme, String(localized: "SUDOKU"))
+
+                    DKCard(theme: theme) {
+                        SudokuStatsCard(
+                            theme: theme,
+                            records: sudokuRecords,
+                            bestTimes: sudokuBestTimes
                         )
                     }
                 }

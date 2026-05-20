@@ -143,6 +143,30 @@ final class GameStats {
         try modelContext.save()
     }
 
+    // MARK: - Read API (Phase 16 — first read path on GameStats)
+
+    /// All puzzle IDs for a (gameKind, difficulty) the player has WON.
+    /// Source of truth = `GameRecord` rows (puzzle-based games store the
+    /// pool entry's UUID in `puzzleIdRaw`). Used by `SudokuViewModel` to
+    /// skip already-solved puzzles when the pool serves the next entry.
+    ///
+    /// Capture-let per RESEARCH §Pattern 4 — `#Predicate` cannot capture
+    /// `self` in a KeyPath, so `gameKind.rawValue` is captured into
+    /// `kindRaw` before the predicate closure.
+    func wonPuzzleIDs(gameKind: GameKind, difficulty: String) -> Set<String> {
+        let kindRaw = gameKind.rawValue
+        let winRaw = Outcome.win.rawValue
+        let descriptor = FetchDescriptor<GameRecord>(
+            predicate: #Predicate { record in
+                record.gameKindRaw == kindRaw
+                    && record.difficultyRaw == difficulty
+                    && record.outcomeRaw == winRaw
+            }
+        )
+        let records = (try? modelContext.fetch(descriptor)) ?? []
+        return Set(records.compactMap { $0.puzzleIdRaw })
+    }
+
     /// Atomic reset of all stats — deletes every `GameRecord`, every
     /// `BestTime`, and every `BestScore` inside one
     /// `modelContext.transaction { ... }` block (D-13). Partial reset is

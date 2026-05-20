@@ -248,10 +248,10 @@ final class SudokuViewModel {
     private func loadFreshPuzzle() async {
         resetSessionState()
         do {
-            // TODO(Phase 16): swap to gameStats?.sudokuPlayedIDs(for: difficulty)
-            // once GameStats gains a SwiftData read path. For now, pass an empty
-            // set so the pool falls back to its session-cursor round-robin.
-            let playedIDs = Set<String>()
+            let playedIDs = gameStats?.wonPuzzleIDs(
+                gameKind: .sudoku,
+                difficulty: difficulty.rawValue
+            ) ?? Set<String>()
             let entry = try await pool.next(difficulty: difficulty, playedIDs: playedIDs)
             currentPuzzle = entry
             board = SudokuBoard(givens: entry.givens, solution: entry.solution)
