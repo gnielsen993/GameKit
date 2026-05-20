@@ -11,6 +11,11 @@
 //  Token note: plan referenced `theme.colors.accent` which does not exist;
 //  using `theme.colors.accentPrimary` (the correct token name per ThemeColors).
 //
+//  Theme audit (Phase 15-04, 2026-05-19): verified under Classic +
+//  Voltage + Dracula presets on iPhone 17 Pro sim. Cell digits (givens
+//  vs user vs notes), selected/peer/same-number highlights, wrong-flash
+//  danger overlay, and box borders all distinguishable per CLAUDE §8.12.
+//
 
 import SwiftUI
 import DesignKit
