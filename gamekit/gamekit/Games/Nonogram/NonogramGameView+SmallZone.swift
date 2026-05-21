@@ -100,19 +100,14 @@ extension NonogramGameView {
         }
     }
 
-    /// Bottom chrome cluster: compact chips ABOVE compact ModePill — pill
-    /// size matches Mines's compact pill (user feedback 2026-05-14 round 7:
-    /// "nonogram picker is a tad too big, why isnt it the same size as
-    /// minesweeper"). Top zones still use the full-size picker.
+    /// Bottom chrome cluster: compact chips ABOVE compact ModePill.
+    /// Size chip omitted — it was too wide for the small corner area; the
+    /// puzzle grid itself makes the size visible. Only lives (if applicable)
+    /// + timer shown.
     @ViewBuilder
     private var bottomChromeCluster: some View {
         VStack(spacing: theme.spacing.m) {
             HStack(spacing: theme.spacing.s) {
-                NonogramSizeChip(
-                    theme: theme,
-                    sizeLabel: "\(viewModel.difficulty.size) × \(viewModel.difficulty.size)",
-                    compact: true
-                )
                 if viewModel.gameMode == .lives {
                     NonogramLivesChip(
                         theme: theme,
@@ -150,9 +145,10 @@ extension NonogramGameView {
         }
     }
 
-    /// Compact HeaderBar — chips rendered inline with `compact: true` and
-    /// PACKED on the side OPPOSITE the covered PiP corner (per user feedback
-    /// 2026-05-14 round 3).
+    /// Compact header — chips packed to the corner OPPOSITE the PiP.
+    /// Size chip omitted here (same reason as bottomChromeCluster): the
+    /// 3-chip row was too wide for the small zone and got covered. Only
+    /// lives (if applicable) + timer shown.
     @ViewBuilder
     fileprivate var smallZoneCompactHeader: some View {
         let chipsTrailing = (videoModeStore.location == .smallTopLeft
@@ -162,11 +158,6 @@ extension NonogramGameView {
             if chipsTrailing {
                 Spacer()
             }
-            NonogramSizeChip(
-                theme: theme,
-                sizeLabel: "\(viewModel.difficulty.size) × \(viewModel.difficulty.size)",
-                compact: true
-            )
             if viewModel.gameMode == .lives {
                 NonogramLivesChip(
                     theme: theme,

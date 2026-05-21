@@ -16,6 +16,9 @@ struct SudokuToolbarMenu: View {
     let currentGameMode: SudokuGameMode
     let onSelectDifficulty: (SudokuDifficulty) -> Void
     let onSelectGameMode: (SudokuGameMode) -> Void
+    /// Compact variant for Video Mode large-zone control row — smaller frame +
+    /// surface background to match VideoCompactControlRow button style.
+    var compact: Bool = false
 
     var body: some View {
         Menu {
@@ -47,11 +50,20 @@ struct SudokuToolbarMenu: View {
                 }
             }
         } label: {
-            Image(systemName: "slider.horizontal.3")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(theme.colors.textPrimary)
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
+            if compact {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(theme.colors.textPrimary)
+                    .frame(width: theme.spacing.xl, height: theme.spacing.xl)
+                    .background(theme.colors.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
+            } else {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(theme.colors.textPrimary)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
         }
         .accessibilityLabel(Text("Game settings"))
     }

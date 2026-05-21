@@ -33,8 +33,8 @@ struct SudokuGameView: View {
     @Environment(\.videoModeStore) var videoModeStore
     @Environment(\.videoModeCompactness) var videoModeCompactness
 
-    init(initialDifficulty: SudokuDifficulty? = nil) {
-        _viewModel = State(initialValue: SudokuViewModel(difficulty: initialDifficulty))
+    init(initialDifficulty: SudokuDifficulty? = nil, initialMode: SudokuGameMode? = nil) {
+        _viewModel = State(initialValue: SudokuViewModel(difficulty: initialDifficulty, mode: initialMode))
     }
 
     var theme: Theme { themeManager.theme(using: colorScheme) }
@@ -148,25 +148,38 @@ struct SudokuGameView: View {
     }
 }
 
-// MARK: - Existing v1.0 layout (off-path)
+// MARK: - Main layout
 
 extension SudokuGameView {
+
+    /// Timer + lives row rendered above the board. Internal so VideoMode
+    /// extension can reuse it in the top-small-zone layout.
+    @ViewBuilder
+    var gameInfoRow: some View {
+        HStack(spacing: theme.spacing.s) {
+            VideoModeTimerChip(
+                theme: theme,
+                timerAnchor: viewModel.timerAnchor,
+                pausedElapsed: viewModel.pausedElapsed
+            )
+            Spacer()
+            if viewModel.gameMode == .lives {
+                SudokuLivesChip(theme: theme, mistakes: viewModel.mistakes)
+            }
+        }
+        .padding(.horizontal, theme.spacing.m)
+    }
 
     @ViewBuilder
     var existingLayout: some View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
 
-            VStack(spacing: theme.spacing.m) {
-                SudokuHeaderBar(
-                    theme: theme,
-                    timerAnchor: viewModel.timerAnchor,
-                    pausedElapsed: viewModel.pausedElapsed,
-                    mistakes: viewModel.gameMode == .lives ? viewModel.mistakes : nil,
-                    isInteractive: isInteractive,
-                    interactionMode: viewModel.interactionMode,
-                    onSelectMode: { viewModel.setInteractionMode($0) }
-                )
+            VStack(spacing: theme.spacing.s) {
+                // Timer (left) + lives (right) sit just above the board so
+                // they never crowd the mode pill or number pad.
+                gameInfoRow
+                    .padding(.vertical, theme.spacing.xs)
 
                 if viewModel.board != nil {
                     sudokuBoard
@@ -177,6 +190,23 @@ extension SudokuGameView {
                         .foregroundStyle(theme.colors.textSecondary)
                     Spacer()
                 }
+
+                // Mode pill centered, erase trailing. ZStack keeps the pill
+                // truly centered regardless of erase button width.
+                ZStack(alignment: .center) {
+                    SudokuModePill(
+                        theme: theme,
+                        mode: viewModel.interactionMode,
+                        isInteractive: isInteractive,
+                        onSelect: { viewModel.setInteractionMode($0) }
+                    )
+                    HStack {
+                        Spacer()
+                        eraseButton
+                    }
+                    .padding(.horizontal, theme.spacing.m)
+                }
+                .frame(maxWidth: .infinity)
 
                 SudokuNumberPad(viewModel: viewModel, theme: theme)
                     .opacity(isInteractive ? 1 : 0.4)
@@ -256,5 +286,29 @@ extension SudokuGameView {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text("Restart puzzle"))
+    }
+
+    /// Erase button for the mode-pill row. Floats trailing so the 9 numpad
+    /// digits can span the full pad width without a 10th off-center slot.
+    @ViewBuilder
+    var eraseButton: some View {
+        Button {
+            viewModel.erase()
+        } label: {
+            Image(systemName: "delete.left")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(theme.colors.textPrimary)
+                .frame(width: 36, height: 36)
+                .background(theme.colors.surface)
+                .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
+                        .stroke(theme.colors.border, lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+        .disabled(!isInteractive)
+        .opacity(isInteractive ? 1 : 0.4)
+        .accessibilityLabel(Text("Erase"))
     }
 }

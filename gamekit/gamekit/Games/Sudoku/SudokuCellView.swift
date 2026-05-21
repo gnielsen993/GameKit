@@ -19,6 +19,8 @@ struct SudokuCellView: View {
     let highlight: HighlightTier
     let isWrongFlashing: Bool
     let theme: Theme
+    /// When non-nil, notes cells render this digit in accentPrimary to pop.
+    var noteHighlightDigit: Int? = nil
 
     enum HighlightTier: Equatable {
         case none                  // no overlay
@@ -77,9 +79,12 @@ struct SudokuCellView: View {
                 HStack(spacing: 0) {
                     ForEach(0..<3, id: \.self) { c in
                         let digit = r * 3 + c + 1
+                        let isHighlighted = notes.contains(digit) && noteHighlightDigit == digit
                         Text(notes.contains(digit) ? "\(digit)" : " ")
                             .font(theme.typography.caption)
-                            .foregroundStyle(theme.colors.textSecondary)
+                            .foregroundStyle(isHighlighted
+                                ? theme.colors.accentPrimary
+                                : theme.colors.textSecondary)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }

@@ -42,8 +42,8 @@ struct NonogramGameView: View {
     @State var showDifficultyPicker = false               // internal so banner extension can write
     @State var bannerDismissed = false                    // P13 "View board" toggle
 
-    init(initialDifficulty: NonogramDifficulty? = nil) {
-        _viewModel = State(initialValue: NonogramViewModel(difficulty: initialDifficulty))
+    init(initialDifficulty: NonogramDifficulty? = nil, initialMode: NonogramGameMode? = nil) {
+        _viewModel = State(initialValue: NonogramViewModel(difficulty: initialDifficulty, mode: initialMode))
     }
     /// Gates the end-state card so the player gets a beat to admire the
     /// completed picture before the overlay covers it. Flipped true by a

@@ -21,7 +21,7 @@ import SwiftUI
 import DesignKit
 
 struct SudokuBoardView: View {
-    @Bindable var viewModel: SudokuViewModel
+    let viewModel: SudokuViewModel
     let theme: Theme
 
     static let size = SudokuBoard.size       // 9
@@ -51,6 +51,7 @@ struct SudokuBoardView: View {
 
     @ViewBuilder
     private func cellGrid(cellSide: CGFloat) -> some View {
+        let noteDigit = highlightedDigit
         VStack(spacing: 0) {
             ForEach(0..<Self.size, id: \.self) { r in
                 HStack(spacing: 0) {
@@ -63,7 +64,8 @@ struct SudokuBoardView: View {
                             cell: cell,
                             highlight: highlight,
                             isWrongFlashing: isFlash,
-                            theme: theme
+                            theme: theme,
+                            noteHighlightDigit: noteDigit
                         )
                         .frame(width: cellSide, height: cellSide)
                         .onTapGesture {
@@ -73,6 +75,14 @@ struct SudokuBoardView: View {
                 }
             }
         }
+    }
+
+    /// The digit value of the currently-selected cell, or nil if nothing is
+    /// selected or the selected cell has no placed value. Used to highlight
+    /// matching pencil-marks across the board.
+    private var highlightedDigit: Int? {
+        guard let sel = viewModel.selected, let board = viewModel.board else { return nil }
+        return board.cell(row: sel.row, col: sel.col).value
     }
 
     /// Single-pass Path overlay drawing 0.5pt lines between every cell row and
@@ -123,11 +133,19 @@ struct SudokuBoardView: View {
         guard let sel = viewModel.selected else { return .none }
         if sel.row == row && sel.col == col { return .selected }
 
-        // Same-number tier: if selected cell has a value and this cell shares it.
         if let board = viewModel.board {
             let selValue = board.cell(row: sel.row, col: sel.col).value
-            let thisValue = board.cell(row: row, col: col).value
-            if let sv = selValue, let tv = thisValue, sv == tv {
+            let thisCell = board.cell(row: row, col: col)
+
+            // Same placed-value tier.
+            if let sv = selValue, let tv = thisCell.value, sv == tv {
+                return .sameNumber
+            }
+
+            // Same-number in notes: selected cell has a value and this cell's
+            // notes contain it — highlight so the player can see where that
+            // digit is pencilled in.
+            if let sv = selValue, case .empty(let notes) = thisCell, notes.contains(sv) {
                 return .sameNumber
             }
         }

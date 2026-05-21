@@ -12,9 +12,6 @@
 //    - mistakes = 2 → 1 dot filled, 2 dim
 //    - mistakes ≥ 3 → all 3 dim (game-over)
 //
-//  Uses circle glyphs (circle.fill / circle) to distinguish from the
-//  Nonogram heart chip — different game, slightly different icon shape.
-//
 //  Renders NOTHING if the caller's gameMode is .free; parent
 //  (SudokuHeaderBar) is responsible for not rendering in .free mode,
 //  but the chip itself also guards internally for safety.
@@ -37,7 +34,7 @@ struct SudokuLivesChip: View {
     var body: some View {
         HStack(spacing: theme.spacing.xs / 2) {
             ForEach(0..<SudokuGameMode.livesPerPuzzle, id: \.self) { i in
-                Image(systemName: i < livesRemaining ? "circle.fill" : "circle")
+                Image(systemName: i < livesRemaining ? "heart.fill" : "heart")
                     .foregroundStyle(i < livesRemaining
                                      ? theme.colors.danger
                                      : theme.colors.textTertiary)

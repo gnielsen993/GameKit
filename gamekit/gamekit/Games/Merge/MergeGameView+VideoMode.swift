@@ -18,10 +18,10 @@
 //    - `largeZoneLayout` — Large-zone view tree. HeaderBar + ModePill HIDDEN
 //      (their roles migrate into the compact row). Compact row at the edge
 //      opposite the reserved video band.
-//    - `compactRowComposed` — VideoCompactControlRow per D-MG-01:
-//        Back | MergeScoreChip(compact:true) | <Spacer> MergeModePill(compact:true) <Spacer>
-//          | (MergeBestChip(compact:true) · restartWithOverflowMenu)
-//      `onSettings: nil` (D-MG-01 — no gear; Mode picker covers settings).
+//    - `compactRowComposed` — VideoCompactControlRow, no mode picker (switching
+//        mid-game doesn't make sense for Merge):
+//        Back | MergeScoreChip(compact:true) | EmptyView | (MergeBestChip · restartWithOverflowMenu)
+//      `onSettings: nil`. Mode change available from Restart overflow menu only.
 //    - `restartWithOverflowMenu` — Restart button hosts a primary-action Menu
 //      with Change-mode list folded in (always-collapsed pattern per P11-04
 //      round 1 polish; not gated on .collapsedSettings).
@@ -414,40 +414,25 @@ extension MergeGameView {
 
     // MARK: - Compact-row composition (D-MG-01 slot order)
 
-    /// D-MG-01 verbatim Mines pattern: symmetric chip-left/picker-center/chip-right
-    /// layout with `onSettings: nil` (no gear; Mode picker covers settings)
-    /// and the Mode-change menu folded into the Restart button's overflow Menu
-    /// unconditionally (always-collapsed pattern per P11-04 round 1 polish —
-    /// not gated on videoModeCompactness == .collapsedSettings since that
-    /// threshold didn't fire reliably).
-    ///
-    /// Merge has no live timer (D-MG-01 explicit) — slot 4 hosts the persisted
-    /// Best score, slot 5 hosts Restart-w/menu.
+    /// Merge large-zone compact row: no mode picker (switching Win/Infinite
+    /// mid-game doesn't make sense). Layout: Back | Score | Best + Restart.
+    /// Mode change is available only from the Restart overflow menu so the
+    /// player can choose a new mode when starting a fresh game.
     @ViewBuilder
     var compactRowComposed: some View {
         VideoCompactControlRow(
             theme: theme,
             onBack: { dismiss() },
-            onSettings: nil      // D-MG-01 — Mode picker covers settings role
+            onSettings: nil
         ) {
-            // Slot 2 — Score chip (single, not stacked; mirrors Mines P11-04 round 2)
             MergeScoreChip(
                 theme: theme,
                 score: viewModel.score,
                 compact: true
             )
         } picker: {
-            // Slot 3 — Mode pill (center-anchored via Spacer flanking in VideoCompactControlRow)
-            MergeModePill(
-                theme: theme,
-                mode: viewModel.mode,
-                onSelect: { viewModel.requestModeChange($0) },
-                compact: true
-            )
+            EmptyView()          // no mid-game mode switch for Merge
         } secondaryInfo: {
-            // Slot 4+5 composite — Best chip + Restart-with-overflow-menu.
-            // Best is the right-side chip (stable persisted value); Restart
-            // hosts the always-collapsed Change-mode menu.
             HStack(spacing: theme.spacing.s) {
                 MergeBestChip(
                     theme: theme,

@@ -162,11 +162,11 @@ struct HomeView: View {
         case .merge(let mode):
             MergeGameView(initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
-        case .nonogram(let difficulty):
-            NonogramGameView(initialDifficulty: difficulty)
+        case .nonogram(let difficulty, let mode):
+            NonogramGameView(initialDifficulty: difficulty, initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
-        case .sudoku(let difficulty):
-            SudokuGameView(initialDifficulty: difficulty)
+        case .sudoku(let difficulty, let mode):
+            SudokuGameView(initialDifficulty: difficulty, initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
         }
     }
@@ -193,7 +193,7 @@ struct HomeView: View {
                     Text(String(localized: "Upcoming"))
                         .font(theme.typography.headline)
                         .foregroundStyle(theme.colors.textPrimary)
-                    Text(String(localized: "6 games coming"))
+                    Text(String(localized: "5 games coming"))
                         .font(theme.typography.caption)
                         .foregroundStyle(theme.colors.textSecondary)
                 }

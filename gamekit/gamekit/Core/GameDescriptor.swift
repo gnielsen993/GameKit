@@ -82,22 +82,32 @@ struct GameDescriptor: Identifiable, Hashable, Sendable {
 }
 
 /// One mode/difficulty chip rendered inside an expanded drawer.
-/// `route` already carries the concrete mode/difficulty as an associated
-/// value, so tapping the chip is a single `path.append(chip.route)` — no
-/// chip-to-route translation table needed at the call site.
+///
+/// Two variants:
+/// - **Leaf chip** (`route != nil`, `subModes` empty): tapping pushes the
+///   route directly — single-step games (Minesweeper, Merge) use this.
+/// - **Parent chip** (`route == nil`, `subModes` non-empty): tapping drills
+///   to a second tier inside the same fixed-height cavity — two-step games
+///   (Sudoku, Nonogram) use this to surface Free vs Lives before difficulty.
 struct GameModeChip: Identifiable, Hashable, Sendable {
-    /// Stable id for ForEach. Game-scoped string, not globally unique.
     let id: String
-
-    /// English source string for the chip label — passed to
-    /// `String(localized:)` at render time.
     let labelKey: String
-
-    /// Optional secondary line (e.g. "9×9" under "Easy"). Empty = single-line chip.
+    /// Optional secondary line (e.g. "Easy" under "Free"). Empty = single-line.
     let detailKey: String
+    /// nil for parent chips (drill-down); non-nil for leaf chips (launch).
+    let route: GameRoute?
+    /// Non-empty only on parent chips. Shown in the cavity after drill-in.
+    let subModes: [GameModeChip]
 
-    /// NavigationStack route pushed when this chip is tapped.
-    let route: GameRoute
+    init(id: String, labelKey: String, detailKey: String = "", route: GameRoute) {
+        self.id = id; self.labelKey = labelKey; self.detailKey = detailKey
+        self.route = route; self.subModes = []
+    }
+
+    init(id: String, labelKey: String, subModes: [GameModeChip]) {
+        self.id = id; self.labelKey = labelKey; self.detailKey = ""
+        self.route = nil; self.subModes = subModes
+    }
 }
 
 extension GameDescriptor {
@@ -136,12 +146,20 @@ extension GameDescriptor {
             captionKey: "Tap to play",
             symbol: "square.grid.3x3.square",
             accent: .slot3,
-            route: .nonogram(nil),
+            route: .nonogram(nil, nil),
             modes: [
-                GameModeChip(id: "tiny",   labelKey: "5×5",   detailKey: "Tiny",   route: .nonogram(.tiny)),
-                GameModeChip(id: "small",  labelKey: "10×10", detailKey: "Small",  route: .nonogram(.small)),
-                GameModeChip(id: "medium", labelKey: "15×15", detailKey: "Medium", route: .nonogram(.medium)),
-                GameModeChip(id: "large",  labelKey: "20×20", detailKey: "Large",  route: .nonogram(.large))
+                GameModeChip(id: "nono-free", labelKey: "Free", subModes: [
+                    GameModeChip(id: "nono-free-tiny",   labelKey: "5×5",   detailKey: "Tiny",   route: .nonogram(.tiny,   .free)),
+                    GameModeChip(id: "nono-free-small",  labelKey: "10×10", detailKey: "Small",  route: .nonogram(.small,  .free)),
+                    GameModeChip(id: "nono-free-medium", labelKey: "15×15", detailKey: "Medium", route: .nonogram(.medium, .free)),
+                    GameModeChip(id: "nono-free-large",  labelKey: "20×20", detailKey: "Large",  route: .nonogram(.large,  .free))
+                ]),
+                GameModeChip(id: "nono-lives", labelKey: "Lives", subModes: [
+                    GameModeChip(id: "nono-lives-tiny",   labelKey: "5×5",   detailKey: "Tiny",   route: .nonogram(.tiny,   .lives)),
+                    GameModeChip(id: "nono-lives-small",  labelKey: "10×10", detailKey: "Small",  route: .nonogram(.small,  .lives)),
+                    GameModeChip(id: "nono-lives-medium", labelKey: "15×15", detailKey: "Medium", route: .nonogram(.medium, .lives)),
+                    GameModeChip(id: "nono-lives-large",  labelKey: "20×20", detailKey: "Large",  route: .nonogram(.large,  .lives))
+                ])
             ]
         ),
         GameDescriptor(
@@ -150,12 +168,20 @@ extension GameDescriptor {
             captionKey: "Tap to play",
             symbol: "square.grid.3x3.fill",
             accent: .slot4,
-            route: .sudoku(nil),
+            route: .sudoku(nil, nil),
             modes: [
-                GameModeChip(id: "easy",    labelKey: "Easy",    detailKey: "9×9", route: .sudoku(.easy)),
-                GameModeChip(id: "medium",  labelKey: "Medium",  detailKey: "9×9", route: .sudoku(.medium)),
-                GameModeChip(id: "hard",    labelKey: "Hard",    detailKey: "9×9", route: .sudoku(.hard)),
-                GameModeChip(id: "extreme", labelKey: "Extreme", detailKey: "9×9", route: .sudoku(.extreme))
+                GameModeChip(id: "sudoku-free", labelKey: "Free", subModes: [
+                    GameModeChip(id: "sudoku-free-easy",    labelKey: "Easy",    route: .sudoku(.easy,    .free)),
+                    GameModeChip(id: "sudoku-free-medium",  labelKey: "Medium",  route: .sudoku(.medium,  .free)),
+                    GameModeChip(id: "sudoku-free-hard",    labelKey: "Hard",    route: .sudoku(.hard,    .free)),
+                    GameModeChip(id: "sudoku-free-extreme", labelKey: "Extreme", route: .sudoku(.extreme, .free))
+                ]),
+                GameModeChip(id: "sudoku-lives", labelKey: "Lives", subModes: [
+                    GameModeChip(id: "sudoku-lives-easy",    labelKey: "Easy",    route: .sudoku(.easy,    .lives)),
+                    GameModeChip(id: "sudoku-lives-medium",  labelKey: "Medium",  route: .sudoku(.medium,  .lives)),
+                    GameModeChip(id: "sudoku-lives-hard",    labelKey: "Hard",    route: .sudoku(.hard,    .lives)),
+                    GameModeChip(id: "sudoku-lives-extreme", labelKey: "Extreme", route: .sudoku(.extreme, .lives))
+                ])
             ]
         )
     ]

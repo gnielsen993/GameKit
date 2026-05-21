@@ -2,20 +2,19 @@
 //  SudokuNumberPad.swift
 //  gamekit
 //
-//  9-digit number pad + erase button. Each digit shows a remaining-count
-//  badge (9 minus the number of times that digit is already placed on
-//  the board). When a digit's remaining count is 0, the button greys
-//  out and disables.
+//  9-digit number pad. Each digit shows a remaining-count badge
+//  (9 minus how many times that digit is already placed). When a digit's
+//  remaining count reaches 0, the button greys out and disables.
 //
-//  Token note: plan referenced `theme.colors.accent` which does not exist;
-//  using `theme.colors.accentPrimary` (the correct token name per ThemeColors).
+//  Erase lives in SudokuGameView alongside the mode pill so the 9 digits
+//  span the full pad width without an off-center 10th button.
 //
 
 import SwiftUI
 import DesignKit
 
 struct SudokuNumberPad: View {
-    @Bindable var viewModel: SudokuViewModel
+    let viewModel: SudokuViewModel
     let theme: Theme
 
     var body: some View {
@@ -23,7 +22,6 @@ struct SudokuNumberPad: View {
             ForEach(1...9, id: \.self) { digit in
                 digitButton(digit)
             }
-            eraseButton
         }
         .padding(.horizontal, theme.spacing.m)
     }
@@ -57,26 +55,5 @@ struct SudokuNumberPad: View {
         }
         .disabled(isExhausted)
         .accessibilityLabel("Place \(digit), \(remaining) remaining")
-    }
-
-    private var eraseButton: some View {
-        Button {
-            viewModel.erase()
-        } label: {
-            Image(systemName: "delete.left")
-                .font(.system(size: 20))
-                .foregroundStyle(theme.colors.textPrimary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, theme.spacing.s)
-                .background(
-                    RoundedRectangle(cornerRadius: theme.radii.chip)
-                        .fill(theme.colors.surface)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: theme.radii.chip)
-                        .stroke(theme.colors.border, lineWidth: 1)
-                )
-        }
-        .accessibilityLabel("Erase")
     }
 }

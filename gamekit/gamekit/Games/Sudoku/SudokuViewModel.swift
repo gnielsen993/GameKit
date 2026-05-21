@@ -105,6 +105,7 @@ final class SudokuViewModel {
 
     init(
         difficulty: SudokuDifficulty? = nil,
+        mode: SudokuGameMode? = nil,
         pool: SudokuPuzzlePool = SudokuPuzzlePool(),
         userDefaults: UserDefaults = .standard,
         clock: @escaping () -> Date = { Date.now },
@@ -120,7 +121,8 @@ final class SudokuViewModel {
             ?? .easy
         self.difficulty = resolved
 
-        let resolvedMode = SudokuGameMode(rawValue: userDefaults.string(forKey: Self.lastGameModeKey) ?? "")
+        let resolvedMode = mode
+            ?? SudokuGameMode(rawValue: userDefaults.string(forKey: Self.lastGameModeKey) ?? "")
             ?? .free
         self.gameMode = resolvedMode
 

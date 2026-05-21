@@ -317,6 +317,30 @@ Moody preset (e.g. Voltage / Dracula) in addition to the default
 Classic preset. Legibility regressions = fix the token usage, don't
 carve out an exception.
 
+---
+
+## 10) Design rules — [`DESIGN.md`](DESIGN.md)
+
+All visual and interaction consistency rules live in **`DESIGN.md`**
+at the repo root. Read it before touching any game screen's chrome,
+components, or animations. Key sections:
+
+- **§2 Color semantics** — danger = lives/errors, accent = player
+  choice, surface = chip/button fill, etc.
+- **§3 Component dictionary** — lives chips (always hearts), timer
+  (always VideoModeTimerChip, compact in compact rows), mode pill
+  spec, compact control row spec, end-state banner spec
+- **§5 Layout** — ZStack/VStack skeleton, board layoutPriority(1) +
+  m H-padding, info row timer-left/lives-right, mode pill centered
+- **§7 Video Mode** — compact row rules, small-zone ≤2-chip limit,
+  board corner overlays, 12pt cell-size floor
+- **§8 Haptic design** — vocabulary table; §8.3 checklist for new interactions
+- **§10 Animation design** — causality framing; §10.6 compound triple table
+- **§12 Game-specific rules** — per-game chrome decisions
+
+DESIGN.md is the tiebreaker for visual/interaction decisions. New
+games must pass the §12.5 checklist before shipping.
+
 ### 9.13 Brand / project-status changes update §0.1 + CLAUDE.md in the same commit
 When any user-facing fact in §0.1 changes (display name, full brand,
 bundle ID, target iOS, current milestone label, MVP/next-game pick,

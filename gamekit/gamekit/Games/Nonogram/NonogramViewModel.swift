@@ -119,6 +119,7 @@ final class NonogramViewModel {
 
     init(
         difficulty: NonogramDifficulty? = nil,
+        mode: NonogramGameMode? = nil,
         userDefaults: UserDefaults = .standard,
         clock: @escaping () -> Date = { Date.now },
         rng: any RandomNumberGenerator = SystemRandomNumberGenerator(),
@@ -134,7 +135,8 @@ final class NonogramViewModel {
             ?? .small
         self.difficulty = resolved
 
-        let resolvedMode = NonogramGameMode(rawValue: userDefaults.string(forKey: Self.lastGameModeKey) ?? "")
+        let resolvedMode = mode
+            ?? NonogramGameMode(rawValue: userDefaults.string(forKey: Self.lastGameModeKey) ?? "")
             ?? .free
         self.gameMode = resolvedMode
 

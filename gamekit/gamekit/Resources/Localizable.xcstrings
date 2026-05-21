@@ -4,15 +4,8 @@
     "" : {
 
     },
-    "%@ %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$lld"
-          }
-        }
-      }
+    " " : {
+
     },
     "%@ coming soon" : {
       "comment" : "Disabled-card overlay caption with game name interpolated",
@@ -32,6 +25,16 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@: %2$lld games, %3$lld wins, %4$@, best time %5$@"
+          }
+        }
+      }
+    },
+    "%@: %lld games, %lld wins, average %@, best %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld games, %3$lld wins, average %4$@, best %5$@"
           }
         }
       }
@@ -141,6 +144,9 @@
     "6 games coming" : {
 
     },
+    "2048 · Classic" : {
+
+    },
     "Abandon" : {
       "comment" : "Destructive button in mid-game difficulty-change alert (D-10)",
       "extractionState" : "automatic",
@@ -205,6 +211,12 @@
     "Apple Mail isn't set up" : {
 
     },
+    "Avg" : {
+
+    },
+    "Back" : {
+
+    },
     "Back to The Drawer" : {
 
     },
@@ -244,7 +256,13 @@
         }
       }
     },
+    "Bad luck. Restart" : {
+
+    },
     "Best" : {
+
+    },
+    "Best %lld" : {
 
     },
     "BEST TIMES" : {
@@ -262,6 +280,9 @@
 
     },
     "Best: %lld" : {
+
+    },
+    "board placeholder" : {
 
     },
     "Cancel" : {
@@ -373,6 +394,9 @@
     "Done" : {
 
     },
+    "Drawer open. Tap a mode to play, or tap again to close." : {
+
+    },
     "Easy" : {
       "comment" : "Difficulty option — 9x9 / 10 mines",
       "extractionState" : "automatic",
@@ -389,6 +413,9 @@
 
     },
     "Empty" : {
+
+    },
+    "Erase" : {
 
     },
     "Export stats" : {
@@ -432,6 +459,9 @@
     "Game over" : {
 
     },
+    "Game over. Score %d. Restart" : {
+
+    },
     "Game over. Score: %lld. Best: %lld." : {
       "localizations" : {
         "en" : {
@@ -472,6 +502,9 @@
 
     },
     "Games" : {
+
+    },
+    "Given %lld" : {
 
     },
     "Haptics" : {
@@ -521,7 +554,7 @@
     "Infinite" : {
 
     },
-    "Infinite mode" : {
+    "Infinite · Endless" : {
 
     },
     "Large" : {
@@ -543,6 +576,9 @@
 
     },
     "Lives  -  3 strikes" : {
+
+    },
+    "Loading puzzle…" : {
 
     },
     "Make it yours" : {
@@ -639,6 +675,9 @@
     "No solved puzzles yet." : {
 
     },
+    "No Sudoku games played yet." : {
+
+    },
     "Nonogram" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -656,10 +695,22 @@
     "Not signed in" : {
 
     },
+    "Notes" : {
+
+    },
+    "Notes: %@" : {
+
+    },
     "OK" : {
 
     },
     "Out of lives" : {
+
+    },
+    "Out of lives. Try again" : {
+
+    },
+    "Out of mistakes" : {
 
     },
     "Pattern" : {
@@ -679,7 +730,29 @@
     "Pick a theme that fits your mood. Five Classic palettes here, dozens more in Settings." : {
 
     },
+    "picker" : {
+
+    },
+    "PiP" : {
+
+    },
+    "PiP zone (large %@)" : {
+
+    },
     "Place" : {
+
+    },
+    "Place %lld, %lld remaining" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Place %1$lld, %2$lld remaining"
+          }
+        }
+      }
+    },
+    "primary" : {
 
     },
     "Privacy Policy" : {
@@ -727,6 +800,9 @@
         }
       }
     },
+    "Restart puzzle" : {
+
+    },
     "Reveal" : {
 
     },
@@ -755,6 +831,15 @@
       }
     },
     "Score" : {
+
+    },
+    "Score %lld" : {
+
+    },
+    "secondary" : {
+
+    },
+    "Selected" : {
 
     },
     "Settings" : {
@@ -832,6 +917,12 @@
         }
       }
     },
+    "Solved: %@. New puzzle" : {
+
+    },
+    "Solved. New puzzle" : {
+
+    },
     "Stats" : {
       "comment" : "Stats tab + nav title",
       "extractionState" : "manual",
@@ -861,6 +952,9 @@
         }
       }
     },
+    "SUDOKU" : {
+
+    },
     "Support" : {
 
     },
@@ -883,6 +977,9 @@
 
     },
     "System" : {
+
+    },
+    "Tap to open drawer and choose a mode." : {
 
     },
     "Terms of Service" : {
@@ -964,6 +1061,9 @@
       }
     },
     "Upcoming" : {
+
+    },
+    "Value" : {
 
     },
     "Version" : {
@@ -1161,13 +1261,13 @@
         }
       }
     },
+    "View board" : {
+
+    },
     "Win" : {
 
     },
     "Win %" : {
-
-    },
-    "Win mode (stop at 2048)" : {
 
     },
     "Wins" : {
@@ -1190,6 +1290,9 @@
     "You reached 2048!" : {
 
     },
+    "You reached 2048! Score %d. Continue" : {
+
+    },
     "You reached 2048! Score: %lld. Best: %lld." : {
       "localizations" : {
         "en" : {
@@ -1200,7 +1303,13 @@
         }
       }
     },
+    "You solved it!" : {
+
+    },
     "You used all 3 lives" : {
+
+    },
+    "You used all 3 lives." : {
 
     },
     "You won!" : {
@@ -1226,6 +1335,9 @@
           }
         }
       }
+    },
+    "You won! Time: %@. Restart" : {
+
     },
     "You're signed out on this device, but we couldn't wipe the iCloud copy of your stats right now. Reconnect to the internet and sign in again to retry, or open Settings → Apple ID → Sign in with Apple → %@ to revoke access." : {
 

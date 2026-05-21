@@ -351,3 +351,33 @@ See §0.3. Pull `MARKETING_VERSION` from `pbxproj`, append a bullet
 under the right section, land in the same commit as the code. Skip
 only for: self-explanatory refactors, comment / doc-only edits, and
 work that didn't actually ship in this `MARKETING_VERSION`.
+
+---
+
+## 9) Design rules — [`DESIGN.md`](DESIGN.md)
+
+All visual and interaction consistency rules live in **`DESIGN.md`**
+at the repo root. Read it before touching any game screen's chrome,
+components, or animations. Key sections:
+
+- **§2 Color semantics** — which token means what (danger = lives/errors,
+  accent = player choice, etc.)
+- **§3 Component dictionary** — exact specs for lives chips (hearts,
+  always), timer chip (VideoModeTimerChip, always compact in compact rows),
+  info chips, mode pills, compact control rows, end-state banners
+- **§4 Typography** — which token per use case; timers always monospacedDigit
+- **§5 Layout** — ZStack/VStack skeleton, board always layoutPriority(1) + m
+  H-padding, info row timer-left/lives-right, mode pill centered with ZStack
+- **§6 Navigation** — back chevron, restart, toolbar menu placements + sizes
+- **§7 Video Mode** — large-zone compact row rules, small-zone ≤2-chip limit,
+  board corner overlays for lives+timer, cell-size floor 12pt when on
+- **§8 Haptic design** — haptics carry information (vocabulary table); §8.3
+  design checklist for new interactions; counter-trigger pattern
+- **§10 Animation design** — animations explain causality (not decoration);
+  §10.2 vocabulary table; §10.3 pre-roll sequencing; §10.5 design checklist;
+  §10.6 compound triple (visual + haptic + animation per event)
+- **§12 Game-specific rules** — per-game chrome decisions that must not drift
+
+DESIGN.md is the tiebreaker for visual/interaction decisions. When CLAUDE.md
+and DESIGN.md conflict on a non-functional detail, DESIGN.md wins.
+New games must pass the §12.5 checklist before shipping.

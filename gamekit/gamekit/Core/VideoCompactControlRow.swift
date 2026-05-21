@@ -66,6 +66,7 @@ struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: Vie
                 settingsButton
             }
         }
+        .padding(.horizontal, theme.spacing.m)       // consistent edge margin across all games
         .frame(height: theme.spacing.xl)             // D-13 pill height anchor
     }
 

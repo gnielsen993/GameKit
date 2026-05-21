@@ -42,6 +42,10 @@ struct DrawerRow: View {
     let onToggle: () -> Void
     let onSelectMode: (GameRoute) -> Void
 
+    /// Non-nil when the user has drilled into a parent chip's subModes.
+    /// Resets automatically when the drawer closes.
+    @State private var drillChip: GameModeChip? = nil
+
     /// Per-preset palette color resolved at render time.
     private var accentColor: Color {
         theme.catalogueColor(descriptor.accent.index)
@@ -96,6 +100,9 @@ struct DrawerRow: View {
                 )
         )
         .clipShape(RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous))
+        .onChange(of: isExpanded) { _, expanded in
+            if !expanded { drillChip = nil }
+        }
     }
 
     // MARK: - Face
@@ -163,10 +170,63 @@ struct DrawerRow: View {
 
     @ViewBuilder
     private var chipCavity: some View {
+        ZStack {
+            if drillChip == nil {
+                chipRow(chips: descriptor.modes, showBack: false)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+            } else if let parent = drillChip {
+                chipRow(chips: parent.subModes, showBack: true)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+        }
+        .frame(height: 64)
+        .clipped()
+        .background(Self.cavityColor)
+        .overlay(alignment: .top) {
+            LinearGradient(
+                colors: [DrawerChrome.shadow.opacity(0.45), DrawerChrome.shadow.opacity(0)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 6)
+            .allowsHitTesting(false)
+        }
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: drillChip?.id)
+    }
+
+    /// A horizontal row of chips with optional back button at the leading edge.
+    @ViewBuilder
+    private func chipRow(chips: [GameModeChip], showBack: Bool) -> some View {
         HStack(spacing: 0) {
-            ForEach(Array(descriptor.modes.enumerated()), id: \.element.id) { index, chip in
+            if showBack {
+                // Back button — fixed-width so it doesn't crowd the sub-chips.
+                Button {
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.78)) {
+                        drillChip = nil
+                    }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(DrawerChrome.onAccent.opacity(0.7))
+                        .frame(width: 40)
+                        .frame(maxHeight: .infinity)
+                        .background(Self.chipColor)
+                        .overlay(alignment: .top) {
+                            Rectangle()
+                                .fill(Self.hingeHighlight)
+                                .frame(height: 2)
+                        }
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Back"))
+
+                Rectangle()
+                    .fill(DrawerChrome.onAccent.opacity(0.06))
+                    .frame(width: 1)
+            }
+
+            ForEach(Array(chips.enumerated()), id: \.element.id) { index, chip in
                 if index > 0 {
-                    // Hairline rail-divider between hinged tabs.
                     Rectangle()
                         .fill(DrawerChrome.onAccent.opacity(0.06))
                         .frame(width: 1)
@@ -177,22 +237,15 @@ struct DrawerRow: View {
                     chipColor: Self.chipColor,
                     hingeHighlight: Self.hingeHighlight
                 ) {
-                    onSelectMode(chip.route)
+                    if let route = chip.route {
+                        onSelectMode(route)
+                    } else {
+                        withAnimation(.spring(response: 0.32, dampingFraction: 0.78)) {
+                            drillChip = chip
+                        }
+                    }
                 }
             }
-        }
-        .frame(height: 64)
-        .background(Self.cavityColor)
-        .overlay(alignment: .top) {
-            // Top inset shadow — sells the cavity as a recessed space
-            // that the face has been "lifted to expose."
-            LinearGradient(
-                colors: [DrawerChrome.shadow.opacity(0.45), DrawerChrome.shadow.opacity(0)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 6)
-            .allowsHitTesting(false)
         }
     }
 }
