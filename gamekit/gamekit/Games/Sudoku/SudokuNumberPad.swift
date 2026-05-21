@@ -16,6 +16,7 @@ import DesignKit
 struct SudokuNumberPad: View {
     let viewModel: SudokuViewModel
     let theme: Theme
+    @State private var pulsing: Set<Int> = []
 
     var body: some View {
         HStack(spacing: theme.spacing.xs) {
@@ -24,6 +25,14 @@ struct SudokuNumberPad: View {
             }
         }
         .padding(.horizontal, theme.spacing.m)
+        .onChange(of: viewModel.justCompletedDigit) { _, newDigit in
+            guard let d = newDigit else { return }
+            pulsing.insert(d)
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(350))
+                pulsing.remove(d)
+            }
+        }
     }
 
     private func digitButton(_ digit: Int) -> some View {
@@ -38,7 +47,7 @@ struct SudokuNumberPad: View {
                     .foregroundStyle(isExhausted
                         ? theme.colors.textSecondary
                         : theme.colors.textPrimary)
-                Text("\(remaining)")
+                Text(isExhausted ? " " : "\(remaining)")
                     .font(theme.typography.caption)
                     .foregroundStyle(theme.colors.textSecondary)
             }
@@ -52,7 +61,25 @@ struct SudokuNumberPad: View {
                 RoundedRectangle(cornerRadius: theme.radii.chip)
                     .stroke(theme.colors.border, lineWidth: 1)
             )
+            .overlay {
+                if isExhausted {
+                    GeometryReader { g in
+                        Path { p in
+                            p.move(to: CGPoint(x: g.size.width * 0.18, y: g.size.height * 0.18))
+                            p.addLine(to: CGPoint(x: g.size.width * 0.82, y: g.size.height * 0.82))
+                        }
+                        .stroke(
+                            theme.colors.textSecondary.opacity(0.55),
+                            style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
+                        )
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip))
+                    .allowsHitTesting(false)
+                }
+            }
         }
+        .scaleEffect(pulsing.contains(digit) ? 1.12 : 1.0)
+        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: pulsing.contains(digit))
         .disabled(isExhausted)
         .accessibilityLabel("Place \(digit), \(remaining) remaining")
     }

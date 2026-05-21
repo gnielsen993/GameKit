@@ -116,7 +116,7 @@ extension SudokuGameView {
                         compact: true
                     )
                     .padding(.leading, theme.spacing.m)
-                    .padding(.top, theme.spacing.xs)
+                    .padding(.top, theme.spacing.s)
                     .allowsHitTesting(false)
                 }
             }
@@ -128,7 +128,7 @@ extension SudokuGameView {
                     compact: true
                 )
                 .padding(.trailing, theme.spacing.m)
-                .padding(.top, theme.spacing.xs)
+                .padding(.top, theme.spacing.s)
                 .allowsHitTesting(false)
             }
     }

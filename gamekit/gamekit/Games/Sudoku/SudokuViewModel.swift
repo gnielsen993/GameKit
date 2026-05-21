@@ -60,6 +60,19 @@ final class SudokuViewModel {
     /// shake animation in CellView. Auto-cleared ~600ms after being set.
     private(set) var lastWrongAttemptIdx: Int?
 
+    // Completion feedback
+    /// Flat indices of cells belonging to a just-completed row, column, or box.
+    /// Set on every correct placement that completes a group; auto-cleared after 800ms.
+    private(set) var completionGlowIndices: Set<Int> = []
+    /// Incremented each time completionGlowIndices is populated — drives the
+    /// medium-impact haptic in the view.
+    private(set) var completionGlowCount: Int = 0
+    /// Incremented when all 9 instances of a digit have been placed.
+    private(set) var numberCompleteCount: Int = 0
+    /// The digit that just reached 0 remaining. Auto-cleared after 600ms.
+    /// Used to pulse the corresponding button in SudokuNumberPad.
+    private(set) var justCompletedDigit: Int?
+
     // Single-step undo
     private(set) var undoSnapshot: SudokuUndoSnapshot?
 
@@ -278,6 +291,10 @@ final class SudokuViewModel {
         placeCount = 0
         wrongAttemptCount = 0
         lastWrongAttemptIdx = nil
+        completionGlowIndices = []
+        completionGlowCount = 0
+        numberCompleteCount = 0
+        justCompletedDigit = nil
         undoSnapshot = nil
         selected = nil
         lockedCells = []
@@ -306,6 +323,7 @@ final class SudokuViewModel {
             lockedCells.insert(idx)
             placeCount += 1
             if state == .idle { startTimer() }
+            fireCompletionEffects(row: row, col: col, value: value, board: board)
             if board.isSolved { recordWin(); return }
             return
         }
@@ -319,6 +337,7 @@ final class SudokuViewModel {
         self.board = board
         placeCount += 1
         if state == .idle { startTimer() }
+        fireCompletionEffects(row: row, col: col, value: value, board: board)
         if board.isSolved { recordWin() }
     }
 
@@ -400,6 +419,51 @@ final class SudokuViewModel {
             durationSeconds: frozenElapsed,
             puzzleId: currentPuzzle?.id
         )
+    }
+
+    private func fireCompletionEffects(row: Int, col: Int, value: Int, board: SudokuBoard) {
+        var newGlow = Set<Int>()
+
+        // Row complete?
+        if (0..<9).allSatisfy({ board.cell(row: row, col: $0).value != nil }) {
+            for c in 0..<9 { newGlow.insert(row * 9 + c) }
+        }
+        // Column complete?
+        if (0..<9).allSatisfy({ board.cell(row: $0, col: col).value != nil }) {
+            for r in 0..<9 { newGlow.insert(r * 9 + col) }
+        }
+        // Box complete?
+        let br = (row / 3) * 3, bc = (col / 3) * 3
+        if (0..<3).allSatisfy({ dr in (0..<3).allSatisfy({
+            dc in board.cell(row: br + dr, col: bc + dc).value != nil
+        }) }) {
+            for dr in 0..<3 { for dc in 0..<3 { newGlow.insert((br + dr) * 9 + (bc + dc)) } }
+        }
+
+        if !newGlow.isEmpty {
+            completionGlowIndices = newGlow
+            completionGlowCount += 1
+            let snapshot = newGlow
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(800))
+                if self.completionGlowIndices == snapshot {
+                    self.completionGlowIndices = []
+                }
+            }
+        }
+
+        // Number fully placed?
+        let placed = board.cells.filter { $0.value == value }.count
+        if placed == 9 {
+            numberCompleteCount += 1
+            justCompletedDigit = value
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(600))
+                if self.justCompletedDigit == value {
+                    self.justCompletedDigit = nil
+                }
+            }
+        }
     }
 
     // MARK: - Constants

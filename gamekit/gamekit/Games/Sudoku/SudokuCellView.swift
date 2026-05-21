@@ -21,6 +21,8 @@ struct SudokuCellView: View {
     let theme: Theme
     /// When non-nil, notes cells render this digit in accentPrimary to pop.
     var noteHighlightDigit: Int? = nil
+    /// True while this cell belongs to a just-completed row, column, or box.
+    var isGlowing: Bool = false
 
     enum HighlightTier: Equatable {
         case none                  // no overlay
@@ -32,6 +34,7 @@ struct SudokuCellView: View {
     var body: some View {
         ZStack {
             background
+            glowBackground
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -51,6 +54,19 @@ struct SudokuCellView: View {
             }
         }()
         return Rectangle().fill(theme.colors.accentPrimary.opacity(opacity))
+    }
+
+    // Completion glow: flashes in fast, fades out over ~650ms.
+    // Sits between the highlight background and the digit content so text
+    // remains fully legible at all times.
+    private var glowBackground: some View {
+        Rectangle()
+            .fill(theme.colors.accentPrimary.opacity(isGlowing ? 0.22 : 0))
+            .animation(
+                isGlowing ? .easeOut(duration: 0.65) : .easeIn(duration: 0.1),
+                value: isGlowing
+            )
+            .allowsHitTesting(false)
     }
 
     @ViewBuilder

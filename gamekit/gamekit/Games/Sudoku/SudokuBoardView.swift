@@ -52,6 +52,7 @@ struct SudokuBoardView: View {
     @ViewBuilder
     private func cellGrid(cellSide: CGFloat) -> some View {
         let noteDigit = highlightedDigit
+        let glowSet = viewModel.completionGlowIndices
         VStack(spacing: 0) {
             ForEach(0..<Self.size, id: \.self) { r in
                 HStack(spacing: 0) {
@@ -60,12 +61,14 @@ struct SudokuBoardView: View {
                         let cell = board.cell(row: r, col: c)
                         let highlight = highlightTier(row: r, col: c)
                         let isFlash = viewModel.lastWrongAttemptIdx == r * 9 + c
+                        let isGlowing = glowSet.contains(r * 9 + c)
                         SudokuCellView(
                             cell: cell,
                             highlight: highlight,
                             isWrongFlashing: isFlash,
                             theme: theme,
-                            noteHighlightDigit: noteDigit
+                            noteHighlightDigit: noteDigit,
+                            isGlowing: isGlowing
                         )
                         .frame(width: cellSide, height: cellSide)
                         .onTapGesture {
@@ -141,13 +144,8 @@ struct SudokuBoardView: View {
             if let sv = selValue, let tv = thisCell.value, sv == tv {
                 return .sameNumber
             }
-
-            // Same-number in notes: selected cell has a value and this cell's
-            // notes contain it — highlight so the player can see where that
-            // digit is pencilled in.
-            if let sv = selValue, case .empty(let notes) = thisCell, notes.contains(sv) {
-                return .sameNumber
-            }
+            // Notes that contain the selected digit get the individual note
+            // colored via noteHighlightDigit — no whole-cell tint here.
         }
 
         // Peer tier: same row, column, or 3×3 box.

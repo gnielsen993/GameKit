@@ -232,6 +232,14 @@ extension SudokuGameView {
                 trigger: settingsStore.hapticsEnabled ? viewModel.placeCount : 0
             )
             .sensoryFeedback(
+                .impact(weight: .medium, intensity: 0.85),
+                trigger: settingsStore.hapticsEnabled ? viewModel.completionGlowCount : 0
+            )
+            .sensoryFeedback(
+                .impact(weight: .heavy, intensity: 1.0),
+                trigger: settingsStore.hapticsEnabled ? viewModel.numberCompleteCount : 0
+            )
+            .sensoryFeedback(
                 .error,
                 trigger: settingsStore.hapticsEnabled ? viewModel.wrongAttemptCount : 0
             )
