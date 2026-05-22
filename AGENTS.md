@@ -65,6 +65,14 @@ Rule: when the user asks "what's going on" / "status" / "where are
 we", read `STATE.md` + `git log` first, then §0.1 — do not answer
 from this file alone.
 
+## 0.4) Sister repos
+
+| Repo | Path | Purpose |
+|------|------|---------|
+| GameKitWebsite | `~/Desktop/GameKitWebsite` | Marketing site for GameDrawer — `index.html`, `updates.html`, `press.html`, `about.html`, `privacy.html`, `support.html`, `terms.html`. When the user says "update the website", edit files in this repo. |
+
+---
+
 ## 0.3) Release Log — `Docs/releases/`
 
 Per-version release notes for the iOS app live in `Docs/releases/`,
