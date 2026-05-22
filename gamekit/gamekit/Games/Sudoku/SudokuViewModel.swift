@@ -139,15 +139,20 @@ final class SudokuViewModel {
             ?? .free
         self.gameMode = resolvedMode
 
-        // Load the first puzzle lazily.
-        Task { @MainActor in
-            await self.loadFreshPuzzle()
-        }
+        // Puzzle load is deferred to attachGameStats() so the first call
+        // always has the full wonPuzzleIDs history from SwiftData.
+        // Loading here (before stats injection) would always see an empty
+        // played set and serve puzzle 0 on every cold start.
     }
 
     func attachGameStats(_ stats: GameStats) {
         guard self.gameStats == nil else { return }
         self.gameStats = stats
+        // First load now — stats are available so wonPuzzleIDs is non-empty
+        // when applicable, and the pool correctly skips already-won puzzles.
+        if board == nil {
+            Task { @MainActor in await loadFreshPuzzle() }
+        }
     }
 
     // MARK: - Public API

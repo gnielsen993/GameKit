@@ -178,9 +178,10 @@ extension SudokuGameView {
 
             Spacer(minLength: 0).frame(maxWidth: theme.spacing.xs)
 
-            // Restart
-            Button { viewModel.restart() } label: {
-                Image(systemName: "arrow.counterclockwise")
+            // Restart / Next Puzzle — adapts when puzzle is won
+            let isWon = viewModel.state == .won
+            Button { if isWon { viewModel.newPuzzle() } else { viewModel.restart() } } label: {
+                Image(systemName: isWon ? "chevron.forward" : "arrow.counterclockwise")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(theme.colors.textPrimary)
                     .frame(width: theme.spacing.xl, height: theme.spacing.xl)
@@ -188,7 +189,7 @@ extension SudokuGameView {
                     .clipShape(RoundedRectangle(cornerRadius: theme.radii.button,
                                                style: .continuous))
             }
-            .accessibilityLabel(Text("Restart puzzle"))
+            .accessibilityLabel(isWon ? Text("Next puzzle") : Text("Restart puzzle"))
 
             // Difficulty + game-mode settings (compact)
             SudokuToolbarMenu(

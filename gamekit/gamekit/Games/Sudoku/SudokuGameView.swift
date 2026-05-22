@@ -283,17 +283,18 @@ extension SudokuGameView {
 
     @ViewBuilder
     var restartButton: some View {
+        let isWon = viewModel.state == .won
         Button {
-            viewModel.restart()
+            if isWon { viewModel.newPuzzle() } else { viewModel.restart() }
         } label: {
-            Image(systemName: "arrow.counterclockwise")
+            Image(systemName: isWon ? "chevron.forward" : "arrow.counterclockwise")
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(theme.colors.textPrimary)
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text("Restart puzzle"))
+        .accessibilityLabel(isWon ? Text("Next puzzle") : Text("Restart puzzle"))
     }
 
     /// Erase button for the mode-pill row. Floats trailing so the 9 numpad
