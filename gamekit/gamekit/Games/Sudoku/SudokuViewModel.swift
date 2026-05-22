@@ -76,6 +76,11 @@ final class SudokuViewModel {
     // Single-step undo
     private(set) var undoSnapshot: SudokuUndoSnapshot?
 
+    // Save state — non-nil when a persisted in-progress game is waiting for
+    // the player to choose Continue or New Puzzle. Cleared on restore,
+    // discard, win, game-over, or restart.
+    private(set) var pendingSaveState: SudokuSaveState?
+
     // MARK: - Injection seams
 
     private let pool: SudokuPuzzlePool
@@ -148,10 +153,8 @@ final class SudokuViewModel {
     func attachGameStats(_ stats: GameStats) {
         guard self.gameStats == nil else { return }
         self.gameStats = stats
-        // First load now — stats are available so wonPuzzleIDs is non-empty
-        // when applicable, and the pool correctly skips already-won puzzles.
         if board == nil {
-            Task { @MainActor in await loadFreshPuzzle() }
+            checkAndLoadOrRestoreState()
         }
     }
 
@@ -200,9 +203,11 @@ final class SudokuViewModel {
         case .user:
             captureUndo(at: s.row, col: s.col, previousCell: cell)
             self.board = board.setting(.empty(notes: []), atRow: s.row, col: s.col)
+            saveCurrentState()
         case .empty(let notes) where !notes.isEmpty:
             captureUndo(at: s.row, col: s.col, previousCell: cell)
             self.board = board.setting(.empty(notes: []), atRow: s.row, col: s.col)
+            saveCurrentState()
         default:
             break  // .given handled above; .empty(notes: []) is a no-op
         }
@@ -236,6 +241,7 @@ final class SudokuViewModel {
 
     /// Restart the current puzzle (same givens, fresh state).
     func restart() {
+        clearSavedState()
         guard let puzzle = currentPuzzle else { return }
         resetSessionState()
         board = SudokuBoard(givens: puzzle.givens, solution: puzzle.solution)
@@ -300,6 +306,7 @@ final class SudokuViewModel {
         completionGlowCount = 0
         numberCompleteCount = 0
         justCompletedDigit = nil
+        pendingSaveState = nil
         undoSnapshot = nil
         selected = nil
         lockedCells = []
@@ -329,6 +336,7 @@ final class SudokuViewModel {
             placeCount += 1
             if state == .idle { startTimer() }
             fireCompletionEffects(row: row, col: col, value: value, board: board)
+            saveCurrentState()
             if board.isSolved { recordWin(); return }
             return
         }
@@ -343,6 +351,7 @@ final class SudokuViewModel {
         placeCount += 1
         if state == .idle { startTimer() }
         fireCompletionEffects(row: row, col: col, value: value, board: board)
+        saveCurrentState()
         if board.isSolved { recordWin() }
     }
 
@@ -360,6 +369,7 @@ final class SudokuViewModel {
         captureUndo(at: row, col: col, previousCell: cell)
         self.board = board.setting(.empty(notes: notes), atRow: row, col: col)
         if state == .idle { startTimer() }
+        saveCurrentState()
     }
 
     private func startTimer() {
@@ -394,6 +404,7 @@ final class SudokuViewModel {
     }
 
     private func recordGameOver() {
+        clearSavedState()
         if let anchor = timerAnchor {
             pausedElapsed += clock().timeIntervalSince(anchor)
             timerAnchor = nil
@@ -410,6 +421,7 @@ final class SudokuViewModel {
     }
 
     private func recordWin() {
+        clearSavedState()
         if let anchor = timerAnchor {
             pausedElapsed += clock().timeIntervalSince(anchor)
             timerAnchor = nil
@@ -424,6 +436,78 @@ final class SudokuViewModel {
             durationSeconds: frozenElapsed,
             puzzleId: currentPuzzle?.id
         )
+    }
+
+    // MARK: - Save state
+
+    /// Called from SudokuGameView when the player taps Continue on the resume prompt.
+    func restoreState(_ saved: SudokuSaveState) {
+        guard let cleanBoard = SudokuBoard(givens: saved.givens, solution: saved.solution) else {
+            // Malformed save — discard and load fresh.
+            discardSaveAndLoadNew()
+            return
+        }
+        // Overlay saved non-default cells onto the clean board.
+        var restored = cleanBoard
+        for (idx, savedCell) in saved.cells.enumerated() where !savedCell.isGiven {
+            let row = idx / 9, col = idx % 9
+            if case .empty(let notes) = savedCell, notes.isEmpty { continue }
+            restored = restored.setting(savedCell, atRow: row, col: col)
+        }
+        currentPuzzle = SudokuPuzzleEntry(
+            id: saved.puzzleId,
+            givens: saved.givens,
+            solution: saved.solution,
+            givenCount: saved.givenCount
+        )
+        self.board = restored
+        mistakes = saved.mistakes
+        lockedCells = Set(saved.lockedCellIndices)
+        pausedElapsed = saved.elapsedSeconds
+        state = .playing
+        timerAnchor = clock()
+        pendingSaveState = nil
+    }
+
+    /// Called from SudokuGameView when the player taps New Puzzle on the resume prompt.
+    func discardSaveAndLoadNew() {
+        clearSavedState()
+        Task { @MainActor in await loadFreshPuzzle() }
+    }
+
+    private func checkAndLoadOrRestoreState() {
+        let key = SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode)
+        if let data = userDefaults.data(forKey: key),
+           let saved = try? JSONDecoder().decode(SudokuSaveState.self, from: data) {
+            pendingSaveState = saved
+        } else {
+            Task { @MainActor in await loadFreshPuzzle() }
+        }
+    }
+
+    private func saveCurrentState() {
+        guard state == .playing, let board, let puzzle = currentPuzzle else { return }
+        let snapshot = SudokuSaveState(
+            puzzleId: puzzle.id,
+            givens: puzzle.givens,
+            solution: puzzle.solution,
+            givenCount: puzzle.givenCount,
+            cells: board.cells,
+            elapsedSeconds: elapsedSeconds,
+            mistakes: mistakes,
+            lockedCellIndices: Array(lockedCells),
+            gameMode: gameMode.rawValue,
+            savedAt: Date.now
+        )
+        let key = SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode)
+        if let data = try? JSONEncoder().encode(snapshot) {
+            userDefaults.set(data, forKey: key)
+        }
+    }
+
+    private func clearSavedState() {
+        userDefaults.removeObject(forKey: SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode))
+        pendingSaveState = nil
     }
 
     private func fireCompletionEffects(row: Int, col: Int, value: Int, board: SudokuBoard) {

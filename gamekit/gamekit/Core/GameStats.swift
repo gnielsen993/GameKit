@@ -181,11 +181,10 @@ final class GameStats {
         }
         try modelContext.save()
 
-        // Per-game progress trackers that live outside SwiftData. Currently
-        // only Nonogram's curated-rotation seen-set; future games extend
-        // here. Outside the transaction since UserDefaults isn't part of
-        // the modelContext.
+        // Per-game progress trackers that live outside SwiftData. Outside the
+        // transaction since UserDefaults isn't part of the modelContext.
         NonogramPicker.resetSeen()
+        SudokuSaveState.clearAll()
     }
 
     // MARK: - Private

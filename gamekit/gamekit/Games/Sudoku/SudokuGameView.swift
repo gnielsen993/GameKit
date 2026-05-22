@@ -57,6 +57,21 @@ struct SudokuGameView: View {
                 videoModeLayout
             }
         }
+        .alert("Resume puzzle?", isPresented: Binding(
+            get: { viewModel.pendingSaveState != nil },
+            set: { _ in }
+        )) {
+            Button("Continue") {
+                if let saved = viewModel.pendingSaveState {
+                    viewModel.restoreState(saved)
+                }
+            }
+            Button("New Puzzle", role: .destructive) {
+                viewModel.discardSaveAndLoadNew()
+            }
+        } message: {
+            Text("You have an unfinished \(viewModel.difficulty.displayName) puzzle in \(viewModel.gameMode == .lives ? "Lives" : "Free") mode.")
+        }
         .onChange(of: viewModel.state) { _, newState in
             switch newState {
             case .won:
