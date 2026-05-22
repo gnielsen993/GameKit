@@ -11,83 +11,82 @@ noted where limits apply. Do not include the section headers in submissions.
 ## Promotional Text (170 chars max — shown above description, updatable without a new build)
 
 ```
-Four logic games. No ads. No coins. No nonsense. Minesweeper, Merge, Nonogram, and Sudoku — with Video Mode, beautiful themes, and full offline play.
+The only puzzle game that plays alongside your video. Six PiP positions. Four games. Zero ads. Minesweeper, Merge, Nonogram, Sudoku.
 ```
 
-151 chars ✓
+133 chars ✓
 
 ---
 
 ## What's New (4000 chars max — shown in the Updates tab and version history)
 
 ```
-Sudoku is here — and it has more personality than most.
+VIDEO MODE — across all four games.
+
+Keep a video running in Picture-in-Picture while you play. Pick from six positions: large top, large bottom, or any of the four corners. Every game layout reflows around your video — controls stay visible, nothing gets buried. Switch it off and the layout returns to exactly what it was. This is the only multi-game puzzle app that does this.
 
 SUDOKU
-9×9 classic logic. 6,000 curated puzzles across Easy, Medium, Hard, and Extreme. Pencil in notes, undo the last move, and play in Free mode (wrong placements show in red but you keep going) or Lives mode (three mistakes ends the puzzle).
+9×9 classic logic. 6,000 curated puzzles across Easy, Medium, Hard, and Extreme. Pencil notes, undo, and two modes: Free (wrong placements show in red, you keep going) or Lives (three mistakes ends the game).
 
-The finishing moves feel satisfying on purpose: complete a row, column, or 3×3 box and those cells briefly glow. Place the last of a number and its button bounces and gets a diagonal strike — no more counting to check if there are any 7s left. Selecting a placed digit highlights only the matching pencil marks, not the whole cell.
+The feedback is designed alongside the game, not bolted on after: complete a row, column, or 3×3 box and those cells glow. Place the last of a number and the pad button bounces, strikes through, and goes quiet — no more counting to see if there are any 7s left.
 
-VIDEO MODE (all four games)
-Keep playing while a video runs in Picture-in-Picture. Pick one of six positions for your video window — large top, large bottom, or four corners. Every layout reflows to keep controls visible and tappable. Minesweeper, Merge, Nonogram, and Sudoku all support it.
-
-POLISH
-• Lives counters use hearts in every game
-• Compact control bar sized consistently across all games
+ALSO IN THIS UPDATE
+• Resume where you left off — in-progress Sudoku puzzles save automatically and pick back up next launch
+• Completed puzzle tracking — you won't see the same board twice
+• Lives counters use hearts in every game, consistently
 • Timer and lives chips lift clear of the board in large Video Mode zones
 
-No ads. No coins. No subscription. Just four games worth playing.
+No ads. No coins. No subscription. Four games worth playing.
 ```
 
-~950 chars ✓
+~970 chars ✓
 
 ---
 
 ## Description (4000 chars max — main App Store listing)
 
 ```
-GameDrawer is a collection of classic logic games with no ads, no coins, and no nonsense. Four games. Beautiful themes. Fast to open, hard to put down.
+GameDrawer plays alongside your video.
+
+Every game supports Video Mode. Choose one of six Picture-in-Picture positions — large top, large bottom, or four corner slots — and each layout reflows to keep every control clear and tappable. No other puzzle suite does this. Turn it off and the layout is unchanged.
 
 — THE GAMES —
 
 MINESWEEPER
-Classic 9×9, 16×16, and 16×30 boards. Tap to reveal, hold to flag. Your first tap is always safe. Three difficulty levels, all fully offline.
+Classic 9×9, 16×16, and 16×30 boards. Tap to reveal, hold to flag. First tap is always safe.
 
 MERGE
-Slide tiles to combine matching numbers and reach 2048 — then keep going. Play in Goal mode to set a target or Infinite mode to see how high you can stack.
+Slide tiles to combine matching numbers and chase 2048 — then keep going. Goal mode or Infinite mode.
 
 NONOGRAM
-Fill a grid to reveal a hidden picture using row and column hints. Play relaxed in Free mode or add stakes with three lives on the clock.
+Fill a grid to reveal a hidden picture using row and column hints. Free mode or Lives mode with three chances.
 
 SUDOKU
-9×9 classic. 6,000 curated puzzles across Easy, Medium, Hard, and Extreme. Pencil in notes. Undo. Play Free or Lives mode. Rows, columns, and boxes glow when completed. Finished numbers strike through on the pad so you always know what's left.
+9×9 classic. 6,000 curated puzzles across four difficulties. Pencil notes, undo, Free and Lives modes. Complete a row, column, or box and those cells glow. Place the last of a number and the pad button strikes through — you always know what's left. In-progress puzzles save automatically and pick back up next launch.
 
 — VIDEO MODE —
-All four games support Video Mode. Choose one of six Picture-in-Picture positions — large top, large bottom, or four corner slots — and every layout reflows to stay clear. No features lost, no controls buried.
+All four games. Six PiP positions. Every layout reflows. No features lost, no controls buried.
 
 — THEMES —
-Seventeen presets plus custom color support. Switch instantly. Every theme is legible on every game. Classic Chrome Diner is the default; try Voltage or Dracula for something darker.
+Seventeen presets plus custom colors. Switch instantly. Every theme is legible on every game. Classic Chrome Diner is the default; try Voltage or Dracula for something darker.
 
-— NOTHING TO SIGN IN FOR —
-No account. No required permissions. Stats stay on your device. The app works fully offline and always will.
+— ZERO NONSENSE —
+No account. No required permissions. No ads, no coins, no subscription, no energy timers, no paywalled features. Stats live on your device. Works fully offline and always will.
 
-Stats: games played, wins, best times per difficulty — tracked locally per game.
-No ads: no banners, no video ads, no ad networks.
-No coins: no fake currency, no energy systems, no paywalled features.
-No subscription: download once, play forever.
+Download once. Play as long as you want.
 ```
 
-~1,480 chars ✓
+~1,430 chars ✓
 
 ---
 
 ## Keywords (100 chars max — comma-separated, no spaces after commas)
 
 ```
-sudoku,minesweeper,nonogram,logic,puzzle,merge,2048,picross,brain,no ads,offline,themes
+sudoku,minesweeper,nonogram,puzzle,merge,2048,picross,pip,logic,offline,no ads,themes,brain
 ```
 
-88 chars ✓
+92 chars ✓
 
 ---
 
@@ -99,23 +98,23 @@ Longer-form, for a blog post, website banner, or press release. Less constrained
 
 ### Headline options
 
-- **GameDrawer 1.2 — Sudoku, Video Mode, and games that feel finished**
-- **Four games in. Still no ads. GameDrawer 1.2 is out.**
-- **1.2: Sudoku arrives, Video Mode goes everywhere**
+- **The puzzle app that actually works in Picture-in-Picture.**
+- **GameDrawer plays alongside your video. Four games. Zero ads.**
+- **GameDrawer 1.2 — Video Mode, Sudoku, and a game suite that respects your time.**
 
 ---
 
 ### Body
 
-**GameDrawer 1.2 is a meaningful update.** Sudoku joins the drawer, Video Mode lands on all four games, and a round of polish makes every detail feel deliberate.
+GameDrawer 1.2 ships two things: Sudoku, and a feature we haven't seen in any other multi-game puzzle app.
 
-**Sudoku.** Full 9×9, 6,000 curated puzzles, pencil notes, single-step undo. Two modes: Free (see your mistakes, keep going) and Lives (three errors ends the game). The feedback is designed alongside the game, not added after — complete a row, column, or box and the cells briefly glow; place the last of a number and the pad button spring-bounces before settling into a diagonal strike. It knows what you just did, and it tells you.
+**Video Mode.** Every game in GameDrawer now supports Picture-in-Picture. Choose from six positions — large top, large bottom, or four corner slots — and the entire layout reflows around your video. Controls stay visible, the board stays full-size, and nothing gets buried. Switch it off and you're back to exactly what you had before. Minesweeper, Merge, Nonogram, and Sudoku all support it, day one. Most game apps ignore PiP entirely. We built the layouts from scratch for all six positions.
 
-**Video Mode.** GameDrawer was designed for focused play, but you're allowed to multitask. Video Mode lets you keep a Picture-in-Picture video on screen while you play — choose from six positions (large top, large bottom, or four corner slots) and every game layout reflows to stay out of the way. Minesweeper, Merge, Nonogram, and Sudoku all support it. Turn it off and the layout is byte-identical to what you had before.
+**Sudoku.** Full 9×9 classic, 6,000 curated puzzles across Easy, Medium, Hard, and Extreme. Pencil notes, single-step undo, and two modes: Free (see your mistakes and keep going) or Lives (three errors ends the game). In-progress puzzles save automatically — come back days later and pick up exactly where you left off. Completed puzzles are tracked, so you won't see the same board twice across sessions.
 
-**Polish.** This release also fixes what bothered us: lives counters now use hearts everywhere (not circles in Sudoku and hearts in Nonogram), compact control bars are consistently sized across all games, and note highlighting in Sudoku now colors just the digit — not the whole cell.
+The feedback is intentional: complete a row, column, or 3×3 box and those cells briefly glow. Place the last of a number and the pad button spring-bounces before settling into a diagonal strike-through. It knows what you just did.
 
-**Still no ads. Still no coins. Still no accounts.** GameDrawer is a premium-feeling game suite that stays free of the patterns that make most puzzle apps unpleasant. That part isn't changing.
+**Still no ads. Still no coins. Still no accounts.** That's not a marketing line — it's a design constraint. GameDrawer has no ad SDK, no coin economy, no energy system, and no paywalled features. You download it once.
 
 [Download on the App Store]
 
@@ -123,13 +122,12 @@ Longer-form, for a blog post, website banner, or press release. Less constrained
 
 ### Feature bullet list (for website feature grid or press kit)
 
+- Play any game while watching a video — 6 PiP positions, all layouts reflow
 - 4 games: Minesweeper · Merge · Nonogram · Sudoku
-- 6,000 Sudoku puzzles (Easy / Medium / Hard / Extreme)
-- Video Mode — 6 PiP positions, all games supported
-- Pencil notes, undo, Free and Lives modes in Sudoku
+- 6,000 Sudoku puzzles, four difficulties, in-progress save state
 - Completion glow on rows, columns, and boxes
-- Diagonal strike on exhausted number-pad digits
+- Exhausted number-pad digits strike through automatically
 - 17 color themes + custom color support
-- Full offline play — no account, no permissions
-- Stats per game, per difficulty — local only
-- No ads. No coins. No subscription.
+- Full offline — no account, no permissions, no network required
+- Stats per game, per difficulty — device-local only
+- No ads. No coins. No subscription. Ever.
