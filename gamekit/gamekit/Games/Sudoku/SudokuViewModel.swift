@@ -480,6 +480,9 @@ final class SudokuViewModel {
         if let data = userDefaults.data(forKey: key),
            let saved = try? JSONDecoder().decode(SudokuSaveState.self, from: data) {
             pendingSaveState = saved
+            // Pre-warm the pool while the alert is on screen so "New Puzzle"
+            // → instant board with no loading flash when the user decides.
+            Task { try? await pool.load() }
         } else {
             Task { @MainActor in await loadFreshPuzzle() }
         }
