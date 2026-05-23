@@ -126,6 +126,14 @@ struct FreeCellGameView: View {
         .sensoryFeedback(.success,              trigger: vm.dropTick)
         .sensoryFeedback(.error,                trigger: vm.rejectTick)
         .sheet(isPresented: $showingDealEntry)  { dealEntrySheet }
+        .overlay {
+            if vm.gameState == .won {
+                GeometryReader { g in
+                    FreeCellCascadeView(theme: theme, isClassic: isClassic, screenSize: g.size)
+                }
+                .ignoresSafeArea()
+            }
+        }
         .overlay(alignment: .bottom)            { winLossBanner }
         .onAppear {
             vm.gameStats = GameStats(modelContext: modelContext)
