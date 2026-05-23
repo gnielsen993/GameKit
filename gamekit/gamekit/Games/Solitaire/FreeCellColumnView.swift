@@ -9,17 +9,16 @@ struct FreeCellColumnView: View {
     let isClassic: Bool
     let cardWidth: CGFloat
     var dragSource: FreeCellSelection? = nil
+    var dragTarget: FreeCellDest?      = nil
 
     private var cardHeight: CGFloat { cardWidth * 1.4 }
     private var radius:     CGFloat { cardWidth * 0.10 }
 
-    // Dynamic fan — compress when cards stack deeply
     private var fanOffset: CGFloat {
         let base: CGFloat = cardWidth * 0.40
         let floor: CGFloat = cardWidth * 0.18
         guard cards.count > 8 else { return base }
-        let shrink = CGFloat(cards.count - 8) * 2.5
-        return max(floor, base - shrink)
+        return max(floor, base - CGFloat(cards.count - 8) * 2.5)
     }
 
     private var columnHeight: CGFloat {
@@ -27,7 +26,14 @@ struct FreeCellColumnView: View {
         return cardHeight + CGFloat(cards.count - 1) * fanOffset
     }
 
-    private var isValidTarget: Bool { vm.validColumnTargets.contains(colIdx) }
+    private var isTapTarget: Bool { vm.validColumnTargets.contains(colIdx) }
+
+    private var isDragTarget: Bool {
+        if case .column(let col) = dragTarget { return col == colIdx }
+        return false
+    }
+
+    private var isHighlighted: Bool { isTapTarget || isDragTarget }
 
     private var selectedStartIdx: Int? {
         if case .column(let col, let idx) = vm.selection, col == colIdx { return idx }
@@ -36,22 +42,23 @@ struct FreeCellColumnView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            // Slot outline (always present as drop zone indicator)
+            // Slot — visible border when empty; green tint when highlighted+empty
             RoundedRectangle(cornerRadius: radius, style: .continuous)
                 .stroke(
-                    isValidTarget ? theme.colors.success : .white.opacity(0.18),
-                    lineWidth: isValidTarget ? 2 : 1
+                    isHighlighted && cards.isEmpty ? theme.colors.success : theme.colors.border,
+                    lineWidth: isHighlighted && cards.isEmpty ? 2 : 1.5
                 )
                 .background(
                     RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .fill(isValidTarget ? theme.colors.success.opacity(0.10) : Color.clear)
+                        .fill(isHighlighted && cards.isEmpty
+                              ? theme.colors.success.opacity(0.10)
+                              : theme.colors.surface.opacity(0.15))
                 )
                 .frame(width: cardWidth, height: cardHeight)
                 .onTapGesture {
                     if cards.isEmpty { vm.tapEmptyColumn(colIdx: colIdx) }
                 }
 
-            // Cards fanned downward
             ForEach(Array(cards.enumerated()), id: \.element.id) { idx, card in
                 cardTile(card: card, idx: idx)
                     .offset(y: CGFloat(idx) * fanOffset)
@@ -73,12 +80,18 @@ struct FreeCellColumnView: View {
         let isSelected  = selIdx.map { idx >= $0 } ?? false
         let isTopOfSel  = selIdx == idx
         let ghosted     = isGhosted(idx)
+        let isTopCard   = idx == cards.count - 1
 
         PlayingCardView(card, theme: theme, isClassic: isClassic, width: cardWidth)
             .overlay(alignment: .topLeading) {
                 if isTopOfSel && !ghosted {
                     RoundedRectangle(cornerRadius: radius, style: .continuous)
                         .stroke(theme.colors.accentPrimary, lineWidth: 2)
+                }
+                // Highlight the card the dragged/selected stack lands on
+                if isTopCard && isHighlighted && !ghosted {
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .stroke(theme.colors.success, lineWidth: 2)
                 }
             }
             .opacity(ghosted ? 0.22 : (isSelected ? 0.85 : 1.0))

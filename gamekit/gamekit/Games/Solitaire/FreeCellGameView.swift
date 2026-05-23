@@ -14,6 +14,7 @@ struct FreeCellGameView: View {
     @State private var dealEntryText   = ""
     @State private var dealEntryError  = false
     @State var dragState:    FreeCellDragState?
+    @State var dragTarget:   FreeCellDest? = nil
     @State var headerHeight: CGFloat = 44
 
     private let initialMode: FreeCellMode
@@ -116,7 +117,8 @@ struct FreeCellGameView: View {
                                 theme:     theme,
                                 isClassic: isClassic,
                                 cardWidth: cardW,
-                                dragSource: dragState?.source
+                                dragSource: dragState?.source,
+                                dragTarget: dragTarget
                             )
                         }
                     }
@@ -164,8 +166,12 @@ struct FreeCellGameView: View {
         cardW: CGFloat, cardH: CGFloat, shelfH: CGFloat,
         boardPad: CGFloat, colGap: CGFloat, geoW: CGFloat
     ) {
-        if dragState != nil {
+        if let ds = dragState {
             dragState?.location = val.location
+            dragTarget = validatedDragTarget(
+                at: val.location, dragging: ds.cards, from: ds.source,
+                cardW: cardW, shelfH: shelfH, boardPad: boardPad, colGap: colGap, geoW: geoW
+            )
             return
         }
         // First movement — compute source
@@ -194,7 +200,7 @@ struct FreeCellGameView: View {
         cardW: CGFloat, shelfH: CGFloat,
         boardPad: CGFloat, colGap: CGFloat, geoW: CGFloat
     ) {
-        defer { dragState = nil }
+        defer { dragState = nil; dragTarget = nil }
         guard let ds = dragState else { return }
         guard let dest = computeDropTarget(
             at: val.location,
@@ -256,6 +262,29 @@ struct FreeCellGameView: View {
             return (.column(colIdx: col, startCardIdx: cardIdx), offset)
         }
         return nil
+    }
+
+    private func validatedDragTarget(
+        at loc: CGPoint, dragging cards: [PlayingCard], from source: FreeCellSelection,
+        cardW: CGFloat, shelfH: CGFloat, boardPad: CGFloat, colGap: CGFloat, geoW: CGFloat
+    ) -> FreeCellDest? {
+        guard let raw = computeDropTarget(at: loc, cardW: cardW, shelfH: shelfH,
+                                          boardPad: boardPad, colGap: colGap, geoW: geoW)
+        else { return nil }
+        switch raw {
+        case .column(let col):
+            let isSrc: Bool = { if case .column(let c, _) = source { return c == col } else { return false } }()
+            if isSrc { return nil }
+            let dst = vm.board.columns[col]
+            let canPlace = FreeCellRules.canPlace(cards[0], onto: dst)
+            let limit = FreeCellRules.maxMoveable(board: vm.board, toEmptyColumn: dst.isEmpty)
+            return (canPlace && cards.count <= limit) ? raw : nil
+        case .freeCell(let idx):
+            return (cards.count == 1 && vm.board.freeCells[idx] == nil) ? raw : nil
+        case .foundation:
+            return (cards.count == 1 &&
+                    FreeCellRules.canMoveToFoundation(cards[0], foundations: vm.board.foundations)) ? raw : nil
+        }
     }
 
     private func computeDropTarget(

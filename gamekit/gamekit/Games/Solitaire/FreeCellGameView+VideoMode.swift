@@ -172,7 +172,8 @@ extension FreeCellGameView {
                             theme:     theme,
                             isClassic: isClassic,
                             cardWidth: cardW,
-                            dragSource: dragState?.source
+                            dragSource: dragState?.source,
+                            dragTarget: dragTarget
                         )
                     }
                 }
