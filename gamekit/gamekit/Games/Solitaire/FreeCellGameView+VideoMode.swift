@@ -52,7 +52,6 @@ extension FreeCellGameView {
                             cardW: cardW, cardH: cardH, shelfH: shelfH,
                             boardPad: boardPad, colGap: colGap, geo: geo
                         )
-                        .overlay(alignment: .topTrailing) { fcTimerCornerChip }
                         .layoutPriority(1)
 
                         fcLargeZoneControlRow
@@ -68,7 +67,6 @@ extension FreeCellGameView {
                             cardW: cardW, cardH: cardH, shelfH: shelfH,
                             boardPad: boardPad, colGap: colGap, geo: geo
                         )
-                        .overlay(alignment: .topTrailing) { fcTimerCornerChip }
                         .layoutPriority(1)
                     }
                     .padding(.bottom, theme.spacing.l)
@@ -239,6 +237,14 @@ extension FreeCellGameView {
 
             Spacer(minLength: 0)
 
+            VideoModeTimerChip(
+                theme: theme,
+                timerAnchor: vm.timerAnchor,
+                pausedElapsed: vm.pausedElapsed,
+                compact: true
+            )
+            .allowsHitTesting(false)
+
             Text(fcDealLabel)
                 .font(theme.typography.caption)
                 .foregroundStyle(theme.colors.textSecondary)
@@ -328,18 +334,6 @@ extension FreeCellGameView {
     }
 
     // MARK: - Helpers
-
-    private var fcTimerCornerChip: some View {
-        VideoModeTimerChip(
-            theme: theme,
-            timerAnchor: vm.timerAnchor,
-            pausedElapsed: vm.pausedElapsed,
-            compact: true
-        )
-        .padding(.trailing, theme.spacing.m)
-        .padding(.top, theme.spacing.s)
-        .allowsHitTesting(false)
-    }
 
     @ViewBuilder
     private var fcCascadeOverlay: some View {

@@ -49,15 +49,15 @@ struct FreeCellTopRowView: View {
                 .stroke(
                     isTarget   ? theme.colors.success :
                     isSelected ? theme.colors.accentPrimary :
-                                 .white.opacity(0.22),
-                    lineWidth: (isTarget || isSelected) ? 2 : 1
+                                 theme.colors.border,
+                    lineWidth: (isTarget || isSelected) ? 2 : 1.5
                 )
                 .background(
                     RoundedRectangle(cornerRadius: cardWidth * 0.10, style: .continuous)
                         .fill(
                             isTarget   ? theme.colors.success.opacity(0.12) :
                             isSelected ? theme.colors.accentPrimary.opacity(0.10) :
-                                         .white.opacity(0.05)
+                                         theme.colors.surface.opacity(0.25)
                         )
                 )
                 .frame(width: cardWidth, height: cardHeight)
@@ -91,12 +91,12 @@ struct FreeCellTopRowView: View {
         ZStack {
             RoundedRectangle(cornerRadius: cardWidth * 0.10, style: .continuous)
                 .stroke(
-                    isTarget ? theme.colors.success : .white.opacity(0.22),
-                    lineWidth: isTarget ? 2 : 1
+                    isTarget ? theme.colors.success : theme.colors.border,
+                    lineWidth: isTarget ? 2 : 1.5
                 )
                 .background(
                     RoundedRectangle(cornerRadius: cardWidth * 0.10, style: .continuous)
-                        .fill(isTarget ? theme.colors.success.opacity(0.12) : .white.opacity(0.05))
+                        .fill(isTarget ? theme.colors.success.opacity(0.12) : theme.colors.surface.opacity(0.25))
                 )
                 .frame(width: cardWidth, height: cardHeight)
 

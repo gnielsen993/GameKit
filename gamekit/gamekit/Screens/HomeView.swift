@@ -41,8 +41,6 @@ struct HomeView: View {
     @State private var showingUpcoming: Bool = false
     @State private var showingSettings: Bool = false
     @State private var showingStats: Bool = false
-    @State private var showingCardDesign: Bool = false
-
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
@@ -120,9 +118,6 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showingStats) {
                 StatsView()
-            }
-            .sheet(isPresented: $showingCardDesign) {
-                CardDesignShowcaseView()
             }
             .overlay(alignment: .bottom) {
                 if let card = showingComingSoon {
@@ -242,12 +237,6 @@ struct HomeView: View {
                 showingSettings = true
             } label: {
                 Label(String(localized: "Settings"), systemImage: "gearshape")
-            }
-            Divider()
-            Button {
-                showingCardDesign = true
-            } label: {
-                Label(String(localized: "Card Design"), systemImage: "suit.spade.fill")
             }
         } label: {
             Image(systemName: "person.crop.circle")
