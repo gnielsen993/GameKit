@@ -174,6 +174,7 @@ struct HomeView: View {
                 .videoModeAware(minBoardHeight: 480)
         case .freeCell(let mode):
             FreeCellGameView(initialMode: mode ?? .random(.easy))
+                .videoModeAware(minBoardHeight: 480)
         }
     }
 

@@ -6,20 +6,22 @@ struct FreeCellGameView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.videoModeStore) var videoModeStore
 
-    @State private var vm: FreeCellViewModel
-    @State private var showingDealEntry = false
+    @State var vm: FreeCellViewModel
+    @State var showingDealEntry = false
     @State private var dealEntryText   = ""
     @State private var dealEntryError  = false
-    @State private var dragState:    FreeCellDragState?
-    @State private var headerHeight: CGFloat = 44
+    @State var dragState:    FreeCellDragState?
+    @State var headerHeight: CGFloat = 44
 
     private let initialMode: FreeCellMode
 
-    private var theme:     Theme   { themeManager.theme(using: colorScheme) }
-    private var isClassic: Bool    { themeManager.preset == .classicMuted }
+    var theme:     Theme   { themeManager.theme(using: colorScheme) }
+    var isClassic: Bool    { themeManager.preset == .classicMuted }
 
-    private var boardColor: Color {
+    var boardColor: Color {
         isClassic ? Color(hue: 0.426, saturation: 0.576, brightness: 0.416) : theme.colors.fillSelected.opacity(0.35)
     }
 
@@ -30,7 +32,7 @@ struct FreeCellGameView: View {
 
     // MARK: - Drag state
 
-    private struct FreeCellDragState {
+    struct FreeCellDragState {
         let source:      FreeCellSelection
         let cards:       [PlayingCard]
         var location:    CGPoint
@@ -43,6 +45,34 @@ struct FreeCellGameView: View {
     // MARK: - Body
 
     var body: some View {
+        Group {
+            if !videoModeStore.isEnabled {
+                normalLayout
+                    .toolbar { toolbarContent }
+            } else {
+                videoModeLayout
+            }
+        }
+        .background(theme.colors.background.ignoresSafeArea())
+        .navigationTitle("FreeCell")
+        .navigationBarTitleDisplayMode(.inline)
+        .sensoryFeedback(.selection,            trigger: vm.selectTick)
+        .sensoryFeedback(.success,              trigger: vm.dropTick)
+        .sensoryFeedback(.error,                trigger: vm.rejectTick)
+        .sheet(isPresented: $showingDealEntry)  { dealEntrySheet }
+        .onAppear {
+            vm.gameStats = GameStats(modelContext: modelContext)
+            if initialMode == .enterDeal { showingDealEntry = true }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { vm.pause() }
+            else if phase == .active { vm.resume() }
+        }
+    }
+
+    // MARK: - Normal layout (off Video Mode path)
+
+    private var normalLayout: some View {
         GeometryReader { geo in
             let boardPad: CGFloat  = 10
             let colGap: CGFloat    = 4
@@ -114,18 +144,8 @@ struct FreeCellGameView: View {
                                     geoW: geo.size.width)
                     }
             )
-            .overlay {
-                dragOverlay(cardW: cardW)
-            }
+            .overlay { dragOverlay(cardW: cardW) }
         }
-        .background(theme.colors.background.ignoresSafeArea())
-        .navigationTitle("FreeCell")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar { toolbarContent }
-        .sensoryFeedback(.selection,            trigger: vm.selectTick)
-        .sensoryFeedback(.success,              trigger: vm.dropTick)
-        .sensoryFeedback(.error,                trigger: vm.rejectTick)
-        .sheet(isPresented: $showingDealEntry)  { dealEntrySheet }
         .overlay {
             if vm.gameState == .won {
                 GeometryReader { g in
@@ -134,20 +154,12 @@ struct FreeCellGameView: View {
                 .ignoresSafeArea()
             }
         }
-        .overlay(alignment: .bottom)            { winLossBanner }
-        .onAppear {
-            vm.gameStats = GameStats(modelContext: modelContext)
-            if initialMode == .enterDeal { showingDealEntry = true }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .background { vm.pause() }
-            else if phase == .active { vm.resume() }
-        }
+        .overlay(alignment: .bottom) { winLossBanner }
     }
 
     // MARK: - Drag logic
 
-    private func onDragChanged(
+    func onDragChanged(
         _ val: DragGesture.Value,
         cardW: CGFloat, cardH: CGFloat, shelfH: CGFloat,
         boardPad: CGFloat, colGap: CGFloat, geoW: CGFloat
@@ -177,7 +189,7 @@ struct FreeCellGameView: View {
         )
     }
 
-    private func onDragEnded(
+    func onDragEnded(
         _ val: DragGesture.Value,
         cardW: CGFloat, shelfH: CGFloat,
         boardPad: CGFloat, colGap: CGFloat, geoW: CGFloat
@@ -279,7 +291,7 @@ struct FreeCellGameView: View {
     // MARK: - Drag overlay
 
     @ViewBuilder
-    private func dragOverlay(cardW: CGFloat) -> some View {
+    func dragOverlay(cardW: CGFloat) -> some View {
         if let ds = dragState {
             let stackH = ds.cardHeight + CGFloat(ds.cards.count - 1) * ds.fanOffset
             let cardLeft = ds.location.x - ds.touchOffset.x
@@ -388,7 +400,7 @@ struct FreeCellGameView: View {
     // MARK: - Win / loss banner
 
     @ViewBuilder
-    private var winLossBanner: some View {
+    var winLossBanner: some View {
         switch vm.gameState {
         case .won:
             bannerCard(
