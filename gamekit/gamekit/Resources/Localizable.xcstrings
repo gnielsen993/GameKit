@@ -141,7 +141,7 @@
         }
       }
     },
-    "6 games coming" : {
+    "5 games coming" : {
 
     },
     "2048 · Classic" : {
@@ -660,6 +660,12 @@
     "New puzzle" : {
 
     },
+    "New Puzzle" : {
+
+    },
+    "Next puzzle" : {
+
+    },
     "No games played yet." : {
 
     },
@@ -801,6 +807,9 @@
       }
     },
     "Restart puzzle" : {
+
+    },
+    "Resume puzzle?" : {
 
     },
     "Reveal" : {
@@ -1283,6 +1292,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Word Grid"
+          }
+        }
+      }
+    },
+    "You have an unfinished %@ puzzle in %@ mode." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You have an unfinished %1$@ puzzle in %2$@ mode."
           }
         }
       }

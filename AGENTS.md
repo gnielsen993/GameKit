@@ -325,6 +325,11 @@ Moody preset (e.g. Voltage / Dracula) in addition to the default
 Classic preset. Legibility regressions = fix the token usage, don't
 carve out an exception.
 
+### 9.13 Release wrap-up fires on "wrap up", "shipping", "ship vX.X", "release vX.X"
+Full procedure in [`WRAPUP.md`](WRAPUP.md). Summary: finalize release notes →
+update `~/Desktop/GameKitWebsite` (index, about, updates) and push → update
+`Docs/store/app-store-copy.md` → deliver What's New copy to user.
+
 ---
 
 ## 10) Design rules — [`DESIGN.md`](DESIGN.md)

@@ -183,6 +183,21 @@ extension GameDescriptor {
                     GameModeChip(id: "sudoku-lives-extreme", labelKey: "Extreme", route: .sudoku(.extreme, .lives))
                 ])
             ]
+        ),
+        GameDescriptor(
+            kind: .freeCell,
+            titleKey: "FreeCell",
+            captionKey: "Tap to play",
+            symbol: "suit.spade.fill",
+            accent: .slot5,
+            route: .freeCell(nil),
+            modes: [
+                GameModeChip(id: "fc-easy",   labelKey: "Easy",   route: .freeCell(.random(.easy))),
+                GameModeChip(id: "fc-medium", labelKey: "Medium", route: .freeCell(.random(.medium))),
+                GameModeChip(id: "fc-hard",   labelKey: "Hard",   route: .freeCell(.random(.hard))),
+                GameModeChip(id: "fc-expert", labelKey: "Expert", route: .freeCell(.random(.expert))),
+                GameModeChip(id: "fc-deal",   labelKey: "Deal #", route: .freeCell(.enterDeal))
+            ]
         )
     ]
 }

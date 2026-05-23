@@ -360,6 +360,11 @@ under the right section, land in the same commit as the code. Skip
 only for: self-explanatory refactors, comment / doc-only edits, and
 work that didn't actually ship in this `MARKETING_VERSION`.
 
+### 8.15 Release wrap-up fires on "wrap up", "shipping", "ship vX.X", "release vX.X"
+Full procedure in [`WRAPUP.md`](WRAPUP.md). Summary: finalize release notes →
+update `~/Desktop/GameKitWebsite` (index, about, updates) and push → update
+`Docs/store/app-store-copy.md` → deliver What's New copy to user.
+
 ---
 
 ## 9) Design rules — [`DESIGN.md`](DESIGN.md)

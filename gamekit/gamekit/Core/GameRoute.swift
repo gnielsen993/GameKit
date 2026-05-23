@@ -28,4 +28,5 @@ enum GameRoute: Hashable, Sendable {
     case merge(MergeMode?)
     case nonogram(NonogramDifficulty?, NonogramGameMode?)
     case sudoku(SudokuDifficulty?, SudokuGameMode?)
+    case freeCell(FreeCellMode?)
 }
