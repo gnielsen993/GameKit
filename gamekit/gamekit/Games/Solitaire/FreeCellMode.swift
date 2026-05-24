@@ -1,6 +1,6 @@
 import Foundation
 
-enum FreeCellDifficulty: String, CaseIterable, Hashable, Sendable {
+enum FreeCellDifficulty: String, CaseIterable, Hashable, Sendable, Codable {
     case easy, medium, hard, expert
 
     var label: String {

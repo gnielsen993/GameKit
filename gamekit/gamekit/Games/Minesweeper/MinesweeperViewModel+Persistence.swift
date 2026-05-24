@@ -33,6 +33,22 @@ extension MinesweeperViewModel {
     func attachGameStats(_ stats: GameStats) {
         guard self.gameStats == nil else { return }
         self.gameStats = stats
+        checkAndLoadOrRestoreState()
+    }
+
+    func saveCurrentState() {
+        guard case .playing = gameState else { return }
+        let snapshot = MinesweeperSaveState(
+            board: board,
+            difficulty: difficulty,
+            flaggedCount: flaggedCount,
+            elapsedSeconds: frozenElapsed,
+            savedAt: Date.now
+        )
+        let key = MinesweeperSaveState.key(difficulty: difficulty)
+        if let data = try? JSONEncoder().encode(snapshot) {
+            userDefaults.set(data, forKey: key)
+        }
     }
 
     /// Writes a GameRecord (and updates BestTime on win-and-faster) at terminal

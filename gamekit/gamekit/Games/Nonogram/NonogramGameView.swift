@@ -145,9 +145,24 @@ struct NonogramGameView: View {
             }
             Button(String(localized: "Cancel"), role: .cancel) { }
         }
+        .alert("Resume puzzle?", isPresented: Binding(
+            get: { viewModel.pendingSaveState != nil },
+            set: { _ in }
+        )) {
+            Button("Continue") {
+                if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
+            }
+            Button("New Puzzle", role: .destructive) { viewModel.discardSaveAndLoadNew() }
+        } message: {
+            if let s = viewModel.pendingSaveState {
+                Text("You have an unfinished \(s.difficulty) puzzle in \(s.gameMode == "lives" ? "Lives" : "Free") mode.")
+            }
+        }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
-            case .background: viewModel.pause()
+            case .background:
+                viewModel.saveCurrentState()
+                viewModel.pause()
             case .active:     viewModel.resume()
             case .inactive:   break
             @unknown default: break

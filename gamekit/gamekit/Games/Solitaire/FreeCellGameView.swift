@@ -13,6 +13,7 @@ struct FreeCellGameView: View {
     @State var showingDealEntry = false
     @State private var dealEntryText   = ""
     @State private var dealEntryError  = false
+    @State private var didInjectStats = false
     @State var dragState:    FreeCellDragState?
     @State var dragTarget:   FreeCellDest? = nil
     @State var headerHeight: CGFloat = 44
@@ -61,12 +62,28 @@ struct FreeCellGameView: View {
         .sensoryFeedback(.success,              trigger: vm.dropTick)
         .sensoryFeedback(.error,                trigger: vm.rejectTick)
         .sheet(isPresented: $showingDealEntry)  { dealEntrySheet }
-        .onAppear {
+        .alert("Resume game?", isPresented: Binding(
+            get: { vm.pendingSaveState != nil },
+            set: { _ in }
+        )) {
+            Button("Continue") {
+                if let saved = vm.pendingSaveState { vm.restoreState(saved) }
+            }
+            Button("New Deal", role: .destructive) { vm.discardSaveAndLoadNew() }
+        } message: {
+            if let s = vm.pendingSaveState {
+                Text("You have an in-progress FreeCell deal #\(s.dealNumber).")
+            }
+        }
+        .task {
+            guard !didInjectStats else { return }
+            didInjectStats = true
             vm.gameStats = GameStats(modelContext: modelContext)
-            if initialMode == .enterDeal { showingDealEntry = true }
+            vm.checkAndLoadOrRestoreState()
+            if initialMode == .enterDeal && vm.pendingSaveState == nil { showingDealEntry = true }
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .background { vm.pause() }
+            if phase == .background { vm.saveCurrentState(); vm.pause() }
             else if phase == .active { vm.resume() }
         }
     }
@@ -127,9 +144,9 @@ struct FreeCellGameView: View {
                     .padding(.bottom, 16)
                 }
                 .scrollDisabled(true)
-                .background(boardColor)
                 .layoutPriority(1)
             }
+            .background(boardColor)
             .coordinateSpace(.named("freecell"))
             .gesture(
                 DragGesture(minimumDistance: 8, coordinateSpace: .named("freecell"))
@@ -343,7 +360,7 @@ struct FreeCellGameView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
+        ToolbarItem(placement: .topBarTrailing) {
             Button {
                 vm.undo()
             } label: {

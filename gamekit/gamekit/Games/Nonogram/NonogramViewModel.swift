@@ -20,17 +20,21 @@ import Foundation
 final class NonogramViewModel {
 
     // MARK: - State surface
+    //
+    // Properties below marked `var` (not `private(set)`) are written by
+    // NonogramViewModel+SaveState.swift. Treated as read-only by external
+    // (view) callers — same pattern as MinesweeperViewModel's timer props.
 
-    private(set) var difficulty: NonogramDifficulty
-    private(set) var currentPuzzle: NonogramPuzzle?
-    private(set) var board: NonogramBoard
-    private(set) var state: NonogramGameState = .idle
+    var difficulty: NonogramDifficulty
+    var currentPuzzle: NonogramPuzzle?
+    var board: NonogramBoard
+    var state: NonogramGameState = .idle
     private(set) var interactionMode: NonogramInteractionMode = .place
-    private(set) var gameMode: NonogramGameMode = .free
+    var gameMode: NonogramGameMode = .free
 
     // Timer
-    private(set) var timerAnchor: Date?         // nil = paused/idle/terminal
-    private(set) var pausedElapsed: TimeInterval = 0
+    var timerAnchor: Date?                       // nil = paused/idle/terminal
+    var pausedElapsed: TimeInterval = 0
     private(set) var frozenElapsed: TimeInterval = 0   // captured at win
 
     // Trigger counters for sensoryFeedback
@@ -60,16 +64,19 @@ final class NonogramViewModel {
     /// ~0.6s after being set.
     private(set) var lastWrongAttemptIdx: Int?
 
+    // Save state prompt
+    var pendingSaveState: NonogramSaveState?
+
     // Lives mode state
-    private(set) var livesRemaining: Int = NonogramGameMode.livesPerPuzzle
+    var livesRemaining: Int = NonogramGameMode.livesPerPuzzle
     /// Flat indices (row * size + col) of cells the player has correctly
     /// filled in lives mode. Locked — taps on these are no-ops.
-    private(set) var lockedCells: Set<Int> = []
+    var lockedCells: Set<Int> = []
 
     // MARK: - Injection seams
 
-    private let userDefaults: UserDefaults
-    private let clock: () -> Date
+    let userDefaults: UserDefaults
+    let clock: () -> Date
     private var rng: any RandomNumberGenerator
     private(set) var gameStats: GameStats?
 
@@ -97,7 +104,7 @@ final class NonogramViewModel {
     private(set) var columnsCrossOff: [[Bool]] = []
 
     /// Recompute cross-off masks. Called after any board mutation.
-    private func refreshCrossOff() {
+    func refreshCrossOff() {
         guard currentPuzzle != nil else {
             rowsCrossOff = []
             columnsCrossOff = []
@@ -154,6 +161,7 @@ final class NonogramViewModel {
     func attachGameStats(_ stats: GameStats) {
         guard self.gameStats == nil else { return }
         self.gameStats = stats
+        checkAndLoadOrRestoreState()
     }
 
     // MARK: - Public API
@@ -228,7 +236,7 @@ final class NonogramViewModel {
     /// Backwards-compat alias for code that still calls `tryAgain()`.
     func tryAgain() { restart() }
 
-    private func resetSessionState() {
+    func resetSessionState() {
         board = .empty(size: difficulty.size)
         state = .idle
         timerAnchor = nil
@@ -245,22 +253,22 @@ final class NonogramViewModel {
         interactionMode = .place
         livesRemaining = NonogramGameMode.livesPerPuzzle
         lockedCells = []
+        pendingSaveState = nil
     }
 
     func setDifficulty(_ d: NonogramDifficulty) {
         guard d != difficulty else { return }
+        clearSavedState()
         difficulty = d
         userDefaults.set(d.rawValue, forKey: Self.lastDifficultyKey)
-        // Difficulty change implies new puzzle — the size is different.
         newPuzzle()
     }
 
     func setGameMode(_ mode: NonogramGameMode) {
         guard mode != gameMode else { return }
+        clearSavedState()
         gameMode = mode
         userDefaults.set(mode.rawValue, forKey: Self.lastGameModeKey)
-        // Mode change pulls a new puzzle so locked-cell state from a
-        // previous lives session can't leak into the new mode.
         newPuzzle()
     }
 
@@ -362,6 +370,8 @@ final class NonogramViewModel {
 
         if let puzzle = currentPuzzle, NonogramWinDetector.isWon(board: board, puzzle: puzzle) {
             recordWin()
+        } else {
+            saveCurrentState()
         }
     }
 
@@ -438,6 +448,7 @@ final class NonogramViewModel {
     }
 
     private func recordGameOver() {
+        clearSavedState()
         if let anchor = timerAnchor {
             pausedElapsed += clock().timeIntervalSince(anchor)
             timerAnchor = nil
@@ -454,7 +465,7 @@ final class NonogramViewModel {
     }
 
     private func recordWin() {
-        // Freeze the timer at win and stop wall-clock advancement.
+        clearSavedState()
         if let anchor = timerAnchor {
             pausedElapsed += clock().timeIntervalSince(anchor)
             timerAnchor = nil

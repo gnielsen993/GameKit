@@ -185,6 +185,11 @@ final class GameStats {
         // transaction since UserDefaults isn't part of the modelContext.
         NonogramPicker.resetSeen()
         SudokuSaveState.clearAll()
+        MinesweeperSaveState.clearAll()
+        NonogramSaveState.clearAll()
+        FreeCellSaveState.clearAll()
+        SolitaireSaveState.clearAll()
+        MergeSaveState.clearAll()
     }
 
     // MARK: - Private

@@ -78,6 +78,7 @@ final class MinesweeperViewModel {
     var timerAnchor: Date?               // nil = paused/idle/terminal (D-05)
     var pausedElapsed: TimeInterval = 0  // accumulator (D-06)
     private(set) var lossContext: LossContext?
+    private(set) var pendingSaveState: MinesweeperSaveState?
 
     /// Interaction-mode toggle (CONTEXT D-06 / D-11 — Phase 6.1).
     /// Defaults to `.reveal` and is reset to `.reveal` by every `restart()`
@@ -244,13 +245,17 @@ final class MinesweeperViewModel {
                 lossContext = computeLossContext()
                 phase = .lossShake(mineIdx: mineIdx)     // P5 D-06
             }
+            clearSavedState()
             freezeTimer()
             recordTerminalState(outcome: .loss)         // NEW (D-15)
         } else if WinDetector.isWon(board) {
             gameState = .won
             phase = .winSweep                            // P5 D-06
+            clearSavedState()
             freezeTimer()
             recordTerminalState(outcome: .win)          // NEW (D-15)
+        } else if case .playing = gameState {
+            saveCurrentState()
         }
     }
 
@@ -293,10 +298,12 @@ final class MinesweeperViewModel {
             // bump flagToggleCount (Plan 05-06 Test "toggleFlag_onRevealedCell").
             return
         }
+        saveCurrentState()
     }
 
     /// Same difficulty, fresh idle board. Timer / pausedElapsed / lossContext reset.
     func restart() {
+        clearSavedState()
         board = Self.idleBoard(for: difficulty)
         gameState = .idle
         flaggedCount = 0
@@ -352,6 +359,39 @@ final class MinesweeperViewModel {
     func cancelDifficultyChange() {
         pendingDifficultyChange = nil
         showingAbandonAlert = false
+    }
+
+    // MARK: - Save state (private(set) writes must live in this file)
+
+    func checkAndLoadOrRestoreState() {
+        let key = MinesweeperSaveState.key(difficulty: difficulty)
+        guard let data = userDefaults.data(forKey: key),
+              let snapshot = try? JSONDecoder().decode(MinesweeperSaveState.self, from: data) else {
+            return
+        }
+        pendingSaveState = snapshot
+    }
+
+    func restoreState(_ snapshot: MinesweeperSaveState) {
+        board = snapshot.board
+        flaggedCount = snapshot.flaggedCount
+        gameState = .playing
+        phase = .idle
+        revealCount = 0
+        flagToggleCount = 0
+        lossContext = nil
+        pendingSaveState = nil
+        pausedElapsed = snapshot.elapsedSeconds
+        timerAnchor = nil
+    }
+
+    func discardSaveAndLoadNew() {
+        clearSavedState()
+    }
+
+    func clearSavedState() {
+        userDefaults.removeObject(forKey: MinesweeperSaveState.key(difficulty: difficulty))
+        pendingSaveState = nil
     }
 
     // `pause()` and `resume()` live in MinesweeperViewModel+Timer.swift.

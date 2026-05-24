@@ -131,6 +131,19 @@ struct MinesweeperGameView: View {
         // screen (besides win/loss → Home from the end-state card). Matches
         // MergeGameView for cross-game consistency.
         .navigationBarBackButtonHidden(true)
+        .alert("Resume game?", isPresented: Binding(
+            get: { viewModel.pendingSaveState != nil },
+            set: { _ in }
+        )) {
+            Button("Continue") {
+                if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
+            }
+            Button("New Game", role: .destructive) {
+                viewModel.discardSaveAndLoadNew()
+            }
+        } message: {
+            Text("You have an unfinished \(viewModel.difficulty.rawValue) Minesweeper game.")
+        }
         .alert(
             String(localized: "Abandon current game?"),
             isPresented: $viewModel.showingAbandonAlert
@@ -147,6 +160,7 @@ struct MinesweeperGameView: View {
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .background:
+                viewModel.saveCurrentState()
                 viewModel.pause()                       // D-06
             case .active:
                 viewModel.resume()                      // D-06

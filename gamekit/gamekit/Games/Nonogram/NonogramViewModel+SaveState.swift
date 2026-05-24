@@ -1,0 +1,68 @@
+import Foundation
+
+extension NonogramViewModel {
+
+    func checkAndLoadOrRestoreState() {
+        let key = NonogramSaveState.key(difficulty: difficulty, gameMode: gameMode)
+        if let data = userDefaults.data(forKey: key),
+           let saved = try? JSONDecoder().decode(NonogramSaveState.self, from: data) {
+            pendingSaveState = saved
+        }
+    }
+
+    func restoreState(_ saved: NonogramSaveState) {
+        guard let d = NonogramDifficulty(rawValue: saved.difficulty),
+              let m = NonogramGameMode(rawValue: saved.gameMode),
+              saved.cells.count == saved.size * saved.size else {
+            discardSaveAndLoadNew()
+            return
+        }
+        let puzzle = NonogramPuzzle(id: saved.puzzleId, title: saved.puzzleTitle, grid: saved.puzzleGrid)
+        let restoredBoard = NonogramBoard(size: saved.size, cells: saved.cells)
+        resetSessionState()
+        difficulty = d
+        gameMode = m
+        currentPuzzle = puzzle
+        board = restoredBoard
+        livesRemaining = saved.livesRemaining
+        lockedCells = Set(saved.lockedCellIndices)
+        pausedElapsed = saved.elapsedSeconds
+        state = .playing
+        timerAnchor = clock()
+        pendingSaveState = nil
+        refreshCrossOff()
+    }
+
+    func discardSaveAndLoadNew() {
+        clearSavedState()
+        // Puzzle was already picked in init — nothing more to load.
+    }
+
+    func saveCurrentState() {
+        guard state == .playing, let puzzle = currentPuzzle else { return }
+        let snapshot = NonogramSaveState(
+            puzzleId: puzzle.id,
+            puzzleGrid: puzzle.grid,
+            puzzleTitle: puzzle.title,
+            cells: board.cells,
+            size: board.size,
+            difficulty: difficulty.rawValue,
+            gameMode: gameMode.rawValue,
+            livesRemaining: livesRemaining,
+            lockedCellIndices: Array(lockedCells),
+            elapsedSeconds: elapsedSeconds,
+            savedAt: Date.now
+        )
+        let key = NonogramSaveState.key(difficulty: difficulty, gameMode: gameMode)
+        if let data = try? JSONEncoder().encode(snapshot) {
+            userDefaults.set(data, forKey: key)
+        }
+    }
+
+    func clearSavedState() {
+        userDefaults.removeObject(
+            forKey: NonogramSaveState.key(difficulty: difficulty, gameMode: gameMode)
+        )
+        pendingSaveState = nil
+    }
+}

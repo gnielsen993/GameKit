@@ -43,6 +43,7 @@ final class MergeViewModel {
     private let userDefaults: UserDefaults
     private var rng: any RandomNumberGenerator
     private(set) var gameStats: GameStats?
+    private(set) var pendingSaveState: MergeSaveState?
 
     // MARK: - Init
 
@@ -78,6 +79,7 @@ final class MergeViewModel {
     func attachGameStats(_ stats: GameStats) {
         guard self.gameStats == nil else { return }
         self.gameStats = stats
+        checkAndLoadOrRestoreState()
     }
 
     // MARK: - Public API
@@ -126,6 +128,8 @@ final class MergeViewModel {
             state = .gameOver
             terminalCount += 1
             recordTerminal(outcome: .loss)
+        } else {
+            saveCurrentState()
         }
     }
 
@@ -143,6 +147,7 @@ final class MergeViewModel {
     /// Re-spawns the initial 2-tile board (matches VM init) so the player
     /// can act immediately without an extra swipe.
     func restart() {
+        clearSavedState()
         board = BoardSpawner.initial(rng: &rng)
         score = 0
         state = .playing
@@ -206,6 +211,7 @@ final class MergeViewModel {
     /// Writes a GameRecord (with `score`) at terminal state. Best-effort —
     /// failure logs inside GameStats and gameplay UI continues to render.
     private func recordTerminal(outcome: Outcome) {
+        clearSavedState()
         try? gameStats?.record(
             gameKind: .merge,
             mode: mode.rawValue,
@@ -218,6 +224,50 @@ final class MergeViewModel {
 
     /// UserDefaults key for the last-played mode. Renaming = data break.
     static let lastModeKey = "merge.lastMode"
+
+    // MARK: - Save state
+
+    func checkAndLoadOrRestoreState() {
+        let key = MergeSaveState.key(mode: mode)
+        if let data = userDefaults.data(forKey: key),
+           let saved = try? JSONDecoder().decode(MergeSaveState.self, from: data) {
+            pendingSaveState = saved
+        }
+    }
+
+    func restoreState(_ saved: MergeSaveState) {
+        guard let m = MergeMode(rawValue: saved.mode) else { discardSaveAndLoadNew(); return }
+        board = saved.board
+        score = saved.score
+        mode = m
+        hasContinuedPastWin = saved.hasContinuedPastWin
+        state = .playing
+        pendingSaveState = nil
+    }
+
+    func discardSaveAndLoadNew() {
+        clearSavedState()
+    }
+
+    func saveCurrentState() {
+        guard state == .playing || (state == .won && hasContinuedPastWin) else { return }
+        let snapshot = MergeSaveState(
+            board: board,
+            score: score,
+            mode: mode.rawValue,
+            hasContinuedPastWin: hasContinuedPastWin,
+            savedAt: Date.now
+        )
+        let key = MergeSaveState.key(mode: mode)
+        if let data = try? JSONEncoder().encode(snapshot) {
+            userDefaults.set(data, forKey: key)
+        }
+    }
+
+    func clearSavedState() {
+        userDefaults.removeObject(forKey: MergeSaveState.key(mode: mode))
+        pendingSaveState = nil
+    }
 
     // MARK: - Test seam (#if DEBUG — do NOT call from production)
 

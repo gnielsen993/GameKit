@@ -40,6 +40,9 @@ final class FreeCellViewModel {
     // Stats write-side firewall
     var gameStats: GameStats?
 
+    // Save state prompt
+    private(set) var pendingSaveState: FreeCellSaveState?
+
     // MARK: - Private
 
     private var history: [FreeCellMove] = []
@@ -215,6 +218,7 @@ final class FreeCellViewModel {
     }
 
     func reset() {
+        clearSavedState()
         board         = FreeCellBoard(dealNumber: dealNumber)
         history       = []
         selection     = nil
@@ -293,14 +297,17 @@ final class FreeCellViewModel {
         selection = nil
         dropTick += 1
         checkTerminalState()
+        if gameState == .playing { saveCurrentState() }
     }
 
     private func checkTerminalState() {
         if board.isWon {
+            clearSavedState()
             freezeTimer()
             gameState = .won
             recordResult(outcome: "win")
         } else if FreeCellRules.isLost(board: board) {
+            clearSavedState()
             freezeTimer()
             gameState = .lost
             recordResult(outcome: "loss")
@@ -348,5 +355,52 @@ final class FreeCellViewModel {
         let s = sel ?? selection
         if case .column(let src, _) = s { return src == colIdx }
         return false
+    }
+
+    // MARK: - Save state
+
+    func checkAndLoadOrRestoreState() {
+        let key = FreeCellSaveState.currentKey
+        if let data = UserDefaults.standard.data(forKey: key),
+           let saved = try? JSONDecoder().decode(FreeCellSaveState.self, from: data) {
+            pendingSaveState = saved
+        }
+    }
+
+    func restoreState(_ saved: FreeCellSaveState) {
+        board         = saved.board
+        dealNumber    = saved.dealNumber
+        difficulty    = saved.difficulty.flatMap { FreeCellDifficulty(rawValue: $0) }
+        history       = []
+        selection     = nil
+        pausedElapsed = saved.elapsedSeconds
+        frozenElapsed = 0
+        timerAnchor   = Date.now
+        gameState     = .playing
+        pendingSaveState = nil
+    }
+
+    func discardSaveAndLoadNew() {
+        clearSavedState()
+    }
+
+    func saveCurrentState() {
+        guard gameState == .playing else { return }
+        let elapsed = pausedElapsed + (timerAnchor.map { Date.now.timeIntervalSince($0) } ?? 0)
+        let snapshot = FreeCellSaveState(
+            board: board,
+            dealNumber: dealNumber,
+            difficulty: difficulty?.rawValue,
+            elapsedSeconds: elapsed,
+            savedAt: Date.now
+        )
+        if let data = try? JSONEncoder().encode(snapshot) {
+            UserDefaults.standard.set(data, forKey: FreeCellSaveState.currentKey)
+        }
+    }
+
+    func clearSavedState() {
+        UserDefaults.standard.removeObject(forKey: FreeCellSaveState.currentKey)
+        pendingSaveState = nil
     }
 }

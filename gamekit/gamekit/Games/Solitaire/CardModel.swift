@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - CardRank
 
-enum CardRank: Int, CaseIterable {
+enum CardRank: Int, CaseIterable, Codable {
     case ace = 1, two, three, four, five, six, seven, eight, nine, ten
     case jack, queen, king
 
@@ -21,7 +21,7 @@ enum CardRank: Int, CaseIterable {
 
 // MARK: - CardSuit
 
-enum CardSuit: CaseIterable {
+enum CardSuit: String, CaseIterable, Codable {
     case spades, hearts, diamonds, clubs
 
     var sfSymbol: String {
@@ -38,7 +38,7 @@ enum CardSuit: CaseIterable {
 
 // MARK: - PlayingCard
 
-struct PlayingCard: Identifiable, Equatable {
+struct PlayingCard: Identifiable, Equatable, Codable {
     let id: UUID
     let rank: CardRank
     let suit: CardSuit

@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Board state (value type — copy for undo)
 
-struct FreeCellBoard {
+struct FreeCellBoard: Codable {
     /// 8 columns. col[0] = top of visual stack; col.last = most accessible card.
     var columns:    [[PlayingCard]]
     /// 4 free-cell slots; nil = empty.

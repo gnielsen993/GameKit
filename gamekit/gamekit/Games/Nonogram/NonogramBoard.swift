@@ -12,7 +12,7 @@
 
 import Foundation
 
-struct NonogramBoard: Equatable, Hashable, Sendable {
+struct NonogramBoard: Equatable, Hashable, Sendable, Codable {
     let size: Int
     var cells: [NonogramCellState]
 

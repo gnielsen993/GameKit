@@ -53,6 +53,7 @@ struct MergeGameView: View {
     @Environment(\.videoModeStore) var videoModeStore
     @Environment(\.videoModeCompactness) var videoModeCompactness
     @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
     @State var bannerDismissed = false                    // P13 "View board" toggle
 
     var theme: Theme { themeManager.theme(using: colorScheme) }
@@ -95,6 +96,19 @@ struct MergeGameView: View {
         // the end-state card). Same treatment applied to MinesweeperGameView
         // for consistency across game screens.
         .navigationBarBackButtonHidden(true)
+        .alert("Resume game?", isPresented: Binding(
+            get: { viewModel.pendingSaveState != nil },
+            set: { _ in }
+        )) {
+            Button("Continue") {
+                if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
+            }
+            Button("New Game", role: .destructive) { viewModel.discardSaveAndLoadNew() }
+        } message: {
+            if let s = viewModel.pendingSaveState {
+                Text("You have an in-progress Merge game with a score of \(s.score).")
+            }
+        }
         .alert(
             String(localized: "Abandon current game?"),
             isPresented: $viewModel.showingAbandonAlert
@@ -107,6 +121,9 @@ struct MergeGameView: View {
             }
         } message: {
             Text(String(localized: "Switching modes resets the board. Your current score will be lost."))
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { viewModel.saveCurrentState() }
         }
         .task {
             guard !didInjectStats else { return }
