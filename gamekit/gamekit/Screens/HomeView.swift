@@ -2,20 +2,11 @@
 //  HomeView.swift
 //  gamekit
 //
-//  The Drawer — entry point to all playable games. Renders one full-width
-//  drawer row per `GameDescriptor.all` entry plus a static Upcoming row
-//  that presents `UpcomingGamesView` in a sheet.
+//  The Drawer — entry point to all playable games.
 //
-//  Drawer interaction (2026-05-11):
-//    - Each row is a closed drawer face. Tap → expand, revealing the
-//      game's mode chips inside the drawer cavity (see DrawerRow.swift).
-//    - Single accordion: only one drawer open at a time. Sibling drawers
-//      dim to 0.4 opacity while another is expanded so the open one
-//      reads as the focused element.
-//    - Tap a mode chip → push the chip's GameRoute (carries the chosen
-//      difficulty/mode as an associated value, see GameRoute.swift).
-//    - Tap the open drawer's face again, or tap any dimmed sibling, to
-//      collapse / switch.
+//  Closed state: 3-column icon grid, each tile 78pt. Tap a tile to expand.
+//  Open state: selected tile renders at 96pt; all others shrink to 44pt in
+//  a horizontal ScrollView strip; HomeDetailPanel appears below.
 //
 //  Routing:
 //    - NavigationStack owns `path: [GameRoute]`. A single
@@ -45,54 +36,46 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            // Plain ZStack — no ScrollView. With 3 playable drawers +
-            // Upcoming the catalogue comfortably fits on every supported
-            // device; dropping ScrollView lets the whole page background
-            // receive taps so "tap anywhere outside" closes a drawer
-            // even above the first row or below Upcoming.
-            ZStack(alignment: .top) {
-                theme.colors.background
-                    .ignoresSafeArea()
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        if expandedKind != nil { expandedKind = nil }
-                    }
-
-                VStack(spacing: theme.spacing.s) {
-                    ForEach(GameDescriptor.all) { descriptor in
-                        DrawerRow(
-                            descriptor: descriptor,
-                            theme: theme,
-                            isExpanded: expandedKind == descriptor.kind,
-                            onToggle: {
-                                // When another drawer is open, tapping
-                                // any closed drawer collapses the cabinet
-                                // rather than switching expansion. Open
-                                // drawer's own face is hidden under the
-                                // cavity so its onToggle won't fire.
-                                if let active = expandedKind, active != descriptor.kind {
-                                    expandedKind = nil
-                                } else {
-                                    toggle(descriptor.kind)
-                                }
-                            },
-                            onSelectMode: { route in
+            ScrollView {
+                ZStack(alignment: .top) {
+                    theme.colors.background
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
                                 expandedKind = nil
-                                path.append(route)
                             }
-                        )
-                        .opacity(opacity(for: descriptor.kind))
-                        .scaleEffect(scale(for: descriptor.kind), anchor: .top)
-                    }
+                        }
 
-                    upcomingRow
-                        .opacity(expandedKind == nil ? 1 : 0.4)
+                    VStack(spacing: theme.spacing.m) {
+                        if expandedKind == nil {
+                            closedGrid
+                        } else {
+                            openStrip
+                            if let kind = expandedKind,
+                               let descriptor = GameDescriptor.all.first(where: { $0.kind == kind }) {
+                                HomeDetailPanel(
+                                    descriptor: descriptor,
+                                    theme: theme,
+                                    onSelect: { route in
+                                        withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+                                            expandedKind = nil
+                                        }
+                                        path.append(route)
+                                    },
+                                    onStats: { showingStats = true }
+                                )
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            }
+                        }
+                    }
+                    .padding(.horizontal, theme.spacing.m)
+                    .padding(.top, theme.spacing.s)
+                    .frame(maxWidth: .infinity, alignment: .top)
+                    .animation(.spring(response: 0.42, dampingFraction: 0.78), value: expandedKind)
                 }
-                .padding(.horizontal, theme.spacing.m)
-                .padding(.top, theme.spacing.s)
-                .frame(maxWidth: .infinity, alignment: .top)
-                .animation(.spring(response: 0.42, dampingFraction: 0.78), value: expandedKind)
             }
+            .scrollBounceBehavior(.basedOnSize)
+            .background(theme.colors.background.ignoresSafeArea())
             .navigationTitle(String(localized: "The Drawer"))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -130,24 +113,134 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Accordion state
+    // MARK: - Closed grid (no selection)
 
-    private func toggle(_ kind: GameKind) {
-        if expandedKind == kind {
-            expandedKind = nil
-        } else {
-            expandedKind = kind
+    private var closedGrid: some View {
+        let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+        return LazyVGrid(columns: columns, spacing: 26) {
+            ForEach(GameDescriptor.all) { descriptor in
+                gameTile(descriptor, tileSize: 78, showLabel: true)
+            }
+            upcomingGridTile
         }
+        .padding(.top, theme.spacing.s)
     }
 
-    private func opacity(for kind: GameKind) -> Double {
-        guard let expandedKind else { return 1 }
-        return expandedKind == kind ? 1 : 0.4
+    // MARK: - Open strip (one game selected)
+
+    private var openStrip: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: theme.spacing.m) {
+                ForEach(GameDescriptor.all) { descriptor in
+                    let isSelected = expandedKind == descriptor.kind
+                    gameTile(descriptor, tileSize: isSelected ? 96 : 44, showLabel: isSelected)
+                        .opacity(isSelected ? 1 : 0.45)
+                        .blur(radius: isSelected ? 0 : 0.5)
+                }
+                upcomingStripTile
+            }
+            .padding(.horizontal, theme.spacing.m)
+            .padding(.vertical, theme.spacing.s)
+        }
+        .padding(.horizontal, -theme.spacing.m)
     }
 
-    private func scale(for kind: GameKind) -> CGFloat {
-        guard let expandedKind else { return 1 }
-        return expandedKind == kind ? 1 : 0.98
+    // MARK: - Tile builders
+
+    @ViewBuilder
+    private func gameTile(_ descriptor: GameDescriptor, tileSize: CGFloat, showLabel: Bool) -> some View {
+        Button {
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+                expandedKind = expandedKind == descriptor.kind ? nil : descriptor.kind
+            }
+        } label: {
+            VStack(spacing: 8) {
+                ZStack(alignment: .topTrailing) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: tileSize * 0.26, style: .continuous)
+                            .fill(descriptor.kind.accentColor)
+                            .shadow(
+                                color: descriptor.kind.accentColor.opacity(
+                                    expandedKind == descriptor.kind ? 0.55 : 0.38
+                                ),
+                                radius: expandedKind == descriptor.kind ? 18 : 10,
+                                x: 0, y: expandedKind == descriptor.kind ? 10 : 6
+                            )
+                        GameIconView(kind: descriptor.kind, size: tileSize * 0.54)
+                    }
+                    .frame(width: tileSize, height: tileSize)
+
+                    if descriptor.isNew && expandedKind == nil {
+                        newBadge
+                            .offset(x: 4, y: -4)
+                    }
+                }
+
+                if showLabel {
+                    Text(String(localized: "\(descriptor.titleKey)"))
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(theme.colors.textPrimary)
+                        .lineLimit(1)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(descriptor.titleKey))
+    }
+
+    private var newBadge: some View {
+        Text("!")
+            .font(.system(size: 9.5, weight: .bold, design: .monospaced))
+            .foregroundStyle(theme.colors.textPrimary)
+            .frame(width: 18, height: 18)
+            .background(Circle().fill(theme.colors.surface))
+            .shadow(color: theme.colors.textPrimary.opacity(0.12), radius: 3, x: 0, y: 1)
+    }
+
+    private var upcomingGridTile: some View {
+        Button {
+            expandedKind = nil
+            showingUpcoming = true
+        } label: {
+            VStack(spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                        .fill(theme.colors.accentSecondary.opacity(0.14))
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(theme.colors.accentSecondary)
+                }
+                .frame(width: 78, height: 78)
+
+                Text(String(localized: "Upcoming"))
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(theme.colors.textSecondary)
+                    .lineLimit(1)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Upcoming games"))
+    }
+
+    private var upcomingStripTile: some View {
+        Button {
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+                expandedKind = nil
+            }
+            showingUpcoming = true
+        } label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
+                    .fill(theme.colors.accentSecondary.opacity(0.14))
+                Image(systemName: "sparkles")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(theme.colors.accentSecondary)
+            }
+            .frame(width: 44, height: 44)
+            .opacity(0.55)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Upcoming games"))
     }
 
     // MARK: - Routing
@@ -173,58 +266,6 @@ struct HomeView: View {
             FreeCellGameView(initialMode: mode ?? .random(.easy))
                 .videoModeAware(minBoardHeight: 480)
         }
-    }
-
-    // MARK: - Upcoming row
-
-    @ViewBuilder
-    private var upcomingRow: some View {
-        Button {
-            expandedKind = nil
-            showingUpcoming = true
-        } label: {
-            HStack(spacing: theme.spacing.m) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
-                        .fill(theme.colors.accentSecondary.opacity(0.18))
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 22, weight: .semibold))
-                        .foregroundStyle(theme.colors.accentSecondary)
-                }
-                .frame(width: 52, height: 52)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(String(localized: "Upcoming"))
-                        .font(theme.typography.headline)
-                        .foregroundStyle(theme.colors.textPrimary)
-                    Text(String(localized: "5 games coming"))
-                        .font(theme.typography.caption)
-                        .foregroundStyle(theme.colors.textSecondary)
-                }
-
-                Spacer(minLength: theme.spacing.s)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(theme.colors.textSecondary)
-                    .frame(width: 28, height: 28)
-                    .background(Circle().fill(theme.colors.background.opacity(0.6)))
-            }
-            .padding(.horizontal, theme.spacing.l)
-            .padding(.vertical, theme.spacing.m)
-            .background(
-                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                    .fill(theme.colors.surface)
-                    .shadow(color: DrawerChrome.shadow.opacity(0.08), radius: 6, x: 0, y: 3)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                    .stroke(theme.colors.border.opacity(0.5), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
     }
 
     @ViewBuilder
