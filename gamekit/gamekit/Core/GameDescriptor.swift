@@ -185,6 +185,19 @@ extension GameDescriptor {
             ]
         ),
         GameDescriptor(
+            kind: .klondike,
+            titleKey: "Solitaire",
+            captionKey: "Tap to play",
+            symbol: "suit.heart.fill",
+            accent: .slot6,
+            route: .klondike(nil),
+            modes: [
+                GameModeChip(id: "sol-easy",   labelKey: "Easy",   detailKey: "Draw 1", route: .klondike(.easy)),
+                GameModeChip(id: "sol-medium", labelKey: "Medium", detailKey: "Draw 2", route: .klondike(.medium)),
+                GameModeChip(id: "sol-hard",   labelKey: "Hard",   detailKey: "Draw 3", route: .klondike(.hard))
+            ]
+        ),
+        GameDescriptor(
             kind: .freeCell,
             titleKey: "FreeCell",
             captionKey: "Tap to play",

@@ -29,4 +29,5 @@ enum GameRoute: Hashable, Sendable {
     case nonogram(NonogramDifficulty?, NonogramGameMode?)
     case sudoku(SudokuDifficulty?, SudokuGameMode?)
     case freeCell(FreeCellMode?)
+    case klondike(SolitaireDifficulty?)
 }

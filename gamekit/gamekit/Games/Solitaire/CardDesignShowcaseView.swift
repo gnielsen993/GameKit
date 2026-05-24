@@ -14,9 +14,15 @@ struct PlayingCardView: View {
     private var height: CGFloat     { width * 1.4 }
     private var radius: CGFloat     { width * 0.10 }
     private var suitColor: Color    { suit.isRed ? theme.colors.danger : theme.colors.textPrimary }
-    private var rankFont: Font      { .system(size: width * 0.17, weight: .bold, design: .rounded) }
-    private var cornerSuit: CGFloat { width * 0.13 }
-    private var centerSuit: CGFloat { rank.isFace ? width * 0.20 : width * 0.44 }
+
+    // Below 44pt (video mode small zones) pack tighter so the top strip
+    // stays readable without crowding the center suit.
+    private var isCondensed: Bool   { width < 44 }
+    private var rankSize:   CGFloat { width * (isCondensed ? 0.28 : 0.31) }
+    private var suitCorner: CGFloat { width * (isCondensed ? 0.21 : 0.24) }
+    private var hPad:       CGFloat { width * (isCondensed ? 0.08 : 0.09) }
+    private var topPad:     CGFloat { width * (isCondensed ? 0.05 : 0.06) }
+    private var suitCenter: CGFloat { rank.isFace ? width * 0.28 : width * 0.50 }
 
     init(_ card: PlayingCard, theme: Theme, isClassic: Bool, width: CGFloat = 70) {
         self.rank = card.rank; self.suit = card.suit
@@ -37,22 +43,25 @@ struct PlayingCardView: View {
                     .fill(theme.colors.surface)
                     .shadow(color: .black.opacity(0.13), radius: 4, x: 0, y: 2)
 
-                if isClassic {
-                    RoundedRectangle(cornerRadius: radius - 3, style: .continuous)
-                        .stroke(suitColor.opacity(0.18), lineWidth: 1)
-                        .padding(theme.spacing.xs)
-                }
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .stroke(suitColor.opacity(0.15), lineWidth: 1)
 
                 VStack(spacing: 0) {
-                    HStack { cornerPip; Spacer() }
-                        .padding(.horizontal, width * 0.10)
-                        .padding(.top, width * 0.08)
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(rank.display)
+                            .font(.system(size: rankSize, weight: .heavy, design: .rounded))
+                            .foregroundStyle(suitColor)
+                        Spacer(minLength: 0)
+                        Image(systemName: suit.sfSymbol)
+                            .font(.system(size: suitCorner, weight: .bold))
+                            .foregroundStyle(suitColor)
+                    }
+                    .padding(.horizontal, hPad)
+                    .padding(.top, topPad)
+
                     Spacer(minLength: 0)
                     centerContent
                     Spacer(minLength: 0)
-                    HStack { Spacer(); cornerPip.rotationEffect(.degrees(180)) }
-                        .padding(.horizontal, width * 0.10)
-                        .padding(.bottom, width * 0.08)
                 }
             } else {
                 CardBackView(theme: theme, isClassic: isClassic, width: width)
@@ -62,30 +71,19 @@ struct PlayingCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
     }
 
-    private var cornerPip: some View {
-        VStack(spacing: 1) {
-            Text(rank.display)
-                .font(rankFont)
-                .foregroundStyle(suitColor)
-            Image(systemName: suit.sfSymbol)
-                .font(.system(size: cornerSuit, weight: .bold))
-                .foregroundStyle(suitColor)
-        }
-    }
-
     @ViewBuilder private var centerContent: some View {
         if rank.isFace {
-            VStack(spacing: width * 0.04) {
+            VStack(spacing: width * 0.03) {
                 Text(rank.display)
-                    .font(.system(size: width * 0.26, weight: .heavy, design: .rounded))
+                    .font(.system(size: width * 0.30, weight: .heavy, design: .rounded))
                     .foregroundStyle(suitColor)
                 Image(systemName: suit.sfSymbol)
-                    .font(.system(size: centerSuit))
+                    .font(.system(size: suitCenter))
                     .foregroundStyle(suitColor)
             }
         } else {
             Image(systemName: suit.sfSymbol)
-                .font(.system(size: rank == .ace ? width * 0.50 : centerSuit))
+                .font(.system(size: rank == .ace ? width * 0.54 : suitCenter))
                 .foregroundStyle(suitColor)
         }
     }
@@ -100,10 +98,8 @@ struct CardBackView: View {
 
     private var height: CGFloat { width * 1.4 }
     private var radius: CGFloat { width * 0.10 }
-    // Classic: baize green. Other presets: accent.
-    // Will move to classicAnchorOverride hook (CLAUDE.md §1) when built in v1.4.
     private var backColor: Color {
-        isClassic ? Color(hue: 0.426, saturation: 0.576, brightness: 0.416) : theme.colors.accentPrimary
+        theme.colors.accentPrimary
     }
 
     var body: some View {

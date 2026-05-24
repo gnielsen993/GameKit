@@ -167,6 +167,8 @@ struct HomeView: View {
         case .sudoku(let difficulty, let mode):
             SudokuGameView(initialDifficulty: difficulty, initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
+        case .klondike(let difficulty):
+            SolitaireGameView(initialDifficulty: difficulty ?? .easy)
         case .freeCell(let mode):
             FreeCellGameView(initialMode: mode ?? .random(.easy))
                 .videoModeAware(minBoardHeight: 480)

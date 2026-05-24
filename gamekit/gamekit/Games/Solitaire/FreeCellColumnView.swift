@@ -15,8 +15,8 @@ struct FreeCellColumnView: View {
     private var radius:     CGFloat { cardWidth * 0.10 }
 
     private var fanOffset: CGFloat {
-        let base: CGFloat = cardWidth * 0.40
-        let floor: CGFloat = cardWidth * 0.18
+        let base: CGFloat = cardWidth * 0.46
+        let floor: CGFloat = cardWidth * 0.20
         guard cards.count > 8 else { return base }
         return max(floor, base - CGFloat(cards.count - 8) * 2.5)
     }

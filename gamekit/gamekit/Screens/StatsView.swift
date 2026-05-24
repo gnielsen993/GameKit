@@ -91,6 +91,16 @@ struct StatsView: View {
     @Query(filter: #Predicate<BestTime> { $0.gameKindRaw == "freeCell" })
     private var freeCellBestTimes: [BestTime]
 
+    @Query(
+        filter: #Predicate<GameRecord> { $0.gameKindRaw == "klondike" },
+        sort: \.playedAt,
+        order: .reverse
+    )
+    private var klondikeRecords: [GameRecord]
+
+    @Query(filter: #Predicate<BestTime> { $0.gameKindRaw == "klondike" })
+    private var klondikeBestTimes: [BestTime]
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
@@ -145,6 +155,15 @@ struct StatsView: View {
                             theme: theme,
                             records: freeCellRecords,
                             bestTimes: freeCellBestTimes
+                        )
+                    }
+
+                    settingsSectionHeader(theme: theme, String(localized: "SOLITAIRE"))
+
+                    DKCard(theme: theme) {
+                        SolitaireStatsCard(
+                            records: klondikeRecords,
+                            bestTimes: klondikeBestTimes
                         )
                     }
                 }

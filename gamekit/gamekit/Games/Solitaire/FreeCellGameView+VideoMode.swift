@@ -182,9 +182,9 @@ extension FreeCellGameView {
                 .padding(.bottom, 16)
             }
             .scrollDisabled(true)
-            .background(boardColor)
             .layoutPriority(1)
         }
+        .background(boardColor)
         .coordinateSpace(.named("freecell"))
         .onAppear { headerHeight = 0 }
         .gesture(
@@ -206,7 +206,7 @@ extension FreeCellGameView {
     }
 
     // MARK: - Compact control row (large zone)
-    // Back · Undo · [spacer] · deal label · [spacer] · Menu
+    // Back · [spacer] · Timer · Deal label · Undo · [spacer] · Menu
 
     @ViewBuilder
     var fcLargeZoneControlRow: some View {
@@ -222,20 +222,6 @@ extension FreeCellGameView {
             }
             .accessibilityLabel(Text("Back"))
 
-            Button { vm.undo() } label: {
-                Image(systemName: "arrow.uturn.backward")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(
-                        vm.canUndo ? theme.colors.accentPrimary : theme.colors.textSecondary
-                    )
-                    .frame(width: theme.spacing.xl, height: theme.spacing.xl)
-                    .background(theme.colors.surface)
-                    .clipShape(RoundedRectangle(cornerRadius: theme.radii.button,
-                                               style: .continuous))
-            }
-            .disabled(!vm.canUndo)
-            .accessibilityLabel(Text("Undo"))
-
             Spacer(minLength: 0)
 
             VideoModeTimerChip(
@@ -250,6 +236,20 @@ extension FreeCellGameView {
                 .font(theme.typography.caption)
                 .foregroundStyle(theme.colors.textSecondary)
                 .lineLimit(1)
+
+            Button { vm.undo() } label: {
+                Image(systemName: "arrow.uturn.backward")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(
+                        vm.canUndo ? theme.colors.accentPrimary : theme.colors.textSecondary
+                    )
+                    .frame(width: theme.spacing.xl, height: theme.spacing.xl)
+                    .background(theme.colors.surface)
+                    .clipShape(RoundedRectangle(cornerRadius: theme.radii.button,
+                                               style: .continuous))
+            }
+            .disabled(!vm.canUndo)
+            .accessibilityLabel(Text("Undo"))
 
             Spacer(minLength: 0)
 
@@ -310,6 +310,9 @@ extension FreeCellGameView {
         }
         ToolbarItem(placement: Self.fcToolbarPlacement(for: anchors.settings)) {
             Menu {
+                Button("Undo") { vm.undo() }
+                    .disabled(!vm.canUndo)
+                Divider()
                 Button("New Random Game") {
                     vm.startNewGame(mode: .random(vm.difficulty ?? .easy))
                 }

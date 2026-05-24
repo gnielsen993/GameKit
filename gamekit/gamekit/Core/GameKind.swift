@@ -27,4 +27,5 @@ enum GameKind: String, Codable, Sendable, CaseIterable {
     case nonogram
     case sudoku
     case freeCell
+    case klondike
 }

@@ -19,6 +19,16 @@
         }
       }
     },
+    "%@: %lld games, %lld wins, %@, best %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld games, %3$lld wins, %4$@, best %5$@"
+          }
+        }
+      }
+    },
     "%@: %lld games, %lld wins, %@, best time %@" : {
       "localizations" : {
         "en" : {
@@ -297,6 +307,9 @@
         }
       }
     },
+    "Card Design" : {
+
+    },
     "Change difficulty" : {
       "comment" : "End-state card secondary action (D-03 W-02 — calls restart in P3)",
       "extractionState" : "automatic",
@@ -325,6 +338,9 @@
           }
         }
       }
+    },
+    "Choose a Deal" : {
+
     },
     "Choose size" : {
 
@@ -362,6 +378,12 @@
 
     },
     "DATA" : {
+
+    },
+    "Deal #" : {
+
+    },
+    "Deal number" : {
 
     },
     "Default mail app" : {
@@ -415,7 +437,16 @@
     "Empty" : {
 
     },
+    "Enter a deal number between 1 and 32,000 to play that specific game." : {
+
+    },
+    "Enter Deal #" : {
+
+    },
     "Erase" : {
+
+    },
+    "Expert" : {
 
     },
     "Export stats" : {
@@ -454,6 +485,12 @@
       }
     },
     "Free" : {
+
+    },
+    "FreeCell" : {
+
+    },
+    "FREECELL" : {
 
     },
     "Game over" : {
@@ -505,6 +542,9 @@
 
     },
     "Given %lld" : {
+
+    },
+    "Green border = valid drop · Pick up a stack by tapping any card in it" : {
 
     },
     "Haptics" : {
@@ -657,13 +697,22 @@
     "More themes & custom colors" : {
 
     },
+    "New Game" : {
+
+    },
     "New puzzle" : {
 
     },
     "New Puzzle" : {
 
     },
+    "New Random Game" : {
+
+    },
     "Next puzzle" : {
+
+    },
+    "No FreeCell games played yet." : {
 
     },
     "No games played yet." : {
@@ -758,6 +807,12 @@
         }
       }
     },
+    "Play Deal #%@" : {
+
+    },
+    "Please enter a number between 1 and 32,000." : {
+
+    },
     "primary" : {
 
     },
@@ -771,6 +826,9 @@
 
     },
     "Quit and reopen to finish iCloud setup" : {
+
+    },
+    "Reset" : {
 
     },
     "Reset all stats" : {
@@ -807,6 +865,9 @@
       }
     },
     "Restart puzzle" : {
+
+    },
+    "Restart This Deal" : {
 
     },
     "Resume puzzle?" : {
@@ -932,6 +993,9 @@
     "Solved. New puzzle" : {
 
     },
+    "Stack: lower rank · opposite colour · King to empty" : {
+
+    },
     "Stats" : {
       "comment" : "Stats tab + nav title",
       "extractionState" : "manual",
@@ -1055,6 +1119,9 @@
 
     },
     "Try again" : {
+
+    },
+    "Undo" : {
 
     },
     "Unrevealed, row %lld column %lld" : {
