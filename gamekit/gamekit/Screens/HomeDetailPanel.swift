@@ -5,6 +5,12 @@
 //  Appears below the horizontal tile strip when a game is expanded on HomeView.
 //  Driven entirely by GameDescriptor props — no SwiftData access here.
 //
+//  Games with parent chips (Nonogram, Sudoku) show two tiers:
+//    - Mode pills (Free / Lives) — selecting one filters the difficulty row.
+//    - Difficulty chips (5×5 / 10×10 / …) — tapping launches the game.
+//  Games with leaf chips (Minesweeper, Merge, Solitaire, FreeCell) show a
+//  single chip row that launches directly.
+//
 
 import SwiftUI
 import DesignKit
@@ -14,6 +20,27 @@ struct HomeDetailPanel: View {
     let theme: Theme
     var onSelect: (GameRoute) -> Void
     var onStats: () -> Void
+
+    @State private var selectedModeId: String
+
+    init(descriptor: GameDescriptor, theme: Theme,
+         onSelect: @escaping (GameRoute) -> Void,
+         onStats: @escaping () -> Void) {
+        self.descriptor = descriptor
+        self.theme = theme
+        self.onSelect = onSelect
+        self.onStats = onStats
+        _selectedModeId = State(initialValue: descriptor.modes.first?.id ?? "")
+    }
+
+    // True when the first chip is a parent chip (no route, has subModes).
+    private var hasParentChips: Bool {
+        descriptor.modes.first?.route == nil
+    }
+
+    private var selectedParent: GameModeChip? {
+        descriptor.modes.first(where: { $0.id == selectedModeId })
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -36,7 +63,6 @@ struct HomeDetailPanel: View {
     private var header: some View {
         HStack(spacing: theme.spacing.m) {
             iconTile(size: 64)
-
             VStack(alignment: .leading, spacing: 3) {
                 Text(String(localized: "\(descriptor.titleKey)"))
                     .font(theme.typography.headline)
@@ -45,53 +71,96 @@ struct HomeDetailPanel: View {
                     .font(theme.typography.caption)
                     .foregroundStyle(theme.colors.textSecondary)
             }
-
             Spacer(minLength: 0)
         }
     }
 
-    // MARK: - Mode chips
+    // MARK: - Mode section
 
+    @ViewBuilder
     private var modeSection: some View {
-        VStack(alignment: .leading, spacing: theme.spacing.s) {
-            Text("MODE / DIFFICULTY")
-                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                .foregroundStyle(theme.colors.textSecondary)
-                .kerning(1.4)
-
-            modeChips(descriptor.modes)
+        if hasParentChips {
+            VStack(alignment: .leading, spacing: theme.spacing.s) {
+                sectionLabel("MODE")
+                modePillRow
+                sectionLabel("DIFFICULTY")
+                    .padding(.top, theme.spacing.xs)
+                if let parent = selectedParent {
+                    difficultyGrid(parent.subModes)
+                }
+            }
+        } else {
+            VStack(alignment: .leading, spacing: theme.spacing.s) {
+                sectionLabel("MODE / DIFFICULTY")
+                leafGrid(descriptor.modes)
+            }
         }
     }
 
-    @ViewBuilder
-    private func modeChips(_ chips: [GameModeChip]) -> some View {
-        let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
-        LazyVGrid(columns: columns, spacing: theme.spacing.s) {
+    // MARK: - Mode pill row (Free / Lives)
+
+    private var modePillRow: some View {
+        HStack(spacing: theme.spacing.s) {
+            ForEach(descriptor.modes) { chip in
+                modePill(chip)
+            }
+        }
+    }
+
+    private func modePill(_ chip: GameModeChip) -> some View {
+        let selected = chip.id == selectedModeId
+        return Button {
+            selectedModeId = chip.id
+        } label: {
+            Text(String(localized: "\(chip.labelKey)"))
+                .font(theme.typography.body.weight(.semibold))
+                .foregroundStyle(selected ? .white : theme.colors.textPrimary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, theme.spacing.s)
+                .background(
+                    RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
+                        .fill(selected ? descriptor.kind.accentColor : theme.colors.background)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
+                                .stroke(
+                                    selected ? descriptor.kind.accentColor : theme.colors.border.opacity(0.6),
+                                    lineWidth: 1
+                                )
+                        )
+                )
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Difficulty chips (sub-modes of selected parent)
+
+    private func difficultyGrid(_ chips: [GameModeChip]) -> some View {
+        let columns = [GridItem(.flexible()), GridItem(.flexible())]
+        return LazyVGrid(columns: columns, spacing: theme.spacing.s) {
             ForEach(chips) { chip in
                 if let route = chip.route {
-                    // Leaf chip — tapping launches the game
-                    Button {
-                        onSelect(route)
-                    } label: {
-                        chipLabel(chip)
-                    }
-                    .buttonStyle(.plain)
-                } else {
-                    // Parent chip with sub-modes — show sub-modes inline
-                    ForEach(chip.subModes) { sub in
-                        if let route = sub.route {
-                            Button {
-                                onSelect(route)
-                            } label: {
-                                chipLabel(sub)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+                    Button { onSelect(route) } label: { chipLabel(chip) }
+                        .buttonStyle(.plain)
                 }
             }
         }
     }
+
+    // MARK: - Leaf chips (direct launch, 3-col grid)
+
+    private func leafGrid(_ chips: [GameModeChip]) -> some View {
+        let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+        return LazyVGrid(columns: columns, spacing: theme.spacing.s) {
+            ForEach(chips) { chip in
+                if let route = chip.route {
+                    Button { onSelect(route) } label: { chipLabel(chip) }
+                        .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    // MARK: - Shared chip cell
 
     @ViewBuilder
     private func chipLabel(_ chip: GameModeChip) -> some View {
@@ -108,7 +177,7 @@ struct HomeDetailPanel: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, theme.spacing.s)
-        .padding(.vertical, 10)
+        .padding(.vertical, theme.spacing.s)
         .background(
             RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
                 .fill(theme.colors.background)
@@ -119,11 +188,18 @@ struct HomeDetailPanel: View {
         )
     }
 
-    // MARK: - Stats link
+    // MARK: - Helpers
+
+    private func sectionLabel(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+            .foregroundStyle(theme.colors.textSecondary)
+            .kerning(1.4)
+    }
 
     private var statsLink: some View {
         Button(action: onStats) {
-            HStack(spacing: 6) {
+            HStack(spacing: theme.spacing.xs) {
                 Text(String(localized: "Stats"))
                     .font(theme.typography.caption.weight(.semibold))
                     .foregroundStyle(descriptor.kind.accentColor)
@@ -136,16 +212,11 @@ struct HomeDetailPanel: View {
         .padding(.top, theme.spacing.m)
     }
 
-    // MARK: - Icon tile helper
-
     private func iconTile(size: CGFloat) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.26, style: .continuous)
                 .fill(descriptor.kind.accentColor)
-                .shadow(
-                    color: descriptor.kind.accentColor.opacity(0.45),
-                    radius: 10, x: 0, y: 6
-                )
+                .shadow(color: descriptor.kind.accentColor.opacity(0.45), radius: 10, x: 0, y: 6)
             GameIconView(kind: descriptor.kind, size: size * 0.54)
         }
         .frame(width: size, height: size)

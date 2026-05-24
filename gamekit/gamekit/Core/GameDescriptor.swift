@@ -78,10 +78,6 @@ struct GameDescriptor: Identifiable, Hashable, Sendable {
     /// Empty = no mode selection surfaced (drawer just opens the game).
     let modes: [GameModeChip]
 
-    /// Drives the `!` badge on the grid tile. Set true for newly-shipped
-    /// games; can be cleared in a follow-up once first-play tracking lands.
-    let isNew: Bool
-
     /// Short subtitle shown in the detail panel (e.g. "Klondike", "Standard").
     let shortMeta: String
 
@@ -134,7 +130,6 @@ extension GameDescriptor {
                 GameModeChip(id: "medium", labelKey: "Medium", detailKey: "16×16 · 40", route: .minesweeper(.medium)),
                 GameModeChip(id: "hard",   labelKey: "Hard",   detailKey: "24×16 · 80", route: .minesweeper(.hard))
             ],
-            isNew: false,
             shortMeta: "Mine clearance"
         ),
         GameDescriptor(
@@ -148,7 +143,6 @@ extension GameDescriptor {
                 GameModeChip(id: "win",      labelKey: "2048",     detailKey: "Classic", route: .merge(.winMode)),
                 GameModeChip(id: "infinite", labelKey: "Infinite", detailKey: "Endless", route: .merge(.infinite))
             ],
-            isNew: false,
             shortMeta: "Slide & merge"
         ),
         GameDescriptor(
@@ -172,7 +166,6 @@ extension GameDescriptor {
                     GameModeChip(id: "nono-lives-large",  labelKey: "20×20", detailKey: "Large",  route: .nonogram(.large,  .lives))
                 ])
             ],
-            isNew: false,
             shortMeta: "Picture logic"
         ),
         GameDescriptor(
@@ -196,7 +189,6 @@ extension GameDescriptor {
                     GameModeChip(id: "sudoku-lives-extreme", labelKey: "Extreme", route: .sudoku(.extreme, .lives))
                 ])
             ],
-            isNew: false,
             shortMeta: "Number grids"
         ),
         GameDescriptor(
@@ -211,7 +203,6 @@ extension GameDescriptor {
                 GameModeChip(id: "sol-medium", labelKey: "Medium", detailKey: "Draw 2", route: .klondike(.medium)),
                 GameModeChip(id: "sol-hard",   labelKey: "Hard",   detailKey: "Draw 3", route: .klondike(.hard))
             ],
-            isNew: true,
             shortMeta: "Klondike"
         ),
         GameDescriptor(
@@ -228,7 +219,6 @@ extension GameDescriptor {
                 GameModeChip(id: "fc-expert", labelKey: "Expert", route: .freeCell(.random(.expert))),
                 GameModeChip(id: "fc-deal",   labelKey: "Deal #", route: .freeCell(.enterDeal))
             ],
-            isNew: true,
             shortMeta: "Standard"
         )
     ]

@@ -38,6 +38,8 @@ import SwiftData
 import DesignKit
 
 struct StatsView: View {
+    var focusedKind: GameKind? = nil
+
     @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
 
@@ -103,74 +105,68 @@ struct StatsView: View {
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
+    private func shows(_ kind: GameKind) -> Bool {
+        focusedKind == nil || focusedKind == kind
+    }
+
+    private var navigationTitle: String {
+        guard let kind = focusedKind,
+              let title = GameDescriptor.all.first(where: { $0.kind == kind })?.titleKey
+        else { return String(localized: "Stats") }
+        return title
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: theme.spacing.l) {
 
-                    settingsSectionHeader(theme: theme, String(localized: "MINESWEEPER"))
-
-                    DKCard(theme: theme) {
-                        MinesStatsCard(
-                            theme: theme,
-                            records: minesRecords,
-                            bestTimes: minesBestTimes
-                        )
+                    if shows(.minesweeper) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "MINESWEEPER")) }
+                        DKCard(theme: theme) {
+                            MinesStatsCard(theme: theme, records: minesRecords, bestTimes: minesBestTimes)
+                        }
                     }
 
-                    settingsSectionHeader(theme: theme, String(localized: "MERGE"))
-
-                    DKCard(theme: theme) {
-                        MergeStatsCard(
-                            theme: theme,
-                            records: mergeRecords,
-                            bestScores: mergeBestScores
-                        )
+                    if shows(.merge) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "MERGE")) }
+                        DKCard(theme: theme) {
+                            MergeStatsCard(theme: theme, records: mergeRecords, bestScores: mergeBestScores)
+                        }
                     }
 
-                    settingsSectionHeader(theme: theme, String(localized: "NONOGRAM"))
-
-                    DKCard(theme: theme) {
-                        NonogramStatsCard(
-                            theme: theme,
-                            records: nonogramRecords,
-                            bestTimes: nonogramBestTimes
-                        )
+                    if shows(.nonogram) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "NONOGRAM")) }
+                        DKCard(theme: theme) {
+                            NonogramStatsCard(theme: theme, records: nonogramRecords, bestTimes: nonogramBestTimes)
+                        }
                     }
 
-                    settingsSectionHeader(theme: theme, String(localized: "SUDOKU"))
-
-                    DKCard(theme: theme) {
-                        SudokuStatsCard(
-                            theme: theme,
-                            records: sudokuRecords,
-                            bestTimes: sudokuBestTimes
-                        )
+                    if shows(.sudoku) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "SUDOKU")) }
+                        DKCard(theme: theme) {
+                            SudokuStatsCard(theme: theme, records: sudokuRecords, bestTimes: sudokuBestTimes)
+                        }
                     }
 
-                    settingsSectionHeader(theme: theme, String(localized: "FREECELL"))
-
-                    DKCard(theme: theme) {
-                        FreeCellStatsCard(
-                            theme: theme,
-                            records: freeCellRecords,
-                            bestTimes: freeCellBestTimes
-                        )
+                    if shows(.freeCell) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "FREECELL")) }
+                        DKCard(theme: theme) {
+                            FreeCellStatsCard(theme: theme, records: freeCellRecords, bestTimes: freeCellBestTimes)
+                        }
                     }
 
-                    settingsSectionHeader(theme: theme, String(localized: "SOLITAIRE"))
-
-                    DKCard(theme: theme) {
-                        SolitaireStatsCard(
-                            records: klondikeRecords,
-                            bestTimes: klondikeBestTimes
-                        )
+                    if shows(.klondike) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "SOLITAIRE")) }
+                        DKCard(theme: theme) {
+                            SolitaireStatsCard(records: klondikeRecords, bestTimes: klondikeBestTimes)
+                        }
                     }
                 }
                 .padding(theme.spacing.l)
             }
             .background(theme.colors.background.ignoresSafeArea())
-            .navigationTitle(String(localized: "Stats"))
+            .navigationTitle(navigationTitle)
         }
     }
 }

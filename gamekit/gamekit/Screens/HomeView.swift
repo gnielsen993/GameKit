@@ -32,6 +32,7 @@ struct HomeView: View {
     @State private var showingUpcoming: Bool = false
     @State private var showingSettings: Bool = false
     @State private var showingStats: Bool = false
+    @State private var statsGame: GameKind? = nil
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var body: some View {
@@ -62,7 +63,10 @@ struct HomeView: View {
                                         }
                                         path.append(route)
                                     },
-                                    onStats: { showingStats = true }
+                                    onStats: {
+                                        statsGame = expandedKind
+                                        showingStats = true
+                                    }
                                 )
                                 .transition(.opacity.combined(with: .move(edge: .bottom)))
                             }
@@ -100,7 +104,7 @@ struct HomeView: View {
                 SettingsView()
             }
             .sheet(isPresented: $showingStats) {
-                StatsView()
+                StatsView(focusedKind: statsGame)
             }
             .overlay(alignment: .bottom) {
                 if let card = showingComingSoon {
@@ -170,10 +174,6 @@ struct HomeView: View {
                     }
                     .frame(width: tileSize, height: tileSize)
 
-                    if descriptor.isNew && expandedKind == nil {
-                        newBadge
-                            .offset(x: 4, y: -4)
-                    }
                 }
 
                 if showLabel {
@@ -186,15 +186,6 @@ struct HomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(descriptor.titleKey))
-    }
-
-    private var newBadge: some View {
-        Text("!")
-            .font(.system(size: 9.5, weight: .bold, design: .monospaced))
-            .foregroundStyle(theme.colors.textPrimary)
-            .frame(width: 18, height: 18)
-            .background(Circle().fill(theme.colors.surface))
-            .shadow(color: theme.colors.textPrimary.opacity(0.12), radius: 3, x: 0, y: 1)
     }
 
     private var upcomingGridTile: some View {
@@ -272,6 +263,7 @@ struct HomeView: View {
     private var profileMenu: some View {
         Menu {
             Button {
+                statsGame = nil
                 showingStats = true
             } label: {
                 Label(String(localized: "Stats"), systemImage: "chart.bar")
