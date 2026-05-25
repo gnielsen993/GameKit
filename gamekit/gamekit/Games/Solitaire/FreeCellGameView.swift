@@ -14,9 +14,10 @@ struct FreeCellGameView: View {
     @State private var dealEntryText   = ""
     @State private var dealEntryError  = false
     @State private var didInjectStats = false
-    @State var dragState:    FreeCellDragState?
-    @State var dragTarget:   FreeCellDest? = nil
-    @State var headerHeight: CGFloat = 44
+    @State var dragState:       FreeCellDragState?
+    @State var dragTarget:      FreeCellDest? = nil
+    @State var headerHeight:    CGFloat = 44
+    @State private var hintDismissTask: Task<Void, Never>? = nil
 
     private let initialMode: FreeCellMode
 
@@ -88,6 +89,29 @@ struct FreeCellGameView: View {
         }
         .onChange(of: vm.board.canAutoComplete) { _, canAC in
             if canAC { vm.beginAutoCompleteAnimation() }
+        }
+        .onChange(of: vm.hintText) { _, text in
+            guard text != nil else { return }
+            hintDismissTask?.cancel()
+            hintDismissTask = Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2.5))
+                vm.dismissHint()
+            }
+        }
+        .overlay(alignment: .top) { hintToast }
+        .animation(.easeInOut(duration: 0.22), value: vm.hintText != nil)
+    }
+
+    @ViewBuilder private var hintToast: some View {
+        if let hint = vm.hintText {
+            Text(hint)
+                .font(theme.typography.caption.weight(.semibold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, theme.spacing.m)
+                .padding(.vertical, theme.spacing.s)
+                .background(Capsule().fill(theme.colors.textPrimary.opacity(0.72)))
+                .padding(.top, theme.spacing.s)
+                .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
 
@@ -263,11 +287,7 @@ struct FreeCellGameView: View {
             let colCards = vm.board.columns[col]
             guard !colCards.isEmpty else { return nil }
             let localY = loc.y - boardTopY
-            let base: CGFloat = cardW * 0.40
-            let floor: CGFloat = cardW * 0.18
-            let fo = colCards.count > 8
-                ? max(floor, base - CGFloat(colCards.count - 8) * 2.5)
-                : base
+            let fo = FreeCellColumnView.fanOffset(for: colCards.count, cardWidth: cardW)
             let cardIdx = max(0, min(colCards.count - 1, Int(localY / fo)))
             let dragCards = Array(colCards[cardIdx...])
             guard FreeCellRules.isValidSequence(dragCards) else { return nil }

@@ -301,6 +301,7 @@ extension FreeCellGameView {
     @ToolbarContentBuilder
     var fcSmallZoneToolbarContent: some ToolbarContent {
         let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
+        // Back — placed at the back anchor (moves away from PiP)
         ToolbarItem(placement: Self.fcToolbarPlacement(for: anchors.back)) {
             Button { dismiss() } label: {
                 Image(systemName: "chevron.left")
@@ -308,11 +309,18 @@ extension FreeCellGameView {
             }
             .foregroundStyle(theme.colors.textPrimary)
         }
+        // Undo — also at the back anchor alongside back, mirrors other games' restart button
+        ToolbarItem(placement: Self.fcToolbarPlacement(for: anchors.back)) {
+            Button { vm.undo() } label: {
+                Image(systemName: "arrow.uturn.backward")
+                    .font(.system(size: 17, weight: .medium))
+            }
+            .foregroundStyle(vm.canUndo ? theme.colors.accentPrimary : theme.colors.textSecondary)
+            .disabled(!vm.canUndo)
+        }
+        // Settings menu — no undo here; it has its own button above
         ToolbarItem(placement: Self.fcToolbarPlacement(for: anchors.settings)) {
             Menu {
-                Button("Undo") { vm.undo() }
-                    .disabled(!vm.canUndo)
-                Divider()
                 Button("New Random Game") {
                     vm.startNewGame(mode: .random(vm.difficulty ?? .easy))
                 }

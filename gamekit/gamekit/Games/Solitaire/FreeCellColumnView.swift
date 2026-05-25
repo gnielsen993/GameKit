@@ -15,10 +15,16 @@ struct FreeCellColumnView: View {
     private var radius:     CGFloat { cardWidth * 0.10 }
 
     private var fanOffset: CGFloat {
-        let base: CGFloat = cardWidth * 0.46
-        let floor: CGFloat = cardWidth * 0.20
-        guard cards.count > 8 else { return base }
-        return max(floor, base - CGFloat(cards.count - 8) * 2.5)
+        FreeCellColumnView.fanOffset(for: cards.count, cardWidth: cardWidth)
+    }
+
+    // Shared by FreeCellGameView.computeSource so visual layout and hit-detection
+    // stay in sync — both call this, neither hard-codes its own formula.
+    static func fanOffset(for count: Int, cardWidth: CGFloat) -> CGFloat {
+        let base: CGFloat  = cardWidth * 0.46
+        let floor: CGFloat = cardWidth * 0.33   // raised from 0.20 — keeps rank/suit readable
+        guard count > 8 else { return base }
+        return max(floor, base - CGFloat(count - 8) * 1.5)   // gentler than old 2.5
     }
 
     private var columnHeight: CGFloat {

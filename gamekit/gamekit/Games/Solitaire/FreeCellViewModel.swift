@@ -39,6 +39,7 @@ final class FreeCellViewModel {
     private(set) var rejectTick  = 0
 
     private(set) var isAutoCompleting = false
+    private(set) var hintText: String? = nil
 
     // Stats write-side firewall
     var gameStats: GameStats?
@@ -49,6 +50,7 @@ final class FreeCellViewModel {
     // MARK: - Private
 
     private var history: [FreeCellMove] = []
+    private var rejectStreak = 0
 
     // MARK: - Init
 
@@ -133,7 +135,8 @@ final class FreeCellViewModel {
 
     var canUndo: Bool { !history.isEmpty && gameState == .playing }
 
-    func clearSelection() { selection = nil }
+    func clearSelection() { selection = nil; rejectStreak = 0 }
+    func dismissHint()    { hintText = nil }
 
     @discardableResult
     func applyDragDrop(from sel: FreeCellSelection, to dest: FreeCellDest) -> Bool {
@@ -159,10 +162,20 @@ final class FreeCellViewModel {
             }
         } else {
             guard FreeCellRules.isValidSequence(tappedCards), canPickUp(cards: tappedCards) else {
-                rejectTick += 1; return
+                rejectTick  += 1
+                rejectStreak += 1
+                if rejectStreak >= 5 {
+                    let limit = FreeCellRules.maxMoveable(board: board, toEmptyColumn: false)
+                    hintText = tappedCards.count > limit
+                        ? "Need \(tappedCards.count) free cells — only \(limit) available"
+                        : "Cards are out of sequence"
+                    rejectStreak = 0
+                }
+                return
             }
-            selection  = .column(colIdx: colIdx, startCardIdx: cardIdx)
-            selectTick += 1
+            selection    = .column(colIdx: colIdx, startCardIdx: cardIdx)
+            selectTick  += 1
+            rejectStreak = 0
         }
     }
 
@@ -337,8 +350,10 @@ final class FreeCellViewModel {
         }
 
         history.append(FreeCellMove(cards: cards, source: source, destination: dest, boardBefore: snap))
-        selection = nil
-        dropTick += 1
+        selection    = nil
+        rejectStreak = 0
+        hintText     = nil
+        dropTick    += 1
         checkTerminalState()
         if gameState == .playing { saveCurrentState() }
     }
