@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Video Mode
 status: in_progress
-stopped_at: Phase 13 (banner) shipped — Sudoku phases pending (outside party designing, awaiting deliverables)
-last_updated: "2026-05-14T22:30:00.000Z"
+stopped_at: context exhaustion at 75% (2026-05-24)
+last_updated: "2026-05-24T07:14:41.951Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 15
-  completed_phases: 14
-  total_plans: 86
-  completed_plans: 86
-  percent: 93
+  completed_phases: 13
+  total_plans: 91
+  completed_plans: 84
+  percent: 87
 ---
 
 # Project State
@@ -34,6 +34,7 @@ Progress: [█████████░] 93% (v1.2 reopened with Sudoku scope 
 **Phase 13 — what shipped:** Shared `VideoModeBanner` primitive (Core/) consumed by Mines + Merge + Nonogram. Banner is a centered card with 2-1 button layout (primary CTA + change-X on top row, "View board" dismiss below). Ships on BOTH Video Mode On AND Off (user override during execution — deprecates the v1.x full-screen EndStateCard from the render path). Haptics / SFX / animation gating routes through existing SettingsStore toggles + accessibilityReduceMotion per v1.0 05-03 + 05-06 locks.
 
 **Design deviations from 08-BANNER-PLACEMENT.md (recorded in `Docs/releases/v1.2.md`):**
+
 - Original "edge-docked pill opposite PiP corner" overridden → centered card
 - Single-action D-02 lock relaxed → 2-1 button layout (Restart + Change-X + View board)
 - Off-path byte-identity D-13-OFFPATH relaxed → banner unified across all modes
@@ -404,8 +405,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-14T19:20:06.879Z
-Stopped at: Completed 12.1-01-PLAN.md
+Last session: 2026-05-24T07:14:41.943Z
+Stopped at: context exhaustion at 75% (2026-05-24)
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z

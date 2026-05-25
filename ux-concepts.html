@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameDrawer — UX Concepts</title>
+<style>
+:root {
+  --bg: #F2EDE3; --surface: #FFFFFF; --surface2: #F5F1EB;
+  --accent: #C0392B; --text: #1C1C1E; --text2: #6C6C70;
+  --border: #D1D1D6; --shadow: rgba(0,0,0,0.10);
+  --sudoku: #8E44AD; --mines: #C0392B; --nono: #27AE60;
+  --merge: #2980B9; --bezel: #1C1C1E;
+  --pw: 272px; --ph: 540px; --pr: 34px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  background: #E8E4DC; min-height: 100vh; color: var(--text); }
+
+/* ── Nav ── */
+.topnav { background: var(--bezel); padding: 0 20px; display: flex;
+  align-items: center; gap: 2px; position: sticky; top: 0; z-index: 100; }
+.topnav h1 { color: #fff; font-size: 13px; font-weight: 700; padding: 13px 0;
+  margin-right: 14px; letter-spacing: -0.2px; white-space: nowrap; }
+.tbtn { background: none; border: none; border-bottom: 2px solid transparent;
+  color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 600; padding: 13px 12px;
+  cursor: pointer; transition: color .15s, border-color .15s; white-space: nowrap; }
+.tbtn.active { color: #fff; border-bottom-color: var(--accent); }
+
+/* ── Layout ── */
+main { padding: 28px 20px; max-width: 1060px; margin: 0 auto; }
+.tab { display: none; } .tab.active { display: block; }
+.sh { font-size: 20px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 4px; }
+.ss { font-size: 13px; color: var(--text2); margin-bottom: 24px; line-height: 1.5; }
+.row { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+.col { display: flex; flex-direction: column; align-items: center; gap: 10px;
+  flex: 1; min-width: 240px; }
+.clabel { font-size: 11px; font-weight: 700; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--text2); }
+.clabel.p { color: var(--accent); }
+
+/* ── Phone ── */
+.phone { width: var(--pw); height: var(--ph); background: var(--bezel);
+  border-radius: var(--pr); padding: 11px; flex-shrink: 0;
+  box-shadow: 0 18px 50px rgba(0,0,0,.28), 0 0 0 1px rgba(255,255,255,.04); }
+.screen { width: 100%; height: 100%; background: var(--bg);
+  border-radius: calc(var(--pr) - 7px); overflow: hidden;
+  display: flex; flex-direction: column; }
+
+/* ── Status bar ── */
+.sbar { height: 40px; padding: 12px 16px 0; display: flex;
+  justify-content: space-between; align-items: center; flex-shrink: 0; }
+.sbar-t { font-size: 12px; font-weight: 700; letter-spacing: -.3px; }
+.sbar-r { display: flex; gap: 5px; align-items: center; font-size: 11px; }
+
+/* ── Navbar ── */
+.nbar { padding: 3px 14px 10px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0; }
+.nbar-title { font-size: 19px; font-weight: 700; letter-spacing: -.4px; }
+.nbar-btn { width: 30px; height: 30px; background: var(--surface); border-radius: 9px;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+  box-shadow: 0 1px 3px var(--shadow); }
+
+/* ── Scroll area ── */
+.scr { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 6px 0 14px;
+  scrollbar-width: none; }
+.scr::-webkit-scrollbar { display: none; }
+
+/* ── Game rows ── */
+.grow { margin: 0 10px 5px; background: var(--surface); border-radius: 14px;
+  overflow: hidden; box-shadow: 0 1px 3px var(--shadow); }
+.ghdr { display: flex; align-items: center; gap: 9px; padding: 11px 12px;
+  cursor: pointer; user-select: none; -webkit-user-select: none; transition: background .1s; }
+.ghdr:active { background: var(--surface2); }
+.gicon { width: 34px; height: 34px; border-radius: 9px; display: flex;
+  align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.ginfo { flex: 1; }
+.gname { font-size: 14px; font-weight: 600; letter-spacing: -.2px; }
+.gsub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.chev { font-size: 14px; color: var(--text2); transition: transform .25s cubic-bezier(.34,1.56,.64,1); }
+.grow.open .chev { transform: rotate(90deg); }
+
+/* ── Drawer ── */
+.cavity { max-height: 0; overflow: hidden;
+  transition: max-height .32s cubic-bezier(.4,0,.2,1); background: #1C1C1E; }
+.grow.open .cavity { max-height: 180px; }
+.cinner { padding: 11px 12px 13px; }
+.clbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4);
+  letter-spacing: .8px; text-transform: uppercase; margin-bottom: 9px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { padding: 6px 12px; border-radius: 18px; border: 1.5px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.07); color: rgba(255,255,255,.85); font-size: 11px;
+  font-weight: 600; cursor: pointer; transition: all .15s; user-select: none; }
+.chip:hover { background: rgba(255,255,255,.13); }
+.chip:active { transform: scale(.95); }
+.chip.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip.mode { padding: 7px 15px; border-radius: 20px; }
+
+/* ── Two-step ── */
+.bc { display: flex; align-items: center; gap: 5px; margin-bottom: 9px; }
+.bcbtn { background: none; border: none; color: rgba(255,255,255,.5); font-size: 11px;
+  font-weight: 500; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 2px; }
+.bcbtn:hover { color: rgba(255,255,255,.8); }
+.bcsep { color: rgba(255,255,255,.25); font-size: 10px; }
+.bclbl { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.55); }
+
+/* ── Upcoming ── */
+.ustrip { margin: 3px 10px 0; display: flex; align-items: center; gap: 7px; padding: 9px 12px; }
+.ubadge { font-size: 10px; font-weight: 700; color: var(--text2); padding: 3px 8px;
+  background: var(--surface); border-radius: 8px; box-shadow: 0 1px 3px var(--shadow); }
+.utxt { font-size: 11px; color: var(--text2); }
+
+/* ════════════════════════════════
+   TAB 2 — Sudoku Toggle
+   ════════════════════════════════ */
+.concept-tabs { display: flex; gap: 0; background: var(--surface);
+  border-radius: 12px; padding: 3px; margin-bottom: 20px;
+  box-shadow: 0 1px 4px var(--shadow); align-self: flex-start; }
+.ctab { padding: 8px 18px; border-radius: 9px; font-size: 13px; font-weight: 600;
+  cursor: pointer; color: var(--text2); transition: all .18s; }
+.ctab.active { background: var(--accent); color: #fff; }
+
+.sudoku-screen { display: flex; flex-direction: column; height: 100%; padding: 0 8px 8px; }
+.snav { display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 6px; }
+.snav-title { font-size: 15px; font-weight: 700; }
+.snav-btn { width: 30px; height: 30px; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; cursor: pointer; border-radius: 8px; color: var(--text); }
+.snav-btn:active { background: rgba(0,0,0,.07); }
+
+.irow { display: flex; justify-content: space-between; align-items: center;
+  padding: 3px 2px; flex-shrink: 0; }
+.tchip { background: var(--surface); border-radius: 9px; padding: 4px 9px;
+  font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 3px var(--shadow); }
+.lchip { background: var(--surface); border-radius: 9px; padding: 4px 9px;
+  font-size: 11px; font-weight: 700; box-shadow: 0 1px 3px var(--shadow); color: var(--accent); }
+
+.mpill { display: flex; background: var(--surface); border-radius: 18px; padding: 2px;
+  gap: 2px; align-self: center; margin: 5px 0; box-shadow: 0 1px 4px var(--shadow); flex-shrink: 0; }
+.mseg { padding: 5px 13px; border-radius: 14px; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all .18s; color: var(--text2); white-space: nowrap; }
+.mseg.act { background: var(--accent); color: #fff; }
+
+.mbadge { align-self: center; font-size: 10px; font-weight: 700; padding: 3px 9px;
+  border-radius: 9px; margin: 2px 0; transition: all .2s; flex-shrink: 0; }
+.mbadge.val { background: var(--surface); color: var(--text2); box-shadow: 0 1px 3px var(--shadow); }
+.mbadge.nts { background: rgba(142,68,173,.12); color: var(--sudoku); }
+
+/* ── Board ── */
+.bwrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 4px 0; }
+.board { display: grid; grid-template-columns: repeat(9,1fr);
+  grid-template-rows: repeat(9,1fr); width: 100%; aspect-ratio: 1;
+  border: 2px solid var(--text); background: var(--surface); position: relative;
+  cursor: pointer; }
+.board::before { content: '';
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image:
+    linear-gradient(to right, transparent calc(33.33% - 1px), rgba(28,28,30,.75) calc(33.33%),rgba(28,28,30,.75) calc(33.33% + 1px), transparent calc(33.33% + 1px)),
+    linear-gradient(to right, transparent calc(66.66% - 1px), rgba(28,28,30,.75) calc(66.66%),rgba(28,28,30,.75) calc(66.66% + 1px), transparent calc(66.66% + 1px)),
+    linear-gradient(to bottom, transparent calc(33.33% - 1px), rgba(28,28,30,.75) calc(33.33%),rgba(28,28,30,.75) calc(33.33% + 1px), transparent calc(33.33% + 1px)),
+    linear-gradient(to bottom, transparent calc(66.66% - 1px), rgba(28,28,30,.75) calc(66.66%),rgba(28,28,30,.75) calc(66.66% + 1px), transparent calc(66.66% + 1px)); }
+.cell { border-right: .5px solid rgba(100,100,100,.22); border-bottom: .5px solid rgba(100,100,100,.22);
+  display: flex; align-items: center; justify-content: center; font-size: 9px;
+  font-weight: 600; position: relative; transition: background .1s; user-select: none; }
+.cell:nth-child(9n) { border-right: none; }
+.cell:nth-child(n+73) { border-bottom: none; }
+.cell.given { color: var(--text); font-weight: 800; }
+.cell.placed { color: var(--sudoku); }
+.cell.sel { background: rgba(142,68,173,.18) !important; }
+.cell.peer { background: rgba(142,68,173,.06); }
+.cell.same { background: rgba(142,68,173,.13); }
+.cell.note { font-size: 4.5px; color: var(--text2); }
+.noteg { display: grid; grid-template-columns: 1fr 1fr 1fr;
+  width: 100%; height: 100%; padding: 1px; }
+.noteg span { display: flex; align-items: center; justify-content: center;
+  font-size: 4px; font-weight: 700; color: var(--text2); }
+.noteg span.hl { color: var(--accent); font-size: 4.5px; }
+
+/* ── Numpad ── */
+.npad { display: grid; grid-template-columns: repeat(9,1fr); gap: 2px;
+  flex-shrink: 0; padding: 3px 0; }
+.npad10 { grid-template-columns: repeat(5,1fr) !important; }
+.nb { aspect-ratio: 1; background: var(--surface); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+  font-weight: 700; cursor: pointer; box-shadow: 0 1px 3px var(--shadow);
+  transition: all .12s; user-select: none; -webkit-user-select: none;
+  position: relative; overflow: hidden; }
+.nb:active { transform: scale(.92); }
+.nb.notes-on { background: var(--sudoku); color: #fff; }
+.nb.pencil { font-size: 11px; color: var(--text2); }
+.nb.pencil.on { background: var(--sudoku); color: #fff; }
+.nb .hring { position: absolute; inset: 0; border-radius: 7px;
+  border: 2px solid var(--sudoku); opacity: 0; transition: opacity .1s; pointer-events: none; }
+
+/* hold progress */
+.nb .hprog { position: absolute; bottom: 0; left: 0; height: 2px;
+  background: var(--sudoku); width: 0%; transition: none; border-radius: 0 0 7px 7px; }
+
+/* concept descriptions */
+.cdesc { max-width: var(--pw); width: 100%; background: var(--surface);
+  border-radius: 12px; padding: 13px; box-shadow: 0 2px 8px var(--shadow); }
+.cdesc h3 { font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+.cdesc p { font-size: 11px; color: var(--text2); line-height: 1.55; }
+.cdesc .pro { color: #27AE60; font-size: 11px; margin-top: 6px; }
+.cdesc .con { color: var(--accent); font-size: 11px; }
+
+/* ════════════════════════════════
+   TAB 3 — Mines / Nonogram
+   ════════════════════════════════ */
+.gsection { margin-bottom: 32px; }
+.gsection h2 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.gsection p { font-size: 12px; color: var(--text2); margin-bottom: 16px; }
+
+.game-screen { display: flex; flex-direction: column; height: 100%; padding: 0 8px 8px; }
+
+.gpill { display: flex; background: rgba(0,0,0,.06); border-radius: 18px; padding: 2px;
+  gap: 1px; align-self: center; margin: 4px 0 6px; flex-shrink: 0; }
+.gseg { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all .18s; color: var(--text2); }
+.gseg.act { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px var(--shadow); }
+
+.hint { font-size: 10px; color: var(--text2); text-align: center; margin: 3px 0 5px;
+  opacity: .8; line-height: 1.4; }
+
+/* Mines board */
+.mboard { display: grid; gap: 2.5px; flex: 1; padding: 4px 2px; align-self: stretch; }
+.mcell { background: var(--surface); border-radius: 4px; display: flex;
+  align-items: center; justify-content: center; font-size: 11px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 1px 2px var(--shadow); transition: all .12s;
+  aspect-ratio: 1; user-select: none; -webkit-user-select: none; }
+.mcell.rev { background: var(--bg); box-shadow: inset 0 1px 2px rgba(0,0,0,.07); }
+.mcell.flag { color: var(--accent); background: rgba(192,57,43,.08); }
+.mcell.lph { outline: 2px solid var(--accent); outline-offset: -2px; }
+.mcell.boom { background: rgba(192,57,43,.15); color: var(--accent); }
+.m1{color:#2980B9} .m2{color:#27AE60} .m3{color:#C0392B} .m4{color:#8E44AD}
+
+/* Nonogram */
+.nono-wrap { flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 4px 0; }
+.nono-tbl { display: flex; flex-direction: column; }
+.nono-tr { display: flex; align-items: center; gap: 2px; margin-bottom: 2px; }
+.nono-rc { font-size: 7px; font-weight: 700; color: var(--text2); min-width: 14px;
+  text-align: right; padding-right: 3px; }
+.ncell { width: 20px; height: 20px; background: var(--surface); border-radius: 3px;
+  border: 1px solid var(--border); display: flex; align-items: center;
+  justify-content: center; font-size: 9px; cursor: pointer; transition: all .12s;
+  user-select: none; -webkit-user-select: none; }
+.ncell.filled { background: var(--text); border-color: var(--text); }
+.ncell.marked { background: rgba(192,57,43,.08); border-color: var(--accent); color: var(--accent); }
+.ncell.lph { outline: 2px solid var(--accent); outline-offset: -1px; }
+.nono-hdr { display: flex; margin-bottom: 2px; padding-left: 17px; gap: 2px; }
+.nono-cc { font-size: 7px; font-weight: 700; color: var(--text2); width: 20px;
+  text-align: center; line-height: 1.3; }
+
+/* ── Responsive ── */
+@media(max-width:700px) {
+  .row { flex-direction: column; align-items: center; }
+  :root { --pw: 252px; --ph: 504px; }
+  main { padding: 16px 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <h1>GameDrawer UX</h1>
+  <button class="tbtn active" onclick="switchTab('home',this)">Home Drawer</button>
+  <button class="tbtn" onclick="switchTab('sudoku',this)">Sudoku Toggle</button>
+  <button class="tbtn" onclick="switchTab('games',this)">Mines / Nonogram</button>
+</div>
+
+<main>
+
+<!-- ═══════════ TAB 1: Home Drawer ═══════════ -->
+<div id="home" class="tab active">
+  <div class="sh">Home Screen Drawer</div>
+  <div class="ss">Current: difficulty chips appear immediately. Proposed: Sudoku &amp; Nonogram show mode first (Free vs Lives), then difficulty chips.</div>
+
+  <div class="row">
+    <!-- CURRENT -->
+    <div class="col">
+      <div class="clabel">Current</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="sbar"><span class="sbar-t">9:41</span><span class="sbar-r">●●● ≋ 🔋</span></div>
+          <div class="nbar"><div class="nbar-title">GameDrawer</div><div class="nbar-btn">⚙</div></div>
+          <div class="scr">
+            <div class="grow" id="c-mines">
+              <div class="ghdr" onclick="toggleRow('c-mines','c')">
+                <div class="gicon" style="background:rgba(192,57,43,.1)">💣</div>
+                <div class="ginfo"><div class="gname">Minesweeper</div><div class="gsub">Classic — tap to reveal</div></div>
+                <div class="chev">›</div>
+              </div>
+              <div class="cavity"><div class="cinner">
+                <div class="clbl">Difficulty</div>
+                <div class="chips" id="cc-mines">
+                  <div class="chip" onclick="selChip(this,'cc-mines')">Beginner</div>
+                  <div class="chip" onclick="selChip(this,'cc-mines')">Intermediate</div>
+                  <div class="chip" onclick="selChip(this,'cc-mines')">Expert</div>
+                </div>
+              </div></div>
+            </div>
+            <div class="grow" id="c-merge">
+              <div class="ghdr" onclick="toggleRow('c-merge','c')">
+                <div class="gicon" style="background:rgba(41,128,185,.1)">🔢</div>
+                <div class="ginfo"><div class="gname">Merge</div><div class="gsub">Slide tiles, reach 2048</div></div>
+                <div class="chev">›</div>
+              </div>
+              <div class="cavity"><div class="cinner">
+                <div class="clbl">Board size</div>
+                <div class="chips" id="cc-merge">
+                  <div class="chip" onclick="selChip(this,'cc-merge')">4×4</div>
+                  <div class="chip" onclick="selChip(this,'cc-merge')">5×5</div>
+                  <div class="chip" onclick="selChip(this,'cc-merge')">6×6</div>
+                </div>
+              </div></div>
+            </div>
+            <div class="grow" id="c-nono">
+              <div class="ghdr" onclick="toggleRow('c-nono','c')">
+                <div class="gicon" style="background:rgba(39,174,96,.1)">🟩</div>
+                <div class="ginfo"><div class="gname">Nonogram</div><div class="gsub">Pixel logic puzzles</div></div>
+                <div class="chev">›</div>
+              </div>
+              <div class="cavity"><div class="cinner">
+                <div class="clbl">Difficulty</div>
+                <div class="chips" id="cc-nono">
+                  <div class="chip" onclick="selChip(this,'cc-nono')">Easy</div>
+                  <div class="chip" onclick="selChip(this,'cc-nono')">Medium</div>
+                  <div class="chip" onclick="selChip(this,'cc-nono')">Hard</div>
+                </div>
+              </div></div>
+            </div>
+            <div class="grow" id="c-sudoku">
+              <div class="ghdr" onclick="toggleRow('c-sudoku','c')">
+                <div class="gicon" style="background:rgba(142,68,173,.1)">9️⃣</div>
+                <div class="ginfo"><div class="gname">Sudoku</div><div class="gsub">Fill the grid logically</div></div>
+                <div class="chev">›</div>
+              </div>
+              <div class="cavity"><div class="cinner">
+                <div class="clbl">Difficulty</div>
+                <div class="chips" id="cc-sudoku">
+                  <div class="chip" onclick="selChip(this,'cc-sudoku')">Easy</div>
+                  <div class="chip" onclick="selChip(this,'cc-sudoku')">Medium</div>
+                  <div class="chip" onclick="selChip(this,'cc-sudoku')">Hard</div>
+                  <div class="chip" onclick="selChip(this,'cc-sudoku')">Expert</div>
+                </div>
+              </div></div>
+            </div>
+            <div class="ustrip"><div class="ubadge">5 coming</div><div class="utxt">Word Grid · Solitaire · Flow…</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cdesc" style="max-width:var(--pw)">
+        <h3>Current</h3>
+        <p>Difficulty is the only dimension. Mode (Free vs Lives) is hidden in settings — player might never find it.</p>
+        <p class="con">✗ Lives mode is effectively invisible to new users</p>
+      </div>
+    </div>
+
+    <!-- PROPOSED -->
+    <div class="col">
+      <div class="clabel p">Proposed</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="sbar"><span class="sbar-t">9:41</span><span class="sbar-r">●●● ≋ 🔋</span></div>
+          <div class="nbar"><div class="nbar-title">GameDrawer</div><div class="nbar-btn">⚙</div></div>
+          <div class="scr">
+            <div class="grow" id="p-mines">
+              <div class="ghdr" onclick="toggleRow('p-mines','p')">
+                <div class="gicon" style="background:rgba(192,57,43,.1)">💣</div>
+                <div class="ginfo"><div class="gname">Minesweeper</div><div class="gsub">Classic — tap to reveal</div></div>
+                <div class="chev">›</div>
+              </div>
+              <div class="cavity"><div class="cinner">
+                <div class="clbl">Difficulty</div>
+                <div class="chips" id="cp-mines">
+                  <div class="chip" onclick="selChip(this,'cp-mines')">Beginner</div>
+                  <div class="chip" onclick="selChip(this,'cp-mines')">Intermediate</div>
+                  <div class="chip" onclick="selChip(this,'cp-mines')">Expert</div>
+                </div>
+              </div></div>
+            </div>
+            <div class="grow" id="p-merge">
+              <div class="ghdr" onclick="toggleRow('p-merge','p')">
+                <div class="gicon" style="background:rgba(41,128,185,.1)">🔢</div>
+                <div class="ginfo"><div class="gname">Merge</div><div class="gsub">Slide tiles, reach 2048</div></div>
+                <div class="chev">›</div>
+              </div>
+              <div class="cavity"><div class="cinner">
+                <div class="clbl">Board size</div>
+                <div class="chips" id="cp-merge">
+                  <div class="chip" onclick="selChip(this,'cp-merge')">4×4</div>
+                  <div class="chip" onclick="selChip(this,'cp-merge')">5×5</div>
+                  <div class="chip" onclick="selChip(this,'cp-merge')">6×6</div>
+                </div>
+              </div></div>
+            </div>
+            <!-- Nonogram two-step -->
+            <div class="grow" id="p-nono">
+              <div class="ghdr" onclick="toggleRow('p-nono','p')">
+                <div class="gicon" style="background:rgba(39,174,96,.1)">🟩</div>
+                <div class="ginfo"><div class="gname">Nonogram</div><div class="gsub">Pixel logic puzzles</div></div>
+                <div class="chev">›</div>
+              </div>
+              <div class="cavity"><div class="cinner" id="p-nono-inner">
+                <div id="p-nono-s1">
+                  <div class="clbl">Mode</div>
+                  <div class="chips">
+                    <div class="chip mode" onclick="step2('p-nono','Free')">Free</div>
+                    <div class="chip mode" onclick="step2('p-nono','Lives ❤️')">Lives ❤️</div>
+                  </div>
+                </div>
+                <div id="p-nono-s2" style="display:none">
+                  <div class="bc">
+                    <button class="bcbtn" onclick="back('p-nono')">‹ Mode</button>
+                    <span class="bcsep">›</span>
+                    <span class="bclbl" id="p-nono-ml"></span>
+                  </div>
+                  <div class="clbl">Difficulty</div>
+                  <div class="chips" id="cp-nono-d">
+                    <div class="chip" onclick="selChip(this,'cp-nono-d')">Easy</div>
+                    <div class="chip" onclick="selChip(this,'cp-nono-d')">Medium</div>
+                    <div class="chip" onclick="selChip(this,'cp-nono-d')">Hard</div>
+                  </div>
+                </div>
+              </div></div>
+            </div>
+            <!-- Sudoku two-step -->
+            <div class="grow" id="p-sudoku">
+              <div class="ghdr" onclick="toggleRow('p-sudoku','p')">
+                <div class="gicon" style="background:rgba(142,68,173,.1)">9️⃣</div>
+                <div class="ginfo"><div class="gname">Sudoku</div><div class="gsub">Fill the grid logically</div></div>
+                <div class="chev">›</div>
+              </div>
+              <div class="cavity"><div class="cinner" id="p-sudoku-inner">
+                <div id="p-sudoku-s1">
+                  <div class="clbl">Mode</div>
+                  <div class="chips">
+                    <div class="chip mode" onclick="step2('p-sudoku','Free')">Free</div>
+                    <div class="chip mode" onclick="step2('p-sudoku','Lives ❤️')">Lives ❤️</div>
+                  </div>
+                </div>
+                <div id="p-sudoku-s2" style="display:none">
+                  <div class="bc">
+                    <button class="bcbtn" onclick="back('p-sudoku')">‹ Mode</button>
+                    <span class="bcsep">›</span>
+                    <span class="bclbl" id="p-sudoku-ml"></span>
+                  </div>
+                  <div class="clbl">Difficulty</div>
+                  <div class="chips" id="cp-sudoku-d">
+                    <div class="chip" onclick="selChip(this,'cp-sudoku-d')">Easy</div>
+                    <div class="chip" onclick="selChip(this,'cp-sudoku-d')">Medium</div>
+                    <div class="chip" onclick="selChip(this,'cp-sudoku-d')">Hard</div>
+                    <div class="chip" onclick="selChip(this,'cp-sudoku-d')">Expert</div>
+                  </div>
+                </div>
+              </div></div>
+            </div>
+            <div class="ustrip"><div class="ubadge">5 coming</div><div class="utxt">Word Grid · Solitaire · Flow…</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cdesc" style="max-width:var(--pw)">
+        <h3>Two-step drawer</h3>
+        <p>Mode is the first choice — exposes Lives to every new player. Breadcrumb lets you correct your mode pick without closing the drawer.</p>
+        <p class="pro">✓ Lives mode discoverable at launch point<br>✓ Back arrow without closing drawer</p>
+      </div>
+    </div>
+  </div><!-- /row -->
+</div><!-- /home tab -->
+
+<!-- ═══════════ TAB 2: Sudoku Toggle ═══════════ -->
+<div id="sudoku" class="tab">
+  <div class="sh">Sudoku — In-Game Toggle</div>
+  <div class="ss">Three concepts for switching between Value mode and Notes mode. Tap cells and numpad buttons to interact.</div>
+
+  <div style="display:flex;gap:0;background:var(--surface);border-radius:12px;padding:3px;margin-bottom:24px;box-shadow:0 1px 4px var(--shadow);align-self:flex-start;display:inline-flex">
+    <div class="ctab active" id="st-cur" onclick="sConcept('cur')">Current Pill</div>
+    <div class="ctab" id="st-hold" onclick="sConcept('hold')">Hold for Notes</div>
+    <div class="ctab" id="st-pad" onclick="sConcept('pad')">Pencil in Pad</div>
+  </div>
+
+  <div class="row" style="justify-content:center">
+
+    <!-- CONCEPT PHONE (single phone, swaps) -->
+    <div class="col">
+      <div class="phone">
+        <div class="screen">
+          <div class="sbar"><span class="sbar-t">9:41</span><span class="sbar-r">●●● ≋ 🔋</span></div>
+          <div class="sudoku-screen">
+            <div class="snav">
+              <div class="snav-btn">‹</div>
+              <div class="snav-title">Sudoku</div>
+              <div class="snav-btn" style="font-size:11px">≡</div>
+            </div>
+
+            <!-- Info row -->
+            <div class="irow">
+              <div class="tchip" id="s-timer">0:42</div>
+              <div class="lchip" id="s-lives" style="display:none">❤️❤️❤️</div>
+            </div>
+
+            <!-- Mode pill (current only) -->
+            <div class="mpill" id="cur-pill">
+              <div class="mseg act" id="seg-val" onclick="sPillMode('val')">Value</div>
+              <div class="mseg" id="seg-nts" onclick="sPillMode('nts')">Notes</div>
+            </div>
+
+            <!-- Mode badge (hold/pad) -->
+            <div class="mbadge val" id="mode-badge" style="display:none">Value mode</div>
+
+            <!-- Board -->
+            <div class="bwrap"><div class="board" id="s-board"></div></div>
+
+            <!-- Numpad — 9 wide (cur/hold) or 10 btn (pad) -->
+            <div class="npad" id="s-npad"></div>
+
+            <!-- Hint text -->
+            <div class="hint" id="s-hint"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="col" style="max-width:320px;align-self:flex-start;margin-top:60px">
+      <div class="cdesc" style="max-width:320px;width:100%" id="concept-desc">
+        <h3>Current — Toggle Pill</h3>
+        <p>A segmented pill above the numpad lets you toggle between Value and Notes mode. Tap either segment to switch.</p>
+        <p class="con">✗ Takes up permanent screen space<br>✗ Easy to forget which mode is active mid-game<br>✗ Truncates with Lives chip visible</p>
+        <p class="pro">✓ Always-visible state indicator<br>✓ One tap to switch</p>
+      </div>
+      <div class="cdesc" style="max-width:320px;width:100%;margin-top:12px" id="concept-try">
+        <h3 style="color:var(--sudoku)">Try it →</h3>
+        <p id="concept-try-text">Tap a cell to select it, then tap numbers to place values. Switch to Notes with the pill above.</p>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /sudoku tab -->
+
+<!-- ═══════════ TAB 3: Mines / Nonogram ═══════════ -->
+<div id="games" class="tab">
+  <div class="sh">Mines &amp; Nonogram — Long-Press</div>
+  <div class="ss">Current: a toggle pill switches between primary and secondary actions. Proposed: tap = primary, hold = secondary. Try both side by side.</div>
+
+  <!-- MINES -->
+  <div class="gsection">
+    <h2>Minesweeper</h2>
+    <p>Tap = reveal. Long-press = flag/unflag. The toggle pill disappears — you always reveal by default.</p>
+    <div class="row">
+      <!-- Current mines -->
+      <div class="col">
+        <div class="clabel">Current</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sbar"><span class="sbar-t">9:41</span><span class="sbar-r">●●● ≋ 🔋</span></div>
+            <div class="game-screen">
+              <div class="snav" style="padding:4px 4px 4px">
+                <div class="snav-btn">‹</div>
+                <div class="snav-title">Minesweeper</div>
+                <div class="snav-btn">⟳</div>
+              </div>
+              <div class="irow"><div class="tchip">1:23</div><div class="tchip">💣 12</div></div>
+              <div class="gpill" id="m-cur-pill">
+                <div class="gseg act" id="m-seg-r" onclick="mToggle('reveal')">Reveal</div>
+                <div class="gseg" id="m-seg-f" onclick="mToggle('flag')">Flag 🚩</div>
+              </div>
+              <div class="mboard" style="grid-template-columns:repeat(7,1fr)" id="m-cur-board"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Proposed mines (long-press) -->
+      <div class="col">
+        <div class="clabel p">Proposed — Long Press</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sbar"><span class="sbar-t">9:41</span><span class="sbar-r">●●● ≋ 🔋</span></div>
+            <div class="game-screen">
+              <div class="snav" style="padding:4px 4px 4px">
+                <div class="snav-btn">‹</div>
+                <div class="snav-title">Minesweeper</div>
+                <div class="snav-btn">⟳</div>
+              </div>
+              <div class="irow"><div class="tchip">1:23</div><div class="tchip">💣 12</div></div>
+              <div class="hint" style="margin:2px 0 5px">Tap to reveal · Hold to flag 🚩</div>
+              <div class="mboard" style="grid-template-columns:repeat(7,1fr);margin-top:2px" id="m-prop-board"></div>
+            </div>
+          </div>
+        </div>
+        <div class="cdesc" style="max-width:var(--pw)">
+          <h3>Long-press to flag</h3>
+          <p>No mode to manage. The most natural mapping: tap the cell you want to reveal, hold the cell you're uncertain about.</p>
+          <p class="pro">✓ Mirrors native iOS patterns (long-press in Files, Photos)<br>✓ Frees layout space — no pill needed</p>
+          <p class="con">✗ Less discoverable than a visible toggle<br>✗ Flagging requires hold patience</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NONOGRAM -->
+  <div class="gsection">
+    <h2>Nonogram</h2>
+    <p>Tap = fill cell black. Long-press = mark cell with ×. No mode pill needed.</p>
+    <div class="row">
+      <!-- Current nonogram -->
+      <div class="col">
+        <div class="clabel">Current</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sbar"><span class="sbar-t">9:41</span><span class="sbar-r">●●● ≋ 🔋</span></div>
+            <div class="game-screen">
+              <div class="snav" style="padding:4px 4px 4px">
+                <div class="snav-btn">‹</div>
+                <div class="snav-title">Nonogram</div>
+                <div class="snav-btn">⟳</div>
+              </div>
+              <div class="irow"><div class="tchip">2:05</div></div>
+              <div class="gpill" id="n-cur-pill">
+                <div class="gseg act" id="n-seg-f" onclick="nToggle('fill')">Fill</div>
+                <div class="gseg" id="n-seg-m" onclick="nToggle('mark')">Mark ×</div>
+              </div>
+              <div class="nono-wrap" id="n-cur-nono"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Proposed nonogram -->
+      <div class="col">
+        <div class="clabel p">Proposed — Long Press</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sbar"><span class="sbar-t">9:41</span><span class="sbar-r">●●● ≋ 🔋</span></div>
+            <div class="game-screen">
+              <div class="snav" style="padding:4px 4px 4px">
+                <div class="snav-btn">‹</div>
+                <div class="snav-title">Nonogram</div>
+                <div class="snav-btn">⟳</div>
+              </div>
+              <div class="irow"><div class="tchip">2:05</div></div>
+              <div class="hint" style="margin:2px 0 5px">Tap to fill · Hold to mark ×</div>
+              <div class="nono-wrap" id="n-prop-nono"></div>
+            </div>
+          </div>
+        </div>
+        <div class="cdesc" style="max-width:var(--pw)">
+          <h3>Long-press to mark</h3>
+          <p>Filling (primary action) is always just a tap. Marking (secondary) requires intent — which is appropriate since marks are just helpers.</p>
+          <p class="pro">✓ Faster flow: no mode switching while solving<br>✓ Consistent with Minesweeper long-press</p>
+          <p class="con">✗ Less obvious for first-time players</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /games tab -->
+
+</main>
+
+<script>
+// ══════════════════════════════════════
+// Tab switching
+// ══════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// Home drawer — group: 'c' or 'p'
+// ══════════════════════════════════════
+const openRows = { c: null, p: null };
+
+function toggleRow(id, group) {
+  const el = document.getElementById(id);
+  const cur = openRows[group];
+  if (cur && cur !== id) {
+    const prev = document.getElementById(cur);
+    if (prev) prev.classList.remove('open');
+    // reset two-step state for proposed
+    resetStep(cur);
+  }
+  el.classList.toggle('open');
+  openRows[group] = el.classList.contains('open') ? id : null;
+}
+
+function selChip(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' .chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function step2(gameId, mode) {
+  document.getElementById(gameId + '-s1').style.display = 'none';
+  document.getElementById(gameId + '-s2').style.display = 'block';
+  document.getElementById(gameId + '-ml').textContent = mode;
+  // expand cavity more for difficulty chips
+  const row = document.getElementById(gameId.replace('p-','p-'));
+  const cav = row ? row.querySelector('.cavity') : null;
+  if (cav) cav.style.maxHeight = '160px';
+}
+
+function back(gameId) {
+  document.getElementById(gameId + '-s1').style.display = 'block';
+  document.getElementById(gameId + '-s2').style.display = 'none';
+  // deselect diff chips
+  const grp = gameId === 'p-nono' ? 'cp-nono-d' : 'cp-sudoku-d';
+  document.querySelectorAll('#' + grp + ' .chip').forEach(c => c.classList.remove('sel'));
+}
+
+function resetStep(id) {
+  if (id === 'p-nono' || id === 'p-sudoku') {
+    const s1 = document.getElementById(id + '-s1');
+    const s2 = document.getElementById(id + '-s2');
+    if (s1) s1.style.display = 'block';
+    if (s2) s2.style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════
+// Sudoku board + toggle concepts
+// ══════════════════════════════════════
+const BOARD_GIVENS = [
+  [5,3,0,0,7,0,0,0,0],
+  [6,0,0,1,9,5,0,0,0],
+  [0,9,8,0,0,0,0,6,0],
+  [8,0,0,0,6,0,0,0,3],
+  [4,0,0,8,0,3,0,0,1],
+  [7,0,0,0,2,0,0,0,6],
+  [0,6,0,0,0,0,2,8,0],
+  [0,0,0,4,1,9,0,0,5],
+  [0,0,0,0,8,0,0,7,9]
+];
+
+// Pre-placed by player
+const PLACED = { '20':4, '31':2, '44':5, '53':3, '62':3, '70':1 };
+// Pre-set notes
+const NOTES = { '01':[1,3,6], '11':[4,6], '32':[1,5], '63':[7,9] };
+
+let selCell = null;
+let sudokuMode = 'val'; // 'val' or 'nts'
+let activeConcept = 'cur';
+let cellState = {}; // key: 'rc' -> {placed: N} or {notes: []}
+
+// init cellState from PLACED + NOTES
+Object.entries(PLACED).forEach(([k,v]) => { cellState[k] = {placed: v}; });
+Object.entries(NOTES).forEach(([k,v]) => { cellState[k] = {notes: [...v]}; });
+
+function renderBoard() {
+  const board = document.getElementById('s-board');
+  board.innerHTML = '';
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const el = document.createElement('div');
+      el.className = 'cell';
+      const key = `${r}${c}`;
+      const g = BOARD_GIVENS[r][c];
+      const st = cellState[key];
+      const isSel = selCell && selCell[0] === r && selCell[1] === c;
+      const isPeer = selCell && isPeerOf(r, c, selCell[0], selCell[1]);
+
+      if (isSel) el.classList.add('sel');
+      else if (isPeer) el.classList.add('peer');
+
+      if (g > 0) {
+        el.classList.add('given');
+        el.textContent = g;
+      } else if (st && st.placed) {
+        el.classList.add('placed');
+        el.textContent = st.placed;
+        // same-number highlight
+        if (selCell) {
+          const selKey = `${selCell[0]}${selCell[1]}`;
+          const selG = BOARD_GIVENS[selCell[0]][selCell[1]];
+          const selPlaced = cellState[selKey] && cellState[selKey].placed;
+          const selVal = selG > 0 ? selG : selPlaced;
+          if (selVal && selVal === st.placed && !isSel) el.classList.add('same');
+        }
+      } else if (st && st.notes && st.notes.length > 0) {
+        el.classList.add('note');
+        const ng = document.createElement('div');
+        ng.className = 'noteg';
+        // selected-digit highlight for notes
+        let hlDigit = null;
+        if (selCell) {
+          const sk = `${selCell[0]}${selCell[1]}`;
+          const sg = BOARD_GIVENS[selCell[0]][selCell[1]];
+          const sp = cellState[sk] && cellState[sk].placed;
+          hlDigit = sg > 0 ? sg : sp;
+        }
+        for (let d = 1; d <= 9; d++) {
+          const s = document.createElement('span');
+          const hasNote = st.notes.includes(d);
+          s.textContent = hasNote ? d : '';
+          if (hasNote && hlDigit && hlDigit === d) s.classList.add('hl');
+          ng.appendChild(s);
+        }
+        el.appendChild(ng);
+      }
+
+      el.addEventListener('click', () => selectCell(r, c));
+      board.appendChild(el);
+    }
+  }
+}
+
+function isPeerOf(r, c, sr, sc) {
+  if (r === sr || c === sc) return true;
+  return Math.floor(r/3) === Math.floor(sr/3) && Math.floor(c/3) === Math.floor(sc/3);
+}
+
+function selectCell(r, c) {
+  selCell = [r, c];
+  renderBoard();
+}
+
+function renderNumpad() {
+  const pad = document.getElementById('s-npad');
+  pad.innerHTML = '';
+  if (activeConcept === 'pad') {
+    pad.className = 'npad'; // 9 wide + pencil = 10, use 5-col for 2 rows
+    // row 1: 1-5 | row 2: 6-9 + pencil + erase
+    // Actually do 9 + pencil = let me do 5+5
+    pad.style.gridTemplateColumns = 'repeat(5,1fr)';
+    for (let n = 1; n <= 9; n++) {
+      const btn = document.createElement('div');
+      btn.className = 'nb';
+      btn.textContent = n;
+      btn.addEventListener('click', () => placeNumber(n));
+      pad.appendChild(btn);
+    }
+    // Pencil toggle
+    const pencil = document.createElement('div');
+    pencil.className = 'nb pencil' + (sudokuMode === 'nts' ? ' on' : '');
+    pencil.id = 'pencil-btn';
+    pencil.textContent = '✏️';
+    pencil.title = 'Toggle notes mode';
+    pencil.addEventListener('click', () => {
+      sudokuMode = sudokuMode === 'val' ? 'nts' : 'val';
+      pencil.classList.toggle('on', sudokuMode === 'nts');
+      updateModeIndicators();
+    });
+    pad.appendChild(pencil);
+  } else {
+    pad.style.gridTemplateColumns = 'repeat(9,1fr)';
+    for (let n = 1; n <= 9; n++) {
+      const btn = document.createElement('div');
+      btn.className = 'nb';
+      btn.textContent = n;
+
+      if (activeConcept === 'hold') {
+        const ring = document.createElement('div');
+        ring.className = 'hring';
+        btn.appendChild(ring);
+        const prog = document.createElement('div');
+        prog.className = 'hprog';
+        btn.appendChild(prog);
+
+        let holdTimer = null;
+        let holdStart = null;
+        let progAnim = null;
+
+        function startHold(e) {
+          e.preventDefault();
+          holdStart = Date.now();
+          // Animate progress bar
+          prog.style.transition = 'none';
+          prog.style.width = '0%';
+          setTimeout(() => {
+            prog.style.transition = 'width 450ms linear';
+            prog.style.width = '100%';
+          }, 10);
+          ring.style.opacity = '1';
+          holdTimer = setTimeout(() => {
+            // HOLD complete — notes mode for this digit
+            prog.style.width = '0%';
+            prog.style.transition = 'none';
+            ring.style.opacity = '0';
+            placeNumber(n, true);
+            holdTimer = null;
+          }, 450);
+        }
+        function endHold() {
+          if (holdTimer) {
+            clearTimeout(holdTimer);
+            holdTimer = null;
+            const elapsed = Date.now() - holdStart;
+            prog.style.transition = 'none';
+            prog.style.width = '0%';
+            ring.style.opacity = '0';
+            if (elapsed < 400) placeNumber(n, false); // quick tap = place
+          }
+        }
+        btn.addEventListener('mousedown', startHold);
+        btn.addEventListener('touchstart', startHold, {passive: false});
+        btn.addEventListener('mouseup', endHold);
+        btn.addEventListener('mouseleave', endHold);
+        btn.addEventListener('touchend', endHold);
+      } else {
+        btn.addEventListener('click', () => placeNumber(n));
+      }
+      pad.appendChild(btn);
+    }
+  }
+}
+
+function placeNumber(n, forceNote) {
+  if (!selCell) return;
+  const [r, c] = selCell;
+  if (BOARD_GIVENS[r][c] > 0) return; // can't overwrite given
+  const key = `${r}${c}`;
+  const isNote = forceNote !== undefined ? forceNote : (sudokuMode === 'nts');
+
+  if (isNote) {
+    const cur = cellState[key] || {};
+    if (cur.placed) return; // can't note over a placed digit
+    const notes = cur.notes ? [...cur.notes] : [];
+    const idx = notes.indexOf(n);
+    if (idx >= 0) notes.splice(idx, 1); else notes.push(n);
+    cellState[key] = {notes};
+  } else {
+    const cur = cellState[key] || {};
+    if (cur.placed === n) { cellState[key] = {}; }
+    else { cellState[key] = {placed: n}; }
+  }
+  renderBoard();
+  updateModeIndicators();
+
+  // flash the board cell
+  const cells = document.querySelectorAll('#s-board .cell');
+  const idx = r * 9 + c;
+  if (cells[idx]) {
+    cells[idx].style.transform = 'scale(0.88)';
+    setTimeout(() => { cells[idx].style.transform = ''; }, 120);
+  }
+}
+
+function updateModeIndicators() {
+  const badge = document.getElementById('mode-badge');
+  if (badge) {
+    badge.textContent = sudokuMode === 'val' ? 'Value mode' : 'Notes mode ✏️';
+    badge.className = 'mbadge ' + (sudokuMode === 'val' ? 'val' : 'nts');
+  }
+}
+
+function sPillMode(mode) {
+  sudokuMode = mode;
+  document.getElementById('seg-val').classList.toggle('act', mode === 'val');
+  document.getElementById('seg-nts').classList.toggle('act', mode === 'nts');
+  updateModeIndicators();
+}
+
+const conceptDescriptions = {
+  cur: {
+    title: 'Current — Toggle Pill',
+    body: 'A segmented pill lets you toggle between Value and Notes. Tap either segment to switch.',
+    cons: '✗ Permanent screen space<br>✗ Truncates with Lives chip visible',
+    pros: '✓ Always-visible state<br>✓ One tap to switch'
+  },
+  hold: {
+    title: 'Concept A — Hold for Notes',
+    body: '<strong>Quick tap</strong> a number = place digit. <strong>Hold</strong> a number (≈450ms) = add as pencil note. No pill needed — intent is encoded in the gesture.',
+    cons: '✗ Less discoverable<br>✗ Hold timing can feel uncertain',
+    pros: '✓ Zero UI chrome — clean screen<br>✓ Natural: deliberate vs instinctive'
+  },
+  pad: {
+    title: 'Concept B — Pencil in Numpad',
+    body: 'A ✏️ toggle button lives at the end of the numpad row. Tap it to turn notes mode on or off — then tap numbers as usual.',
+    cons: '✗ Extra button in numpad row',
+    pros: '✓ Explicit and discoverable<br>✓ Persistent mode state visible<br>✓ Frees top-area layout'
+  }
+};
+const tryText = {
+  cur: 'Tap a cell, then tap numbers to place. Switch to Notes with the pill.',
+  hold: 'Tap a cell. Tap a number quickly to place it. Hold a number to add it as a pencil note.',
+  pad: 'Tap a cell. Tap ✏️ to toggle notes mode, then tap numbers.'
+};
+
+function sConcept(c) {
+  activeConcept = c;
+  ['cur','hold','pad'].forEach(id => {
+    document.getElementById('st-'+id).classList.toggle('active', id === c);
+  });
+  // show/hide pill vs badge
+  const pill = document.getElementById('cur-pill');
+  const badge = document.getElementById('mode-badge');
+  if (c === 'cur') { pill.style.display = ''; badge.style.display = 'none'; }
+  else { pill.style.display = 'none'; badge.style.display = ''; }
+  sudokuMode = 'val';
+  updateModeIndicators();
+  renderNumpad();
+  const d = conceptDescriptions[c];
+  document.getElementById('concept-desc').innerHTML =
+    `<h3>${d.title}</h3><p>${d.body}</p><p class="con">${d.cons}</p><p class="pro">${d.pros}</p>`;
+  document.getElementById('concept-try-text').textContent = tryText[c];
+}
+
+// ══════════════════════════════════════
+// Mines board
+// ══════════════════════════════════════
+// 7x7. 0=hidden, 1=revealed-empty, 2-5=number, 9=mine, F=flagged
+const MINE_GRID = [
+  [1, 'm2', 0, 0, 1, 'm1', 0],
+  [1, 'm3', 0, 0, 1, 1, 0],
+  [1, 'm1', 0, 'F', 0, 0, 0],
+  [1, 1, 0, 0, 0, 'F', 0],
+  [0, 0, 0, 0, 'm2', 0, 0],
+  [0, 0, 'F', 'm3', 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0]
+];
+const MINE_LABELS = { m1:'1', m2:'2', m3:'3', m4:'4', m5:'5' };
+const MINE_COLORS = { m1:'m1', m2:'m2', m3:'m3', m4:'m4' };
+
+let mMode = 'reveal'; // for current version
+let mCurState = JSON.parse(JSON.stringify(MINE_GRID));
+let mPropState = JSON.parse(JSON.stringify(MINE_GRID));
+
+function renderMineBoard(id, state, isProposed) {
+  const board = document.getElementById(id);
+  board.innerHTML = '';
+  for (let r = 0; r < 7; r++) {
+    for (let c = 0; c < 7; c++) {
+      const v = state[r][c];
+      const el = document.createElement('div');
+      el.className = 'mcell';
+      if (v === 1) { el.classList.add('rev'); }
+      else if (typeof v === 'string' && v.startsWith('m')) {
+        el.classList.add('rev');
+        el.classList.add(MINE_COLORS[v] || '');
+        el.textContent = MINE_LABELS[v] || '';
+      } else if (v === 'F') { el.classList.add('flag'); el.textContent = '🚩'; }
+      else if (v === 'X') { el.classList.add('boom'); el.textContent = '💣'; }
+
+      if (isProposed) {
+        attachLongPress(el, r, c, state, id, isProposed);
+      } else {
+        el.addEventListener('click', () => { mCurTap(r, c); });
+      }
+      board.appendChild(el);
+    }
+  }
+}
+
+function mCurTap(r, c) {
+  const v = mCurState[r][c];
+  if (mMode === 'reveal' && v === 0) {
+    mCurState[r][c] = 1;
+  } else if (mMode === 'flag' && v === 0) {
+    mCurState[r][c] = 'F';
+  } else if (mMode === 'flag' && v === 'F') {
+    mCurState[r][c] = 0;
+  }
+  renderMineBoard('m-cur-board', mCurState, false);
+}
+
+function mToggle(mode) {
+  mMode = mode;
+  document.getElementById('m-seg-r').classList.toggle('act', mode === 'reveal');
+  document.getElementById('m-seg-f').classList.toggle('act', mode === 'flag');
+}
+
+// Long press helpers
+function attachLongPress(el, r, c, state, boardId, isNono) {
+  let timer = null;
+  let didLong = false;
+
+  function start(e) {
+    e.preventDefault();
+    didLong = false;
+    el.classList.add('lph');
+    timer = setTimeout(() => {
+      didLong = true;
+      el.classList.remove('lph');
+      longAction(r, c, state, boardId, isNono);
+    }, 450);
+  }
+  function end() {
+    clearTimeout(timer);
+    el.classList.remove('lph');
+    if (!didLong) primaryAction(r, c, state, boardId, isNono);
+  }
+  function cancel() { clearTimeout(timer); el.classList.remove('lph'); didLong = true; }
+
+  el.addEventListener('mousedown', start);
+  el.addEventListener('touchstart', start, {passive: false});
+  el.addEventListener('mouseup', end);
+  el.addEventListener('touchend', end);
+  el.addEventListener('mouseleave', cancel);
+  el.addEventListener('touchcancel', cancel);
+}
+
+function primaryAction(r, c, state, boardId, isNono) {
+  if (isNono === 'nono-prop') {
+    // fill
+    if (state[r][c] === 0) state[r][c] = 'F';
+    else if (state[r][c] === 'F') state[r][c] = 0;
+    renderNonoBoard('n-prop-nono', state, true);
+  } else {
+    // mine reveal
+    if (state[r][c] === 0) state[r][c] = 1;
+    else if (state[r][c] === 'F') {} // flagged — tap does nothing
+    renderMineBoard(boardId, state, true);
+  }
+}
+
+function longAction(r, c, state, boardId, isNono) {
+  if (isNono === 'nono-prop') {
+    // mark
+    if (state[r][c] === 0) state[r][c] = 'M';
+    else if (state[r][c] === 'M') state[r][c] = 0;
+    renderNonoBoard('n-prop-nono', state, true);
+  } else {
+    // flag
+    if (state[r][c] === 0) state[r][c] = 'F';
+    else if (state[r][c] === 'F') state[r][c] = 0;
+    renderMineBoard(boardId, state, true);
+  }
+}
+
+// ══════════════════════════════════════
+// Nonogram
+// ══════════════════════════════════════
+const NONO_COL_CLUES = ['2','3','1,2','3','1'];
+const NONO_ROW_CLUES = ['1','3','2','3','2'];
+// 5x5 state: 0=empty, F=filled, M=marked
+let nCurState = Array.from({length:5}, () => Array(5).fill(0));
+let nPropState = Array.from({length:5}, () => Array(5).fill(0));
+// Pre-fill a couple
+nCurState[0][1] = 'F'; nCurState[1][0] = 'F'; nCurState[1][1] = 'F'; nCurState[1][2] = 'F';
+nCurState[2][0] = 'F'; nCurState[2][2] = 'F';
+nPropState[0][1] = 'F'; nPropState[1][0] = 'F'; nPropState[1][1] = 'F'; nPropState[1][2] = 'F';
+nPropState[2][0] = 'F'; nPropState[2][2] = 'F';
+
+let nMode = 'fill';
+
+function renderNonoBoard(containerId, state, isProposed) {
+  const wrap = document.getElementById(containerId);
+  wrap.innerHTML = '';
+
+  // Header row
+  const hdr = document.createElement('div');
+  hdr.className = 'nono-hdr';
+  NONO_COL_CLUES.forEach(clue => {
+    const d = document.createElement('div');
+    d.className = 'nono-cc';
+    d.innerHTML = clue.replace(',','<br>');
+    hdr.appendChild(d);
+  });
+  wrap.appendChild(hdr);
+
+  const tbl = document.createElement('div');
+  tbl.className = 'nono-tbl';
+
+  for (let r = 0; r < 5; r++) {
+    const row = document.createElement('div');
+    row.className = 'nono-tr';
+    const rc = document.createElement('div');
+    rc.className = 'nono-rc';
+    rc.innerHTML = NONO_ROW_CLUES[r].replace(',','<br>');
+    row.appendChild(rc);
+
+    for (let c = 0; c < 5; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'ncell';
+      const v = state[r][c];
+      if (v === 'F') cell.classList.add('filled');
+      else if (v === 'M') { cell.classList.add('marked'); cell.textContent = '×'; }
+
+      if (isProposed) {
+        attachLongPress(cell, r, c, state, containerId, 'nono-prop');
+      } else {
+        cell.addEventListener('click', () => {
+          if (nMode === 'fill') {
+            state[r][c] = state[r][c] === 'F' ? 0 : 'F';
+          } else {
+            state[r][c] = state[r][c] === 'M' ? 0 : 'M';
+          }
+          renderNonoBoard(containerId, state, false);
+        });
+      }
+      row.appendChild(cell);
+    }
+    tbl.appendChild(row);
+  }
+  wrap.appendChild(tbl);
+}
+
+function nToggle(mode) {
+  nMode = mode;
+  document.getElementById('n-seg-f').classList.toggle('act', mode === 'fill');
+  document.getElementById('n-seg-m').classList.toggle('act', mode === 'mark');
+}
+
+// ══════════════════════════════════════
+// Init
+// ══════════════════════════════════════
+renderBoard();
+renderNumpad();
+renderMineBoard('m-cur-board', mCurState, false);
+renderMineBoard('m-prop-board', mPropState, true);
+renderNonoBoard('n-cur-nono', nCurState, false);
+renderNonoBoard('n-prop-nono', nPropState, true);
+</script>
+
+</body>
+</html>

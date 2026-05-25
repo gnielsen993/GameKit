@@ -1,0 +1,46 @@
+:root {
+  /* GameDrawer palette */
+  --color-bg: #F5F0E8;
+  --color-surface: #FFFFFF;
+  --color-border: #E8E3D9;
+  --color-text: #1A1A1A;
+  --color-text-muted: #888888;
+  --color-text-tertiary: #BBBBBB;
+
+  /* Game accent colors */
+  --color-minesweeper: #2F7BF6;
+  --color-merge: #29C254;
+  --color-nonogram: #E84743;
+  --color-sudoku: #E89A1F;
+  --color-klondike: #1AB4C2;
+  --color-freecell: #A458EE;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --text-xs: 0.70rem;
+  --text-sm: 0.8125rem;
+  --text-base: 1rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Shapes */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
+  --shadow-md: 0 4px 14px rgba(0,0,0,0.10);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.14);
+}

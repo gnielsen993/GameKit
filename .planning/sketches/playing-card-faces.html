@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Face Card Center — Design Ideas</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  background: #2C2C2E;
+  color: #F2F2F7;
+  padding: 32px 24px;
+}
+h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: #8E8E93; margin-bottom: 12px; }
+.context-note {
+  font-size: 12px; color: #636366; background: #1C1C1E;
+  border-radius: 8px; padding: 10px 14px; margin-bottom: 32px;
+  border-left: 3px solid #48484A;
+}
+
+.section { margin-bottom: 44px; }
+.dir-header {
+  display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;
+}
+.dir-title { font-size: 16px; font-weight: 700; color: #F2F2F7; }
+.dir-desc { font-size: 12px; color: #8E8E93; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+.col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.lbl {
+  font-size: 10px; color: #636366;
+  font-family: "SF Mono", monospace; text-align: center; max-width: 80px;
+}
+
+/* ── EXACT current card shell ── */
+.card {
+  width: 70px; height: 98px;
+  border-radius: 7px;
+  background: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 0.5px rgba(0,0,0,0.15);
+}
+.card.red  { --sc: #D92B2B; }
+.card.black{ --sc: #1C1C1E; }
+
+/* Corner — exactly like current code: rank heavy rounded + suit icon below */
+.corner {
+  position: absolute; top: 5px; left: 5px;
+  display: flex; flex-direction: column; align-items: center;
+  line-height: 1;
+}
+.cr { /* rank */
+  font-size: 15px; font-weight: 800;
+  color: var(--sc);
+  font-family: -apple-system, "SF Pro Display", sans-serif;
+  line-height: 1;
+}
+.cs { /* suit symbol */
+  font-size: 9px; color: var(--sc); line-height: 1.1;
+}
+
+/* Center area — everything below changes per direction */
+.center {
+  position: absolute;
+  left: 0; right: 0; top: 28px; bottom: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Number card reference (unchanged) */
+.num-center {
+  position: absolute;
+  left: 0; right: 0; top: 28px; bottom: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: var(--sc);
+}
+
+.divider { border: none; border-top: 1px solid #3A3A3C; margin: 36px 0; }
+
+.note {
+  font-size: 12px; color: #8E8E93; background: #1C1C1E;
+  border-radius: 8px; padding: 14px 16px; margin-top: 28px;
+  line-height: 1.6;
+}
+.note strong { color: #F2F2F7; }
+.badge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px; margin-left: 6px;
+  vertical-align: middle;
+}
+.rec { background: #30D158; color: #000; }
+.low { background: #FF9F0A; color: #000; }
+</style>
+</head>
+<body>
+
+<h1>Face Card Centers</h1>
+<p class="subtitle">Same card shell as today — only the center content changes for J/Q/K</p>
+<div class="context-note">
+  Current: rank letter + suit symbol stacked center. Top-left corner only (no bottom mirror — sizing constraint). Red = danger token. Black = textPrimary token.
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<!-- REFERENCE: current number card              -->
+<!-- ─────────────────────────────────────────── -->
+<div class="section">
+  <div class="dir-header">
+    <span class="dir-title">Reference — Number Cards (unchanged)</span>
+    <span class="dir-desc">Just for context; these aren't changing</span>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">A</span><span class="cs">♥</span></div>
+        <div class="num-center" style="font-size:34px;">♥</div>
+      </div>
+      <span class="lbl">Ace (current)</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">7</span><span class="cs">♠</span></div>
+        <div class="num-center" style="font-size:28px;">♠</div>
+      </div>
+      <span class="lbl">7 (current)</span>
+    </div>
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">K</span><span class="cs">♥</span></div>
+        <!-- CURRENT face — ugly reference -->
+        <div class="center" style="flex-direction:column;gap:3px;">
+          <span style="font-size:21px;font-weight:800;color:#D92B2B;font-family:-apple-system,'SF Pro Display',sans-serif;">K</span>
+          <span style="font-size:17px;color:#D92B2B;">♥</span>
+        </div>
+      </div>
+      <span class="lbl">K♥ current</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ─────────────────────────────────────────── -->
+<!-- DIRECTION 1: Large suit fill               -->
+<!-- ─────────────────────────────────────────── -->
+<div class="section">
+  <div class="dir-header">
+    <span class="dir-title">1 — Large Suit <span class="badge rec">easiest</span></span>
+    <span class="dir-desc">Drop the center letter entirely. Big suit pip like a high Ace. Rank is already in the corner.</span>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">J</span><span class="cs">♥</span></div>
+        <div class="center"><span style="font-size:40px;color:#D92B2B;">♥</span></div>
+      </div>
+      <span class="lbl">J♥</span>
+    </div>
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">Q</span><span class="cs">♥</span></div>
+        <div class="center"><span style="font-size:40px;color:#D92B2B;">♥</span></div>
+      </div>
+      <span class="lbl">Q♥</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">K</span><span class="cs">♠</span></div>
+        <div class="center"><span style="font-size:40px;color:#1C1C1E;">♠</span></div>
+      </div>
+      <span class="lbl">K♠</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">J</span><span class="cs">♣</span></div>
+        <div class="center"><span style="font-size:40px;color:#1C1C1E;">♣</span></div>
+      </div>
+      <span class="lbl">J♣</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ─────────────────────────────────────────── -->
+<!-- DIRECTION 2: Ghost rank watermark + suit   -->
+<!-- ─────────────────────────────────────────── -->
+<div class="section">
+  <div class="dir-header">
+    <span class="dir-title">2 — Ghost Watermark + Suit</span>
+    <span class="dir-desc">Large transparent rank letter behind a medium suit. Corner anchors identity; center adds depth.</span>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">J</span><span class="cs">♥</span></div>
+        <div class="center" style="flex-direction:column; position:absolute; top:24px; bottom:0; left:0; right:0;">
+          <!-- ghost rank behind -->
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:68px;font-weight:900;color:#D92B2B;opacity:0.07;line-height:1;font-family:-apple-system,'SF Pro Display',sans-serif;letter-spacing:-2px;">J</span>
+          </div>
+          <!-- suit on top -->
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:30px;color:#D92B2B;">♥</span>
+          </div>
+        </div>
+      </div>
+      <span class="lbl">J♥</span>
+    </div>
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">Q</span><span class="cs">♦</span></div>
+        <div style="position:absolute;top:24px;bottom:0;left:0;right:0;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:68px;font-weight:900;color:#D92B2B;opacity:0.07;line-height:1;font-family:-apple-system,'SF Pro Display',sans-serif;letter-spacing:-2px;">Q</span>
+          </div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:30px;color:#D92B2B;">♦</span>
+          </div>
+        </div>
+      </div>
+      <span class="lbl">Q♦</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">K</span><span class="cs">♠</span></div>
+        <div style="position:absolute;top:24px;bottom:0;left:0;right:0;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:68px;font-weight:900;color:#1C1C1E;opacity:0.07;line-height:1;font-family:-apple-system,'SF Pro Display',sans-serif;letter-spacing:-2px;">K</span>
+          </div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:30px;color:#1C1C1E;">♠</span>
+          </div>
+        </div>
+      </div>
+      <span class="lbl">K♠</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">J</span><span class="cs">♣</span></div>
+        <div style="position:absolute;top:24px;bottom:0;left:0;right:0;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:68px;font-weight:900;color:#1C1C1E;opacity:0.07;line-height:1;font-family:-apple-system,'SF Pro Display',sans-serif;letter-spacing:-2px;">J</span>
+          </div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:30px;color:#1C1C1E;">♣</span>
+          </div>
+        </div>
+      </div>
+      <span class="lbl">J♣</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ─────────────────────────────────────────── -->
+<!-- DIRECTION 3: Tinted face band              -->
+<!-- ─────────────────────────────────────────── -->
+<div class="section">
+  <div class="dir-header">
+    <span class="dir-title">3 — Tinted Face Zone</span>
+    <span class="dir-desc">Lower 60% of card tinted in suit color (soft wash). White suit + rank label. Differentiated from number cards at a glance.</span>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card red" style="overflow:hidden;">
+        <div class="corner"><span class="cr">J</span><span class="cs">♥</span></div>
+        <!-- tinted zone -->
+        <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:rgba(217,43,43,0.10);border-top:1px solid rgba(217,43,43,0.15);"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;">
+          <span style="font-size:28px;color:#D92B2B;">♥</span>
+          <span style="font-size:9px;font-weight:800;color:#D92B2B;letter-spacing:0.10em;">JACK</span>
+        </div>
+      </div>
+      <span class="lbl">J♥</span>
+    </div>
+    <div class="col">
+      <div class="card red" style="overflow:hidden;">
+        <div class="corner"><span class="cr">Q</span><span class="cs">♦</span></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:rgba(217,43,43,0.10);border-top:1px solid rgba(217,43,43,0.15);"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;">
+          <span style="font-size:28px;color:#D92B2B;">♦</span>
+          <span style="font-size:9px;font-weight:800;color:#D92B2B;letter-spacing:0.10em;">QUEEN</span>
+        </div>
+      </div>
+      <span class="lbl">Q♦</span>
+    </div>
+    <div class="col">
+      <div class="card black" style="overflow:hidden;">
+        <div class="corner"><span class="cr">K</span><span class="cs">♠</span></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:rgba(28,28,30,0.07);border-top:1px solid rgba(28,28,30,0.12);"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;">
+          <span style="font-size:28px;color:#1C1C1E;">♠</span>
+          <span style="font-size:9px;font-weight:800;color:#1C1C1E;letter-spacing:0.10em;">KING</span>
+        </div>
+      </div>
+      <span class="lbl">K♠</span>
+    </div>
+    <div class="col">
+      <div class="card black" style="overflow:hidden;">
+        <div class="corner"><span class="cr">J</span><span class="cs">♣</span></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:64px;background:rgba(28,28,30,0.07);border-top:1px solid rgba(28,28,30,0.12);"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;">
+          <span style="font-size:28px;color:#1C1C1E;">♣</span>
+          <span style="font-size:9px;font-weight:800;color:#1C1C1E;letter-spacing:0.10em;">JACK</span>
+        </div>
+      </div>
+      <span class="lbl">J♣</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ─────────────────────────────────────────── -->
+<!-- DIRECTION 4: Crown glyph + suit            -->
+<!-- ─────────────────────────────────────────── -->
+<div class="section">
+  <div class="dir-header">
+    <span class="dir-title">4 — Crown Glyph</span>
+    <span class="dir-desc">SF Symbol crown above the suit. K gets crown.fill, Q gets crown, J gets shield. Immediately reads as royalty without custom art.</span>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">J</span><span class="cs">♥</span></div>
+        <div class="center" style="flex-direction:column;gap:4px;">
+          <!-- shield for Jack -->
+          <svg width="22" height="24" viewBox="0 0 22 24" fill="none">
+            <path d="M11 2L2 6V12C2 17 6 21 11 23C16 21 20 17 20 12V6L11 2Z" fill="#D92B2B" opacity="0.85"/>
+          </svg>
+          <span style="font-size:18px;color:#D92B2B;margin-top:1px;">♥</span>
+        </div>
+      </div>
+      <span class="lbl">J♥ shield</span>
+    </div>
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">Q</span><span class="cs">♦</span></div>
+        <div class="center" style="flex-direction:column;gap:4px;">
+          <!-- simple crown outline for Queen -->
+          <svg width="26" height="18" viewBox="0 0 26 18" fill="none">
+            <path d="M2 16L5 6L13 12L21 6L24 16H2Z" fill="none" stroke="#D92B2B" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="2" cy="6" r="2" fill="#D92B2B"/>
+            <circle cx="13" cy="2" r="2" fill="#D92B2B"/>
+            <circle cx="24" cy="6" r="2" fill="#D92B2B"/>
+          </svg>
+          <span style="font-size:18px;color:#D92B2B;margin-top:2px;">♦</span>
+        </div>
+      </div>
+      <span class="lbl">Q♦ crown</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">K</span><span class="cs">♠</span></div>
+        <div class="center" style="flex-direction:column;gap:4px;">
+          <!-- filled crown for King -->
+          <svg width="26" height="20" viewBox="0 0 26 20" fill="none">
+            <path d="M2 18L5 6L13 13L21 6L24 18H2Z" fill="#1C1C1E" opacity="0.85"/>
+            <circle cx="2" cy="6" r="2.5" fill="#1C1C1E"/>
+            <circle cx="13" cy="2" r="2.5" fill="#1C1C1E"/>
+            <circle cx="24" cy="6" r="2.5" fill="#1C1C1E"/>
+          </svg>
+          <span style="font-size:18px;color:#1C1C1E;margin-top:2px;">♠</span>
+        </div>
+      </div>
+      <span class="lbl">K♠ crown</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">Q</span><span class="cs">♣</span></div>
+        <div class="center" style="flex-direction:column;gap:4px;">
+          <svg width="26" height="18" viewBox="0 0 26 18" fill="none">
+            <path d="M2 16L5 6L13 12L21 6L24 16H2Z" fill="none" stroke="#1C1C1E" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="2" cy="6" r="2" fill="#1C1C1E"/>
+            <circle cx="13" cy="2" r="2" fill="#1C1C1E"/>
+            <circle cx="24" cy="6" r="2" fill="#1C1C1E"/>
+          </svg>
+          <span style="font-size:18px;color:#1C1C1E;margin-top:2px;">♣</span>
+        </div>
+      </div>
+      <span class="lbl">Q♣ crown</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ─────────────────────────────────────────── -->
+<!-- DIRECTION 5: Double suit stack             -->
+<!-- ─────────────────────────────────────────── -->
+<div class="section">
+  <div class="dir-header">
+    <span class="dir-title">5 — Double Suit Stack</span>
+    <span class="dir-desc">Two suit symbols — top upright, bottom inverted (traditional double-headed echo). No letter needed center.</span>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">J</span><span class="cs">♥</span></div>
+        <div class="center" style="flex-direction:column;gap:0px;">
+          <span style="font-size:26px;color:#D92B2B;line-height:1;">♥</span>
+          <span style="font-size:26px;color:#D92B2B;line-height:1;transform:rotate(180deg);">♥</span>
+        </div>
+      </div>
+      <span class="lbl">J♥</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">Q</span><span class="cs">♠</span></div>
+        <div class="center" style="flex-direction:column;gap:0px;">
+          <span style="font-size:26px;color:#1C1C1E;line-height:1;">♠</span>
+          <span style="font-size:26px;color:#1C1C1E;line-height:1;transform:rotate(180deg);">♠</span>
+        </div>
+      </div>
+      <span class="lbl">Q♠</span>
+    </div>
+    <div class="col">
+      <div class="card red">
+        <div class="corner"><span class="cr">K</span><span class="cs">♦</span></div>
+        <div class="center" style="flex-direction:column;gap:0px;">
+          <span style="font-size:26px;color:#D92B2B;line-height:1;">♦</span>
+          <span style="font-size:26px;color:#D92B2B;line-height:1;transform:rotate(180deg);">♦</span>
+        </div>
+      </div>
+      <span class="lbl">K♦</span>
+    </div>
+    <div class="col">
+      <div class="card black">
+        <div class="corner"><span class="cr">K</span><span class="cs">♣</span></div>
+        <div class="center" style="flex-direction:column;gap:0px;">
+          <span style="font-size:26px;color:#1C1C1E;line-height:1;">♣</span>
+          <span style="font-size:26px;color:#1C1C1E;line-height:1;transform:rotate(180deg);">♣</span>
+        </div>
+      </div>
+      <span class="lbl">K♣</span>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>1 — Large suit:</strong> Simplest change. Identical to Ace treatment. J/Q/K lose their center letter but corner still identifies them.<br>
+  <strong>2 — Ghost watermark:</strong> Best of both — rank readable as depth texture, suit clear on top. Minimal code change.<br>
+  <strong>3 — Tinted zone:</strong> Strongest visual split between face and number cards. Reads fast at small sizes. "JACK/QUEEN/KING" label optional.<br>
+  <strong>4 — Crown glyph:</strong> Clever — royalty reads without any text. Needs small SVG per face type (King/Queen/Jack × done inline).<br>
+  <strong>5 — Double suit:</strong> Traditional nod, zero implementation cost. Subtle — may not read as differentiated enough from number cards.
+</div>
+
+</body>
+</html>

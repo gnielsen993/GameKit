@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameDrawer — Drawer Home Concepts</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  background: #111118;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 56px;
+}
+
+/* ── Variant nav ── */
+#variant-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  background: rgba(17,17,24,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 10px 20px; display: flex; gap: 8px; align-items: center;
+}
+#variant-nav .vn-label { color: rgba(255,255,255,0.3); font-size: 11px; font-weight: 600; letter-spacing: 1px; margin-right: 6px; }
+.variant-tab {
+  padding: 6px 18px; border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.18);
+  background: transparent; color: rgba(255,255,255,0.5);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.18s ease; font-family: var(--font-sans);
+}
+.variant-tab:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); }
+.variant-tab.active { background: white; color: #111118; border-color: white; font-weight: 700; }
+
+/* ── Variant containers ── */
+.variant { display: none; width: 100%; padding: 32px 24px 60px; flex-direction: column; align-items: center; }
+.variant.active { display: flex; }
+
+/* ── Concept label ── */
+.concept-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.25); margin-bottom: 20px;
+}
+.concept-desc {
+  max-width: 375px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.35);
+  line-height: 1.5; margin-top: 20px;
+}
+
+/* ── Phone frame ── */
+.phone {
+  width: 375px; height: 812px; position: relative; overflow: hidden;
+  background: var(--color-bg);
+  border-radius: 52px;
+  box-shadow:
+    0 60px 120px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 0 0 1.5px rgba(255,255,255,0.12),
+    inset 0 0 0 3px rgba(0,0,0,0.25);
+  flex-shrink: 0;
+}
+
+/* Notch */
+.phone::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #111118; border-radius: 0 0 20px 20px; z-index: 100;
+}
+
+/* ── Status bar ── */
+.status-bar {
+  height: 44px; display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 26px 6px; background: var(--color-surface); position: relative; z-index: 10;
+}
+.status-time { font-size: 15px; font-weight: 700; color: var(--color-text); letter-spacing: -0.3px; }
+.status-icons { display: flex; gap: 5px; align-items: center; }
+.status-icons svg { width: 15px; height: 15px; fill: var(--color-text); }
+
+/* ── Nav bar ── */
+.nav-bar {
+  height: 44px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; background: var(--color-surface);
+  border-bottom: 0.5px solid rgba(0,0,0,0.10);
+  position: relative; z-index: 10;
+}
+.nav-title { font-size: 17px; font-weight: 700; color: var(--color-text); letter-spacing: -0.3px; }
+.nav-btn {
+  width: 32px; height: 32px; border-radius: 50%; background: none;
+  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--color-text);
+}
+.nav-btn:hover { background: rgba(0,0,0,0.06); }
+
+/* ── Scrollable phone content ── */
+.phone-scroll {
+  position: absolute; top: 88px; left: 0; right: 0; bottom: 0;
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: var(--color-bg);
+}
+.phone-scroll::-webkit-scrollbar { display: none; }
+
+
+/* ═══════════════════════════════════════
+   VARIANT A — ACCORDION DRAWER ROWS
+   ═══════════════════════════════════════ */
+
+.acc-list { padding: 10px 14px 24px; display: flex; flex-direction: column; gap: 3px; }
+
+.acc-row {
+  background: var(--color-surface);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+  --acc-color: #888;
+}
+.acc-row.acc-open { box-shadow: 0 2px 12px rgba(0,0,0,0.10); }
+
+.acc-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px 11px 18px; cursor: pointer;
+  position: relative;
+  user-select: none; -webkit-tap-highlight-color: transparent;
+}
+
+/* Left accent bar */
+.acc-header::before {
+  content: '';
+  position: absolute; left: 0; top: 8px; bottom: 8px;
+  width: 3.5px; border-radius: 2px;
+  background: transparent;
+  transition: background 0.25s ease;
+}
+.acc-row.acc-open .acc-header::before { background: var(--acc-color); }
+
+.acc-icon {
+  width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+.acc-row.acc-open .acc-icon { transform: scale(1.04); }
+
+.acc-icon-inner {
+  font-size: 0; /* hide emoji, use SVG */
+  width: 24px; height: 24px;
+}
+
+.acc-text { flex: 1; min-width: 0; }
+.acc-name { font-size: 15px; font-weight: 600; color: var(--color-text); }
+.acc-meta { font-size: 11.5px; color: var(--color-text-muted); margin-top: 1px; }
+
+/* Drawer handle — three horizontal lines → rotates to arrow when open */
+.acc-handle {
+  display: flex; flex-direction: column; gap: 3.5px;
+  width: 22px; flex-shrink: 0; padding: 2px 0;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.acc-handle span {
+  display: block; height: 2px; border-radius: 1px;
+  background: rgba(0,0,0,0.20);
+  transition: all 0.3s ease;
+}
+.acc-handle span:nth-child(1) { width: 100%; }
+.acc-handle span:nth-child(2) { width: 70%; }
+.acc-handle span:nth-child(3) { width: 50%; }
+.acc-row.acc-open .acc-handle { transform: rotate(180deg); }
+.acc-row.acc-open .acc-handle span:nth-child(1) { width: 100%; }
+.acc-row.acc-open .acc-handle span:nth-child(2) { width: 100%; }
+.acc-row.acc-open .acc-handle span:nth-child(3) { width: 100%; }
+
+.acc-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.acc-row.acc-open .acc-body { max-height: 220px; }
+
+.acc-body-inner { padding: 0 14px 14px 18px; border-top: 0.5px solid #F0EBE0; }
+
+.chip-section-label {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px;
+  color: var(--color-text-muted); text-transform: uppercase;
+  padding-top: 11px; padding-bottom: 6px;
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  padding: 6px 13px; border-radius: var(--radius-full);
+  font-size: 12.5px; font-weight: 500;
+  background: var(--color-bg); color: var(--color-text);
+  border: 1px solid var(--color-border);
+  cursor: pointer; transition: all 0.14s ease; white-space: nowrap;
+}
+.chip:hover { opacity: 0.8; }
+.chip.chip-primary { color: white; border-color: transparent; }
+.chip.chip-primary:hover { opacity: 0.88; }
+
+.acc-upcoming {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; margin-top: 3px;
+  background: var(--color-surface); border-radius: 16px;
+  box-shadow: var(--shadow-sm); cursor: pointer;
+}
+.acc-upcoming-icon {
+  width: 44px; height: 44px; border-radius: 11px;
+  background: rgba(164,88,238,0.10);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 21px;
+}
+.acc-upcoming-text .acc-name { color: var(--color-text-muted); }
+.acc-upcoming-text .acc-meta { color: var(--color-text-tertiary); }
+.acc-upcoming-chevron { margin-left: auto; color: var(--color-text-tertiary); font-size: 14px; }
+
+
+/* ═══════════════════════════════════════
+   VARIANT B — BOTTOM SHEET DRAWER
+   ═══════════════════════════════════════ */
+
+.sheet-stage {
+  position: absolute; top: 88px; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+}
+
+.sheet-backdrop {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--color-bg); padding: 24px;
+}
+
+.sheet-wordmark { font-size: 34px; font-weight: 800; color: var(--color-text); letter-spacing: -2px; line-height: 1; }
+.sheet-tagline { font-size: 13px; color: var(--color-text-muted); margin-top: 8px; text-align: center; }
+
+.sheet-recent-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--color-text-tertiary); margin-top: 32px; align-self: flex-start; margin-left: 4px;
+}
+.sheet-recent-row {
+  display: flex; gap: 14px; margin-top: 10px; align-self: flex-start;
+}
+.sheet-recent-chip {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 12px; border-radius: var(--radius-full);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  font-size: 12px; font-weight: 500; color: var(--color-text);
+}
+.sheet-recent-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.sheet-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0); pointer-events: none;
+  transition: background 0.4s ease;
+}
+.sheet-overlay.visible { background: rgba(0,0,0,0.35); pointer-events: auto; }
+
+.bottom-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 680px; background: var(--color-surface);
+  border-radius: 26px 26px 0 0;
+  box-shadow: 0 -4px 30px rgba(0,0,0,0.12);
+  transform: translateY(calc(100% - 178px));
+  transition: transform 0.46s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex; flex-direction: column;
+}
+.bottom-sheet.sheet-open { transform: translateY(0); }
+
+.sheet-grip-area {
+  padding: 12px 20px 0; display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.sheet-grip { width: 36px; height: 4px; border-radius: 2px; background: #D4CFC6; }
+.sheet-peek-hint {
+  font-size: 12px; color: var(--color-text-muted); font-weight: 500;
+  margin-top: 8px; margin-bottom: 2px;
+}
+
+/* Peeking row of icons */
+.sheet-peek-icons {
+  display: flex; gap: 10px; padding: 10px 20px 0; overflow: hidden; flex-shrink: 0;
+}
+.sheet-peek-icon {
+  width: 50px; height: 50px; border-radius: 13px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Open state content */
+.sheet-open-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px 10px; border-bottom: 0.5px solid var(--color-border);
+  flex-shrink: 0;
+  opacity: 0; transition: opacity 0.2s ease 0.1s;
+}
+.bottom-sheet.sheet-open .sheet-open-header { opacity: 1; }
+.sheet-open-title { font-size: 18px; font-weight: 700; color: var(--color-text); }
+.sheet-close-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #F0EBE2; border: none; cursor: pointer; font-size: 13px;
+  color: var(--color-text-muted); display: flex; align-items: center; justify-content: center;
+}
+
+.sheet-game-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px; padding: 12px 16px 24px; overflow-y: auto;
+  opacity: 0; transition: opacity 0.2s ease 0.15s;
+}
+.bottom-sheet.sheet-open .sheet-game-grid { opacity: 1; }
+.sheet-game-grid::-webkit-scrollbar { display: none; }
+
+.sheet-game-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 14px 8px; border-radius: 14px; cursor: pointer;
+  transition: background 0.14s ease;
+}
+.sheet-game-cell:hover { background: #F8F4EE; }
+.sheet-game-icon {
+  width: 66px; height: 66px; border-radius: 17px;
+  display: flex; align-items: center; justify-content: center;
+}
+.sheet-game-name { font-size: 12px; font-weight: 600; color: var(--color-text); }
+
+
+/* ═══════════════════════════════════════
+   VARIANT C — PULL-TAB GRID
+   ═══════════════════════════════════════ */
+
+.pull-scroll-wrap { padding: 10px 14px 24px; }
+
+.pull-tile-row {
+  display: flex; gap: 12px; margin-bottom: 12px;
+}
+.pull-tile-slot { flex: 1; display: flex; flex-direction: column; align-items: center; }
+
+.pull-tile {
+  width: 100%; display: flex; flex-direction: column; align-items: center;
+  gap: 8px; cursor: pointer; padding: 4px 0;
+  user-select: none; -webkit-tap-highlight-color: transparent;
+}
+
+.pull-tile-icon-wrap { position: relative; }
+.pull-tile-icon {
+  width: 84px; height: 84px; border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s ease;
+}
+.pull-tile-slot.selected .pull-tile-icon {
+  transform: scale(1.06);
+}
+
+/* The pull handle pill — sits below the icon */
+.pull-handle-pip {
+  width: 28px; height: 4px; border-radius: 2px;
+  background: rgba(0,0,0,0.14); margin-top: 5px;
+  transition: all 0.22s ease;
+  align-self: center;
+}
+.pull-tile-slot.selected .pull-handle-pip {
+  width: 18px; background: var(--slot-color);
+}
+
+.pull-tile-name {
+  font-size: 12px; font-weight: 600; color: var(--color-text);
+  transition: color 0.2s ease;
+}
+.pull-tile-slot.selected .pull-tile-name { color: var(--slot-color); }
+
+/* Expanded detail panel — spans full width, inserted between rows */
+.pull-detail-panel {
+  width: 100%; max-height: 0; overflow: hidden; margin-bottom: 0;
+  transition: max-height 0.40s cubic-bezier(0.4,0,0.2,1), margin-bottom 0.35s ease, opacity 0.25s ease;
+  opacity: 0;
+}
+.pull-detail-panel.panel-open {
+  max-height: 210px; margin-bottom: 0px; opacity: 1;
+}
+
+.pull-detail-inner {
+  background: var(--color-surface); border-radius: 16px;
+  padding: 14px; box-shadow: var(--shadow-md);
+  margin-bottom: 4px;
+}
+
+.pull-detail-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.pull-detail-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pull-detail-name { font-size: 14px; font-weight: 700; color: var(--color-text); }
+.pull-detail-meta { font-size: 11px; color: var(--color-text-muted); margin-top: 1px; }
+
+/* Upcoming tile */
+.pull-upcoming-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 4px 0; opacity: 0.7;
+}
+.pull-upcoming-icon {
+  width: 84px; height: 84px; border-radius: 22px;
+  background: rgba(164,88,238,0.10);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+}
+.pull-upcoming-pip { width: 28px; height: 4px; border-radius: 2px; background: rgba(164,88,238,0.20); margin-top: 5px; }
+.pull-upcoming-name { font-size: 12px; font-weight: 600; color: var(--color-text-muted); }
+
+
+/* ─── Shared icon rendering via SVG ─── */
+.game-svg { display: block; }
+
+</style>
+</head>
+<body>
+
+<!-- Variant nav -->
+<div id="variant-nav">
+  <span class="vn-label">CONCEPT</span>
+  <button class="variant-tab active" onclick="showVariant('a',this)">A — Accordion Rows</button>
+  <button class="variant-tab" onclick="showVariant('b',this)">B — Bottom Sheet</button>
+  <button class="variant-tab" onclick="showVariant('c',this)">C — Pull-Tab Grid</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     VARIANT A: ACCORDION DRAWER ROWS
+     ═══════════════════════════════════════════════════════════ -->
+<div id="variant-a" class="variant active">
+  <div class="concept-label">Concept A — Accordion Drawer Rows</div>
+  <div class="phone" id="phone-a">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4l2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div style="width:32px"></div>
+      <span class="nav-title">The Drawer</span>
+      <button class="nav-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+      </button>
+    </div>
+    <div class="phone-scroll">
+      <div class="acc-list" id="acc-list"></div>
+    </div>
+  </div>
+  <div class="concept-desc">Each game is a drawer. Tap the row to pull it open — accent bar on the left lights up, modes/difficulty slide down. All games visible at once.</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     VARIANT B: BOTTOM SHEET DRAWER
+     ═══════════════════════════════════════════════════════════ -->
+<div id="variant-b" class="variant">
+  <div class="concept-label">Concept B — Bottom Sheet Drawer</div>
+  <div class="phone" id="phone-b">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4l2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div style="width:32px"></div>
+      <span class="nav-title">GameDrawer</span>
+      <button class="nav-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+      </button>
+    </div>
+    <div class="sheet-stage">
+      <!-- Backdrop -->
+      <div class="sheet-backdrop">
+        <div class="sheet-wordmark">GameDrawer</div>
+        <div class="sheet-tagline">Classic games, no fuss.</div>
+        <div class="sheet-recent-label">Continue</div>
+        <div class="sheet-recent-row" id="recent-row"></div>
+      </div>
+
+      <!-- Dim overlay -->
+      <div class="sheet-overlay" id="b-overlay" onclick="sheetClose()"></div>
+
+      <!-- The bottom sheet / drawer -->
+      <div class="bottom-sheet" id="bottom-sheet">
+        <div class="sheet-grip-area" onclick="sheetToggle()" id="b-grip">
+          <div class="sheet-grip"></div>
+          <div class="sheet-peek-hint" id="b-peek-hint">Your drawer — tap to open</div>
+        </div>
+        <div class="sheet-peek-icons" id="b-peek-icons"></div>
+
+        <!-- Revealed when open -->
+        <div class="sheet-open-header" id="b-open-header">
+          <span class="sheet-open-title">Your Games</span>
+          <button class="sheet-close-btn" onclick="sheetClose()">✕</button>
+        </div>
+        <div class="sheet-game-grid" id="b-game-grid"></div>
+      </div>
+    </div>
+  </div>
+  <div class="concept-desc">The app shows identity + recent games. The drawer peeks from the bottom — tap the grip to slide it fully open. Literal drawer metaphor, theatrical reveal.</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     VARIANT C: PULL-TAB GRID
+     ═══════════════════════════════════════════════════════════ -->
+<div id="variant-c" class="variant">
+  <div class="concept-label">Concept C — Pull-Tab Grid</div>
+  <div class="phone" id="phone-c">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 0 0-6 0zm-4-4l2 2a7.074 7.074 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div style="width:32px"></div>
+      <span class="nav-title">The Drawer</span>
+      <button class="nav-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+      </button>
+    </div>
+    <div class="phone-scroll">
+      <div class="pull-scroll-wrap" id="pull-grid-root"></div>
+    </div>
+  </div>
+  <div class="concept-desc">Icon grid preserved. Each tile has a pull-handle pip below it. Tap → tile scales up, handle lights up accent color, detail panel slides open below that row, pushing everything else down.</div>
+</div>
+
+
+<script>
+/* ─── Game data ─── */
+const GAMES = [
+  {
+    id: 'minesweeper', name: 'Minesweeper', color: '#2F7BF6',
+    meta: '5 difficulties · Classic & Medic', icon: 'mine',
+    modes: [{ label: 'Classic', primary: true }, { label: 'Medic' }],
+    diffs: ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'],
+  },
+  {
+    id: 'merge', name: 'Merge', color: '#29C254',
+    meta: 'Solo · Arcade · Timed', icon: 'merge',
+    modes: [{ label: 'Play', primary: true }, { label: 'Timed' }, { label: 'Arcade' }],
+    diffs: [],
+  },
+  {
+    id: 'nonogram', name: 'Nonogram', color: '#E84743',
+    meta: '5×5 · 10×10 · 15×15', icon: 'nonogram',
+    modes: [{ label: '5×5', primary: true }, { label: '10×10' }, { label: '15×15' }],
+    diffs: [],
+  },
+  {
+    id: 'sudoku', name: 'Sudoku', color: '#E89A1F',
+    meta: 'Classic · Rush · 4 difficulties', icon: 'sudoku',
+    modes: [{ label: 'Classic', primary: true }, { label: 'Rush' }],
+    diffs: ['Easy', 'Normal', 'Hard', 'Expert'],
+  },
+  {
+    id: 'klondike', name: 'Solitaire', color: '#1AB4C2',
+    meta: 'Easy · Normal · Hard draw modes', icon: 'klondike',
+    modes: [{ label: 'Easy', primary: true }, { label: 'Normal' }, { label: 'Hard' }],
+    diffs: [],
+  },
+  {
+    id: 'freecell', name: 'FreeCell', color: '#A458EE',
+    meta: 'Random · Challenge modes', icon: 'freecell',
+    modes: [{ label: 'Random', primary: true }, { label: 'Challenge' }],
+    diffs: [],
+  },
+];
+
+/* ─── SVG icons (simplified glyph paths, white, in a 24×24 vb) ─── */
+const ICONS = {
+  mine: `<svg class="game-svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+    <line x1="4" y1="22" x2="22" y2="22" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+    <line x1="13" y1="5" x2="13" y2="20" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M13 5 L21 9 L13 13 Z" fill="white"/>
+  </svg>`,
+  merge: `<svg class="game-svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+    <rect x="4" y="4" width="12" height="12" rx="3" fill="white" opacity="0.45"/>
+    <rect x="10" y="10" width="12" height="12" rx="3" fill="white"/>
+  </svg>`,
+  nonogram: `<svg class="game-svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+    ${[0,1,2,3,4].map(r=>[0,1,2,3,4].map(c=>{
+      const filled=[[0,1],[0,3],[1,0],[1,1],[1,2],[1,3],[1,4],[2,0],[2,1],[2,2],[2,3],[2,4],[3,1],[3,2],[3,3],[4,2]];
+      const on=filled.some(([fr,fc])=>fr===r&&fc===c);
+      return on?`<rect x="${4+c*4}" y="${4+r*4}" width="3" height="3" rx="0.5" fill="white" ${r===0||r===4?'opacity="0.4"':''}/>`:''
+    }).join('')).join('')}
+  </svg>`,
+  sudoku: `<svg class="game-svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+    <rect x="4" y="4" width="18" height="18" rx="2" stroke="white" stroke-width="1.5" opacity="0.5"/>
+    <line x1="4" y1="10" x2="22" y2="10" stroke="white" stroke-width="1" opacity="0.4"/>
+    <line x1="4" y1="16" x2="22" y2="16" stroke="white" stroke-width="1" opacity="0.4"/>
+    <line x1="10" y1="4" x2="10" y2="22" stroke="white" stroke-width="1" opacity="0.4"/>
+    <line x1="16" y1="4" x2="16" y2="22" stroke="white" stroke-width="1" opacity="0.4"/>
+    <circle cx="7" cy="7" r="1.2" fill="white"/>
+    <circle cx="19" cy="13" r="1.2" fill="white"/>
+    <circle cx="13" cy="19" r="1.2" fill="white"/>
+  </svg>`,
+  klondike: `<svg class="game-svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+    <rect x="4" y="7" width="13" height="17" rx="2.5" fill="white" opacity="0.38"/>
+    <rect x="9" y="4" width="13" height="17" rx="2.5" fill="white"/>
+    <path d="M15.5 8 L16.6 10.2 L19 10.5 L17.2 12.3 L17.7 14.7 L15.5 13.5 L13.3 14.7 L13.8 12.3 L12 10.5 L14.4 10.2 Z" fill="#E84743"/>
+  </svg>`,
+  freecell: `<svg class="game-svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+    <rect x="3" y="5" width="13" height="17" rx="2.5" fill="white" opacity="0.35"/>
+    <rect x="10" y="4" width="13" height="17" rx="2.5" fill="white"/>
+    <text x="16.5" y="17" font-family="-apple-system,sans-serif" font-size="11" font-weight="700" fill="#A458EE" text-anchor="middle">♣</text>
+  </svg>`,
+};
+
+/* ─── Hex to rgba helper ─── */
+function hexAlpha(hex, a) {
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ─── Icon tile HTML ─── */
+function iconTileHTML(game, size=44, radius=11) {
+  return `<div style="width:${size}px;height:${size}px;border-radius:${radius}px;background:${game.color};
+    box-shadow:0 5px 14px ${hexAlpha(game.color,0.45)};
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    ${ICONS[game.icon]}
+  </div>`;
+}
+
+/* ─── Mode chips HTML ─── */
+function chipsHTML(game) {
+  let html = '';
+  if (game.modes.length) {
+    html += `<div class="chip-section-label">${game.diffs.length ? 'MODE' : 'MODE / DIFFICULTY'}</div>`;
+    html += `<div class="chip-row">`;
+    game.modes.forEach(m => {
+      const primary = m.primary;
+      html += `<button class="chip${primary?' chip-primary':''}" ${primary?`style="background:${game.color};"`:''}>${m.label}</button>`;
+    });
+    html += `</div>`;
+  }
+  if (game.diffs.length) {
+    html += `<div class="chip-section-label" style="margin-top:8px;">DIFFICULTY</div>`;
+    html += `<div class="chip-row">`;
+    game.diffs.forEach(d => { html += `<button class="chip">${d}</button>`; });
+    html += `</div>`;
+  }
+  return html;
+}
+
+
+/* ═══════════════════════
+   BUILD VARIANT A
+   ═══════════════════════ */
+function buildA() {
+  const list = document.getElementById('acc-list');
+  list.innerHTML = '';
+
+  GAMES.forEach(game => {
+    const row = document.createElement('div');
+    row.className = 'acc-row';
+    row.style.setProperty('--acc-color', game.color);
+    row.innerHTML = `
+      <div class="acc-header" onclick="accToggle(this)">
+        ${iconTileHTML(game, 44, 11)}
+        <div class="acc-text">
+          <div class="acc-name">${game.name}</div>
+          <div class="acc-meta">${game.meta}</div>
+        </div>
+        <div class="acc-handle"><span></span><span></span><span></span></div>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">${chipsHTML(game)}</div>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  // Upcoming
+  const upcoming = document.createElement('div');
+  upcoming.className = 'acc-upcoming';
+  upcoming.innerHTML = `
+    <div class="acc-upcoming-icon">✨</div>
+    <div class="acc-upcoming-text">
+      <div class="acc-name">Upcoming</div>
+      <div class="acc-meta">Word Grid · Flow · Chess · More</div>
+    </div>
+    <div class="acc-upcoming-chevron">›</div>
+  `;
+  list.appendChild(upcoming);
+}
+
+function accToggle(header) {
+  const row = header.closest('.acc-row');
+  const wasOpen = row.classList.contains('acc-open');
+  document.querySelectorAll('.acc-row.acc-open').forEach(r => r.classList.remove('acc-open'));
+  if (!wasOpen) row.classList.add('acc-open');
+}
+
+
+/* ═══════════════════════
+   BUILD VARIANT B
+   ═══════════════════════ */
+function buildB() {
+  // Recent chips
+  const recent = document.getElementById('recent-row');
+  [GAMES[0], GAMES[4]].forEach(g => {
+    const chip = document.createElement('div');
+    chip.className = 'sheet-recent-chip';
+    chip.innerHTML = `<div class="sheet-recent-dot" style="background:${g.color}"></div>${g.name}`;
+    recent.appendChild(chip);
+  });
+
+  // Peek icons
+  const peekRow = document.getElementById('b-peek-icons');
+  GAMES.slice(0,4).forEach(g => {
+    const icon = document.createElement('div');
+    icon.className = 'sheet-peek-icon';
+    icon.style.cssText = `background:${g.color};box-shadow:0 4px 12px ${hexAlpha(g.color,0.40)};border-radius:14px;`;
+    icon.innerHTML = ICONS[g.icon];
+    peekRow.appendChild(icon);
+  });
+
+  // Game grid
+  const grid = document.getElementById('b-game-grid');
+  GAMES.forEach(g => {
+    const cell = document.createElement('div');
+    cell.className = 'sheet-game-cell';
+    cell.innerHTML = `
+      <div class="sheet-game-icon" style="background:${g.color};border-radius:17px;box-shadow:0 6px 18px ${hexAlpha(g.color,0.42)};">
+        ${ICONS[g.icon]}
+      </div>
+      <div class="sheet-game-name">${g.name}</div>
+    `;
+    grid.appendChild(cell);
+  });
+  const upcoming = document.createElement('div');
+  upcoming.className = 'sheet-game-cell';
+  upcoming.innerHTML = `
+    <div class="sheet-game-icon" style="background:rgba(164,88,238,0.12);border-radius:17px;">
+      <span style="font-size:28px;">✨</span>
+    </div>
+    <div class="sheet-game-name" style="color:#aaa;">Upcoming</div>
+  `;
+  grid.appendChild(upcoming);
+}
+
+let bOpen = false;
+function sheetToggle() { bOpen ? sheetClose() : sheetOpen(); }
+function sheetOpen() {
+  bOpen = true;
+  document.getElementById('bottom-sheet').classList.add('sheet-open');
+  document.getElementById('b-overlay').classList.add('visible');
+  document.getElementById('b-peek-hint').style.display = 'none';
+  document.getElementById('b-peek-icons').style.display = 'none';
+}
+function sheetClose() {
+  bOpen = false;
+  document.getElementById('bottom-sheet').classList.remove('sheet-open');
+  document.getElementById('b-overlay').classList.remove('visible');
+  setTimeout(() => {
+    document.getElementById('b-peek-hint').style.display = '';
+    document.getElementById('b-peek-icons').style.display = '';
+  }, 400);
+}
+
+
+/* ═══════════════════════
+   BUILD VARIANT C
+   ═══════════════════════ */
+let cSelected = null;
+
+function buildC() {
+  const root = document.getElementById('pull-grid-root');
+  root.innerHTML = '';
+
+  const ROW = 3;
+  for (let i = 0; i < GAMES.length; i += ROW) {
+    const rowGames = GAMES.slice(i, i + ROW);
+    const rowIndex = Math.floor(i / ROW);
+
+    const tileRow = document.createElement('div');
+    tileRow.className = 'pull-tile-row';
+    tileRow.dataset.rowIndex = rowIndex;
+
+    rowGames.forEach(game => {
+      const slot = document.createElement('div');
+      slot.className = 'pull-tile-slot';
+      slot.style.setProperty('--slot-color', game.color);
+      slot.dataset.gameId = game.id;
+      slot.innerHTML = `
+        <div class="pull-tile" onclick="cTileToggle('${game.id}', ${rowIndex})">
+          <div class="pull-tile-icon-wrap">
+            <div class="pull-tile-icon" style="background:${game.color};box-shadow:0 8px 22px ${hexAlpha(game.color,0.42)};">
+              ${ICONS[game.icon]}
+            </div>
+          </div>
+          <div class="pull-handle-pip"></div>
+          <div class="pull-tile-name">${game.name}</div>
+        </div>
+      `;
+      tileRow.appendChild(slot);
+    });
+
+    // Pad if fewer than ROW games
+    while (rowGames.length < ROW) {
+      tileRow.appendChild(document.createElement('div')).style.flex = '1';
+      rowGames.push(null);
+    }
+
+    root.appendChild(tileRow);
+
+    // Detail panel placeholder (hidden, after this row)
+    const panel = document.createElement('div');
+    panel.className = 'pull-detail-panel';
+    panel.dataset.rowIndex = rowIndex;
+    panel.innerHTML = `<div class="pull-detail-inner" id="pull-panel-inner-${rowIndex}"></div>`;
+    root.appendChild(panel);
+  }
+
+  // Upcoming tile in extra row
+  const upcomingRow = document.createElement('div');
+  upcomingRow.className = 'pull-tile-row';
+  upcomingRow.innerHTML = `
+    <div class="pull-tile-slot">
+      <div class="pull-upcoming-tile">
+        <div class="pull-upcoming-icon">✨</div>
+        <div class="pull-upcoming-pip"></div>
+        <div class="pull-upcoming-name">Upcoming</div>
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="flex:1"></div>
+  `;
+  root.appendChild(upcomingRow);
+}
+
+function cTileToggle(gameId, rowIndex) {
+  const game = GAMES.find(g => g.id === gameId);
+  const panel = document.querySelector(`.pull-detail-panel[data-row-index="${rowIndex}"]`);
+  const slot = document.querySelector(`.pull-tile-slot[data-game-id="${gameId}"]`);
+  const sameGame = cSelected === gameId;
+
+  // Deselect all
+  document.querySelectorAll('.pull-tile-slot.selected').forEach(s => s.classList.remove('selected'));
+  document.querySelectorAll('.pull-detail-panel.panel-open').forEach(p => p.classList.remove('panel-open'));
+
+  if (!sameGame) {
+    cSelected = gameId;
+    slot.classList.add('selected');
+    panel.classList.add('panel-open');
+
+    // Fill panel content
+    const inner = document.getElementById(`pull-panel-inner-${rowIndex}`);
+    inner.innerHTML = `
+      <div class="pull-detail-header">
+        <div class="pull-detail-icon" style="background:${game.color};box-shadow:0 4px 10px ${hexAlpha(game.color,0.38)};">
+          ${ICONS[game.icon]}
+        </div>
+        <div>
+          <div class="pull-detail-name">${game.name}</div>
+          <div class="pull-detail-meta">${game.meta}</div>
+        </div>
+      </div>
+      ${chipsHTML(game)}
+    `;
+  } else {
+    cSelected = null;
+  }
+}
+
+
+/* ─── Variant switching ─── */
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+
+/* ─── Init ─── */
+buildA();
+buildB();
+buildC();
+</script>
+</body>
+</html>
