@@ -166,9 +166,13 @@ final class FreeCellViewModel {
                 rejectStreak += 1
                 if rejectStreak >= 5 {
                     let limit = FreeCellRules.maxMoveable(board: board, toEmptyColumn: false)
-                    hintText = tappedCards.count > limit
-                        ? "Need \(tappedCards.count) free cells — only \(limit) available"
-                        : "Cards are out of sequence"
+                    if tappedCards.count > limit {
+                        hintText = board.emptyFreeCellCount == 0
+                            ? "No free cells — move one card at a time"
+                            : "Free more cells to pick up that stack"
+                    } else {
+                        hintText = "Cards aren't in sequence"
+                    }
                     rejectStreak = 0
                 }
                 return

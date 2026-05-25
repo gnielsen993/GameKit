@@ -28,10 +28,12 @@ extension FreeCellGameView {
                 .toolbar(.hidden, for: .navigationBar)
         } else if videoModeStore.location.isTopSmall {
             topSmallZoneLayout
+                .navigationBarBackButtonHidden(true)
                 .toolbar { fcSmallZoneToolbarContent }
         } else {
+            // Bottom small zones: PiP is below the nav bar — keep normal toolbar, no duplicates
             bottomSmallZoneLayout
-                .toolbar { fcSmallZoneToolbarContent }
+                .toolbar { toolbarContent }
         }
     }
 

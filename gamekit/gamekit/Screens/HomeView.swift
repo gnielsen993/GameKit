@@ -330,20 +330,26 @@ struct HomeView: View {
         case .minesweeper(let difficulty):
             MinesweeperGameView(initialDifficulty: difficulty)
                 .videoModeAware(minBoardHeight: 480)
+                .disableInteractivePop()
         case .merge(let mode):
             MergeGameView(initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
+                .disableInteractivePop()
         case .nonogram(let difficulty, let mode):
             NonogramGameView(initialDifficulty: difficulty, initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
+                .disableInteractivePop()
         case .sudoku(let difficulty, let mode):
             SudokuGameView(initialDifficulty: difficulty, initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
+                .disableInteractivePop()
         case .klondike(let difficulty):
             SolitaireGameView(initialDifficulty: difficulty ?? .easy)
+                .disableInteractivePop()
         case .freeCell(let mode):
             FreeCellGameView(initialMode: mode ?? .random(.easy))
                 .videoModeAware(minBoardHeight: 480)
+                .disableInteractivePop()
         }
     }
 
