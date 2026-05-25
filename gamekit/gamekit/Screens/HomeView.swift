@@ -4,19 +4,17 @@
 //
 //  The Drawer — entry point to all playable games.
 //
-//  Closed state: 3-column icon grid, each tile 78pt. Tap a tile to expand.
-//  Open state: selected tile renders at 96pt; all others shrink to 44pt in
-//  a horizontal ScrollView strip; HomeDetailPanel appears below.
+//  Closed state: 3-column icon grid. Tap a tile to expand.
+//  Open state: selected tile at 96pt; all others shrink to 44pt in
+//  a horizontal ScrollView strip; HomeDetailPanel (or upcoming panel)
+//  appears below.
 //
-//  Routing:
-//    - NavigationStack owns `path: [GameRoute]`. A single
-//      `.navigationDestination(for: GameRoute.self)` switch maps each
-//      case (with its associated mode) to its game view's init.
-//    - Adding game #N = one descriptor entry in GameDescriptor.all +
-//      one case in GameRoute + one switch arm here.
+//  Expanded state covers both games (expandedKind) and the Upcoming
+//  tile (expandedUpcoming). A 36pt clear zone at the top of the
+//  expanded content gives a tap-to-dismiss target above the strip.
 //
-//  Per P1 D-02: this file owns its own NavigationStack — RootTabView
-//  does not (Anti-Pattern 3 in ARCHITECTURE.md).
+//  Stats sheet uses .sheet(item:) so focusedKind is always captured
+//  at presentation time, not at closure-capture time.
 //
 
 import SwiftUI
@@ -28,12 +26,13 @@ struct HomeView: View {
 
     @State private var path: [GameRoute] = []
     @State private var expandedKind: GameKind?
+    @State private var expandedUpcoming = false
     @State private var showingComingSoon: GameCard?
-    @State private var showingUpcoming: Bool = false
     @State private var showingSettings: Bool = false
-    @State private var showingStats: Bool = false
-    @State private var statsGame: GameKind? = nil
+    @State private var statsRequest: StatsRequest? = nil
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
+    private var isExpanded: Bool { expandedKind != nil || expandedUpcoming }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -41,34 +40,31 @@ struct HomeView: View {
                 ZStack(alignment: .top) {
                     theme.colors.background
                         .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
-                                expandedKind = nil
-                            }
-                        }
+                        .onTapGesture { collapse() }
 
                     VStack(spacing: theme.spacing.m) {
-                        if expandedKind == nil {
+                        if !isExpanded {
                             closedGrid
                         } else {
                             openStrip
+
                             if let kind = expandedKind,
                                let descriptor = GameDescriptor.all.first(where: { $0.kind == kind }) {
                                 HomeDetailPanel(
                                     descriptor: descriptor,
                                     theme: theme,
                                     onSelect: { route in
-                                        withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
-                                            expandedKind = nil
-                                        }
+                                        collapse()
                                         path.append(route)
                                     },
                                     onStats: {
-                                        statsGame = expandedKind
-                                        showingStats = true
+                                        statsRequest = StatsRequest(kind: expandedKind)
                                     }
                                 )
                                 .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            } else if expandedUpcoming {
+                                upcomingDetailPanel
+                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
                             }
                         }
                     }
@@ -76,6 +72,7 @@ struct HomeView: View {
                     .padding(.top, theme.spacing.s)
                     .frame(maxWidth: .infinity, alignment: .top)
                     .animation(.spring(response: 0.42, dampingFraction: 0.78), value: expandedKind)
+                    .animation(.spring(response: 0.42, dampingFraction: 0.78), value: expandedUpcoming)
                 }
             }
             .scrollBounceBehavior(.basedOnSize)
@@ -89,22 +86,11 @@ struct HomeView: View {
             .navigationDestination(for: GameRoute.self) { route in
                 destination(for: route)
             }
-            .sheet(isPresented: $showingUpcoming) {
-                UpcomingGamesView(theme: theme) { card in
-                    showingComingSoon = card
-                    Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: 1_800_000_000)
-                        if showingComingSoon?.id == card.id {
-                            showingComingSoon = nil
-                        }
-                    }
-                }
-            }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
             }
-            .sheet(isPresented: $showingStats) {
-                StatsView(focusedKind: statsGame)
+            .sheet(item: $statsRequest) { req in
+                StatsView(focusedKind: req.kind)
             }
             .overlay(alignment: .bottom) {
                 if let card = showingComingSoon {
@@ -114,6 +100,15 @@ struct HomeView: View {
                     )
                 }
             }
+        }
+    }
+
+    // MARK: - Collapse helper
+
+    private func collapse() {
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+            expandedKind = nil
+            expandedUpcoming = false
         }
     }
 
@@ -130,7 +125,7 @@ struct HomeView: View {
         .padding(.top, theme.spacing.s)
     }
 
-    // MARK: - Open strip (one game selected)
+    // MARK: - Open strip (one tile selected)
 
     private var openStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -138,7 +133,7 @@ struct HomeView: View {
                 ForEach(GameDescriptor.all) { descriptor in
                     let isSelected = expandedKind == descriptor.kind
                     gameTile(descriptor, tileSize: isSelected ? 96 : 44, showLabel: isSelected)
-                        .opacity(isSelected ? 1 : 0.45)
+                        .opacity(isSelected ? 1 : (expandedUpcoming ? 0.35 : 0.45))
                         .blur(radius: isSelected ? 0 : 0.5)
                 }
                 upcomingStripTile
@@ -155,26 +150,24 @@ struct HomeView: View {
     private func gameTile(_ descriptor: GameDescriptor, tileSize: CGFloat, showLabel: Bool) -> some View {
         Button {
             withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+                expandedUpcoming = false
                 expandedKind = expandedKind == descriptor.kind ? nil : descriptor.kind
             }
         } label: {
             VStack(spacing: 8) {
-                ZStack(alignment: .topTrailing) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: tileSize * 0.26, style: .continuous)
-                            .fill(descriptor.kind.accentColor)
-                            .shadow(
-                                color: descriptor.kind.accentColor.opacity(
-                                    expandedKind == descriptor.kind ? 0.55 : 0.38
-                                ),
-                                radius: expandedKind == descriptor.kind ? 18 : 10,
-                                x: 0, y: expandedKind == descriptor.kind ? 10 : 6
-                            )
-                        GameIconView(kind: descriptor.kind, size: tileSize * 0.54)
-                    }
-                    .frame(width: tileSize, height: tileSize)
-
+                ZStack {
+                    RoundedRectangle(cornerRadius: tileSize * 0.26, style: .continuous)
+                        .fill(descriptor.kind.accentColor)
+                        .shadow(
+                            color: descriptor.kind.accentColor.opacity(
+                                expandedKind == descriptor.kind ? 0.55 : 0.38
+                            ),
+                            radius: expandedKind == descriptor.kind ? 18 : 10,
+                            x: 0, y: expandedKind == descriptor.kind ? 10 : 6
+                        )
+                    GameIconView(kind: descriptor.kind, size: tileSize * 0.54)
                 }
+                .frame(width: tileSize, height: tileSize)
 
                 if showLabel {
                     Text(String(localized: "\(descriptor.titleKey)"))
@@ -188,10 +181,14 @@ struct HomeView: View {
         .accessibilityLabel(Text(descriptor.titleKey))
     }
 
+    // MARK: - Upcoming tile (closed grid)
+
     private var upcomingGridTile: some View {
         Button {
-            expandedKind = nil
-            showingUpcoming = true
+            withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+                expandedKind = nil
+                expandedUpcoming = true
+            }
         } label: {
             VStack(spacing: 8) {
                 ZStack {
@@ -213,25 +210,116 @@ struct HomeView: View {
         .accessibilityLabel(Text("Upcoming games"))
     }
 
+    // MARK: - Upcoming tile (open strip)
+
     private var upcomingStripTile: some View {
-        Button {
+        let isSelected = expandedUpcoming
+        let size: CGFloat = isSelected ? 96 : 44
+        return Button {
             withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
-                expandedKind = nil
+                if isSelected {
+                    expandedUpcoming = false
+                } else {
+                    expandedKind = nil
+                    expandedUpcoming = true
+                }
             }
-            showingUpcoming = true
         } label: {
-            ZStack {
-                RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
-                    .fill(theme.colors.accentSecondary.opacity(0.14))
-                Image(systemName: "sparkles")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(theme.colors.accentSecondary)
+            VStack(spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: size * 0.26, style: .continuous)
+                        .fill(theme.colors.accentSecondary.opacity(isSelected ? 0.22 : 0.14))
+                        .shadow(
+                            color: theme.colors.accentSecondary.opacity(isSelected ? 0.45 : 0),
+                            radius: isSelected ? 14 : 0,
+                            x: 0, y: isSelected ? 8 : 0
+                        )
+                    Image(systemName: "sparkles")
+                        .font(.system(size: size * 0.33, weight: .semibold))
+                        .foregroundStyle(theme.colors.accentSecondary)
+                }
+                .frame(width: size, height: size)
+
+                if isSelected {
+                    Text(String(localized: "Upcoming"))
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(theme.colors.textSecondary)
+                        .lineLimit(1)
+                }
             }
-            .frame(width: 44, height: 44)
-            .opacity(0.55)
         }
         .buttonStyle(.plain)
+        .opacity(isSelected ? 1 : (expandedKind != nil ? 0.45 : 0.55))
         .accessibilityLabel(Text("Upcoming games"))
+    }
+
+    // MARK: - Upcoming detail panel (inline, mirrors HomeDetailPanel structure)
+
+    private var upcomingDetailPanel: some View {
+        let iconSz: CGFloat = 64
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: theme.spacing.m) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: iconSz * 0.26, style: .continuous)
+                        .fill(theme.colors.accentSecondary.opacity(0.18))
+                        .shadow(color: theme.colors.accentSecondary.opacity(0.35), radius: 10, x: 0, y: 6)
+                    Image(systemName: "sparkles")
+                        .font(.system(size: iconSz * 0.36, weight: .semibold))
+                        .foregroundStyle(theme.colors.accentSecondary)
+                }
+                .frame(width: iconSz, height: iconSz)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(String(localized: "Upcoming"))
+                        .font(theme.typography.headline)
+                        .foregroundStyle(theme.colors.textPrimary)
+                    Text(String(localized: "In development"))
+                        .font(theme.typography.caption)
+                        .foregroundStyle(theme.colors.textSecondary)
+                }
+                Spacer(minLength: 0)
+            }
+
+            Divider().padding(.vertical, theme.spacing.m)
+
+            VStack(spacing: theme.spacing.s) {
+                ForEach(upcomingGames) { card in
+                    Button {
+                        showingComingSoon = card
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 1_800_000_000)
+                            if showingComingSoon?.id == card.id { showingComingSoon = nil }
+                        }
+                    } label: {
+                        HStack(spacing: theme.spacing.m) {
+                            Image(systemName: card.symbol)
+                                .font(.body)
+                                .foregroundStyle(theme.colors.textSecondary)
+                                .frame(width: 28)
+                            Text(card.title)
+                                .font(theme.typography.body)
+                                .foregroundStyle(theme.colors.textPrimary)
+                            Spacer()
+                            Image(systemName: "lock")
+                                .font(.caption)
+                                .foregroundStyle(theme.colors.textTertiary)
+                        }
+                        .padding(.vertical, theme.spacing.xs)
+                    }
+                    .buttonStyle(.plain)
+
+                    if card.id != upcomingGames.last?.id {
+                        Divider()
+                    }
+                }
+            }
+        }
+        .padding(theme.spacing.m)
+        .background(
+            RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                .fill(theme.colors.surface)
+                .shadow(color: theme.colors.textPrimary.opacity(0.10), radius: 16, x: 0, y: 8)
+        )
     }
 
     // MARK: - Routing
@@ -263,8 +351,7 @@ struct HomeView: View {
     private var profileMenu: some View {
         Menu {
             Button {
-                statsGame = nil
-                showingStats = true
+                statsRequest = StatsRequest(kind: nil)
             } label: {
                 Label(String(localized: "Stats"), systemImage: "chart.bar")
             }
@@ -282,7 +369,7 @@ struct HomeView: View {
     }
 }
 
-// MARK: - GameCard model (used by UpcomingGamesView)
+// MARK: - Supporting types
 
 struct GameCard: Identifiable, Equatable {
     let id: String
@@ -290,3 +377,19 @@ struct GameCard: Identifiable, Equatable {
     let symbol: String
     let isEnabled: Bool
 }
+
+// Stats sheet item — wraps optional GameKind so .sheet(item:) can carry
+// both "focused on one game" and "show all" through the same binding.
+private struct StatsRequest: Identifiable {
+    let id = UUID()
+    let kind: GameKind?
+}
+
+// Upcoming games catalog. Entries here move to GameDescriptor.all when
+// they graduate to playable. Order determines display order in the panel.
+private let upcomingGames: [GameCard] = [
+    GameCard(id: "wordGrid",      title: String(localized: "Word Grid"),      symbol: "textformat.abc",     isEnabled: false),
+    GameCard(id: "flow",          title: String(localized: "Flow"),           symbol: "scribble.variable",  isEnabled: false),
+    GameCard(id: "patternMemory", title: String(localized: "Pattern Memory"), symbol: "rectangle.grid.2x2", isEnabled: false),
+    GameCard(id: "chessPuzzles",  title: String(localized: "Chess Puzzles"),  symbol: "checkmark.shield",   isEnabled: false),
+]

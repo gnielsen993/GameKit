@@ -52,6 +52,31 @@ struct FreeCellBoard: Codable {
     var emptyColumnCount:   Int { columns.filter { $0.isEmpty }.count }
     var isWon: Bool { foundations.allSatisfy { $0 == .king } }
 
+    var canAutoComplete: Bool {
+        var sim = self
+        var changed = true
+        while changed {
+            changed = false
+            for i in sim.columns.indices {
+                if let card = sim.columns[i].last,
+                   FreeCellRules.canMoveToFoundation(card, foundations: sim.foundations) {
+                    sim.columns[i].removeLast()
+                    sim.advanceFoundation(for: card.suit)
+                    changed = true
+                }
+            }
+            for i in sim.freeCells.indices {
+                if let card = sim.freeCells[i],
+                   FreeCellRules.canMoveToFoundation(card, foundations: sim.foundations) {
+                    sim.freeCells[i] = nil
+                    sim.advanceFoundation(for: card.suit)
+                    changed = true
+                }
+            }
+        }
+        return sim.isWon
+    }
+
     func firstEmptyFreeCellIndex() -> Int? {
         freeCells.indices.first { freeCells[$0] == nil }
     }

@@ -1,17 +1,3 @@
-//
-//  HomeDetailPanel.swift
-//  gamekit
-//
-//  Appears below the horizontal tile strip when a game is expanded on HomeView.
-//  Driven entirely by GameDescriptor props — no SwiftData access here.
-//
-//  Games with parent chips (Nonogram, Sudoku) show two tiers:
-//    - Mode pills (Free / Lives) — selecting one filters the difficulty row.
-//    - Difficulty chips (5×5 / 10×10 / …) — tapping launches the game.
-//  Games with leaf chips (Minesweeper, Merge, Solitaire, FreeCell) show a
-//  single chip row that launches directly.
-//
-
 import SwiftUI
 import DesignKit
 
@@ -33,10 +19,7 @@ struct HomeDetailPanel: View {
         _selectedModeId = State(initialValue: descriptor.modes.first?.id ?? "")
     }
 
-    // True when the first chip is a parent chip (no route, has subModes).
-    private var hasParentChips: Bool {
-        descriptor.modes.first?.route == nil
-    }
+    private var hasParentChips: Bool { descriptor.modes.first?.route == nil }
 
     private var selectedParent: GameModeChip? {
         descriptor.modes.first(where: { $0.id == selectedModeId })
@@ -45,8 +28,7 @@ struct HomeDetailPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-            Divider()
-                .padding(.vertical, theme.spacing.m)
+            Divider().padding(.vertical, theme.spacing.m)
             modeSection
             statsLink
         }
@@ -97,21 +79,17 @@ struct HomeDetailPanel: View {
         }
     }
 
-    // MARK: - Mode pill row (Free / Lives)
+    // MARK: - Mode pill row
 
     private var modePillRow: some View {
         HStack(spacing: theme.spacing.s) {
-            ForEach(descriptor.modes) { chip in
-                modePill(chip)
-            }
+            ForEach(descriptor.modes) { chip in modePill(chip) }
         }
     }
 
     private func modePill(_ chip: GameModeChip) -> some View {
         let selected = chip.id == selectedModeId
-        return Button {
-            selectedModeId = chip.id
-        } label: {
+        return Button { selectedModeId = chip.id } label: {
             Text(String(localized: "\(chip.labelKey)"))
                 .font(theme.typography.body.weight(.semibold))
                 .foregroundStyle(selected ? .white : theme.colors.textPrimary)
@@ -132,7 +110,7 @@ struct HomeDetailPanel: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - Difficulty chips (sub-modes of selected parent)
+    // MARK: - Difficulty grid
 
     private func difficultyGrid(_ chips: [GameModeChip]) -> some View {
         let columns = [GridItem(.flexible()), GridItem(.flexible())]
@@ -146,8 +124,6 @@ struct HomeDetailPanel: View {
         }
     }
 
-    // MARK: - Leaf chips (direct launch, 3-col grid)
-
     private func leafGrid(_ chips: [GameModeChip]) -> some View {
         let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
         return LazyVGrid(columns: columns, spacing: theme.spacing.s) {
@@ -159,8 +135,6 @@ struct HomeDetailPanel: View {
             }
         }
     }
-
-    // MARK: - Shared chip cell
 
     @ViewBuilder
     private func chipLabel(_ chip: GameModeChip) -> some View {
@@ -187,8 +161,6 @@ struct HomeDetailPanel: View {
                 )
         )
     }
-
-    // MARK: - Helpers
 
     private func sectionLabel(_ text: String) -> some View {
         Text(text)

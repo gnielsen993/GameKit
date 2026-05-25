@@ -159,7 +159,7 @@ struct StatsView: View {
                     if shows(.klondike) {
                         if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "SOLITAIRE")) }
                         DKCard(theme: theme) {
-                            SolitaireStatsCard(records: klondikeRecords, bestTimes: klondikeBestTimes)
+                            SolitaireStatsCard(theme: theme, records: klondikeRecords, bestTimes: klondikeBestTimes)
                         }
                     }
                 }

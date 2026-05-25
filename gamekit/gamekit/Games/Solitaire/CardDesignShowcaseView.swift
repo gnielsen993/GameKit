@@ -22,7 +22,7 @@ struct PlayingCardView: View {
     private var suitCorner: CGFloat { width * (isCondensed ? 0.21 : 0.24) }
     private var hPad:       CGFloat { width * (isCondensed ? 0.08 : 0.09) }
     private var topPad:     CGFloat { width * (isCondensed ? 0.05 : 0.06) }
-    private var suitCenter: CGFloat { rank.isFace ? width * 0.28 : width * 0.50 }
+    private var suitCenter: CGFloat { width * 0.50 }
 
     init(_ card: PlayingCard, theme: Theme, isClassic: Bool, width: CGFloat = 70) {
         self.rank = card.rank; self.suit = card.suit
@@ -72,20 +72,9 @@ struct PlayingCardView: View {
     }
 
     @ViewBuilder private var centerContent: some View {
-        if rank.isFace {
-            VStack(spacing: width * 0.03) {
-                Text(rank.display)
-                    .font(.system(size: width * 0.30, weight: .heavy, design: .rounded))
-                    .foregroundStyle(suitColor)
-                Image(systemName: suit.sfSymbol)
-                    .font(.system(size: suitCenter))
-                    .foregroundStyle(suitColor)
-            }
-        } else {
-            Image(systemName: suit.sfSymbol)
-                .font(.system(size: rank == .ace ? width * 0.54 : suitCenter))
-                .foregroundStyle(suitColor)
-        }
+        Image(systemName: suit.sfSymbol)
+            .font(.system(size: rank == .ace ? width * 0.54 : suitCenter))
+            .foregroundStyle(suitColor)
     }
 }
 

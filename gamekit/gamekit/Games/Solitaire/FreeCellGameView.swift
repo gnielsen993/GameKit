@@ -86,6 +86,9 @@ struct FreeCellGameView: View {
             if phase == .background { vm.saveCurrentState(); vm.pause() }
             else if phase == .active { vm.resume() }
         }
+        .onChange(of: vm.board.canAutoComplete) { _, canAC in
+            if canAC { vm.beginAutoCompleteAnimation() }
+        }
     }
 
     // MARK: - Normal layout (off Video Mode path)

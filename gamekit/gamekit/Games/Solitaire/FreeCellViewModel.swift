@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftUI
 
 // MARK: - Selection
 
@@ -36,6 +37,8 @@ final class FreeCellViewModel {
     private(set) var selectTick  = 0
     private(set) var dropTick    = 0
     private(set) var rejectTick  = 0
+
+    private(set) var isAutoCompleting = false
 
     // Stats write-side firewall
     var gameStats: GameStats?
@@ -232,6 +235,46 @@ final class FreeCellViewModel {
         dealNumber = Self.resolveDealNumber(mode: mode)
         difficulty = { if case .random(let d) = mode { return d } else { return nil } }()
         reset()
+    }
+
+    // MARK: - Auto-complete
+
+    func beginAutoCompleteAnimation() {
+        guard board.canAutoComplete, gameState == .playing, !isAutoCompleting else { return }
+        isAutoCompleting = true
+        Task { @MainActor in
+            while gameState == .playing {
+                var moved = false
+                for i in board.columns.indices {
+                    if let card = board.columns[i].last,
+                       FreeCellRules.canMoveToFoundation(card, foundations: board.foundations) {
+                        withAnimation(.easeInOut(duration: 0.12)) {
+                            board.columns[i].removeLast()
+                            board.advanceFoundation(for: card.suit)
+                        }
+                        moved = true
+                        break
+                    }
+                }
+                if !moved {
+                    for i in board.freeCells.indices {
+                        if let card = board.freeCells[i],
+                           FreeCellRules.canMoveToFoundation(card, foundations: board.foundations) {
+                            withAnimation(.easeInOut(duration: 0.12)) {
+                                board.freeCells[i] = nil
+                                board.advanceFoundation(for: card.suit)
+                            }
+                            moved = true
+                            break
+                        }
+                    }
+                }
+                if !moved { break }
+                if board.isWon { checkTerminalState(); break }
+                try? await Task.sleep(for: .milliseconds(80))
+            }
+            isAutoCompleting = false
+        }
     }
 
     // MARK: - Private move logic

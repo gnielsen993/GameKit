@@ -134,11 +134,6 @@ extension SolitaireGameView {
                     .padding(.top, theme.spacing.s)
                     .frame(maxHeight: .infinity, alignment: .top)
                     .background(boardColor)
-
-                if vm.board.canAutoComplete && vm.gameState == .playing {
-                    autoCompleteBar
-                        .background(boardColor)
-                }
             }
 
             if isDragging {

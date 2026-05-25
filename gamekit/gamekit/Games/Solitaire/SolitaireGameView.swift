@@ -85,6 +85,9 @@ struct SolitaireGameView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: pickUpTick)
         .sensoryFeedback(.success, trigger: dropTick)
         .sensoryFeedback(.error, trigger: rejectTick)
+        .onChange(of: vm.board.canAutoComplete) { _, canAC in
+            if canAC { vm.beginAutoCompleteAnimation() }
+        }
     }
 
     var normalLayout: some View {
@@ -95,10 +98,6 @@ struct SolitaireGameView: View {
                         .background(theme.colors.background)
                     boardArea(geo: geo)
                         .layoutPriority(1)
-                    if vm.board.canAutoComplete && vm.gameState == .playing {
-                        autoCompleteBar
-                            .background(boardColor)
-                    }
                 }
                 if vm.gameState == .won {
                     winBanner
@@ -385,15 +384,6 @@ struct SolitaireGameView: View {
     func selectedFrom(col: Int) -> Int? {
         guard case .column(let c, let from) = vm.selection, c == col else { return nil }
         return from
-    }
-
-    // MARK: - Auto-complete
-
-    var autoCompleteBar: some View {
-        Button("Auto-Complete") { withAnimation { vm.autoComplete() } }
-            .buttonStyle(.borderedProminent)
-            .tint(theme.colors.accentPrimary)
-            .padding(.bottom, theme.spacing.m)
     }
 
     // MARK: - Win banner

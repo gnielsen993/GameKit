@@ -20,6 +20,7 @@ final class SolitaireViewModel {
 
     var timerAnchor: Date?       = nil
     var pausedElapsed: TimeInterval = 0
+    private(set) var isAutoCompleting = false
 
     // MARK: - Private state
 
@@ -158,23 +159,30 @@ final class SolitaireViewModel {
 
     // MARK: - Auto-complete
 
-    func autoComplete() {
-        guard board.canAutoComplete, gameState == .playing else { return }
-        // Sweep one card at a time to the correct foundation
-        var changed = true
-        while changed {
-            changed = false
-            for col in board.tableau.indices {
-                guard let card = board.tableau[col].last else { continue }
-                let topRank = board.foundations[card.suit.foundationIndex]
-                if SolitaireRules.canPlaceOnFoundation(card, topRank: topRank) {
-                    board.tableau[col].removeLast()
-                    board.foundations[card.suit.foundationIndex] = card.rank
-                    changed = true
+    func beginAutoCompleteAnimation() {
+        guard board.canAutoComplete, gameState == .playing, !isAutoCompleting else { return }
+        isAutoCompleting = true
+        Task { @MainActor in
+            while gameState == .playing {
+                var moved = false
+                for col in board.tableau.indices {
+                    guard let card = board.tableau[col].last else { continue }
+                    let topRank = board.foundations[card.suit.foundationIndex]
+                    if SolitaireRules.canPlaceOnFoundation(card, topRank: topRank) {
+                        withAnimation(.easeInOut(duration: 0.12)) {
+                            board.tableau[col].removeLast()
+                            board.foundations[card.suit.foundationIndex] = card.rank
+                        }
+                        moved = true
+                        break
+                    }
                 }
+                if !moved { break }
+                if board.isWon { finishGame(outcome: .win); break }
+                try? await Task.sleep(for: .milliseconds(80))
             }
+            isAutoCompleting = false
         }
-        if board.isWon { finishGame(outcome: .win) }
     }
 
     // MARK: - Undo
@@ -302,7 +310,7 @@ final class SolitaireViewModel {
     private func finishGame(outcome: Outcome) {
         clearSavedState()
         gameState = .won
-        let elapsed = pausedElapsed
+        let elapsed = pausedElapsed + (timerAnchor.map { Date.now.timeIntervalSince($0) } ?? 0)
         timerAnchor = nil
         Task {
             try? gameStats?.record(
