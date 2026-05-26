@@ -1,7 +1,7 @@
-# App Store Copy — GameDrawer v1.2
+# App Store Copy — GameDrawer v1.3
 
-Last updated: 2026-05-21
-Marketing version: 1.2
+Last updated: 2026-05-25
+Marketing version: 1.3
 
 Paste each section into App Store Connect verbatim. Character counts are
 noted where limits apply. Do not include the section headers in submissions.
@@ -11,35 +11,35 @@ noted where limits apply. Do not include the section headers in submissions.
 ## Promotional Text (170 chars max — shown above description, updatable without a new build)
 
 ```
-The only puzzle game that plays alongside your video. Six PiP positions. Four games. Zero ads. Minesweeper, Merge, Nonogram, Sudoku.
+The only puzzle game that plays alongside your video. Six PiP positions. Six games. Zero ads. Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire.
 ```
 
-133 chars ✓
+151 chars ✓
 
 ---
 
 ## What's New (4000 chars max — shown in the Updates tab and version history)
 
 ```
-VIDEO MODE — across all four games.
+FREECELL AND SOLITAIRE
 
-Keep a video running in Picture-in-Picture while you play. Pick from six positions: large top, large bottom, or any of the four corners. Every game layout reflows around your video — controls stay visible, nothing gets buried. Switch it off and the layout returns to exactly what it was. This is the only multi-game puzzle app that does this.
+Two classic card games, now in the drawer.
 
-SUDOKU
-9×9 classic logic. 6,000 curated puzzles across Easy, Medium, Hard, and Extreme. Pencil notes, undo, and two modes: Free (wrong placements show in red, you keep going) or Lives (three mistakes ends the game).
+FREECELL
+8-column tableau, 4 free cells, 4 foundations. Tap or drag to move cards; multi-card sequences are capped by the standard supermove rule. Double-tap the top card of any column or free cell to auto-send it to the foundation. Enter any deal number from 1 to 32,000, or pick Easy, Medium, Hard, or Expert at random. Undo, restart-this-deal, loss detection, win cascade animation, Video Mode across all six PiP zones, and per-difficulty stats.
 
-The feedback is designed alongside the game, not bolted on after: complete a row, column, or 3×3 box and those cells glow. Place the last of a number and the pad button bounces, strikes through, and goes quiet — no more counting to see if there are any 7s left.
+KLONDIKE SOLITAIRE
+7-column tableau, stock and waste pile, 4 foundations. Draw 1, 2, or 3 cards from the stock depending on difficulty. Drag cards and sequences between columns, double-tap to auto-send to foundation, and use the Auto-Complete button when all remaining cards can be swept automatically. Undo up to 50 moves, restart the same deal, Video Mode, and per-difficulty stats.
 
 ALSO IN THIS UPDATE
-• Resume where you left off — in-progress Sudoku puzzles save automatically and pick back up next launch
-• Completed puzzle tracking — you won't see the same board twice
-• Lives counters use hearts in every game, consistently
-• Timer and lives chips lift clear of the board in large Video Mode zones
+• New home screen — a 3-column icon grid replaces the accordion drawer; tap a tile to expand it into mode chips and a stats link
+• In-progress games save automatically across all six games — resume exactly where you left off or start fresh
+• Win haptic and green flash in both card games confirm the win the moment it happens
 
-No ads. No coins. No subscription. Four games worth playing.
+No ads. No coins. No subscription. Six games worth playing.
 ```
 
-~970 chars ✓
+~1,060 chars ✓
 
 ---
 
@@ -64,8 +64,14 @@ Fill a grid to reveal a hidden picture using row and column hints. Free mode or 
 SUDOKU
 9×9 classic. 6,000 curated puzzles across four difficulties. Pencil notes, undo, Free and Lives modes. Complete a row, column, or box and those cells glow. Place the last of a number and the pad button strikes through — you always know what's left. In-progress puzzles save automatically and pick back up next launch.
 
+FREECELL
+8-column tableau, 4 free cells, 4 foundations. Supermove rules, deal-number entry (1-32,000), Easy through Expert tiers, loss detection, win cascade animation, and undo.
+
+SOLITAIRE
+Klondike with draw 1, 2, or 3. Drag sequences, double-tap to auto-send, auto-complete when the position is clear. Undo up to 50 moves.
+
 — VIDEO MODE —
-All four games. Six PiP positions. Every layout reflows. No features lost, no controls buried.
+All six games. Six PiP positions. Every layout reflows. No features lost, no controls buried.
 
 — THEMES —
 Seventeen presets plus custom colors. Switch instantly. Every theme is legible on every game. Classic Chrome Diner is the default; try Voltage or Dracula for something darker.
@@ -76,14 +82,14 @@ No account. No required permissions. No ads, no coins, no subscription, no energ
 Download once. Play as long as you want.
 ```
 
-~1,430 chars ✓
+~1,850 chars ✓
 
 ---
 
 ## Keywords (100 chars max — comma-separated, no spaces after commas)
 
 ```
-sudoku,minesweeper,nonogram,puzzle,merge,2048,picross,pip,logic,offline,no ads,themes,brain
+sudoku,minesweeper,solitaire,freecell,nonogram,puzzle,merge,pip,logic,offline,no ads,themes
 ```
 
 92 chars ✓
