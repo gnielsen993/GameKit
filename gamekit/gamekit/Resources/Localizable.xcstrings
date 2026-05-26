@@ -7,6 +7,19 @@
     " " : {
 
     },
+    "%@" : {
+
+    },
+    "%@ — %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$@"
+          }
+        }
+      }
+    },
     "%@ coming soon" : {
       "comment" : "Disabled-card overlay caption with game name interpolated",
       "extractionState" : "manual",
@@ -65,6 +78,16 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@: %2$lld games, best score %3$@"
+          }
+        }
+      }
+    },
+    "%@: %lld wins, best %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld wins, best %3$@"
           }
         }
       }
@@ -129,6 +152,9 @@
         }
       }
     },
+    "%lld moves" : {
+
+    },
     "%lld of %lld lives remaining" : {
       "localizations" : {
         "en" : {
@@ -151,7 +177,7 @@
         }
       }
     },
-    "5 games coming" : {
+    "9" : {
 
     },
     "2048 · Classic" : {
@@ -383,6 +409,16 @@
     "Deal #" : {
 
     },
+    "Deal #%lld · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Deal #%1$lld · %2$@"
+          }
+        }
+      }
+    },
     "Deal number" : {
 
     },
@@ -414,9 +450,6 @@
       }
     },
     "Done" : {
-
-    },
-    "Drawer open. Tap a mode to play, or tap again to close." : {
 
     },
     "Easy" : {
@@ -591,6 +624,9 @@
     "Import stats" : {
 
     },
+    "In development" : {
+
+    },
     "Infinite" : {
 
     },
@@ -697,6 +733,12 @@
     "More themes & custom colors" : {
 
     },
+    "New %@ Game" : {
+
+    },
+    "New Deal" : {
+
+    },
     "New Game" : {
 
     },
@@ -725,6 +767,9 @@
 
     },
     "No puzzles bundled yet" : {
+
+    },
+    "No Solitaire games played yet." : {
 
     },
     "No solved puzzles yet." : {
@@ -870,6 +915,9 @@
     "Restart This Deal" : {
 
     },
+    "Resume game?" : {
+
+    },
     "Resume puzzle?" : {
 
     },
@@ -968,6 +1016,9 @@
         }
       }
     },
+    "SOLITAIRE" : {
+
+    },
     "Solved" : {
 
     },
@@ -1052,9 +1103,6 @@
     "System" : {
 
     },
-    "Tap to open drawer and choose a mode." : {
-
-    },
     "Terms of Service" : {
 
     },
@@ -1137,6 +1185,9 @@
       }
     },
     "Upcoming" : {
+
+    },
+    "Upcoming games" : {
 
     },
     "Value" : {
@@ -1362,6 +1413,18 @@
           }
         }
       }
+    },
+    "You have an in-progress %@ Solitaire game." : {
+
+    },
+    "You have an in-progress FreeCell deal #%lld." : {
+
+    },
+    "You have an in-progress Merge game with a score of %lld." : {
+
+    },
+    "You have an unfinished %@ Minesweeper game." : {
+
     },
     "You have an unfinished %@ puzzle in %@ mode." : {
       "localizations" : {

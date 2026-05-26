@@ -18,6 +18,7 @@ struct FreeCellGameView: View {
     @State var dragTarget:      FreeCellDest? = nil
     @State var headerHeight:    CGFloat = 44
     @State private var hintDismissTask: Task<Void, Never>? = nil
+    @State private var showWinFlash = false
 
     private let initialMode: FreeCellMode
 
@@ -90,12 +91,27 @@ struct FreeCellGameView: View {
         .onChange(of: vm.board.canAutoComplete) { _, canAC in
             if canAC { vm.beginAutoCompleteAnimation() }
         }
+        .sensoryFeedback(.success, trigger: vm.winTick)
         .onChange(of: vm.hintText) { _, text in
             guard text != nil else { return }
             hintDismissTask?.cancel()
             hintDismissTask = Task { @MainActor in
                 try? await Task.sleep(for: .seconds(2.5))
                 vm.dismissHint()
+            }
+        }
+        .onChange(of: vm.winTick) { _, _ in
+            withAnimation(.easeIn(duration: 0.05)) { showWinFlash = true }
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(350))
+                withAnimation(.easeOut(duration: 0.5)) { showWinFlash = false }
+            }
+        }
+        .overlay {
+            if showWinFlash {
+                theme.colors.success.opacity(0.30)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
             }
         }
         .overlay(alignment: .top) { hintToast }

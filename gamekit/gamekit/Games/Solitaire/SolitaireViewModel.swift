@@ -22,6 +22,9 @@ final class SolitaireViewModel {
     var pausedElapsed: TimeInterval = 0
     private(set) var isAutoCompleting = false
 
+    // Win feedback trigger (DESIGN.md §8)
+    private(set) var winTick = 0
+
     // MARK: - Private state
 
     private var history: [SolitaireBoard] = []
@@ -310,6 +313,7 @@ final class SolitaireViewModel {
     private func finishGame(outcome: Outcome) {
         clearSavedState()
         gameState = .won
+        winTick += 1
         let elapsed = pausedElapsed + (timerAnchor.map { Date.now.timeIntervalSince($0) } ?? 0)
         timerAnchor = nil
         Task {

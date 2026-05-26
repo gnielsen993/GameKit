@@ -37,6 +37,7 @@ final class FreeCellViewModel {
     private(set) var selectTick  = 0
     private(set) var dropTick    = 0
     private(set) var rejectTick  = 0
+    private(set) var winTick     = 0
 
     private(set) var isAutoCompleting = false
     private(set) var hintText: String? = nil
@@ -367,6 +368,7 @@ final class FreeCellViewModel {
             clearSavedState()
             freezeTimer()
             gameState = .won
+            winTick += 1
             recordResult(outcome: "win")
         } else if FreeCellRules.isLost(board: board) {
             clearSavedState()
