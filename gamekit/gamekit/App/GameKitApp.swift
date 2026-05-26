@@ -135,10 +135,14 @@ struct GameKitApp: App {
         // account). Reset command + reseed instructions live in
         // App/DummyDataSeeder.swift.
         #if DEBUG
-        DummyDataSeeder.seedIfNeeded(
-            container: sharedContainer,
-            cloudSyncEnabled: store.cloudSyncEnabled
-        )
+        if ScreenshotSeeder.isActive {
+            ScreenshotSeeder.seed(container: sharedContainer)
+        } else {
+            DummyDataSeeder.seedIfNeeded(
+                container: sharedContainer,
+                cloudSyncEnabled: store.cloudSyncEnabled
+            )
+        }
         #endif
     }
 
