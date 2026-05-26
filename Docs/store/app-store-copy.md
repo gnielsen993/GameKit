@@ -48,7 +48,7 @@ No ads. No coins. No subscription. Six games worth playing.
 ```
 GameDrawer plays alongside your video.
 
-Every game supports Video Mode. Pick one of six Picture-in-Picture positions - large top, large bottom, or any of the four corners - and each layout reflows to keep every control clear and tappable. No other puzzle suite does this. Turn it off and the layout is unchanged.
+Every game supports Video Mode. Pick one of six positions for your video: large top, large bottom, or any of the four corners. Each layout reflows to keep every control clear and tappable. No other puzzle suite does this. Turn it off and the layout is unchanged.
 
 - THE GAMES -
 
