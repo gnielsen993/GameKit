@@ -305,14 +305,24 @@ struct NonogramBoardView: View {
                 guard row >= 0, row < board.size, col >= 0, col < board.size else { return }
 
                 // First sample: lock the start cell + capture intent.
+                // Use startLocation (where the finger actually landed), not
+                // location (current position after minimumDistance crossed).
+                // By the time onChanged fires, the finger may have drifted
+                // into an adjacent cell, reading the wrong state and locking
+                // the wrong fill/erase intent for the whole drag.
                 if dragTarget == nil {
-                    let startCell = board.cell(row: row, col: col)
+                    let sxCell = value.startLocation.x / cellSize
+                    let syCell = value.startLocation.y / cellSize
+                    let sRow = Int(syCell.rounded(.down))
+                    let sCol = Int(sxCell.rounded(.down))
+                    guard sRow >= 0, sRow < board.size, sCol >= 0, sCol < board.size else { return }
+                    let startCell = board.cell(row: sRow, col: sCol)
                     dragTarget = Self.dragTarget(
                         mode: interactionMode,
                         currentCell: startCell
                     )
-                    dragStartRow = row
-                    dragStartCol = col
+                    dragStartRow = sRow
+                    dragStartCol = sCol
                     dragStartState = startCell
                 }
                 guard let target = dragTarget,
