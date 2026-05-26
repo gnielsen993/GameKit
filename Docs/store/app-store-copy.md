@@ -32,9 +32,9 @@ KLONDIKE SOLITAIRE
 7-column tableau, stock and waste pile, 4 foundations. Draw 1, 2, or 3 cards from the stock depending on difficulty. Drag cards and sequences between columns, double-tap to auto-send to foundation, and use the Auto-Complete button when all remaining cards can be swept automatically. Undo up to 50 moves, restart the same deal, Video Mode, and per-difficulty stats.
 
 ALSO IN THIS UPDATE
-• New home screen — a 3-column icon grid replaces the accordion drawer; tap a tile to expand it into mode chips and a stats link
-• In-progress games save automatically across all six games — resume exactly where you left off or start fresh
-• Win haptic and green flash in both card games confirm the win the moment it happens
+• New home screen: a 3-column icon grid replaces the accordion drawer. Tap a tile to expand it into mode chips and a stats link.
+• In-progress games save automatically across all six games. Resume exactly where you left off or start fresh.
+• Win haptic and green flash in both card games fire the moment the board is solved.
 
 No ads. No coins. No subscription. Six games worth playing.
 ```
@@ -48,21 +48,21 @@ No ads. No coins. No subscription. Six games worth playing.
 ```
 GameDrawer plays alongside your video.
 
-Every game supports Video Mode. Choose one of six Picture-in-Picture positions — large top, large bottom, or four corner slots — and each layout reflows to keep every control clear and tappable. No other puzzle suite does this. Turn it off and the layout is unchanged.
+Every game supports Video Mode. Pick one of six Picture-in-Picture positions - large top, large bottom, or any of the four corners - and each layout reflows to keep every control clear and tappable. No other puzzle suite does this. Turn it off and the layout is unchanged.
 
-— THE GAMES —
+- THE GAMES -
 
 MINESWEEPER
-Classic 9×9, 16×16, and 16×30 boards. Tap to reveal, hold to flag. First tap is always safe.
+Classic 9x9, 16x16, and 16x30 boards. Tap to reveal, hold to flag. First tap is always safe.
 
 MERGE
-Slide tiles to combine matching numbers and chase 2048 — then keep going. Goal mode or Infinite mode.
+Slide tiles to combine matching numbers and chase 2048, then keep going. Goal mode or Infinite mode.
 
 NONOGRAM
 Fill a grid to reveal a hidden picture using row and column hints. Free mode or Lives mode with three chances.
 
 SUDOKU
-9×9 classic. 6,000 curated puzzles across four difficulties. Pencil notes, undo, Free and Lives modes. Complete a row, column, or box and those cells glow. Place the last of a number and the pad button strikes through — you always know what's left. In-progress puzzles save automatically and pick back up next launch.
+9x9 classic. 6,000 curated puzzles across four difficulties. Pencil notes, undo, Free and Lives modes. Complete a row, column, or box and those cells glow. Place the last of a number and the pad button strikes through. You always know what's left. In-progress puzzles save automatically and pick back up next launch.
 
 FREECELL
 8-column tableau, 4 free cells, 4 foundations. Supermove rules, deal-number entry (1-32,000), Easy through Expert tiers, loss detection, win cascade animation, and undo.
@@ -70,19 +70,19 @@ FREECELL
 SOLITAIRE
 Klondike with draw 1, 2, or 3. Drag sequences, double-tap to auto-send, auto-complete when the position is clear. Undo up to 50 moves.
 
-— VIDEO MODE —
+- VIDEO MODE -
 All six games. Six PiP positions. Every layout reflows. No features lost, no controls buried.
 
-— THEMES —
+- THEMES -
 Seventeen presets plus custom colors. Switch instantly. Every theme is legible on every game. Classic Chrome Diner is the default; try Voltage or Dracula for something darker.
 
-— ZERO NONSENSE —
+- ZERO NONSENSE -
 No account. No required permissions. No ads, no coins, no subscription, no energy timers, no paywalled features. Stats live on your device. Works fully offline and always will.
 
 Download once. Play as long as you want.
 ```
 
-~1,850 chars ✓
+~1,840 chars ✓
 
 ---
 
