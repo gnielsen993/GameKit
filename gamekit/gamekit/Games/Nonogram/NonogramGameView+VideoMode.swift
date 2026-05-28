@@ -208,7 +208,6 @@ extension NonogramGameView {
             flashRow: viewModel.flashRow,
             flashCol: viewModel.flashCol,
             onTap: { row, col in viewModel.handleTap(at: row, col: col) },
-            onLongPress: { row, col in viewModel.handleLongPress(at: row, col: col) },
             onSlide: { row, col, next in viewModel.setCell(at: row, col: col, to: next) }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)

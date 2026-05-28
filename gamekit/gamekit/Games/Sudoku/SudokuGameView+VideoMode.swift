@@ -107,30 +107,26 @@ extension SudokuGameView {
     /// through to the underlying board.
     @ViewBuilder
     var largeZoneBoardBlock: some View {
-        sudokuBoard
-            .overlay(alignment: .topLeading) {
+        VStack(spacing: theme.spacing.xs) {
+            // Timer + lives sit ABOVE the board so they never cover cell notes.
+            HStack(spacing: theme.spacing.s) {
                 if viewModel.gameMode == .lives {
-                    SudokuLivesChip(
-                        theme: theme,
-                        mistakes: viewModel.mistakes,
-                        compact: true
-                    )
-                    .padding(.leading, theme.spacing.m)
-                    .padding(.top, theme.spacing.s)
-                    .allowsHitTesting(false)
+                    SudokuLivesChip(theme: theme, mistakes: viewModel.mistakes, compact: true)
+                        .allowsHitTesting(false)
                 }
-            }
-            .overlay(alignment: .topTrailing) {
+                Spacer()
                 VideoModeTimerChip(
                     theme: theme,
                     timerAnchor: viewModel.timerAnchor,
                     pausedElapsed: viewModel.pausedElapsed,
                     compact: true
                 )
-                .padding(.trailing, theme.spacing.m)
-                .padding(.top, theme.spacing.s)
                 .allowsHitTesting(false)
             }
+            .padding(.horizontal, theme.spacing.m)
+
+            sudokuBoard
+        }
     }
 
     /// Compact control row replacing the navbar in large-zone Video Mode.

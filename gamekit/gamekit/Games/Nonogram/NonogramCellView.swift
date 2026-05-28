@@ -27,7 +27,6 @@ struct NonogramCellView: View {
     /// completion across the whole line, not just at the touched cell.
     let completionFlash: Bool
     let onTap: () -> Void
-    let onLongPress: () -> Void
 
     var body: some View {
         ZStack {
@@ -54,17 +53,10 @@ struct NonogramCellView: View {
         .animation(.spring(response: 0.18, dampingFraction: 0.35), value: wrongFlash)
         .animation(.easeOut(duration: 0.35), value: completionFlash)
         .contentShape(Rectangle())
-        .gesture(
-            LongPressGesture(minimumDuration: 0.25)
-                .exclusively(before: TapGesture())
-                .onEnded { result in
-                    guard isInteractive else { return }
-                    switch result {
-                    case .first:  onLongPress()
-                    case .second: onTap()
-                    }
-                }
-        )
+        .onTapGesture {
+            guard isInteractive else { return }
+            onTap()
+        }
     }
 
     @ViewBuilder

@@ -44,7 +44,6 @@ struct NonogramBoardView: View {
     let flashRow: Int?
     let flashCol: Int?
     let onTap: (Int, Int) -> Void
-    let onLongPress: (Int, Int) -> Void
     /// Slide-fill callback. Returns `true` if the mutation went through
     /// cleanly. A `false` return aborts the drag — used in Lives mode
     /// when a swipe hits a wrong cell, so a careless smear can't burn
@@ -239,8 +238,7 @@ struct NonogramBoardView: View {
                             isInteractive: isInteractive,
                             wrongFlash: wrongFlashIdx == idx,
                             completionFlash: flashRow == row || flashCol == col,
-                            onTap: { onTap(row, col) },
-                            onLongPress: { onLongPress(row, col) }
+                            onTap: { onTap(row, col) }
                         )
                     }
                 }

@@ -54,6 +54,7 @@ struct SolitaireGameView: View {
         .background(theme.colors.background.ignoresSafeArea())
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("Solitaire")
+        .navigationBarBackButtonHidden(true)
         .alert("Resume game?", isPresented: Binding(
             get: { vm.pendingSaveState != nil },
             set: { _ in }
@@ -429,6 +430,14 @@ struct SolitaireGameView: View {
 
     @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button { dismiss() } label: {
+                Image(systemName: "chevron.backward")
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(theme.colors.accentPrimary)
+            }
+            .accessibilityLabel(Text("Back"))
+        }
         ToolbarItem(placement: .topBarTrailing) {
             Button { vm.undo() } label: {
                 Image(systemName: "arrow.uturn.backward")
