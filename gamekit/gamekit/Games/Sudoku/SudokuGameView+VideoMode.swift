@@ -9,8 +9,8 @@
 //
 //  Large zones (.largeTop / .largeBottom):
 //    Navbar hidden. A compact control row (back · mode-pill · erase · restart ·
-//    settings-menu) replaces the navbar. Lives (if lives mode) overlays the
-//    board's top-leading corner; timer overlays the top-trailing corner.
+//    settings-menu) replaces the navbar. A chip row (timer right, lives left)
+//    sits ABOVE the board in the outer VStack — never overlapping cell notes.
 //    For .largeBottom the control row sits at the TOP; for .largeTop at the BOTTOM.
 //
 //  Small zones — top corner (.smallTopLeft / .smallTopRight):
@@ -55,9 +55,10 @@ extension SudokuGameView {
             theme.colors.background.ignoresSafeArea()
 
             if videoModeStore.location == .largeTop {
-                // PiP at top → board + numpad first, control row at bottom
+                // PiP at top → chips + board + numpad first, control row at bottom
                 VStack(spacing: theme.spacing.s) {
                     if viewModel.board != nil {
+                        largeZoneChipRow
                         largeZoneBoardBlock
                     } else {
                         Spacer()
@@ -77,6 +78,7 @@ extension SudokuGameView {
                 VStack(spacing: theme.spacing.s) {
                     largeZoneControlRow
                     if viewModel.board != nil {
+                        largeZoneChipRow
                         largeZoneBoardBlock
                     } else {
                         Spacer()
@@ -99,39 +101,37 @@ extension SudokuGameView {
         }
     }
 
-    /// Board + corner info overlays for large-zone Video Mode.
-    /// Lives (compact) anchors to the board's top-leading corner;
-    /// timer (compact) anchors to the top-trailing corner. Both chips
-    /// sit inside the board's horizontal padding so they're visually
-    /// inside the grid confines. Non-interactive overlays — taps pass
-    /// through to the underlying board.
+    /// Timer + lives chip row for large-zone Video Mode. Sits in the outer VStack
+    /// ABOVE largeZoneBoardBlock so it never overlaps cell notes in the top row.
+    @ViewBuilder
+    var largeZoneChipRow: some View {
+        HStack(spacing: theme.spacing.s) {
+            if viewModel.gameMode == .lives {
+                SudokuLivesChip(theme: theme, mistakes: viewModel.mistakes, compact: true)
+                    .allowsHitTesting(false)
+            }
+            Spacer()
+            VideoModeTimerChip(
+                theme: theme,
+                timerAnchor: viewModel.timerAnchor,
+                pausedElapsed: viewModel.pausedElapsed,
+                compact: true
+            )
+            .allowsHitTesting(false)
+        }
+        .padding(.horizontal, theme.spacing.m)
+    }
+
+    /// The board alone — no wrapper VStack. Lives + timer sit in largeZoneChipRow
+    /// (a sibling in the outer VStack) so layout priorities are unambiguous.
     @ViewBuilder
     var largeZoneBoardBlock: some View {
-        VStack(spacing: theme.spacing.xs) {
-            // Timer + lives sit ABOVE the board so they never cover cell notes.
-            HStack(spacing: theme.spacing.s) {
-                if viewModel.gameMode == .lives {
-                    SudokuLivesChip(theme: theme, mistakes: viewModel.mistakes, compact: true)
-                        .allowsHitTesting(false)
-                }
-                Spacer()
-                VideoModeTimerChip(
-                    theme: theme,
-                    timerAnchor: viewModel.timerAnchor,
-                    pausedElapsed: viewModel.pausedElapsed,
-                    compact: true
-                )
-                .allowsHitTesting(false)
-            }
-            .padding(.horizontal, theme.spacing.m)
-
-            sudokuBoard
-        }
+        sudokuBoard
     }
 
     /// Compact control row replacing the navbar in large-zone Video Mode.
-    /// Lives and timer have moved to board corner overlays (largeZoneBoardBlock)
-    /// so this row stays narrow: Back · Mode pill · Erase · Restart · Settings.
+    /// Lives and timer live in largeZoneChipRow (above the board), so this
+    /// row stays narrow: Back · Mode pill · Erase · Restart · Settings.
     @ViewBuilder
     var largeZoneControlRow: some View {
         HStack(spacing: theme.spacing.s) {
