@@ -64,6 +64,7 @@ xcodebuild \
 APP=$(find ~/Library/Developer/Xcode/DerivedData \
     -name "gamekit.app" \
     -path "*/Debug-iphonesimulator/*" \
+    ! -path "*/Index.noindex/*" \
     | sort -t/ -k1,1 | tail -1)
 
 if [[ -z "$APP" ]]; then

@@ -127,7 +127,6 @@ enum ScreenshotSeeder {
     private static func seedSaveStates() {
         let defaults = UserDefaults.standard
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
 
         // Minesweeper Easy — mid-game (45 s elapsed, top-left corner revealed, 2 flags)
         var rng = SeededRNG(seed: 42)

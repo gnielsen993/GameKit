@@ -1,11 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.3
-milestone_name: FreeCell + Solitaire
+milestone_name: milestone
 status: shipped
-shipped_at: 2026-05-25
-last_updated: "2026-05-25"
-last_activity: 2026-05-25
+stopped_at: context exhaustion at 78% (2026-05-28)
+last_updated: "2026-05-28T14:07:40.410Z"
+last_activity: 2026-05-14
+progress:
+  total_phases: 15
+  completed_phases: 13
+  total_plans: 91
+  completed_plans: 84
+  percent: 87
 ---
 
 # Project State
@@ -399,8 +405,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-25T20:25:23.306Z
-Stopped at: context exhaustion at 76% (2026-05-25)
+Last session: 2026-05-28T14:07:40.403Z
+Stopped at: context exhaustion at 78% (2026-05-28)
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
