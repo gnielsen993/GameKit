@@ -42,7 +42,7 @@ struct IntroFlowView: View {
             TabView(selection: $currentStep) {
                 IntroStep1ThemesView(theme: theme)
                     .tag(0)
-                IntroStep2StatsView(theme: theme)
+                IntroStep2FeaturesView(theme: theme)
                     .tag(1)
                 IntroStep3SignInView(
                     theme: theme,
@@ -182,62 +182,99 @@ private struct IntroStep1ThemesView: View {
     }
 }
 
-// MARK: - Step 2: Stats preview (D-20)
+// MARK: - Step 2: Feature showcase
 
-private struct IntroStep2StatsView: View {
+private struct IntroStep2FeaturesView: View {
     let theme: Theme
 
     var body: some View {
-        VStack(alignment: .leading, spacing: theme.spacing.l) {
-            Text(String(localized: "Track your progress"))
-                .font(theme.typography.titleLarge)
-                .foregroundStyle(theme.colors.textPrimary)
-            Text(String(localized: "Best times and win streaks save automatically. No accounts. No leaderboards. Just your numbers."))
-                .font(theme.typography.body)
-                .foregroundStyle(theme.colors.textSecondary)
-                .multilineTextAlignment(.leading)
-            Spacer(minLength: theme.spacing.xxl)
-            // Hand-coded sample stats — NOT @Query (CLAUDE.md §8.3 + UI-SPEC line 148).
-            // Onboarding never shows the empty state; the sample numbers convey what
-            // StatsView will surface once the user plays.
-            DKCard(theme: theme) {
-                VStack(spacing: theme.spacing.s) {
-                    sampleRow(difficulty: String(localized: "Easy"),   plays: "12", winPct: "67%", best: "1:42")
-                    sampleRow(difficulty: String(localized: "Medium"), plays: "5",  winPct: "40%", best: "4:15")
-                    sampleRow(difficulty: String(localized: "Hard"),   plays: "—",  winPct: "—",   best: "—")
-                }
+        VStack(spacing: 0) {
+            VStack(spacing: theme.spacing.xs) {
+                Text(String(localized: "Welcome to"))
+                    .font(theme.typography.title)
+                    .foregroundStyle(theme.colors.textSecondary)
+                Text(String(localized: "GameDrawer"))
+                    .font(theme.typography.titleLarge)
+                    .foregroundStyle(theme.colors.textPrimary)
             }
-            Spacer(minLength: theme.spacing.xxl)
+            .frame(maxWidth: .infinity)
+            .padding(.top, theme.spacing.xxl)
+            .padding(.bottom, theme.spacing.m)
+
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    ForEach(GameDrawerFeature.all) { feature in
+                        featureRow(feature)
+                        if feature.id != GameDrawerFeature.all.last?.id {
+                            Divider()
+                                .padding(.leading, 48 + theme.spacing.m * 2)
+                        }
+                    }
+                }
+                .padding(.horizontal, theme.spacing.l)
+            }
+
+            Spacer(minLength: 44) // clear TabView page indicator dots
         }
-        .padding(theme.spacing.l)
-        .padding(.top, theme.spacing.xxl)
-        .frame(maxWidth: 480, alignment: .center)
+        .frame(maxWidth: 480)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text(String(localized: "Step 2 of 3. Track your progress. Best times and win streaks save automatically. No accounts. No leaderboards. Just your numbers.")))
+        .accessibilityLabel(Text(String(localized: "Step 2 of 3. Welcome to GameDrawer.")))
         .dynamicTypeSize(...DynamicTypeSize.accessibility5)
     }
 
-    @ViewBuilder
-    private func sampleRow(difficulty: String, plays: String, winPct: String, best: String) -> some View {
-        HStack {
-            Text(difficulty)
-                .font(theme.typography.body)
-                .foregroundStyle(theme.colors.textPrimary)
-            Spacer()
-            Text(plays)
-                .font(theme.typography.monoNumber)
-                .monospacedDigit()
-                .foregroundStyle(theme.colors.textSecondary)
-            Text(winPct)
-                .font(theme.typography.monoNumber)
-                .monospacedDigit()
-                .foregroundStyle(theme.colors.textSecondary)
-            Text(best)
-                .font(theme.typography.monoNumber)
-                .monospacedDigit()
-                .foregroundStyle(theme.colors.textSecondary)
+    private func featureRow(_ feature: GameDrawerFeature) -> some View {
+        HStack(spacing: theme.spacing.m) {
+            ZStack {
+                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                    .fill(theme.colors.accentPrimary.opacity(0.12))
+                    .frame(width: 48, height: 48)
+                Image(systemName: feature.icon)
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(theme.colors.accentPrimary)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(feature.title)
+                    .font(theme.typography.body.weight(.semibold))
+                    .foregroundStyle(theme.colors.accentPrimary)
+                Text(feature.description)
+                    .font(theme.typography.caption)
+                    .foregroundStyle(theme.colors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
         }
+        .padding(.vertical, theme.spacing.s)
     }
+}
+
+// MARK: - Feature data (shared with FeatureGuideView)
+
+struct GameDrawerFeature: Identifiable {
+    let id = UUID()
+    let icon: String
+    let title: String
+    let description: String
+
+    static let all: [GameDrawerFeature] = [
+        .init(icon: "square.grid.2x2.fill",
+              title: String(localized: "Six Classic Games"),
+              description: String(localized: "Minesweeper, Solitaire, FreeCell, Merge, Nonogram, and Sudoku — all in one place.")),
+        .init(icon: "play.rectangle.fill",
+              title: String(localized: "Video Mode"),
+              description: String(localized: "Float the game board over any video. Play in a PiP corner while you watch.")),
+        .init(icon: "paintpalette.fill",
+              title: String(localized: "Themes"),
+              description: String(localized: "Dozens of presets plus custom colors. Switch anytime from Settings.")),
+        .init(icon: "chart.bar.fill",
+              title: String(localized: "Stats"),
+              description: String(localized: "Best times and win rates track automatically on-device. No account required.")),
+        .init(icon: "arrow.counterclockwise",
+              title: String(localized: "Auto-Save"),
+              description: String(localized: "Every game saves mid-session. Open the app and pick up exactly where you left off.")),
+        .init(icon: "hand.thumbsup.fill",
+              title: String(localized: "No Ads, No Coins"),
+              description: String(localized: "Pure gameplay — nothing to buy, nothing in the way.")),
+    ]
 }
 
 // MARK: - Step 3: Sign-in card with Skip (D-21)

@@ -247,6 +247,9 @@
     "Apple Mail isn't set up" : {
 
     },
+    "Auto-Save" : {
+
+    },
     "Avg" : {
 
     },
@@ -312,7 +315,7 @@
         }
       }
     },
-    "Best times and win streaks save automatically. No accounts. No leaderboards. Just your numbers." : {
+    "Best times and win rates track automatically on-device. No account required." : {
 
     },
     "Best: %lld" : {
@@ -452,6 +455,9 @@
     "Done" : {
 
     },
+    "Dozens of presets plus custom colors. Switch anytime from Settings." : {
+
+    },
     "Easy" : {
       "comment" : "Difficulty option — 9x9 / 10 mines",
       "extractionState" : "automatic",
@@ -479,10 +485,16 @@
     "Erase" : {
 
     },
+    "Every game saves mid-session. Open the app and pick up exactly where you left off." : {
+
+    },
     "Expert" : {
 
     },
     "Export stats" : {
+
+    },
+    "Feature Guide" : {
 
     },
     "FEEL" : {
@@ -505,6 +517,9 @@
           }
         }
       }
+    },
+    "Float the game board over any video. Play in a PiP corner while you watch." : {
+
     },
     "Flow" : {
       "extractionState" : "manual",
@@ -543,6 +558,9 @@
       }
     },
     "Game settings" : {
+
+    },
+    "GameDrawer" : {
 
     },
     "GameKit" : {
@@ -724,6 +742,9 @@
     "MINESWEEPER" : {
 
     },
+    "Minesweeper, Solitaire, FreeCell, Merge, Nonogram, and Sudoku — all in one place." : {
+
+    },
     "Mode" : {
 
     },
@@ -752,6 +773,9 @@
 
     },
     "Next puzzle" : {
+
+    },
+    "No Ads, No Coins" : {
 
     },
     "No FreeCell games played yet." : {
@@ -865,6 +889,9 @@
 
     },
     "Profile" : {
+
+    },
+    "Pure gameplay — nothing to buy, nothing in the way." : {
 
     },
     "Puzzle size %@" : {
@@ -987,6 +1014,9 @@
     "Signed in to iCloud" : {
 
     },
+    "Six Classic Games" : {
+
+    },
     "Size" : {
 
     },
@@ -1062,7 +1092,7 @@
     "Step 1 of 3. Make it yours. Pick a theme that fits your mood. Five Classic palettes here, dozens more in Settings." : {
 
     },
-    "Step 2 of 3. Track your progress. Best times and win streaks save automatically. No accounts. No leaderboards. Just your numbers." : {
+    "Step 2 of 3. Welcome to GameDrawer." : {
 
     },
     "Sudoku" : {
@@ -1123,6 +1153,9 @@
         }
       }
     },
+    "Themes" : {
+
+    },
     "This deletes all your Minesweeper games and best times. This can't be undone." : {
 
     },
@@ -1163,9 +1196,6 @@
     "Tiny  ·  5 × 5" : {
 
     },
-    "Track your progress" : {
-
-    },
     "Try again" : {
 
     },
@@ -1194,6 +1224,9 @@
 
     },
     "Version" : {
+
+    },
+    "Video Mode" : {
 
     },
     "videoMode.location.largeBottom" : {
@@ -1389,6 +1422,12 @@
       }
     },
     "View board" : {
+
+    },
+    "View Intro" : {
+
+    },
+    "Welcome to" : {
 
     },
     "Win" : {

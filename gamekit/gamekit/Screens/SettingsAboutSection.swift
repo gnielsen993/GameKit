@@ -31,12 +31,35 @@ struct SettingsAboutSection: View {
     @State private var showingMailComposer = false
     @State private var mailUnavailableMessage: String?
     @State private var copiedConfirmation = false
+    @State private var showingIntro = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: theme.spacing.l) {
             settingsSectionHeader(theme: theme, String(localized: "ABOUT"))
             DKCard(theme: theme) {
                 VStack(spacing: 0) {
+                    NavigationLink(destination: FeatureGuideView()) {
+                        settingsNavRow(theme: theme, title: String(localized: "Feature Guide"))
+                    }
+                    .buttonStyle(.plain)
+                    divider
+                    Button {
+                        showingIntro = true
+                    } label: {
+                        HStack {
+                            Text(String(localized: "View Intro"))
+                                .font(theme.typography.body)
+                                .foregroundStyle(theme.colors.textPrimary)
+                            Spacer()
+                            Image(systemName: "chevron.forward")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(theme.colors.textTertiary)
+                        }
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    divider
                     versionRow
                     divider
                     Link(destination: AppInfo.termsURL) {
@@ -67,6 +90,9 @@ struct SettingsAboutSection: View {
                     .buttonStyle(.plain)
                 }
             }
+        }
+        .fullScreenCover(isPresented: $showingIntro) {
+            IntroFlowView()
         }
         .confirmationDialog(
             String(localized: "Contact support"),
