@@ -7,6 +7,7 @@ import SwiftUI
 enum FreeCellSelection: Equatable {
     case column(colIdx: Int, startCardIdx: Int)
     case freeCell(cellIdx: Int)
+    case foundation(suit: CardSuit)
 }
 
 // MARK: - Game state
@@ -109,6 +110,10 @@ final class FreeCellViewModel {
         switch sel {
         case .column(let col, let idx): return Array(board.columns[col][idx...])
         case .freeCell(let cell):       return board.freeCells[cell].map { [$0] } ?? []
+        case .foundation(let suit):
+            let idx = board.foundationIndex(for: suit)
+            guard let rank = board.foundations[idx] else { return [] }
+            return [PlayingCard(rank: rank, suit: suit)]
         }
     }
 
@@ -206,9 +211,27 @@ final class FreeCellViewModel {
         _ = attemptMove(from: sel, to: .column(colIdx))
     }
 
-    func tapFoundation(suitIdx: Int) {
-        guard let sel = selection else { return }
-        _ = attemptMove(from: sel, to: .foundation)
+    func tapFoundation(suit: CardSuit) {
+        // Foundation card already selected — deselect same, switch to other
+        if case .foundation(let s) = selection {
+            if s == suit {
+                selection = nil
+            } else {
+                let idx = board.foundationIndex(for: suit)
+                selection = board.foundations[idx] != nil ? .foundation(suit: suit) : nil
+            }
+            return
+        }
+
+        // Non-foundation selection → try to move it to this foundation
+        if let sel = selection {
+            if attemptMove(from: sel, to: .foundation) { return }
+            // Move failed — fall through to select this foundation
+        }
+
+        // Select the top foundation card (if any)
+        let idx = board.foundationIndex(for: suit)
+        selection = board.foundations[idx] != nil ? .foundation(suit: suit) : nil
     }
 
     /// Double-tap shortcut: auto-move bottom card of column to foundation.
@@ -351,6 +374,12 @@ final class FreeCellViewModel {
         case (.freeCell(let src), .freeCell(let dst)):
             board.freeCells[src] = nil
             board.freeCells[dst] = cards[0]
+        case (.foundation(let suit), .column(let dst)):
+            board.regressFoundation(for: suit)
+            board.columns[dst].append(cards[0])
+        case (.foundation(let suit), .freeCell(let cell)):
+            board.regressFoundation(for: suit)
+            board.freeCells[cell] = cards[0]
         default: return
         }
 
@@ -405,6 +434,10 @@ final class FreeCellViewModel {
         switch sel {
         case .column(let col, let idx): return Array(board.columns[col][idx...])
         case .freeCell(let cell):       return board.freeCells[cell].map { [$0] } ?? []
+        case .foundation(let suit):
+            let idx = board.foundationIndex(for: suit)
+            guard let rank = board.foundations[idx] else { return [] }
+            return [PlayingCard(rank: rank, suit: suit)]
         }
     }
 
@@ -412,6 +445,7 @@ final class FreeCellViewModel {
         switch sel {
         case .column(let col, let idx): return .column(colIdx: col, startIdx: idx)
         case .freeCell(let cell):       return .freeCell(cellIdx: cell)
+        case .foundation(let suit):     return .foundation(suit: suit)
         }
     }
 

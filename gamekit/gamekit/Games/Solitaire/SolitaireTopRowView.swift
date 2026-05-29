@@ -8,8 +8,9 @@ struct SolitaireTopRowView: View {
     let theme:       Theme
     let isClassic:   Bool
     let cardWidth:   CGFloat
-    var selectedIsWaste: Bool = false
-    var onStockTap:         () -> Void
+    var selectedIsWaste:      Bool      = false
+    var selectedFoundationSuit: CardSuit? = nil
+    var onStockTap:           () -> Void
     var onWasteTap:         () -> Void
     var onWasteDoubleTap:   () -> Void
     var onFoundationTap:    (CardSuit) -> Void
@@ -45,10 +46,14 @@ struct SolitaireTopRowView: View {
     // MARK: - Foundation slot
 
     private func foundationSlot(suit: CardSuit) -> some View {
-        let topRank = foundations[suit.foundationIndex]
+        let topRank   = foundations[suit.foundationIndex]
+        let isSelected = selectedFoundationSuit == suit
         return ZStack {
             RoundedRectangle(cornerRadius: radius, style: .continuous)
-                .stroke(theme.colors.border, lineWidth: 1)
+                .stroke(
+                    isSelected ? theme.colors.accentPrimary : theme.colors.border,
+                    lineWidth: isSelected ? 2 : 1
+                )
                 .frame(width: cardWidth, height: cardHeight)
 
             if let rank = topRank {

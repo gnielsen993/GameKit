@@ -83,29 +83,33 @@ struct FreeCellTopRowView: View {
 
     @ViewBuilder
     private func foundationSlot(suit: CardSuit, suitIdx: Int) -> some View {
-        let suitIdx2     = vm.board.foundationIndex(for: suit)
-        let topRank     = vm.board.foundations[suitIdx2]
+        let fidx        = vm.board.foundationIndex(for: suit)
+        let topRank     = vm.board.foundations[fidx]
         let isTarget    = vm.selection != nil && vm.canMoveSelectionToFoundation
                           && vm.selectedCards.first?.suit == suit
+        let isSelected: Bool = { if case .foundation(let s) = vm.selection { return s == suit } else { return false } }()
 
         ZStack {
             RoundedRectangle(cornerRadius: cardWidth * 0.10, style: .continuous)
                 .stroke(
-                    isTarget ? theme.colors.success : theme.colors.border,
-                    lineWidth: isTarget ? 2 : 1.5
+                    isSelected ? theme.colors.accentPrimary :
+                    isTarget   ? theme.colors.success : theme.colors.border,
+                    lineWidth: (isSelected || isTarget) ? 2 : 1.5
                 )
                 .background(
                     RoundedRectangle(cornerRadius: cardWidth * 0.10, style: .continuous)
-                        .fill(isTarget ? theme.colors.success.opacity(0.12) : theme.colors.surface.opacity(0.25))
+                        .fill(
+                            isSelected ? theme.colors.accentPrimary.opacity(0.10) :
+                            isTarget   ? theme.colors.success.opacity(0.12) :
+                                         theme.colors.surface.opacity(0.25)
+                        )
                 )
                 .frame(width: cardWidth, height: cardHeight)
 
             if let rank = topRank {
-                // Show top card
                 let card = PlayingCard(rank: rank, suit: suit)
                 PlayingCardView(card, theme: theme, isClassic: isClassic, width: cardWidth)
             } else {
-                // Empty slot — suit symbol hint
                 Image(systemName: suit.sfSymbol)
                     .font(.system(size: cardWidth * 0.32))
                     .foregroundStyle(
@@ -115,6 +119,6 @@ struct FreeCellTopRowView: View {
         }
         .frame(width: cardWidth, height: cardHeight)
         .contentShape(Rectangle())
-        .onTapGesture { vm.tapFoundation(suitIdx: suitIdx2) }
+        .onTapGesture { vm.tapFoundation(suit: suit) }
     }
 }

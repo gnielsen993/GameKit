@@ -87,6 +87,7 @@ struct FreeCellBoard: Codable {
 enum FreeCellSource: Hashable {
     case column(colIdx: Int, startIdx: Int)
     case freeCell(cellIdx: Int)
+    case foundation(suit: CardSuit)
 }
 
 enum FreeCellDest: Hashable {

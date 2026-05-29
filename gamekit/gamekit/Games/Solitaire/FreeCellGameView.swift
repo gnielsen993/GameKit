@@ -244,6 +244,7 @@ struct FreeCellGameView: View {
             switch sel {
             case .column(let col, let idx): return Array(vm.board.columns[col][idx...])
             case .freeCell(let cell):       return vm.board.freeCells[cell].map { [$0] } ?? []
+            case .foundation:               return []   // foundation drag not supported; drops empty
             }
         }()
         guard !cards.isEmpty else { return }
