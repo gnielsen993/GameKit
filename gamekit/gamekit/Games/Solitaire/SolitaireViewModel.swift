@@ -30,6 +30,10 @@ final class SolitaireViewModel {
     private var history: [SolitaireBoard] = []
     private var gameStats: GameStats?
     private(set) var pendingSaveState: SolitaireSaveState?
+    // Cleared on each recycle; set when a face-down card flips or a card
+    // reaches a foundation. If false when stock next empties, no new
+    // information can appear — the game is unwinnable.
+    private var progressSinceLastRecycle = false
 
     var canUndo: Bool { !history.isEmpty && gameState == .playing }
 
@@ -49,14 +53,16 @@ final class SolitaireViewModel {
 
     func drawFromStock() {
         guard gameState == .playing else { return }
-        saveHistory()
         if board.stock.isEmpty {
-            // Recycle waste back to stock
+            guard progressSinceLastRecycle else { finishStuck(); return }
+            progressSinceLastRecycle = false
+            saveHistory()
             board.stock = board.waste.reversed().map {
                 PlayingCard(rank: $0.rank, suit: $0.suit, faceUp: false)
             }
             board.waste = []
         } else {
+            saveHistory()
             let count = min(difficulty.drawCount, board.stock.count)
             let drawn = board.stock.suffix(count).map {
                 PlayingCard(rank: $0.rank, suit: $0.suit, faceUp: true)
@@ -81,6 +87,7 @@ final class SolitaireViewModel {
             guard idx == column.count - 1 else { return }
             saveHistory()
             board.tableau[col][idx] = PlayingCard(rank: card.rank, suit: card.suit, faceUp: true)
+            progressSinceLastRecycle = true
             moveCount += 1
             return
         }
@@ -112,9 +119,25 @@ final class SolitaireViewModel {
 
     func tapFoundation(suit: CardSuit) {
         guard gameState == .playing else { return }
-        if let sel = selection {
-            _ = attemptMove(from: sel, toFoundation: suit)
+
+        // Foundation card already selected — deselect same, switch to other
+        if case .foundation(let s) = selection {
+            if s == suit {
+                selection = nil
+            } else {
+                selection = board.foundations[suit.foundationIndex] != nil ? .foundation(suit: suit) : nil
+            }
+            return
         }
+
+        // Something else selected → try to move it to this foundation
+        if let sel = selection {
+            if attemptMove(from: sel, toFoundation: suit) { return }
+            // Move failed — fall through to select the foundation card instead
+        }
+
+        // Select the top foundation card (if any)
+        selection = board.foundations[suit.foundationIndex] != nil ? .foundation(suit: suit) : nil
     }
 
     @discardableResult
@@ -128,6 +151,7 @@ final class SolitaireViewModel {
         board.tableau[col].removeLast()
         board.foundations[card.suit.foundationIndex] = card.rank
         flipNewTopCard(column: col)
+        progressSinceLastRecycle = true
         moveCount += 1
         selection = nil
         checkWin()
@@ -142,6 +166,7 @@ final class SolitaireViewModel {
         saveHistory()
         board.waste.removeLast()
         board.foundations[card.suit.foundationIndex] = card.rank
+        progressSinceLastRecycle = true
         moveCount += 1
         selection = nil
         checkWin()
@@ -206,6 +231,7 @@ final class SolitaireViewModel {
         moveCount = 0
         selection = nil
         gameState = .playing
+        progressSinceLastRecycle = false
         pausedElapsed = 0
         timerAnchor = .now
     }
@@ -220,6 +246,7 @@ final class SolitaireViewModel {
         moveCount = 0
         selection = nil
         gameState = .playing
+        progressSinceLastRecycle = false
         pausedElapsed = 0
         timerAnchor = .now
     }
@@ -258,6 +285,18 @@ final class SolitaireViewModel {
             saveHistory()
             board.waste.removeLast()
             board.tableau[dst].append(card)
+            progressSinceLastRecycle = true
+            moveCount += 1
+            selection = nil
+            return true
+        case .foundation(let suit):
+            let fidx = suit.foundationIndex
+            guard let rank = board.foundations[fidx] else { return false }
+            let card = PlayingCard(rank: rank, suit: suit, faceUp: true)
+            guard SolitaireRules.canPlaceOnTableau([card], onto: board.tableau[dst]) else { return false }
+            saveHistory()
+            board.foundations[fidx] = rank == .ace ? nil : CardRank(rawValue: rank.rawValue - 1)
+            board.tableau[dst].append(card)
             moveCount += 1
             selection = nil
             return true
@@ -268,6 +307,7 @@ final class SolitaireViewModel {
     private func attemptMove(from sel: SolitaireSelection, toFoundation suit: CardSuit) -> Bool {
         let card: PlayingCard
         switch sel {
+        case .foundation: return false
         case .column(let col, let idx):
             guard idx == board.tableau[col].count - 1,
                   let top = board.tableau[col].last else { return false }
@@ -286,6 +326,7 @@ final class SolitaireViewModel {
             board.waste.removeLast()
         }
         board.foundations[suit.foundationIndex] = card.rank
+        progressSinceLastRecycle = true
         moveCount += 1
         selection = nil
         checkWin()
@@ -296,6 +337,7 @@ final class SolitaireViewModel {
         guard let last = board.tableau[col].last, !last.isFaceUp else { return }
         let idx = board.tableau[col].count - 1
         board.tableau[col][idx] = PlayingCard(rank: last.rank, suit: last.suit, faceUp: true)
+        progressSinceLastRecycle = true
     }
 
     private func saveHistory() {
@@ -325,15 +367,31 @@ final class SolitaireViewModel {
             )
         }
     }
+
+    private func finishStuck() {
+        clearSavedState()
+        gameState = .stuck
+        let elapsed = pausedElapsed + (timerAnchor.map { Date.now.timeIntervalSince($0) } ?? 0)
+        timerAnchor = nil
+        Task {
+            try? gameStats?.record(
+                gameKind: .klondike,
+                difficulty: difficulty.rawValue,
+                outcome: .loss,
+                durationSeconds: elapsed
+            )
+        }
+    }
 }
 
 // MARK: - Supporting types
 
-enum SolitaireGameState: Equatable { case playing, won }
+enum SolitaireGameState: Equatable { case playing, won, stuck }
 
 enum SolitaireSelection: Equatable {
     case column(col: Int, fromIdx: Int)
     case waste
+    case foundation(suit: CardSuit)
 }
 
 // MARK: - Save state

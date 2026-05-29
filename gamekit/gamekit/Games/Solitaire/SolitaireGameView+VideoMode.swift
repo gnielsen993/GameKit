@@ -52,6 +52,7 @@ extension SolitaireGameView {
             }
             .overlay(alignment: .center) {
                 if vm.gameState == .won { winBanner }
+                else if vm.gameState == .stuck { stuckBanner }
             }
         }
     }
@@ -74,6 +75,7 @@ extension SolitaireGameView {
             }
             .overlay(alignment: .center) {
                 if vm.gameState == .won { winBanner }
+                else if vm.gameState == .stuck { stuckBanner }
             }
         }
     }

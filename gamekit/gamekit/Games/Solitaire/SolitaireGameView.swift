@@ -118,6 +118,8 @@ struct SolitaireGameView: View {
                 }
                 if vm.gameState == .won {
                     winBanner
+                } else if vm.gameState == .stuck {
+                    stuckBanner
                 }
             }
         }
@@ -162,6 +164,7 @@ struct SolitaireGameView: View {
                     isClassic:   isClassic,
                     cardWidth:   cardW,
                     selectedIsWaste: vm.selection == .waste,
+                    selectedFoundationSuit: { if case .foundation(let s) = vm.selection { return s } else { return nil } }(),
                     onStockTap:       { vm.drawFromStock() },
                     onWasteTap:       { vm.tapWaste() },
                     onWasteDoubleTap: { vm.sendWasteToFoundation() },
@@ -416,6 +419,33 @@ struct SolitaireGameView: View {
             Button("New Game") { showingNewGame = true }
                 .buttonStyle(.borderedProminent)
                 .tint(theme.colors.accentPrimary)
+        }
+        .padding(theme.spacing.xl)
+        .background(
+            RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                .fill(theme.colors.surface)
+                .shadow(color: .black.opacity(0.2), radius: 20)
+        )
+        .transition(.scale.combined(with: .opacity))
+    }
+
+    var stuckBanner: some View {
+        VStack(spacing: theme.spacing.m) {
+            Text("No moves left")
+                .font(theme.typography.title)
+                .foregroundStyle(theme.colors.textPrimary)
+            Text("A full pass through the deck found no new moves.")
+                .font(theme.typography.caption)
+                .foregroundStyle(theme.colors.textSecondary)
+                .multilineTextAlignment(.center)
+            HStack(spacing: theme.spacing.s) {
+                Button("Restart Deal") { vm.restartCurrentDeal() }
+                    .buttonStyle(.bordered)
+                    .tint(theme.colors.accentPrimary)
+                Button("New Game") { showingNewGame = true }
+                    .buttonStyle(.borderedProminent)
+                    .tint(theme.colors.accentPrimary)
+            }
         }
         .padding(theme.spacing.xl)
         .background(
