@@ -17,6 +17,8 @@ struct SolitaireGameView: View {
     // Drag state
     @State var isDragging      = false
     @State var dragIsFromWaste = false
+    @State var dragIsFromFoundation = false
+    @State var dragFoundationSuit: CardSuit? = nil
     @State var dragSourceCol   = 0
     @State var dragFromIdx     = 0
     @State var dragCards: [PlayingCard] = []
@@ -165,6 +167,7 @@ struct SolitaireGameView: View {
                     cardWidth:   cardW,
                     selectedIsWaste: vm.selection == .waste,
                     selectedFoundationSuit: { if case .foundation(let s) = vm.selection { return s } else { return nil } }(),
+                    draggingFoundationSuit: dragIsFromFoundation ? dragFoundationSuit : nil,
                     onStockTap:       { vm.drawFromStock() },
                     onWasteTap:       { vm.tapWaste() },
                     onWasteDoubleTap: { vm.sendWasteToFoundation() },
@@ -187,6 +190,26 @@ struct SolitaireGameView: View {
                     },
                     onWasteDragEnded: { translation in
                         finalizeWasteDrop(translation: translation, cardW: cardW)
+                    },
+                    onFoundationDragChanged: { suit, translation in
+                        if !isDragging {
+                            guard let rank = vm.board.foundations[suit.foundationIndex] else { return }
+                            dragCards            = [PlayingCard(rank: rank, suit: suit)]
+                            dragIsFromFoundation = true
+                            dragFoundationSuit   = suit
+                            isDragging           = true
+                            vm.clearSelection()
+                            pickUpTick          += 1
+                        }
+                        dragOffset = translation
+                        // Foundation slot center x in board-ZStack space (slots are
+                        // leftmost in the top row, same pad/gap as tableau columns).
+                        let fCX = pad + CGFloat(suit.foundationIndex) * (cardW + gap) + cardW / 2
+                        dropTargetCol = colAtBoardX(fCX + translation.width,
+                                                    cardW: cardW, gap: gap, pad: pad)
+                    },
+                    onFoundationDragEnded: { suit, translation in
+                        finalizeFoundationDrop(suit: suit, translation: translation, cardW: cardW)
                     }
                 )
                 .padding(.horizontal, pad)
@@ -218,7 +241,8 @@ struct SolitaireGameView: View {
                     isClassic:    isClassic,
                     cardWidth:    cardW,
                     selectedFrom: selectedFrom(col: col),
-                    ghostFromIdx: isDragging && !dragIsFromWaste && dragSourceCol == col
+                    ghostFromIdx: isDragging && !dragIsFromWaste && !dragIsFromFoundation
+                                    && dragSourceCol == col
                                     ? dragFromIdx : nil,
                     isDragTarget: isDragging
                         && dropTargetCol == col
@@ -246,7 +270,12 @@ struct SolitaireGameView: View {
 
         let x: CGFloat
         let y: CGFloat
-        if dragIsFromWaste {
+        if dragIsFromFoundation {
+            // Foundation slots are leftmost in the top row, indexed by foundationIndex.
+            let i = dragFoundationSuit?.foundationIndex ?? 0
+            x = pad + CGFloat(i) * (cardW + gap) + dragOffset.width
+            y = theme.spacing.s + dragOffset.height
+        } else if dragIsFromWaste {
             // Waste top card left edge: geoWidth - pad - stock(cardW) - gap - cardW
             x = geoWidth - pad - 2 * cardW - gap + dragOffset.width
             y = theme.spacing.s + dragOffset.height
@@ -329,6 +358,30 @@ struct SolitaireGameView: View {
             return
         }
         vm.commitDrag(fromColumn: dragSourceCol, fromIdx: dragFromIdx, toColumn: target)
+        dropTick += 1
+    }
+
+    func finalizeFoundationDrop(suit: CardSuit, translation: CGSize, cardW: CGFloat) {
+        defer {
+            isDragging           = false
+            dragOffset           = .zero
+            dropTargetCol        = nil
+            dragCards            = []
+            dragIsFromFoundation = false
+            dragFoundationSuit   = nil
+        }
+        // Require a deliberate downward drag into the tableau — a small jiggle
+        // in the top row shouldn't fling a foundation card onto a column.
+        guard translation.height > cardW * 0.7,
+              let target = dropTargetCol,
+              let rank = vm.board.foundations[suit.foundationIndex]
+        else { rejectTick += 1; return }
+        let card = PlayingCard(rank: rank, suit: suit)
+        guard SolitaireRules.canPlaceOnTableau([card], onto: vm.board.tableau[target]) else {
+            rejectTick += 1
+            return
+        }
+        vm.commitFoundationDrag(suit: suit, toColumn: target)
         dropTick += 1
     }
 

@@ -185,6 +185,11 @@ final class SolitaireViewModel {
         _ = attemptMove(from: .waste, toColumn: dstCol)
     }
 
+    func commitFoundationDrag(suit: CardSuit, toColumn dstCol: Int) {
+        guard gameState == .playing else { return }
+        _ = attemptMove(from: .foundation(suit: suit), toColumn: dstCol)
+    }
+
     // MARK: - Auto-complete
 
     func beginAutoCompleteAnimation() {

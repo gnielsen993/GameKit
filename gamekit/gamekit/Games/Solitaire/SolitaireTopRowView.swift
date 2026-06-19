@@ -10,12 +10,15 @@ struct SolitaireTopRowView: View {
     let cardWidth:   CGFloat
     var selectedIsWaste:      Bool      = false
     var selectedFoundationSuit: CardSuit? = nil
+    var draggingFoundationSuit: CardSuit? = nil
     var onStockTap:           () -> Void
     var onWasteTap:         () -> Void
     var onWasteDoubleTap:   () -> Void
     var onFoundationTap:    (CardSuit) -> Void
     var onWasteDragChanged: ((CGSize) -> Void)? = nil
     var onWasteDragEnded:   ((CGSize) -> Void)? = nil
+    var onFoundationDragChanged: ((CardSuit, CGSize) -> Void)? = nil
+    var onFoundationDragEnded:   ((CardSuit, CGSize) -> Void)? = nil
 
     private var cardHeight: CGFloat { cardWidth * 1.4 }
     private var radius:     CGFloat { cardWidth * 0.10 }
@@ -27,7 +30,6 @@ struct SolitaireTopRowView: View {
             // Foundations — left
             ForEach(suitOrder, id: \.sfSymbol) { suit in
                 foundationSlot(suit: suit)
-                    .onTapGesture { onFoundationTap(suit) }
             }
 
             Spacer(minLength: 0)
@@ -48,6 +50,7 @@ struct SolitaireTopRowView: View {
     private func foundationSlot(suit: CardSuit) -> some View {
         let topRank   = foundations[suit.foundationIndex]
         let isSelected = selectedFoundationSuit == suit
+        let isGhosted  = draggingFoundationSuit == suit
         return ZStack {
             RoundedRectangle(cornerRadius: radius, style: .continuous)
                 .stroke(
@@ -59,6 +62,12 @@ struct SolitaireTopRowView: View {
             if let rank = topRank {
                 PlayingCardView(rank: rank, suit: suit, theme: theme,
                                 isClassic: isClassic, width: cardWidth)
+                    .opacity(isGhosted ? 0.15 : 1)
+                    .gesture(
+                        DragGesture(minimumDistance: 6)
+                            .onChanged { onFoundationDragChanged?(suit, $0.translation) }
+                            .onEnded   { onFoundationDragEnded?(suit, $0.translation) }
+                    )
             } else {
                 Image(systemName: suit.sfSymbol)
                     .font(.system(size: cardWidth * 0.30, weight: .light))

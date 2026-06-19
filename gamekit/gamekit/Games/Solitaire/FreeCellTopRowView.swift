@@ -88,6 +88,7 @@ struct FreeCellTopRowView: View {
         let isTarget    = vm.selection != nil && vm.canMoveSelectionToFoundation
                           && vm.selectedCards.first?.suit == suit
         let isSelected: Bool = { if case .foundation(let s) = vm.selection { return s == suit } else { return false } }()
+        let isGhosted:  Bool = { if case .foundation(let s) = dragSource { return s == suit } else { return false } }()
 
         ZStack {
             RoundedRectangle(cornerRadius: cardWidth * 0.10, style: .continuous)
@@ -109,6 +110,7 @@ struct FreeCellTopRowView: View {
             if let rank = topRank {
                 let card = PlayingCard(rank: rank, suit: suit)
                 PlayingCardView(card, theme: theme, isClassic: isClassic, width: cardWidth)
+                    .opacity(isGhosted ? 0.22 : 1.0)
             } else {
                 Image(systemName: suit.sfSymbol)
                     .font(.system(size: cardWidth * 0.32))

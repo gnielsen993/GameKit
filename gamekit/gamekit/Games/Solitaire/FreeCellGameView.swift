@@ -238,13 +238,15 @@ struct FreeCellGameView: View {
         guard let (sel, offset) = computeSource(
             at: val.startLocation,
             cardW: cardW, cardH: cardH, shelfH: shelfH,
-            boardPad: boardPad, colGap: colGap
+            boardPad: boardPad, colGap: colGap, geoW: geoW
         ) else { return }
         let cards: [PlayingCard] = {
             switch sel {
             case .column(let col, let idx): return Array(vm.board.columns[col][idx...])
             case .freeCell(let cell):       return vm.board.freeCells[cell].map { [$0] } ?? []
-            case .foundation:               return []   // foundation drag not supported; drops empty
+            case .foundation(let suit):
+                let fidx = vm.board.foundationIndex(for: suit)
+                return vm.board.foundations[fidx].map { [PlayingCard(rank: $0, suit: suit)] } ?? []
             }
         }()
         guard !cards.isEmpty else { return }
@@ -275,26 +277,45 @@ struct FreeCellGameView: View {
     private func computeSource(
         at loc: CGPoint,
         cardW: CGFloat, cardH: CGFloat, shelfH: CGFloat,
-        boardPad: CGFloat, colGap: CGFloat
+        boardPad: CGFloat, colGap: CGFloat, geoW: CGFloat
     ) -> (FreeCellSelection, CGPoint)? {
         let shelfTopY  = headerHeight
         let shelfBotY  = headerHeight + shelfH
         let boardTopY  = shelfBotY + 8   // .padding(.top, 8) on board HStack
 
         if loc.y >= shelfTopY && loc.y < shelfBotY {
-            // Shelf zone — only free cells are draggable
+            // Shelf zone — free cells (left) and foundations (right) are draggable
             let freeCellsW = 4 * cardW + 3 * colGap
+            let cardTopY   = shelfTopY + 10  // .padding(.vertical, 10)
+
+            // Free cells (left group)
             let relX = loc.x - boardPad
-            guard relX >= 0 && relX < freeCellsW else { return nil }
-            let cellIdx = max(0, min(3, Int(relX / (cardW + colGap))))
-            guard vm.board.freeCells[cellIdx] != nil else { return nil }
-            let cardTopX = boardPad + CGFloat(cellIdx) * (cardW + colGap)
-            let cardTopY = shelfTopY + 10  // .padding(.vertical, 10)
-            let offset = CGPoint(
-                x: max(0, min(cardW, loc.x - cardTopX)),
-                y: max(0, min(cardH, loc.y - cardTopY))
-            )
-            return (.freeCell(cellIdx: cellIdx), offset)
+            if relX >= 0 && relX < freeCellsW {
+                let cellIdx = max(0, min(3, Int(relX / (cardW + colGap))))
+                guard vm.board.freeCells[cellIdx] != nil else { return nil }
+                let cardTopX = boardPad + CGFloat(cellIdx) * (cardW + colGap)
+                let offset = CGPoint(
+                    x: max(0, min(cardW, loc.x - cardTopX)),
+                    y: max(0, min(cardH, loc.y - cardTopY))
+                )
+                return (.freeCell(cellIdx: cellIdx), offset)
+            }
+
+            // Foundations (right group) — drag the top card back into play
+            let foundStartX = geoW - boardPad - freeCellsW
+            if loc.x >= foundStartX {
+                let fRelX = loc.x - foundStartX
+                let i     = max(0, min(3, Int(fRelX / (cardW + colGap))))
+                let suit  = CardSuit.allCases[i]
+                guard vm.board.foundations[vm.board.foundationIndex(for: suit)] != nil else { return nil }
+                let cardTopX = foundStartX + CGFloat(i) * (cardW + colGap)
+                let offset = CGPoint(
+                    x: max(0, min(cardW, loc.x - cardTopX)),
+                    y: max(0, min(cardH, loc.y - cardTopY))
+                )
+                return (.foundation(suit: suit), offset)
+            }
+            return nil
         }
 
         if loc.y >= boardTopY {

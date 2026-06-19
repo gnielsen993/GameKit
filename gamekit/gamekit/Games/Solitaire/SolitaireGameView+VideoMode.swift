@@ -105,6 +105,7 @@ extension SolitaireGameView {
                     isClassic:   isClassic,
                     cardWidth:   cardW,
                     selectedIsWaste: vm.selection == .waste,
+                    draggingFoundationSuit: dragIsFromFoundation ? dragFoundationSuit : nil,
                     onStockTap:       { vm.drawFromStock() },
                     onWasteTap:       { vm.tapWaste() },
                     onWasteDoubleTap: { vm.sendWasteToFoundation() },
@@ -125,6 +126,24 @@ extension SolitaireGameView {
                     },
                     onWasteDragEnded: { translation in
                         finalizeWasteDrop(translation: translation, cardW: cardW)
+                    },
+                    onFoundationDragChanged: { suit, translation in
+                        if !isDragging {
+                            guard let rank = vm.board.foundations[suit.foundationIndex] else { return }
+                            dragCards            = [PlayingCard(rank: rank, suit: suit)]
+                            dragIsFromFoundation = true
+                            dragFoundationSuit   = suit
+                            isDragging           = true
+                            vm.clearSelection()
+                            pickUpTick          += 1
+                        }
+                        dragOffset = translation
+                        let fCX = pad + CGFloat(suit.foundationIndex) * (cardW + gap) + cardW / 2
+                        dropTargetCol = colAtBoardX(fCX + translation.width,
+                                                    cardW: cardW, gap: gap, pad: pad)
+                    },
+                    onFoundationDragEnded: { suit, translation in
+                        finalizeFoundationDrop(suit: suit, translation: translation, cardW: cardW)
                     }
                 )
                 .padding(.horizontal, pad)
