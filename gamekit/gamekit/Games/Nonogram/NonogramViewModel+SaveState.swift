@@ -6,14 +6,19 @@ extension NonogramViewModel {
         let key = NonogramSaveState.key(difficulty: difficulty, gameMode: gameMode)
         if let data = userDefaults.data(forKey: key),
            let saved = try? JSONDecoder().decode(NonogramSaveState.self, from: data) {
-            pendingSaveState = saved
+            if isRestorable(saved) {
+                pendingSaveState = saved
+            } else {
+                userDefaults.removeObject(forKey: key)
+                pendingSaveState = nil
+            }
         }
     }
 
     func restoreState(_ saved: NonogramSaveState) {
-        guard let d = NonogramDifficulty(rawValue: saved.difficulty),
-              let m = NonogramGameMode(rawValue: saved.gameMode),
-              saved.cells.count == saved.size * saved.size else {
+        guard isRestorable(saved),
+              let d = NonogramDifficulty(rawValue: saved.difficulty),
+              let m = NonogramGameMode(rawValue: saved.gameMode) else {
             discardSaveAndLoadNew()
             return
         }
@@ -64,5 +69,19 @@ extension NonogramViewModel {
             forKey: NonogramSaveState.key(difficulty: difficulty, gameMode: gameMode)
         )
         pendingSaveState = nil
+    }
+
+    private func isRestorable(_ saved: NonogramSaveState) -> Bool {
+        guard let d = NonogramDifficulty(rawValue: saved.difficulty),
+              NonogramGameMode(rawValue: saved.gameMode) != nil,
+              saved.size == d.size,
+              saved.cells.count == saved.size * saved.size,
+              saved.livesRemaining > 0,
+              saved.lockedCellIndices.allSatisfy({ $0 >= 0 && $0 < saved.cells.count }) else {
+            return false
+        }
+
+        let puzzle = NonogramPuzzle(id: saved.puzzleId, title: saved.puzzleTitle, grid: saved.puzzleGrid)
+        return puzzle.isValid(for: saved.size)
     }
 }

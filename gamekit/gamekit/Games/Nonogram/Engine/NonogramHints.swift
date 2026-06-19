@@ -154,23 +154,27 @@ enum NonogramHints {
         }
 
         // For each player run, accumulate the set of hint indices it could
-        // be across all valid placements. A player run is identified with
-        // a placed hint ONLY when their length AND start position match
-        // exactly — a length-1 fill inside a length-12 placed run hasn't
-        // completed that hint yet, so it doesn't count.
+        // belong to across all valid placements. Use containment here, not
+        // exact equality: a lone fill that could still grow into a `3` or
+        // `5` must not prematurely cross off a `1`.
         var candidates: [Set<Int>] = playerRuns.map { _ in Set<Int>() }
+        var exactMatches = Array(repeating: false, count: playerRuns.count)
         for placement in placements {
             for (hintIdx, runStart) in placement.enumerated() {
                 let runLen = hints[hintIdx]
+                let runEnd = runStart + runLen
                 for (pIdx, pRun) in playerRuns.enumerated()
-                where pRun.length == runLen && pRun.start == runStart {
+                where pRun.start >= runStart && pRun.start + pRun.length <= runEnd {
                     candidates[pIdx].insert(hintIdx)
+                    if pRun.length == runLen && pRun.start == runStart {
+                        exactMatches[pIdx] = true
+                    }
                 }
             }
         }
 
         var mask = Array(repeating: false, count: hints.count)
-        for set in candidates where set.count == 1 {
+        for (idx, set) in candidates.enumerated() where exactMatches[idx] && set.count == 1 {
             mask[set.first!] = true
         }
         return mask

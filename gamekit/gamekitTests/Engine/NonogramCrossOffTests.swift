@@ -107,4 +107,14 @@ struct NonogramCrossOffTests {
         let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [5])
         #expect(mask == [false], "No fills means no completion regardless of marks.")
     }
+
+    @Test("[1,3,5], single unbounded fill does not cross off the 1")
+    func singleFillThatCouldBelongToLongerRunDoesNotCrossOff() {
+        var filled = Array(repeating: false, count: 20)
+        filled[8] = true
+        let marked = Array(repeating: false, count: 20)
+        let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [1, 3, 5])
+        #expect(mask == [false, false, false],
+                "A lone fill may still become the 3 or 5 run, so the 1 is not complete.")
+    }
 }

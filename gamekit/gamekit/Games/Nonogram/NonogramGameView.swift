@@ -128,6 +128,7 @@ struct NonogramGameView: View {
                 }
             case .idle, .playing:
                 endCardVisible = false
+                bannerDismissed = false
             }
         }
         .navigationTitle(String(localized: "Nonogram"))
