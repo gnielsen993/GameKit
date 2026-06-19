@@ -47,6 +47,7 @@ struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: Vie
     @ViewBuilder let primaryInfo: () -> Primary
     @ViewBuilder let picker: () -> Picker
     @ViewBuilder let secondaryInfo: () -> Secondary
+    @Environment(\.videoModeStore) private var videoModeStore
 
     var body: some View {
         HStack(spacing: theme.spacing.s) {           // D-13 inter-item gap
@@ -68,6 +69,7 @@ struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: Vie
         }
         .padding(.horizontal, theme.spacing.m)       // consistent edge margin across all games
         .frame(height: theme.spacing.xl)             // D-13 pill height anchor
+        .padding(.top, videoModeStore.location == .largeBottom ? theme.spacing.xxl : 0)
     }
 
     @ViewBuilder

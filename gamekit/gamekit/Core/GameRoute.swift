@@ -30,4 +30,6 @@ enum GameRoute: Hashable, Sendable {
     case sudoku(SudokuDifficulty?, SudokuGameMode?)
     case freeCell(FreeCellMode?)
     case klondike(SolitaireDifficulty?)
+    case fiveLetter(FiveLetterMode?)
+    case wordGrid(WordGridMode?)
 }

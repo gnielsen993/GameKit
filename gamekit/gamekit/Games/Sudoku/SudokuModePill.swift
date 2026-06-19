@@ -25,21 +25,32 @@ struct SudokuModePill: View {
     var compact: Bool = false
 
     var body: some View {
-        HStack(spacing: 0) {
-            segment(.value,
-                    glyph: "pencil.slash",
-                    label: String(localized: "Value"))
-            segment(.note,
-                    glyph: "pencil",
-                    label: String(localized: "Notes"))
+        Button {
+            guard isInteractive else { return }
+            onSelect(toggledMode)
+        } label: {
+            HStack(spacing: 0) {
+                segment(.value,
+                        glyph: "pencil.slash",
+                        label: String(localized: "Value"))
+                segment(.note,
+                        glyph: "pencil",
+                        label: String(localized: "Notes"))
+            }
+            .padding(theme.spacing.xs)
+            .background(
+                Capsule().fill(theme.colors.surface)
+            )
+            .overlay(
+                Capsule().stroke(theme.colors.border, lineWidth: 1)
+            )
+            .contentShape(Capsule())
         }
-        .padding(theme.spacing.xs)
-        .background(
-            Capsule().fill(theme.colors.surface)
-        )
-        .overlay(
-            Capsule().stroke(theme.colors.border, lineWidth: 1)
-        )
+        .buttonStyle(.plain)
+        .disabled(!isInteractive)
+        .accessibilityLabel(Text(String(localized: "Toggle mode")))
+        .accessibilityValue(Text(mode == .value ? String(localized: "Value") : String(localized: "Notes")))
+        .accessibilityAddTraits(.isButton)
     }
 
     @ViewBuilder
@@ -47,31 +58,26 @@ struct SudokuModePill: View {
                          glyph: String,
                          label: String) -> some View {
         let isActive = mode == target
-        Button {
-            guard isInteractive else { return }
-            onSelect(target)
-        } label: {
-            HStack(spacing: theme.spacing.xs) {
-                Image(systemName: glyph)
-                    .font(.system(size: compact ? 13 : 16, weight: .semibold))
-                Text(label)
-                    .font(compact ? theme.typography.body : theme.typography.headline)
-                    .lineLimit(1)
-                    .minimumScaleFactor(compact ? 0.7 : 1.0)
-            }
-            .foregroundStyle(isActive
-                             ? theme.colors.background
-                             : theme.colors.textPrimary)
-            .padding(.horizontal, compact ? theme.spacing.s : theme.spacing.l)
-            .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
-            .frame(minHeight: compact ? theme.spacing.l : 44)
-            .background(
-                Capsule().fill(isActive ? theme.colors.accentPrimary : Color.clear)
-            )
-            .contentShape(Capsule())
+        HStack(spacing: theme.spacing.xs) {
+            Image(systemName: glyph)
+                .font(.system(size: compact ? 13 : 16, weight: .semibold))
+            Text(label)
+                .font(compact ? theme.typography.body : theme.typography.headline)
+                .lineLimit(1)
+                .minimumScaleFactor(compact ? 0.7 : 1.0)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Text(label))
-        .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : .isButton)
+        .foregroundStyle(isActive
+                         ? theme.colors.background
+                         : theme.colors.textPrimary)
+        .padding(.horizontal, compact ? theme.spacing.s : theme.spacing.l)
+        .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
+        .frame(minHeight: compact ? theme.spacing.l : 44)
+        .background(
+            Capsule().fill(isActive ? theme.colors.accentPrimary : Color.clear)
+        )
+    }
+
+    private var toggledMode: SudokuInteractionMode {
+        mode == .value ? .note : .value
     }
 }

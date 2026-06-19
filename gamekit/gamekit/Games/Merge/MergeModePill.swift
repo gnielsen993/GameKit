@@ -26,44 +26,49 @@ struct MergeModePill: View {
     var compact: Bool = false
 
     var body: some View {
-        HStack(spacing: 0) {
-            segment(.winMode,
-                    glyph: "trophy.fill",
-                    label: String(localized: "Win"))
-            segment(.infinite,
-                    glyph: "infinity",
-                    label: String(localized: "Infinite"))
+        Button {
+            onSelect(toggledMode)
+        } label: {
+            HStack(spacing: 0) {
+                segment(.winMode,
+                        glyph: "trophy.fill",
+                        label: String(localized: "Win"))
+                segment(.infinite,
+                        glyph: "infinity",
+                        label: String(localized: "Infinite"))
+            }
+            .padding(theme.spacing.xs)
+            .background(Capsule().fill(theme.colors.surface))
+            .overlay(Capsule().stroke(theme.colors.border, lineWidth: 1))
+            .contentShape(Capsule())
         }
-        .padding(theme.spacing.xs)
-        .background(Capsule().fill(theme.colors.surface))
-        .overlay(Capsule().stroke(theme.colors.border, lineWidth: 1))
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(String(localized: "Toggle mode")))
+        .accessibilityValue(Text(mode == .winMode ? String(localized: "Win") : String(localized: "Infinite")))
+        .accessibilityAddTraits(.isButton)
     }
 
     @ViewBuilder
     private func segment(_ target: MergeMode, glyph: String, label: String) -> some View {
         let isActive = mode == target
-        Button {
-            onSelect(target)
-        } label: {
-            HStack(spacing: theme.spacing.xs) {
-                Image(systemName: glyph)
-                    .font(.system(size: compact ? 13 : 16, weight: .semibold))
-                Text(label)
-                    .font(compact ? theme.typography.body : theme.typography.headline)
-                    .lineLimit(1)
-                    .minimumScaleFactor(compact ? 0.7 : 1.0)
-            }
-            .foregroundStyle(isActive ? theme.colors.background : theme.colors.textPrimary)
-            .padding(.horizontal, compact ? theme.spacing.s : theme.spacing.l)
-            .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
-            .frame(minHeight: compact ? theme.spacing.l : 44)
-            .background(
-                Capsule().fill(isActive ? theme.colors.accentPrimary : Color.clear)
-            )
-            .contentShape(Capsule())
+        HStack(spacing: theme.spacing.xs) {
+            Image(systemName: glyph)
+                .font(.system(size: compact ? 13 : 16, weight: .semibold))
+            Text(label)
+                .font(compact ? theme.typography.body : theme.typography.headline)
+                .lineLimit(1)
+                .minimumScaleFactor(compact ? 0.7 : 1.0)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Text(label))
-        .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : .isButton)
+        .foregroundStyle(isActive ? theme.colors.background : theme.colors.textPrimary)
+        .padding(.horizontal, compact ? theme.spacing.s : theme.spacing.l)
+        .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
+        .frame(minHeight: compact ? theme.spacing.l : 44)
+        .background(
+            Capsule().fill(isActive ? theme.colors.accentPrimary : Color.clear)
+        )
+    }
+
+    private var toggledMode: MergeMode {
+        mode == .winMode ? .infinite : .winMode
     }
 }

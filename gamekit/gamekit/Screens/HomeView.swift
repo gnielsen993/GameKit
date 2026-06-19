@@ -29,6 +29,7 @@ struct HomeView: View {
     @State private var expandedUpcoming = false
     @State private var showingComingSoon: GameCard?
     @State private var showingSettings: Bool = false
+    @State private var showingVideoMode: Bool = false
     @State private var statsRequest: StatsRequest? = nil
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
@@ -79,6 +80,11 @@ struct HomeView: View {
             .background(theme.colors.background.ignoresSafeArea())
             .navigationTitle(String(localized: "The Drawer"))
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    HomeVideoModeButton(theme: theme) {
+                        showingVideoMode = true
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     profileMenu
                 }
@@ -88,6 +94,9 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showingVideoMode) {
+                HomeVideoModeSheet()
             }
             .sheet(item: $statsRequest) { req in
                 StatsView(focusedKind: req.kind)
@@ -283,7 +292,7 @@ struct HomeView: View {
             Divider().padding(.vertical, theme.spacing.m)
 
             VStack(spacing: theme.spacing.s) {
-                ForEach(upcomingGames) { card in
+                ForEach(homeUpcomingGames) { card in
                     Button {
                         showingComingSoon = card
                         Task { @MainActor in
@@ -308,7 +317,7 @@ struct HomeView: View {
                     }
                     .buttonStyle(.plain)
 
-                    if card.id != upcomingGames.last?.id {
+                    if card.id != homeUpcomingGames.last?.id {
                         Divider()
                     }
                 }
@@ -350,6 +359,14 @@ struct HomeView: View {
             FreeCellGameView(initialMode: mode ?? .random(.easy))
                 .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
+        case .fiveLetter(let mode):
+            FiveLetterGameView(initialMode: mode)
+                .videoModeAware(minBoardHeight: 480)
+                .disableInteractivePop()
+        case .wordGrid(let mode):
+            WordGridGameView(initialMode: mode)
+                .videoModeAware(minBoardHeight: 480)
+                .disableInteractivePop()
         }
     }
 
@@ -374,28 +391,3 @@ struct HomeView: View {
         .accessibilityLabel(Text("Profile"))
     }
 }
-
-// MARK: - Supporting types
-
-struct GameCard: Identifiable, Equatable {
-    let id: String
-    let title: String
-    let symbol: String
-    let isEnabled: Bool
-}
-
-// Stats sheet item — wraps optional GameKind so .sheet(item:) can carry
-// both "focused on one game" and "show all" through the same binding.
-private struct StatsRequest: Identifiable {
-    let id = UUID()
-    let kind: GameKind?
-}
-
-// Upcoming games catalog. Entries here move to GameDescriptor.all when
-// they graduate to playable. Order determines display order in the panel.
-private let upcomingGames: [GameCard] = [
-    GameCard(id: "wordGrid",      title: String(localized: "Word Grid"),      symbol: "textformat.abc",     isEnabled: false),
-    GameCard(id: "flow",          title: String(localized: "Flow"),           symbol: "scribble.variable",  isEnabled: false),
-    GameCard(id: "patternMemory", title: String(localized: "Pattern Memory"), symbol: "rectangle.grid.2x2", isEnabled: false),
-    GameCard(id: "chessPuzzles",  title: String(localized: "Chess Puzzles"),  symbol: "checkmark.shield",   isEnabled: false),
-]

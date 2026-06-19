@@ -38,6 +38,8 @@ enum AccentRole: Sendable {
     case slot4
     case slot5
     case slot6
+    case slot7
+    case slot8
 
     /// Index into `theme.catalogueColor(_:)`.
     var index: Int {
@@ -48,6 +50,8 @@ enum AccentRole: Sendable {
         case .slot4: return 3
         case .slot5: return 4
         case .slot6: return 5
+        case .slot7: return 6
+        case .slot8: return 7
         }
     }
 }
@@ -220,6 +224,32 @@ extension GameDescriptor {
                 GameModeChip(id: "fc-deal",   labelKey: "Deal #", route: .freeCell(.enterDeal))
             ],
             shortMeta: "Standard"
+        ),
+        GameDescriptor(
+            kind: .fiveLetter,
+            titleKey: "Five Letter",
+            captionKey: "Tap to play",
+            symbol: "textformat.abc",
+            accent: .slot7,
+            route: .fiveLetter(nil),
+            modes: [
+                GameModeChip(id: "five-daily", labelKey: "Daily", route: .fiveLetter(.daily)),
+                GameModeChip(id: "five-unlimited", labelKey: "Unlimited", route: .fiveLetter(.unlimited))
+            ],
+            shortMeta: "Word guess"
+        ),
+        GameDescriptor(
+            kind: .wordGrid,
+            titleKey: "Word Grid",
+            captionKey: "Tap to play",
+            symbol: "square.grid.3x3",
+            accent: .slot8,
+            route: .wordGrid(nil),
+            modes: [
+                GameModeChip(id: "wordgrid-timed", labelKey: "Timed", detailKey: "3 min", route: .wordGrid(.timed)),
+                GameModeChip(id: "wordgrid-relaxed", labelKey: "Relaxed", detailKey: "No timer", route: .wordGrid(.relaxed))
+            ],
+            shortMeta: "Trace words"
         )
     ]
 }

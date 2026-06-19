@@ -63,7 +63,6 @@ struct SettingsView: View {
     @State private var exportDocument: StatsExportDocument?
 
     @Environment(\.settingsStore) private var settingsStore
-    @Environment(\.videoModeStore) private var videoModeStore
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
     private static let logger = Logger(
@@ -77,7 +76,6 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: theme.spacing.l) {
 
                     appearanceSection
-                    videoModeSection
                     audioSection
                     SettingsSyncSection(theme: theme)
                     dataSection
@@ -173,45 +171,6 @@ struct SettingsView: View {
                     )
                 }
                 .buttonStyle(.plain)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var videoModeSection: some View {
-        // P9 (D-01, D-11 — 09-CONTEXT.md lines 44-54):
-        //   - Card sits between APPEARANCE and FEEL/AUDIO.
-        //   - Toggle row ALWAYS shown.
-        //   - NavigationLink "Video location: <label>" row appears only when
-        //     videoModeStore.isEnabled == true.
-        //   - Toggling On does NOT auto-navigate (D-11) — link just becomes visible.
-        // Pitfall 2 lock (09-RESEARCH §Pitfalls): videoModeStore is read via the
-        // EnvironmentKey seam declared above, NEVER via @EnvironmentObject —
-        // @Observable is incompatible with ObservableObject.
-        settingsSectionHeader(theme: theme, String(localized: "videoMode.sectionHeader"))
-        DKCard(theme: theme) {
-            VStack(spacing: 0) {
-                SettingsToggleRow(
-                    theme: theme,
-                    glyph: "play.rectangle",
-                    label: String(localized: "videoMode.toggleLabel"),
-                    isOn: Bindable(videoModeStore).isEnabled
-                )
-                if videoModeStore.isEnabled {
-                    Rectangle()
-                        .fill(theme.colors.border)
-                        .frame(height: 1)
-                    NavigationLink(destination: VideoLocationPickerView()) {
-                        settingsNavRow(
-                            theme: theme,
-                            title: String(
-                                format: String(localized: "videoMode.locationRowTitle"),
-                                videoModeStore.location.localizedLabel
-                            )
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
             }
         }
     }

@@ -10,6 +10,9 @@
     "%@" : {
 
     },
+    "%@ - Strict" : {
+
+    },
     "%@ — %@" : {
       "localizations" : {
         "en" : {
@@ -104,6 +107,9 @@
         }
       }
     },
+    "%lld guesses" : {
+
+    },
     "%lld hours" : {
       "comment" : "VoiceOver spoken time component — hours portion of elapsed",
       "extractionState" : "automatic",
@@ -177,10 +183,19 @@
         }
       }
     },
+    "%lld/6" : {
+
+    },
+    "+%lld" : {
+
+    },
     "9" : {
 
     },
     "2048 · Classic" : {
+
+    },
+    "A full pass through the deck found no new moves." : {
 
     },
     "Abandon" : {
@@ -224,7 +239,13 @@
     "Add a Mail account in iOS Settings to use the in-app composer, or pick another option." : {
 
     },
+    "Already found" : {
+
+    },
     "Animations" : {
+
+    },
+    "Answer: %@" : {
 
     },
     "APPEARANCE" : {
@@ -374,6 +395,9 @@
     "Choose size" : {
 
     },
+    "Clear" : {
+
+    },
     "Coming soon" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -403,6 +427,21 @@
     "Couldn't reach iCloud" : {
 
     },
+    "Daily" : {
+
+    },
+    "Daily already played" : {
+
+    },
+    "Daily Challenge" : {
+
+    },
+    "Daily challenge is one shot" : {
+
+    },
+    "Daily complete" : {
+
+    },
     "Dark" : {
 
     },
@@ -428,6 +467,9 @@
     "Default mail app" : {
 
     },
+    "Delete" : {
+
+    },
     "Delete account" : {
 
     },
@@ -451,6 +493,9 @@
           }
         }
       }
+    },
+    "Do not use %@" : {
+
     },
     "Done" : {
 
@@ -500,7 +545,16 @@
     "FEEL" : {
 
     },
+    "Finish" : {
+
+    },
     "Finish intro" : {
+
+    },
+    "Five Letter" : {
+
+    },
+    "FIVE LETTER" : {
 
     },
     "Flag" : {
@@ -598,6 +652,12 @@
     "Green border = valid drop · Pick up a stack by tapping any card in it" : {
 
     },
+    "Grid complete" : {
+
+    },
+    "Guess distribution" : {
+
+    },
     "Haptics" : {
 
     },
@@ -651,6 +711,16 @@
     "Infinite · Endless" : {
 
     },
+    "Keep %@ in spot %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep %1$@ in spot %2$lld"
+          }
+        }
+      }
+    },
     "Large" : {
 
     },
@@ -665,6 +735,19 @@
     },
     "Later" : {
 
+    },
+    "Letter %@" : {
+
+    },
+    "Letter %@, row %lld, column %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Letter %1$@, row %2$lld, column %3$lld"
+          }
+        }
+      }
     },
     "Light" : {
 
@@ -754,6 +837,9 @@
     "More themes & custom colors" : {
 
     },
+    "Move %@" : {
+
+    },
     "New %@ Game" : {
 
     },
@@ -761,6 +847,12 @@
 
     },
     "New Game" : {
+
+    },
+    "New grid" : {
+
+    },
+    "New Grid" : {
 
     },
     "New puzzle" : {
@@ -778,6 +870,9 @@
     "No Ads, No Coins" : {
 
     },
+    "No Five Letter games played yet." : {
+
+    },
     "No FreeCell games played yet." : {
 
     },
@@ -785,6 +880,9 @@
 
     },
     "No Merge games played yet." : {
+
+    },
+    "No moves left" : {
 
     },
     "No Nonogram games played yet." : {
@@ -802,6 +900,9 @@
     "No Sudoku games played yet." : {
 
     },
+    "No Word Grid games played yet." : {
+
+    },
     "Nonogram" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -816,6 +917,9 @@
     "NONOGRAM" : {
 
     },
+    "Not in word list" : {
+
+    },
     "Not signed in" : {
 
     },
@@ -823,6 +927,9 @@
 
     },
     "Notes: %@" : {
+
+    },
+    "Off" : {
 
     },
     "OK" : {
@@ -879,6 +986,9 @@
     "Play Deal #%@" : {
 
     },
+    "Play unlimited" : {
+
+    },
     "Please enter a number between 1 and 32,000." : {
 
     },
@@ -898,6 +1008,9 @@
 
     },
     "Quit and reopen to finish iCloud setup" : {
+
+    },
+    "Relaxed" : {
 
     },
     "Reset" : {
@@ -923,6 +1036,9 @@
           }
         }
       }
+    },
+    "Restart Deal" : {
+
     },
     "Restart game" : {
       "comment" : "Toolbar leading button a11y label (D-20)",
@@ -980,6 +1096,16 @@
     },
     "Score %lld" : {
 
+    },
+    "Score %lld · %lld words" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Score %1$lld · %2$lld words"
+          }
+        }
+      }
     },
     "secondary" : {
 
@@ -1095,6 +1221,21 @@
     "Step 2 of 3. Welcome to GameDrawer." : {
 
     },
+    "Strict mode off" : {
+
+    },
+    "Strict mode on" : {
+
+    },
+    "Strict mode: Off" : {
+
+    },
+    "Strict mode: On" : {
+
+    },
+    "Submit" : {
+
+    },
     "Sudoku" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1187,6 +1328,9 @@
         }
       }
     },
+    "Timed" : {
+
+    },
     "Tiny" : {
 
     },
@@ -1196,10 +1340,22 @@
     "Tiny  ·  5 × 5" : {
 
     },
+    "Toggle mode" : {
+
+    },
+    "Too short" : {
+
+    },
     "Try again" : {
 
     },
+    "Turn on Video Mode to choose where the video window sits while you play." : {
+
+    },
     "Undo" : {
+
+    },
+    "Unlimited" : {
 
     },
     "Unrevealed, row %lld column %lld" : {
@@ -1218,6 +1374,9 @@
 
     },
     "Upcoming games" : {
+
+    },
+    "Use %@" : {
 
     },
     "Value" : {
@@ -1453,6 +1612,9 @@
         }
       }
     },
+    "WORD GRID" : {
+
+    },
     "You have an in-progress %@ Solitaire game." : {
 
     },
@@ -1474,6 +1636,12 @@
           }
         }
       }
+    },
+    "You have an unfinished Five Letter puzzle." : {
+
+    },
+    "You have an unfinished Word Grid game." : {
+
     },
     "You reached 2048!" : {
 

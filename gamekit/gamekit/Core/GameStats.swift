@@ -190,6 +190,29 @@ final class GameStats {
         FreeCellSaveState.clearAll()
         SolitaireSaveState.clearAll()
         MergeSaveState.clearAll()
+        FiveLetterSaveState.clearAll()
+        WordGridSaveState.clearAll()
+    }
+
+    func record(
+        gameKind: GameKind,
+        difficulty: String,
+        outcome: Outcome,
+        durationSeconds: Double,
+        puzzleId: String?,
+        score: Int
+    ) throws {
+        let record = GameRecord(
+            gameKind: gameKind,
+            difficulty: difficulty,
+            outcome: outcome,
+            durationSeconds: durationSeconds,
+            playedAt: .now,
+            score: score,
+            puzzleId: puzzleId
+        )
+        modelContext.insert(record)
+        try modelContext.save()
     }
 
     // MARK: - Private

@@ -103,6 +103,23 @@ struct StatsView: View {
     @Query(filter: #Predicate<BestTime> { $0.gameKindRaw == "klondike" })
     private var klondikeBestTimes: [BestTime]
 
+    @Query(
+        filter: #Predicate<GameRecord> { $0.gameKindRaw == "fiveLetter" },
+        sort: \.playedAt,
+        order: .reverse
+    )
+    private var fiveLetterRecords: [GameRecord]
+
+    @Query(
+        filter: #Predicate<GameRecord> { $0.gameKindRaw == "wordGrid" },
+        sort: \.playedAt,
+        order: .reverse
+    )
+    private var wordGridRecords: [GameRecord]
+
+    @Query(filter: #Predicate<BestScore> { $0.gameKindRaw == "wordGrid" })
+    private var wordGridBestScores: [BestScore]
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     private func shows(_ kind: GameKind) -> Bool {
@@ -160,6 +177,20 @@ struct StatsView: View {
                         if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "SOLITAIRE")) }
                         DKCard(theme: theme) {
                             SolitaireStatsCard(theme: theme, records: klondikeRecords, bestTimes: klondikeBestTimes)
+                        }
+                    }
+
+                    if shows(.fiveLetter) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "FIVE LETTER")) }
+                        DKCard(theme: theme) {
+                            FiveLetterStatsCard(theme: theme, records: fiveLetterRecords)
+                        }
+                    }
+
+                    if shows(.wordGrid) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "WORD GRID")) }
+                        DKCard(theme: theme) {
+                            WordGridStatsCard(theme: theme, records: wordGridRecords, bestScores: wordGridBestScores)
                         }
                     }
                 }

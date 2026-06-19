@@ -28,6 +28,8 @@ struct GameIconView: View {
             case .sudoku:      drawSudoku(&ctx, s: s, sw: sw, color: color)
             case .klondike:    drawSolitaire(&ctx, s: s, color: color)
             case .freeCell:    drawFreeCell(&ctx, s: s, sw: sw, color: color)
+            case .fiveLetter:  drawFiveLetter(&ctx, s: s, color: color)
+            case .wordGrid:    drawWordGrid(&ctx, s: s, color: color)
             }
         }
         .frame(width: size, height: size)
@@ -176,4 +178,48 @@ private func drawFreeCell(_ ctx: inout GraphicsContext, s: CGFloat, sw: CGFloat,
             c.fill(Path(roundedRect: rect, cornerRadius: s * 1.6), with: .color(color.opacity(card.op)))
         }
     }
+}
+
+private func drawFiveLetter(_ ctx: inout GraphicsContext, s: CGFloat, color: Color) {
+    let letters = Array("FIVE")
+    for row in 0..<2 {
+        for col in 0..<3 {
+            let r = CGRect(
+                x: CGFloat(5 + col * 10) * s,
+                y: CGFloat(8 + row * 11) * s,
+                width: 8 * s,
+                height: 9 * s
+            )
+            ctx.fill(Path(roundedRect: r, cornerRadius: s * 1.4), with: .color(color.opacity(row == 0 ? 1 : 0.42)))
+        }
+    }
+    for index in letters.indices {
+        let x = CGFloat(9 + index * 7) * s
+        ctx.draw(
+            Text(String(letters[index]))
+                .font(.system(size: 6 * s, weight: .black, design: .rounded))
+                .foregroundStyle(.white.opacity(0.95)),
+            at: CGPoint(x: x, y: 13 * s)
+        )
+    }
+}
+
+private func drawWordGrid(_ ctx: inout GraphicsContext, s: CGFloat, color: Color) {
+    for row in 0..<4 {
+        for col in 0..<4 {
+            let r = CGRect(
+                x: CGFloat(5 + col * 8) * s,
+                y: CGFloat(5 + row * 8) * s,
+                width: 6 * s,
+                height: 6 * s
+            )
+            ctx.fill(Path(roundedRect: r, cornerRadius: s), with: .color(color.opacity((row + col).isMultiple(of: 2) ? 1 : 0.4)))
+        }
+    }
+    var path = Path()
+    path.move(to: CGPoint(x: 8 * s, y: 8 * s))
+    path.addLine(to: CGPoint(x: 16 * s, y: 16 * s))
+    path.addLine(to: CGPoint(x: 24 * s, y: 16 * s))
+    path.addLine(to: CGPoint(x: 32 * s, y: 24 * s))
+    ctx.stroke(path, with: .color(.white.opacity(0.95)), style: StrokeStyle(lineWidth: max(1.6, 2.4 * s), lineCap: .round, lineJoin: .round))
 }

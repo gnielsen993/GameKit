@@ -21,6 +21,8 @@ extension GameKind {
         case .sudoku:      return Color(red: 0.910, green: 0.604, blue: 0.122) // #E89A1F
         case .klondike:    return Color(red: 0.102, green: 0.706, blue: 0.761) // #1AB4C2
         case .freeCell:    return Color(red: 0.643, green: 0.345, blue: 0.933) // #A458EE
+        case .fiveLetter:  return Color(red: 0.051, green: 0.659, blue: 0.514) // #0DA883
+        case .wordGrid:    return Color(red: 0.871, green: 0.278, blue: 0.522) // #DE4785
         }
     }
 }

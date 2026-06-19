@@ -57,8 +57,10 @@ struct VideoLocationPickerView: View {
     /// without forcing a write into the store on every flip — the actual
     /// location write happens when the user picks a zone in the new size.
     @State private var size: VideoSize
+    private let showsNavigationChrome: Bool
 
-    init() {
+    init(showsNavigationChrome: Bool = true) {
+        self.showsNavigationChrome = showsNavigationChrome
         // Default initial; replaced in .onAppear from the store so the toggle
         // matches the actual persisted selection on first render.
         _size = State(initialValue: .large)
@@ -88,11 +90,17 @@ struct VideoLocationPickerView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(theme.spacing.l)
+        .padding(showsNavigationChrome ? theme.spacing.l : 0)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(theme.colors.background.ignoresSafeArea())
-        .navigationTitle(String(localized: "videoMode.pickerTitle"))
-        .navigationBarTitleDisplayMode(.inline)
+        .background {
+            if showsNavigationChrome {
+                theme.colors.background.ignoresSafeArea()
+            }
+        }
+        .modifier(VideoLocationNavigationChrome(
+            enabled: showsNavigationChrome,
+            title: String(localized: "videoMode.pickerTitle")
+        ))
         .onAppear {
             // Sync toggle to whatever the store actually holds.
             size = VideoSize(for: videoModeStore.location)
@@ -308,6 +316,21 @@ struct VideoLocationPickerView: View {
         case (.large, .bottom): return .largeBottom
         case (.small, .top):    return .smallTopRight
         case (.small, .bottom): return .smallBottomRight
+        }
+    }
+}
+
+private struct VideoLocationNavigationChrome: ViewModifier {
+    let enabled: Bool
+    let title: String
+
+    func body(content: Content) -> some View {
+        if enabled {
+            content
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+        } else {
+            content
         }
     }
 }

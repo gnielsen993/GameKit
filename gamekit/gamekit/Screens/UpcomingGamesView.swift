@@ -66,7 +66,6 @@ struct UpcomingGamesView: View {
 // "planned" to "playable" — descriptor entry in `GameDescriptor.swift`
 // removes them from the upcoming sheet.
 private let upcomingGames: [GameCard] = [
-    GameCard(id: "wordGrid",      title: String(localized: "Word Grid"),      symbol: "textformat.abc",       isEnabled: false),
     GameCard(id: "solitaire",     title: String(localized: "Solitaire"),      symbol: "suit.spade",           isEnabled: false),
     GameCard(id: "flow",          title: String(localized: "Flow"),           symbol: "scribble.variable",    isEnabled: false),
     GameCard(id: "patternMemory", title: String(localized: "Pattern Memory"), symbol: "rectangle.grid.2x2",   isEnabled: false),

@@ -35,9 +35,9 @@ Mirror of `CLAUDE.md` §0.1 — drift between the two is a bug.
 | Repo / target name | `gamekit` | locked |
 | Target iOS | 17+ | — |
 | Swift / UI | Swift 6 + SwiftUI | — |
-| Current milestone | `v1.3` shipped 2026-05-25; v1.4 TBD | 2026-05-25 |
+| Current milestone | `v1.4` in progress — Word Games release | 2026-06-03 |
 | Current MVP game | Minesweeper | — |
-| Next game (post-MVP) | Word Grid (six games shipped; see roadmap) | 2026-05-25 |
+| Next game (post-MVP) | Five Letter + Word Grid | 2026-06-03 |
 | Icon | Stack-of-three-game-boxes (light / dark / tinted) | 2026-04-30 ev. |
 | Classic preset | Chrome Diner (cream + brushed grey + diner red) | 2026-04-28 |
 
