@@ -30,10 +30,16 @@ final class SudokuViewModel {
 
     // MARK: - State surface
 
+    // NOTE: properties written cross-file by SudokuViewModel+SaveState.swift
+    // and SudokuViewModel+CompletionFeedback.swift are declared plain `var`
+    // (not private(set)) so those extensions can write them — same
+    // convention as NonogramViewModel. They remain read-only to view callers
+    // by discipline.
+
     private(set) var difficulty: SudokuDifficulty
-    private(set) var currentPuzzle: SudokuPuzzleEntry?
-    private(set) var board: SudokuBoard?
-    private(set) var state: SudokuGameState = .idle
+    var currentPuzzle: SudokuPuzzleEntry?
+    var board: SudokuBoard?
+    var state: SudokuGameState = .idle
     private(set) var gameMode: SudokuGameMode = .free
     private(set) var interactionMode: SudokuInteractionMode = .value
 
@@ -42,15 +48,15 @@ final class SudokuViewModel {
     private(set) var selected: (row: Int, col: Int)?
 
     // Timer (mirrors NonogramViewModel's pattern)
-    private(set) var timerAnchor: Date?
-    private(set) var pausedElapsed: TimeInterval = 0
+    var timerAnchor: Date?
+    var pausedElapsed: TimeInterval = 0
     private(set) var frozenElapsed: TimeInterval = 0
 
     // Lives-mode state
-    private(set) var mistakes: Int = 0
+    var mistakes: Int = 0
     /// Flat indices of cells locked by a correct .lives placement (or by
     /// being given). Erase + re-place no-op on these.
-    private(set) var lockedCells: Set<Int> = []
+    var lockedCells: Set<Int> = []
 
     // Sensory feedback counters
     private(set) var placeCount: Int = 0
@@ -63,15 +69,15 @@ final class SudokuViewModel {
     // Completion feedback
     /// Flat indices of cells belonging to a just-completed row, column, or box.
     /// Set on every correct placement that completes a group; auto-cleared after 800ms.
-    private(set) var completionGlowIndices: Set<Int> = []
+    var completionGlowIndices: Set<Int> = []
     /// Incremented each time completionGlowIndices is populated — drives the
     /// medium-impact haptic in the view.
-    private(set) var completionGlowCount: Int = 0
+    var completionGlowCount: Int = 0
     /// Incremented when all 9 instances of a digit have been placed.
-    private(set) var numberCompleteCount: Int = 0
+    var numberCompleteCount: Int = 0
     /// The digit that just reached 0 remaining. Auto-cleared after 600ms.
     /// Used to pulse the corresponding button in SudokuNumberPad.
-    private(set) var justCompletedDigit: Int?
+    var justCompletedDigit: Int?
 
     // Single-step undo
     private(set) var undoSnapshot: SudokuUndoSnapshot?
@@ -79,13 +85,16 @@ final class SudokuViewModel {
     // Save state — non-nil when a persisted in-progress game is waiting for
     // the player to choose Continue or New Puzzle. Cleared on restore,
     // discard, win, game-over, or restart.
-    private(set) var pendingSaveState: SudokuSaveState?
+    var pendingSaveState: SudokuSaveState?
 
     // MARK: - Injection seams
+    //
+    // `pool` / `userDefaults` / `clock` are internal (not private) so the
+    // save-state extension can reach them.
 
-    private let pool: SudokuPuzzlePool
-    private let userDefaults: UserDefaults
-    private let clock: () -> Date
+    let pool: SudokuPuzzlePool
+    let userDefaults: UserDefaults
+    let clock: () -> Date
     private(set) var gameStats: GameStats?
 
     // MARK: - Derived
@@ -271,7 +280,8 @@ final class SudokuViewModel {
 
     // MARK: - Private
 
-    private func loadFreshPuzzle() async {
+    /// Internal (not private) — invoked from SudokuViewModel+SaveState.swift.
+    func loadFreshPuzzle() async {
         resetSessionState()
         do {
             let playedIDs = gameStats?.wonPuzzleIDs(
@@ -438,125 +448,11 @@ final class SudokuViewModel {
         )
     }
 
-    // MARK: - Save state
-
-    /// Called from SudokuGameView when the player taps Continue on the resume prompt.
-    func restoreState(_ saved: SudokuSaveState) {
-        guard let cleanBoard = SudokuBoard(givens: saved.givens, solution: saved.solution) else {
-            // Malformed save — discard and load fresh.
-            discardSaveAndLoadNew()
-            return
-        }
-        // Overlay saved non-default cells onto the clean board.
-        var restored = cleanBoard
-        for (idx, savedCell) in saved.cells.enumerated() where !savedCell.isGiven {
-            let row = idx / 9, col = idx % 9
-            if case .empty(let notes) = savedCell, notes.isEmpty { continue }
-            restored = restored.setting(savedCell, atRow: row, col: col)
-        }
-        currentPuzzle = SudokuPuzzleEntry(
-            id: saved.puzzleId,
-            givens: saved.givens,
-            solution: saved.solution,
-            givenCount: saved.givenCount
-        )
-        self.board = restored
-        mistakes = saved.mistakes
-        lockedCells = Set(saved.lockedCellIndices)
-        pausedElapsed = saved.elapsedSeconds
-        state = .playing
-        timerAnchor = clock()
-        pendingSaveState = nil
-    }
-
-    /// Called from SudokuGameView when the player taps New Puzzle on the resume prompt.
-    func discardSaveAndLoadNew() {
-        clearSavedState()
-        Task { @MainActor in await loadFreshPuzzle() }
-    }
-
-    private func checkAndLoadOrRestoreState() {
-        let key = SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode)
-        if let data = userDefaults.data(forKey: key),
-           let saved = try? JSONDecoder().decode(SudokuSaveState.self, from: data) {
-            pendingSaveState = saved
-            // Pre-warm the pool while the alert is on screen so "New Puzzle"
-            // → instant board with no loading flash when the user decides.
-            Task { try? await pool.load() }
-        } else {
-            Task { @MainActor in await loadFreshPuzzle() }
-        }
-    }
-
-    private func saveCurrentState() {
-        guard state == .playing, let board, let puzzle = currentPuzzle else { return }
-        let snapshot = SudokuSaveState(
-            puzzleId: puzzle.id,
-            givens: puzzle.givens,
-            solution: puzzle.solution,
-            givenCount: puzzle.givenCount,
-            cells: board.cells,
-            elapsedSeconds: elapsedSeconds,
-            mistakes: mistakes,
-            lockedCellIndices: Array(lockedCells),
-            gameMode: gameMode.rawValue,
-            savedAt: Date.now
-        )
-        let key = SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode)
-        if let data = try? JSONEncoder().encode(snapshot) {
-            userDefaults.set(data, forKey: key)
-        }
-    }
-
-    private func clearSavedState() {
-        userDefaults.removeObject(forKey: SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode))
-        pendingSaveState = nil
-    }
-
-    private func fireCompletionEffects(row: Int, col: Int, value: Int, board: SudokuBoard) {
-        var newGlow = Set<Int>()
-
-        // Row complete?
-        if (0..<9).allSatisfy({ board.cell(row: row, col: $0).value != nil }) {
-            for c in 0..<9 { newGlow.insert(row * 9 + c) }
-        }
-        // Column complete?
-        if (0..<9).allSatisfy({ board.cell(row: $0, col: col).value != nil }) {
-            for r in 0..<9 { newGlow.insert(r * 9 + col) }
-        }
-        // Box complete?
-        let br = (row / 3) * 3, bc = (col / 3) * 3
-        if (0..<3).allSatisfy({ dr in (0..<3).allSatisfy({
-            dc in board.cell(row: br + dr, col: bc + dc).value != nil
-        }) }) {
-            for dr in 0..<3 { for dc in 0..<3 { newGlow.insert((br + dr) * 9 + (bc + dc)) } }
-        }
-
-        if !newGlow.isEmpty {
-            completionGlowIndices = newGlow
-            completionGlowCount += 1
-            let snapshot = newGlow
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(800))
-                if self.completionGlowIndices == snapshot {
-                    self.completionGlowIndices = []
-                }
-            }
-        }
-
-        // Number fully placed?
-        let placed = board.cells.filter { $0.value == value }.count
-        if placed == 9 {
-            numberCompleteCount += 1
-            justCompletedDigit = value
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(600))
-                if self.justCompletedDigit == value {
-                    self.justCompletedDigit = nil
-                }
-            }
-        }
-    }
+    // MARK: - Save state + completion feedback
+    //
+    // Persistence I/O lives in SudokuViewModel+SaveState.swift; the
+    // group-completion glow/pulse lives in
+    // SudokuViewModel+CompletionFeedback.swift.
 
     // MARK: - Constants
 

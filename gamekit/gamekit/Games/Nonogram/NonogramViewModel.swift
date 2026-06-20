@@ -47,18 +47,20 @@ final class NonogramViewModel {
     /// Bumps every time a row OR column transitions from "not fully
     /// crossed off" to "fully crossed off". Drives a heavier haptic so
     /// finishing a line feels distinct from individual cell taps.
-    private(set) var lineCompletionCount: Int = 0
+    // Plain `var` (not private(set)) — written by
+    // NonogramViewModel+LineFeedback.swift. Read-only to view callers.
+    var lineCompletionCount: Int = 0
     /// Tracks already-completed lines so we don't re-fire the haptic on
     /// every later mutation in an already-finished row/col. Strings are
     /// `"r<idx>"` / `"c<idx>"` so the same key can't collide between rows
     /// and columns.
-    private var completedLineKeys: Set<String> = []
+    var completedLineKeys: Set<String> = []
     /// Row index of the most-recent line-completion event. Drives a
     /// 700ms accent-glow on every cell in that row so the player gets a
     /// visual "you nailed it" beat on top of the haptic. Auto-cleared.
-    private(set) var flashRow: Int?
+    var flashRow: Int?
     /// Column index of the most-recent line-completion event.
-    private(set) var flashCol: Int?
+    var flashCol: Int?
     /// Flat index (row * size + col) of the most-recent wrong-tap cell.
     /// Drives the red-flash + shake feedback in CellView. Auto-cleared
     /// ~0.6s after being set.
@@ -151,7 +153,6 @@ final class NonogramViewModel {
         // before we touch `&self.rng` for puzzle selection.
         self.board = .empty(size: resolved.size)
         self.currentPuzzle = nil
-        self.board = .empty(size: resolved.size)
         self.currentPuzzle = pickPuzzle(for: resolved)
         refreshCrossOff()
     }
@@ -232,9 +233,6 @@ final class NonogramViewModel {
         currentPuzzle = pickPuzzle(for: difficulty)
         refreshCrossOff()
     }
-
-    /// Backwards-compat alias for code that still calls `tryAgain()`.
-    func tryAgain() { restart() }
 
     func resetSessionState() {
         board = .empty(size: difficulty.size)
@@ -372,57 +370,6 @@ final class NonogramViewModel {
             recordWin()
         } else {
             saveCurrentState()
-        }
-    }
-
-    /// Recompute the completion state for the touched row + column only —
-    /// no other lines could have changed in this single-cell mutation.
-    /// Bumps `lineCompletionCount` for each line that newly transitioned
-    /// to fully-crossed-off; un-completing a previously-finished line
-    /// drops it from the tracked set without firing a haptic.
-    private func updateLineCompletions(touchedRow: Int, touchedCol: Int) {
-        let rowMask = rowsCrossOff
-        let colMask = columnsCrossOff
-
-        let rowKey = "r\(touchedRow)"
-        let rowComplete = touchedRow >= 0 && touchedRow < rowMask.count
-            && rowMask[touchedRow].allSatisfy { $0 }
-        if rowComplete && !completedLineKeys.contains(rowKey) {
-            completedLineKeys.insert(rowKey)
-            lineCompletionCount += 1
-            triggerFlashRow(touchedRow)
-        } else if !rowComplete {
-            completedLineKeys.remove(rowKey)
-        }
-
-        let colKey = "c\(touchedCol)"
-        let colComplete = touchedCol >= 0 && touchedCol < colMask.count
-            && colMask[touchedCol].allSatisfy { $0 }
-        if colComplete && !completedLineKeys.contains(colKey) {
-            completedLineKeys.insert(colKey)
-            lineCompletionCount += 1
-            triggerFlashCol(touchedCol)
-        } else if !colComplete {
-            completedLineKeys.remove(colKey)
-        }
-    }
-
-    /// Light up `row` for ~700ms, then clear the flag. If a newer
-    /// completion lands in the meantime its own trigger overrides this
-    /// one, so the most-recent row's flash always wins.
-    private func triggerFlashRow(_ row: Int) {
-        flashRow = row
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(700))
-            if self.flashRow == row { self.flashRow = nil }
-        }
-    }
-
-    private func triggerFlashCol(_ col: Int) {
-        flashCol = col
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(700))
-            if self.flashCol == col { self.flashCol = nil }
         }
     }
 

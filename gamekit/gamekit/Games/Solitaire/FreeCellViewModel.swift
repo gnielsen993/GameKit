@@ -2,19 +2,7 @@ import Foundation
 import Observation
 import SwiftUI
 
-// MARK: - Selection
-
-enum FreeCellSelection: Equatable {
-    case column(colIdx: Int, startCardIdx: Int)
-    case freeCell(cellIdx: Int)
-    case foundation(suit: CardSuit)
-}
-
-// MARK: - Game state
-
-enum FreeCellGameState {
-    case idle, playing, won, lost
-}
+// FreeCellSelection + FreeCellGameState live in FreeCellSelection.swift.
 
 // MARK: - ViewModel
 
@@ -421,7 +409,7 @@ final class FreeCellViewModel {
     // MARK: - Helpers
 
     private func canPickUp(cards: [PlayingCard]) -> Bool {
-        guard let top = cards.first else { return false }
+        guard !cards.isEmpty else { return false }
         let limit = FreeCellRules.maxMoveable(board: board, toEmptyColumn: false)
         if cards.count > limit { return false }
         // Single card always pickable; sequences need validation
