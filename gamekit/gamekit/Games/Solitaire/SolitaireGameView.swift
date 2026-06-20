@@ -35,9 +35,7 @@ struct SolitaireGameView: View {
     var isClassic: Bool  { themeManager.preset == .classicMuted }
 
     var boardColor: Color {
-        isClassic
-            ? Color(hue: 0.426, saturation: 0.576, brightness: 0.416)
-            : theme.colors.fillSelected.opacity(0.35)
+        SolitaireFelt.boardColor(theme: theme, isClassic: isClassic)
     }
 
     init(initialDifficulty: SolitaireDifficulty = .easy) {

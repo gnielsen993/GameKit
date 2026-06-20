@@ -24,9 +24,7 @@ struct InteractiveTableauView: View {
     private var boardHeight: CGFloat  { boardPad * 2 + maxColHeight + 20 }
 
     private var boardColor: Color {
-        // Classic: green baize. Others: muted fill.
-        // Placeholder until classicAnchorOverride hook lands in v1.4.
-        isClassic ? Color(hue: 0.426, saturation: 0.576, brightness: 0.416) : theme.colors.fillSelected.opacity(0.35)
+        SolitaireFelt.boardColor(theme: theme, isClassic: isClassic)
     }
 
     // MARK: State

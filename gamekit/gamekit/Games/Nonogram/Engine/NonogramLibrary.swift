@@ -21,7 +21,7 @@ import Foundation
 
 enum NonogramLibrary {
     nonisolated(unsafe) private static var cache: [NonogramDifficulty: [NonogramPuzzle]] = [:]
-    nonisolated(unsafe) private static let cacheLock = NSLock()
+    private static let cacheLock = NSLock()
 
     /// All shipped puzzles for the given difficulty, in bundle order.
     /// Filtered to those that pass `isValid(for:)` so a malformed entry
@@ -59,19 +59,25 @@ enum NonogramLibrary {
             withExtension: "json"
         )
         guard let url else {
+            #if DEBUG
             print("ℹ️ NonogramLibrary: no bundle file for \(difficulty.rawValue)")
+            #endif
             return []
         }
         do {
             let data = try Data(contentsOf: url)
             let decoded = try JSONDecoder().decode([NonogramPuzzle].self, from: data)
             let valid = decoded.filter { $0.isValid(for: difficulty.size) }
+            #if DEBUG
             if valid.count != decoded.count {
                 print("⚠️ NonogramLibrary: dropped \(decoded.count - valid.count) invalid \(difficulty.rawValue) entries")
             }
+            #endif
             return valid
         } catch {
+            #if DEBUG
             print("❌ NonogramLibrary: decode failed for \(difficulty.rawValue): \(error)")
+            #endif
             return []
         }
     }
