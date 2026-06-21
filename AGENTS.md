@@ -330,6 +330,16 @@ Full procedure in [`WRAPUP.md`](WRAPUP.md). Summary: finalize release notes →
 update `~/Desktop/GameKitWebsite` (index, about, updates) and push → update
 `Docs/store/app-store-copy.md` → deliver What's New copy to user.
 
+### 9.14 Push cadence — don't let unpushed commits pile up
+Keep local and `origin` close. Push when **either** trigger fires:
+- a commit completing a verified feature or fix lands (the §6 done
+  bar), **or**
+- local is **≥3 commits ahead** of upstream (hard cap).
+
+Plus push on release wrap-up (§9.13). Don't knowingly push a broken
+build unless the ≥3 cap forces it. No need to ask before pushing once
+a trigger is met — this rule is the standing authorization.
+
 ---
 
 ## 10) Design rules — [`DESIGN.md`](DESIGN.md)
