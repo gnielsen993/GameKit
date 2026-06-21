@@ -183,6 +183,16 @@
         }
       }
     },
+    "%lld words found: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld words found: %2$@"
+          }
+        }
+      }
+    },
     "%lld/6" : {
 
     },
@@ -586,6 +596,9 @@
         }
       }
     },
+    "Found" : {
+
+    },
     "Free" : {
 
     },
@@ -901,6 +914,12 @@
 
     },
     "No Word Grid games played yet." : {
+
+    },
+    "No words found yet" : {
+
+    },
+    "No words yet." : {
 
     },
     "Nonogram" : {

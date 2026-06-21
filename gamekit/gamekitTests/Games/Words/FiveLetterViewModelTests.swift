@@ -73,6 +73,32 @@ struct FiveLetterViewModelTests {
     }
 
     @MainActor
+    @Test("non-word five-letter guess is rejected")
+    func nonWordGuessRejected() {
+        let suiteName = "FiveLetterViewModelTests.nonWord.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let viewModel = FiveLetterViewModel(mode: .unlimited, userDefaults: defaults)
+        for letter in "GGGGG" {
+            viewModel.input(letter)
+        }
+        viewModel.submit()
+
+        #expect(viewModel.guesses.isEmpty)
+        #expect(viewModel.state == .playing)
+        #expect(viewModel.message == "Not in word list")
+        #expect(viewModel.invalidCount == 1)
+    }
+
+    @Test("isAllowedFiveLetterGuess requires a real word")
+    func isAllowedFiveLetterGuessRequiresRealWord() {
+        #expect(WordLexicon.isAllowedFiveLetterGuess("GGGGG") == false)
+        #expect(WordLexicon.isAllowedFiveLetterGuess("APPLE") == true)
+        #expect(WordLexicon.isAllowedFiveLetterGuess("CRANE") == true)
+    }
+
+    @MainActor
     @Test("unlimited restart still starts over")
     func unlimitedRestartStillStartsOver() {
         let suiteName = "FiveLetterViewModelTests.unlimited.\(UUID().uuidString)"

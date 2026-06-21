@@ -18,12 +18,16 @@ struct HomeVideoModeButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "pip")
-                .font(.system(size: 22))
-                .foregroundStyle(theme.colors.textPrimary)
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(
+                    videoModeStore.isEnabled
+                    ? theme.colors.accentPrimary
+                    : theme.colors.textPrimary
+                )
                 .frame(width: theme.spacing.xxl, height: theme.spacing.xxl)
                 .background(
                     Circle()
-                        .fill(videoModeStore.isEnabled ? theme.colors.accentPrimary.opacity(0.24) : Color.clear)
+                        .fill(videoModeStore.isEnabled ? theme.colors.accentPrimary.opacity(0.16) : Color.clear)
                 )
         }
         .buttonStyle(.plain)
