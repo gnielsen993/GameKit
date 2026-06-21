@@ -1,7 +1,28 @@
 import Foundation
 
 nonisolated enum WordLexicon {
-    static let fiveLetterAnswers = [
+    /// Secret-answer pool for Five Letter. Loaded from the bundled
+    /// `five-letter-answers.txt` resource (common, fair five-letter words —
+    /// frequency-filtered, plurals dropped; see `Resources/Words/PROVENANCE.md`)
+    /// and unioned with the curated built-in pool so it is always a superset.
+    /// Sorted for deterministic seeded daily/unlimited answer selection.
+    /// Falls back to the built-in pool if the resource fails to load.
+    static let fiveLetterAnswers: [String] = {
+        var words = Set(builtinFiveLetterAnswers)
+        if let url = Bundle.main.url(forResource: "five-letter-answers", withExtension: "txt"),
+           let contents = try? String(contentsOf: url, encoding: .utf8) {
+            for line in contents.split(whereSeparator: \.isNewline) {
+                let word = normalize(String(line))
+                if word.count == 5 { words.insert(word) }
+            }
+        }
+        return words.sorted()
+    }()
+
+    /// Curated built-in answer pool — superseded by the bundled resource above
+    /// when present, retained as a fallback so a resource failure never leaves
+    /// the game without answers.
+    private static let builtinFiveLetterAnswers = [
         "APPLE", "BRAIN", "BRAVE", "CHAIR", "CHARM", "CLOUD", "CRANE", "DELTA",
         "DREAM", "EARTH", "FIELD", "FLAME", "GRACE", "GRAPE", "HEART", "IVORY",
         "JOLLY", "LIGHT", "MUSIC", "PLANT", "PRIDE", "RIVER", "ROAST", "SHARE",
@@ -103,7 +124,31 @@ nonisolated enum WordLexicon {
         "YOUTH", "ZEBRA"
     ] + fiveLetterAnswers)
 
-    static let wordGridWords = Set([
+    /// Accepted-word dictionary for Word Grid validation (`isValidGridWord`).
+    /// Loaded from the bundled `word-grid-words.txt` resource (broad 3–8
+    /// letter word list, see `Resources/Words/PROVENANCE.md`) and unioned with
+    /// the curated generation words so every generated board word is always
+    /// accepted. Falls back to the curated set if the resource fails to load.
+    /// NOTE: this drives validation only — board *generation* uses
+    /// `wordGridGenerationWords` so generated boards stay built around common
+    /// words and DFS pruning stays cheap.
+    static let wordGridWords: Set<String> = {
+        var words = wordGridGenerationWords
+        if let url = Bundle.main.url(forResource: "word-grid-words", withExtension: "txt"),
+           let contents = try? String(contentsOf: url, encoding: .utf8) {
+            for line in contents.split(whereSeparator: \.isNewline) {
+                let word = normalize(String(line))
+                if word.count >= 3 { words.insert(word) }
+            }
+        }
+        return words
+    }()
+
+    /// Curated common-word set that drives board generation: it seeds
+    /// `wordGridPrefixes` (DFS pruning) and `maxWordGridWordLength` (DFS depth).
+    /// Kept small and common on purpose so generated boards are fair and
+    /// generation stays fast — independent of the broad validation set above.
+    static let wordGridGenerationWords = Set([
         "ABLE", "ABOUT", "ACE", "ACED", "ACRE", "ACT", "ADD", "AID", "AIM",
         "AIR", "AND", "ANT", "ARC", "ARE", "ARM", "ART", "ASH", "ASK", "ATE",
         "BAD", "BAG", "BAR", "BARD", "BARE", "BAT", "BEAD", "BEAM", "BEAR",
@@ -152,7 +197,7 @@ nonisolated enum WordLexicon {
 
     static let wordGridPrefixes: Set<String> = {
         var prefixes = Set<String>()
-        for word in wordGridWords {
+        for word in wordGridGenerationWords {
             let letters = Array(word)
             guard letters.count >= 3 else { continue }
             for length in 1...letters.count {
@@ -162,7 +207,7 @@ nonisolated enum WordLexicon {
         return prefixes
     }()
 
-    static let maxWordGridWordLength = wordGridWords.map(\.count).max() ?? 8
+    static let maxWordGridWordLength = wordGridGenerationWords.map(\.count).max() ?? 8
 
     static func normalize(_ raw: String) -> String {
         raw.trimmingCharacters(in: .whitespacesAndNewlines)

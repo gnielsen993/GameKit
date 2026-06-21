@@ -18,17 +18,41 @@ including plurals and inflected forms so common words like `BANKS` /
 - `WordLexicon.fiveLetterGuesses` unions this with the curated answer pool
   and a built-in fallback, so it is always a superset of both.
 
-## Other lists (curated seed lists)
+## `five-letter-answers.txt` — Five Letter secret-answer pool
 
-`five-letter-answers.txt` and `word-grid-words.txt` remain small curated
-seed lists; the live answer pool / Word Grid dictionary are currently the
-curated arrays in `WordLexicon.swift`. Future expansion target:
+1,033 common, fair five-letter words used as the secret answer for Daily /
+Unlimited. Intentionally smaller and more common than the guess list so
+answers stay recognizable and solvable.
+
+- Sources: `first20hours/google-10000-english` (`-no-swears`, MIT,
+  frequency-ranked) ∩ `dwyl/english-words` (Unlicense), unioned with the
+  curated built-in pool in `WordLexicon.swift`.
+- Build: take google's top-10k words that are 5 letters and are valid
+  real words; drop true plurals/3rd-person forms (word ends in `S` and its
+  4-letter stem is itself a real word, e.g. BANKS→BANK) for fairness; keep
+  genuine `-S` words (CHESS, GLASS, FOCUS); union the 40 curated answers.
+- `WordLexicon.fiveLetterAnswers` unions this with the curated pool, so it
+  is always a superset; sorted for deterministic seeded selection.
+
+## `word-grid-words.txt` — Word Grid validation dictionary
+
+148,736 words (3–8 letters) used to validate traced words in Word Grid
+(`isValidGridWord`). Broad on purpose so any real word a player traces is
+accepted.
+
+- Source: `dwyl/english-words` (Unlicense), 3–8 letters, uppercase A–Z,
+  deduplicated, unioned with the curated generation words.
+- Board *generation* does NOT use this list — it uses the small curated
+  `wordGridGenerationWords` in `WordLexicon.swift` (drives prefix pruning
+  and DFS depth), so generated boards stay built around common words and
+  generation stays fast.
+
+Future expansion target for higher-quality curation:
 - English Speller Database / SCOWL: https://github.com/en-wl/wordlist
   (BSD-compatible / MIT-like — retain upstream license text on import).
 
 Filtering policy:
 - Uppercase A-Z only.
-- Five Letter answer list: common, non-offensive, recognizable five-letter
-  words.
+- Five Letter answer list: common, fair, non-offensive five-letter words.
 - Five Letter guess list: broad set of valid five-letter words.
 - Word Grid list: 3+ letter words appropriate for general-audience gameplay.
