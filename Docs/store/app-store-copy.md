@@ -1,6 +1,6 @@
 # App Store Copy — GameDrawer v1.4
 
-Last updated: 2026-06-21
+Last updated: 2026-06-22
 Marketing version: 1.4
 
 Paste each section into App Store Connect verbatim. Character counts are

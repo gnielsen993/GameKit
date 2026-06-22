@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
+milestone: v1.4
 milestone_name: milestone
 status: shipped
-stopped_at: context exhaustion at 78% (2026-05-28)
-last_updated: "2026-05-28T14:07:40.410Z"
-last_activity: 2026-05-14
+stopped_at: v1.4 release wrap-up complete (2026-06-22)
+last_updated: "2026-06-22T00:00:00.000Z"
+last_activity: 2026-06-22
 progress:
   total_phases: 15
   completed_phases: 13
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** v1.2 Video Mode milestone — Phases 8–13 SHIPPED. Sudoku phases pending (outside party designing).
+**Current focus:** v1.4 Word Games release shipped. Next game milestone is not opened yet; Flow, Pattern Memory, and Chess puzzles remain roadmap candidates.
 
 ## Current Position
 
-Milestone: v1.2 — Video Mode + Sudoku (Sudoku added 2026-05-14)
-Phase 13 (banner) complete; next Sudoku phases blocked on outside-party design deliverables.
-Last activity: 2026-05-14
+Milestone: v1.4 — Word Games release
+Status: shipped 2026-06-22. Five Letter and Word Grid are playable, included on Home, supported by Video Mode, resume state, stats, and production-sized bundled word lists.
+Last activity: 2026-06-22
 
-Progress: [█████████░] 93% (v1.2 reopened with Sudoku scope addition)
+Progress: [██████████] 100% (v1.4 shipped)
 
 **Phase 13 — what shipped:** Shared `VideoModeBanner` primitive (Core/) consumed by Mines + Merge + Nonogram. Banner is a centered card with 2-1 button layout (primary CTA + change-X on top row, "View board" dismiss below). Ships on BOTH Video Mode On AND Off (user override during execution — deprecates the v1.x full-screen EndStateCard from the render path). Haptics / SFX / animation gating routes through existing SettingsStore toggles + accessibilityReduceMotion per v1.0 05-03 + 05-06 locks.
 
