@@ -1,8 +1,9 @@
-# Stack Research — GameKit
+# Stack Research — GameKit v1.5 Real-Time Game Loop
 
-**Domain:** iOS classic logic-games suite (MVP = Minesweeper), local-first, optional CloudKit sync, polished SwiftUI UI on top of a shared DesignKit Swift Package.
-**Researched:** 2026-04-24
-**Overall confidence:** HIGH on framework choices, MEDIUM on a handful of nuanced 2026-current details (called out inline).
+**Domain:** Real-time endless arcade games (Stack, Snake) added to an existing SwiftUI/Swift 6/DesignKit logic-game suite.
+**Researched:** 2026-06-25
+**Scope:** Additive stack decisions only. The existing stack (Swift 6, SwiftUI, SwiftData, DesignKit, CloudKit) is proven in production and is NOT re-researched here. This document covers only what v1.5 adds: a real-time frame loop, geometric Canvas rendering, real-time input handling, loop lifecycle management, and high-score persistence hookup.
+**Overall confidence:** HIGH on frame driver, engine pattern, rendering choice, and persistence; MEDIUM on the Canvas/LazyVGrid tradeoff for Snake (either works; the distinction matters less than the engine design).
 
 ---
 
@@ -10,649 +11,495 @@
 
 | Concern | Decision | Confidence |
 |---|---|---|
-| UI | SwiftUI (iOS 17+ baseline, opt-in iOS 18/26 niceties behind `if #available`) | HIGH |
-| Concurrency | Swift 6, strict concurrency ON, MVVM lightweight, `@MainActor` on view models, engines = pure value types | HIGH |
-| Persistence | SwiftData with `ModelConfiguration(cloudKitDatabase: .automatic)`, single `private` DB | HIGH |
-| Sync | SwiftData's built-in CloudKit mirror (NOT `CKSyncEngine`), private DB only | HIGH |
-| Auth | Sign in with Apple via `SignInWithAppleButton` (SwiftUI), credential state polled on launch + `ASAuthorizationAppleIDProviderCredentialRevoked` notification | HIGH |
-| Grid view | `LazyVGrid` (or non-lazy `Grid` for Easy/Medium) — NOT Canvas | HIGH |
-| Reveal cascade | Per-cell `withAnimation` + `.transition` driven by ViewModel state mutation, optionally staggered with `Task.sleep`. Use `phaseAnimator`/`keyframeAnimator` only for the win-board sweep & loss-shake | HIGH |
-| Haptics | SwiftUI `.sensoryFeedback` modifier as the primary; CoreHaptics only for the win/loss custom pattern. DesignKit wraps both behind `DKHaptics`. | HIGH |
-| SFX | `AVAudioPlayer` instances **preloaded at app launch with `prepareToPlay()`**, one per cue. NOT `AudioServicesPlaySystemSound`. | MEDIUM-HIGH |
-| Localization | `String(localized:)` + `Localizable.xcstrings`, "Use Compiler to Extract Swift Strings" build setting ON | HIGH |
-| Cold start | Static LaunchScreen + lazy `ModelContainer`, view-tree depth ≤ 4, no SwiftData fetches before first render | HIGH |
-| Tests | Swift Testing (`@Test` / `#expect`), XCTest only if a UI test or perf measurement specifically needs it | HIGH |
+| Frame driver | `TimelineView(.animation(minimumInterval: nil, paused: isLoopPaused))` | HIGH |
+| Engine tick contract | Pure `mutating func step(dt: Double, input: Input)` on a value-type engine; view model owns the fixed-timestep accumulator | HIGH |
+| Fixed dt value | `1.0/60.0` (60 Hz sim) for both Stack and Snake | HIGH |
+| Renderer — Stack | SwiftUI `Canvas` inside `TimelineView` | HIGH |
+| Renderer — Snake | `LazyVGrid` of colored squares (matches board-game pattern in this codebase) | MEDIUM |
+| SpriteKit? | No — overkill, bypasses DesignKit tokens, adds cognitive dependency | HIGH |
+| DesignKit token feed into Canvas | Capture `theme` in closure scope; pass `theme.colors.X` (SwiftUI `Color`) to `GraphicsContext.Shading.color(_:)` | HIGH |
+| Input — Stack | `.onTapGesture` sets `viewModel.pendingDrop = true`; consumed and cleared each engine tick | HIGH |
+| Input — Snake | `DragGesture(minimumDistance: 20).onEnded` enqueues to `directionQueue: [Direction]` (capacity 2); one dequeued per engine tick | HIGH |
+| Pausing on background | `.onChange(of: scenePhase)` — `.background` → pause loop, `.active` → resume; `.inactive` no-op. Same pattern as all existing games. | HIGH |
+| Loop pause surface | `paused:` parameter on `TimelineView(.animation(paused:))` — declarative, no timer cancellation needed | HIGH |
+| High-score persistence | Extend `GameKind` with `.stack` / `.snake`; reuse existing `BestScore` + `GameStats.record(gameKind:mode:outcome:score:)` unchanged | HIGH |
+| Schema safety | `GameKind` enum additions are additive (no CloudKit constraint impact). `BestScore` / `GameRecord` models need no new fields. | HIGH |
 
 ---
 
-## Recommended Stack
+## 1. Frame Driver — `TimelineView(.animation(paused:))`
 
-### Core Frameworks
+### Decision
 
-| Framework | Version | Purpose | Why |
-|---|---|---|---|
-| Swift | **6.0+** (6.2 if available in Xcode 16.x; 6.3 in Xcode 26) | Language | Strict concurrency is non-negotiable for an MVVM/SwiftData/CloudKit boundary that must not data-race. |
-| SwiftUI | iOS 17 baseline | UI | Already the app's North Star; `phaseAnimator`/`keyframeAnimator`/`sensoryFeedback` ship in 17. iOS 17 is also DesignKit's floor. |
-| SwiftData | iOS 17 (use 17.4+ patterns) | Persistence + CloudKit mirror | Apple-native, pairs naturally with CloudKit, sized for richer stats without re-architecting. |
-| CloudKit | private DB only | Sync | Apple-native, free for users, zero third-party backend, preserves "no servers we don't own". |
-| AuthenticationServices | iOS 17 | Sign in with Apple | Required for SIWA. `SignInWithAppleButton` is a first-party SwiftUI control. |
-| CoreHaptics + UIKit feedback (via SwiftUI `sensoryFeedback`) | iOS 17 | Tactile feedback | `sensoryFeedback` covers 90% of needs; CoreHaptics for 1-2 custom win/loss patterns. |
-| AVFoundation (`AVAudioPlayer`) | iOS 17 | SFX | Tap/win/loss cues. Preload at launch to dodge first-play latency. |
-| Swift Testing | bundled with Xcode 16+ | Engine tests | Modern, parallel, parameterized — built for pure deterministic engines. |
-| XCTest | as-needed | UI / perf tests | Keep available for `XCUIApplication` + `measure` blocks if/when needed. |
+Use `TimelineView(.animation(minimumInterval: nil, paused: isLoopPaused))` as the frame driver. The `paused:` parameter gates the loop declaratively from view model state; no run-loop object to manage.
 
-### Supporting Libraries
+### Why not the alternatives
 
-**None.** GameKit MVP ships with zero third-party dependencies beyond DesignKit (local SPM at `../DesignKit`). This is enforced by the project constitution and the privacy posture.
+**CADisplayLink:**
+CADisplayLink is the traditional UIKit display-sync tool and does fire at the actual screen refresh rate. However in a Swift 6 strict-concurrency codebase it has a concrete problem: `CADisplayLink` is not `Sendable`. Under Swift 6's complete concurrency checking you will get "cannot access property 'displayLink' with a non-sendable type 'CADisplayLink?' from non-isolated context" in `deinit` and similar isolation errors. Working around this requires an explicit `@MainActor`-isolated wrapper class with careful `add(to:forMode:)` / `invalidate()` lifecycle, `#selector` bridging, and a separate stored property for the link. That is non-trivial boilerplate for no tangible gameplay benefit in these two games.
 
-If/when a need arises post-MVP, the bar to add a dependency is: "is this in Apple's stdlib? if no, do at least two ecosystem siblings need it? if yes, promote into DesignKit, not a vendor pull."
+`CADisplayLink.preferredFrameRateRange` is the one thing CADisplayLink offers that `TimelineView` cannot express (a minimum-frame-rate floor for ProMotion throttling). Stack and Snake are simple enough that losing frames below 60Hz is a non-issue — neither relies on sub-frame interpolation. Promote to CADisplayLink only if a future game needs a guaranteed per-frame floor (e.g., a rhythm game where a dropped frame breaks a beat).
 
-### DesignKit Consumption
+**Combine `Timer.publish` / `Timer.scheduledTimer`:**
+Not screen-synchronized. Fires at fixed wall-clock intervals regardless of when the display actually repaints. The result is tearing and jitter visible as inconsistent delta times. Community-observed Snake implementations use this approach (because it is simple), but `Timer`-based loops are consistently the wrong approach for anything the player sees moving smoothly. Reject.
 
-| Aspect | Pattern |
-|---|---|
-| Distribution | Local SPM dependency at `../DesignKit`, NOT git URL, NOT vendored. |
-| Swift tools version | DesignKit ships 6.0; GameKit must match. |
-| Tokens used | `theme.colors.*`, `theme.spacing.*`, `theme.radii.*`, `theme.motion.{fast,normal,slow}`, `theme.typography.*` |
-| Components consumed | `DKCard`, `DKButton`, `DKThemePicker`, `DKBadge`, `DKSectionHeader` |
-| New abstractions to add to DesignKit | `DKHaptics` (SensoryFeedback wrapper + CoreHaptics fallback), `DKSFXPlayer` (only if a 2nd ecosystem app needs SFX — until then, keep local) |
+**Swift Concurrency `AsyncTimerSequence`:**
+Not screen-synchronized. Off-main-thread by default; requires actor hops for every UI mutation. No ProMotion adaptivity. Produces the same jitter problem as `Timer`. Reject.
 
-### Development Tools
+### TimelineView behavior: what it gives you
 
-| Tool | Purpose | Notes |
-|---|---|---|
-| Xcode 16+ (16.4+ ideal; 26 if available) | Build, String Catalog editor, Swift Testing UI | Set "Use Compiler to Extract Swift Strings" = YES on the app target. |
-| `xcodebuild test -scheme GameKit -destination ...` | CI-able test harness | Swift Testing tests run via the same `xcodebuild test` invocation. |
-| `xcrun simctl uninstall ...` | Stale SwiftData store recovery | See CLAUDE.md §8.9 — known recurring trap with schema migrations. |
+**ProMotion adaptivity (60/120Hz):** `TimelineView(.animation)` fires callbacks at the display's current refresh rate. On iPhone 15 Pro with ProMotion, that's up to 120Hz during active animation. The view automatically receives entries at 120Hz without any configuration. `minimumInterval: nil` allows the system to choose the fastest rate; passing a non-nil value (e.g. `1.0/60.0`) tells the system "don't go faster than this" — useful if you want to run the view loop at 60Hz even on 120Hz devices to save battery, but for v1.5 leave it `nil` and let ProMotion do its job.
 
----
+**Background behavior:** When the app goes to background, `TimelineView` automatically stops delivering entries. You do NOT need to pass `paused: true` to kill the loop on background — the system stops it. However, the game's *state* still thinks it is running (the view model's lifecycle is still `.running`) until you explicitly pause it via `.onChange(of: scenePhase)`. The `paused:` parameter is for intentional in-game pausing (game-over banner, tap-to-start idle screen, manual pause); the `.onChange(of: scenePhase)` handler is for automatic OS-driven pausing.
 
-## 1) Swift 6 Strict-Concurrency Posture
+**Cadence:** The context provides `context.cadence` which can be `.live`, `.seconds`, or `.minutes`. For a running game loop, cadence will always be `.live`. Use this signal only if you want to hide detail on a watch or low-power device — not relevant for iPhone gameplay.
 
-Swift 6's enforced data-race safety is the most disruptive ground rule. Get it right once at the start so SwiftData and CloudKit don't fight you later.
+**Battery:** `TimelineView(.animation)` does not spin when `paused: true`. It also does not spin when the view is off-screen or the app is backgrounded. There is no timer object to leak if you forget to cancel it. Safer than `CADisplayLink` where forgetting `invalidate()` in `deinit` causes a retain cycle.
 
-### Rules of thumb (apply consistently)
-
-1. **`@MainActor` on every view model.** ViewModels read SwiftData via `@MainActor`-pinned `ModelContext` (the one off `modelContainer.mainContext`). All `@Observable`/`ObservableObject` view models become `@Observable @MainActor`.
-   - **Trap:** `@Observable` does NOT imply `@MainActor`. Mark explicitly. ([Hacking With Swift][hws-swiftdata-concurrency])
-2. **Engines are pure value types, no actor at all.** `BoardGenerator`, `RevealEngine`, `WinDetector`, `MineLayout` — all `struct`s with `Sendable` conformance, deterministic given inputs (RNG injected). They never touch `ModelContext`, never import `SwiftUI`. This is consistent with the project's existing engine-purity rule.
-3. **`ModelContainer` is `Sendable`. `ModelContext` is NOT. `PersistentIdentifier` IS.** ([Hacking With Swift][hws-swiftdata-concurrency])
-   - Pass `ModelContainer` across boundaries. Pass `PersistentIdentifier` to background work. Re-fetch the model on the destination actor.
-4. **Use `ModelActor` only when you actually need background writes.** For Minesweeper MVP, **you don't.** Stats are tiny (one row per game completion). Writes happen on `@MainActor` after a game ends. Skip the ModelActor complexity.
-   - If you later add JSON export of long stats history, that's a candidate for a `@ModelActor` background actor. Until then, every line of ModelActor code is overhead. ([Massicotte][massicotte-modelactor])
-5. **No `@unchecked Sendable` on engines.** Use proper value semantics. If you're tempted to write `@unchecked Sendable`, the engine isn't pure — fix that instead.
-6. **`@Sendable` closures only where the compiler asks.** Don't sprinkle. SwiftData closures (`Query`, `predicate`) are inherently main-actor in normal use.
-
-### `@MainActor` placement table for GameKit
-
-| Type | Isolation |
-|---|---|
-| `GameKitApp` (App) | implicit `@MainActor` |
-| `MinesweeperViewModel` | `@Observable @MainActor` |
-| `SettingsStore`, `ThemeStore`, `GameStatsStore` | `@MainActor` (UI-bound) |
-| `BoardGenerator`, `RevealEngine`, `WinDetector` | none — pure `Sendable` value types |
-| `Cell`, `Board`, `Difficulty`, `GameOutcome` | none — `Sendable` value types (`struct`/`enum`) |
-| `MinesweeperStat` (`@Model`) | implicit `@MainActor` when accessed via `mainContext` |
-| `SignInCoordinator` | `@MainActor` (presents UI, holds `ASAuthorizationController`) |
-| `CloudKitAccountObserver` | `@MainActor` (observes `NSNotification.Name.CKAccountChanged`) |
-
-### Common `@Sendable` traps in this stack
-
-- **Trap A: closure captures `self` in a `Task` from a non-MainActor context.** If a callback handler isn't already `@MainActor`, wrap with `await MainActor.run { ... }` or annotate the handler.
-- **Trap B: SwiftData model passed to a `Task.detached`.** Models are not `Sendable`. Pass `PersistentIdentifier`, re-fetch.
-- **Trap C: closure into `withAnimation { ... }` capturing a non-Sendable.** Usually harmless (UI is main-actor) but Swift 6 strict mode can complain. Hoist locals first.
-- **Trap D: `ASAuthorizationController` delegate methods are not annotated.** Wrap delegate work with `MainActor.assumeIsolated { ... }` or annotate the conforming class `@MainActor`.
-
-**Confidence:** HIGH on the placement rules; MEDIUM on Trap D (depends on Xcode version's import annotations — verify after you wire it up).
-
-[hws-swiftdata-concurrency]: https://www.hackingwithswift.com/quick-start/swiftdata/how-swiftdata-works-with-swift-concurrency
-[massicotte-modelactor]: https://www.massicotte.org/model-actor/
-
----
-
-## 2) SwiftData ↔ CloudKit Private-DB Integration
-
-### The configuration (one container, one configuration)
+### Confirmed API (iOS 15+, available on iOS 17+ baseline)
 
 ```swift
-import SwiftData
-
-@MainActor
-enum AppModelContainer {
-    static let shared: ModelContainer = {
-        let schema = Schema([
-            MinesweeperStat.self,
-            UserProfile.self
-        ])
-        let config = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            cloudKitDatabase: .automatic   // reads container ID from entitlements
-        )
-        do {
-            return try ModelContainer(for: schema, configurations: [config])
-        } catch {
-            fatalError("ModelContainer init failed: \(error)")
-        }
-    }()
-}
+// Core7 verified:
+static func animation(
+    minimumInterval: Double? = nil,
+    paused: Bool = false
+) -> AnimationTimelineSchedule
 ```
 
-### Hard constraints (these WILL bite you — verified 2025/2026)
-
-CloudKit-mirrored SwiftData has constraints that are NOT optional and have NOT relaxed in iOS 17/18/26: ([Hacking With Swift][hws-icloud-sync], [Apple Forum 731334][apple-forum-731334])
-
-1. **No unique constraints.** `#Unique<T>(...)` and `@Attribute(.unique)` are forbidden on any model that syncs. Compiles fine, crashes at sync. Use a `UUID` `id` field and treat uniqueness as application-level.
-2. **All relationships must be optional.** A required `var profile: UserProfile` will crash at container init. Make it `var profile: UserProfile?` even if you "know" it's always set. Default empty arrays for to-many: `var stats: [MinesweeperStat]? = []`.
-3. **All non-relationship attributes must be optional OR have a default.** `var difficulty: Difficulty` → either `var difficulty: Difficulty = .easy` or `var difficulty: Difficulty?`.
-4. **Codable enums are fine, but provide a default.** `Difficulty.easy` as default works.
-5. **No `@Attribute(.transformable)` with custom transformers** — stick to types CloudKit understands (primitives, `Data`, `Date`, `URL`, simple Codable enums).
-6. **Schema migrations + CloudKit don't always coexist gracefully.** `iOS 17.4` broke a `.none` workaround for custom migrations. (See [Apple Forum 756538][apple-forum-756538].) Plan additive migrations only; if you need destructive, do it via Export/Import JSON instead of `VersionedSchema`.
-
-### Required entitlements (Signing & Capabilities → +Capability)
-
-- **iCloud** → check **CloudKit** → add a container `iCloud.com.lauterstar.gamekit`
-- **Background Modes** → check **Remote notifications** (so silent push wakes the sync)
-- **Push Notifications** capability (CloudKit subscriptions need it — Apple adds this automatically when you check Remote notifications + CloudKit)
-- **Sign in with Apple** capability (separate, see §3)
-
-### Public/shared DB?
-
-**Out of scope.** The project rules say private DB only. `ModelConfiguration` currently can't directly target a public/shared CloudKit database scope anyway — it's `.private` by default with no scope option exposed. ([Hacking With Swift][hws-stop-sync]) If multiplayer ever happens (it won't per PROJECT.md), that's a `CKSyncEngine` rewrite, not a SwiftData add-on.
-
-### Should we use `CKSyncEngine` instead?
-
-**No.** `CKSyncEngine` (iOS 17+) is the right call when you need:
-- Public/shared databases
-- Manual conflict resolution
-- Custom record formats
-- Fine-grained sync timing
-
-GameKit needs none of these. SwiftData's automatic mirror is strictly less code, fewer edge cases, and can't easily coexist with `CKSyncEngine` on the same container anyway. ([Apple Forum 731435][apple-forum-731435])
-
-**Confidence:** HIGH on the constraints (multiply confirmed by Apple forum threads, Hacking With Swift, and Mike Tsai's WWDC25 roundup), HIGH on the recommendation to use the built-in mirror.
-
-[hws-icloud-sync]: https://www.hackingwithswift.com/books/ios-swiftui/syncing-swiftdata-with-cloudkit
-[apple-forum-731334]: https://developer.apple.com/forums/thread/731334
-[apple-forum-731435]: https://developer.apple.com/forums/thread/731435
-[apple-forum-756538]: https://developer.apple.com/forums/thread/756538
-[hws-stop-sync]: https://www.hackingwithswift.com/quick-start/swiftdata/how-to-stop-swiftdata-syncing-with-cloudkit
+The `paused: Bool` parameter stops entries from being generated at all — not just reduced frequency. This is the correct lever for pause/game-over/idle states.
 
 ---
 
-## 3) Sign in with Apple (iOS 17+)
+## 2. Engine Pattern — Fixed-Timestep Accumulator
 
-### The button
+### Decision
 
-Use SwiftUI's first-party `SignInWithAppleButton` from `AuthenticationServices`. It's themable to match DesignKit reasonably well via `.signInWithAppleButtonStyle(.black | .white | .whiteOutline)`. Pick once based on `colorScheme`.
+The VIEW LAYER owns the variable-rate tick. The VIEW MODEL owns the accumulator and dispatches fixed-step ticks. The ENGINE receives only fixed `dt` values and pure `Input`.
 
-```swift
-import AuthenticationServices
+### Why fixed timestep
 
-SignInWithAppleButton(.signIn) { request in
-    request.requestedScopes = []   // GameKit needs no name/email
-} onCompletion: { result in
-    Task { @MainActor in
-        await coordinator.handle(result)
-    }
-}
-.signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
-.frame(height: 48)
-.clipShape(RoundedRectangle(cornerRadius: theme.radii.button))
+Snake and Stack must behave identically at 60Hz and 120Hz. Without a fixed timestep:
+- At 120Hz, Snake moves at 2× speed compared to 60Hz (each step covers one grid cell, twice as many steps per second)
+- Stack's sliding block covers 2× distance per second at 120Hz
+
+Fixed-timestep decouples the simulation rate from the render rate. The simulation always runs at 60Hz (`fixedDt = 1.0/60.0`) regardless of ProMotion frame rate. The render rate can be 60 or 120Hz without changing game physics.
+
+### Architecture
+
+```
+TimelineView(.animation(paused: vm.isLoopPaused))  ← view layer, variable dt
+     ↓  context.date
+ViewModel.tick(now: Date)                            ← MainActor, accumulator
+     ↓  fixedDt ticks
+Engine.step(dt: fixedDt, input: Input) -> Frame     ← pure value type, deterministic
 ```
 
-**Note:** GameKit only needs the *user identifier* (a stable Apple-issued `userID` string). It does NOT request name or email. Smaller scope = less consent friction = closer to the "no popups, no nags" posture in CLAUDE.md.
-
-### Credential lifecycle
-
-The Apple ID credential can be revoked from Settings → Apple ID → Sign In with Apple. Your app must handle this on every cold start AND while running:
-
-1. **On launch (and on `scenePhase == .active`):** call `ASAuthorizationAppleIDProvider().getCredentialState(forUserID:)`.
-   - `.authorized` → keep CloudKit-synced UI on
-   - `.revoked` or `.notFound` → fall back to anonymous/local mode, do NOT delete local data
-   - `.transferred` → re-prompt sign-in
-2. **At runtime:** observe `ASAuthorizationAppleIDProvider.credentialRevokedNotification` (the `Notification.Name` is `ASAuthorizationAppleIDProviderCredentialRevoked`). On fire: tear down the CloudKit-aware container or hard-flip a flag the UI reads. ([Apple Docs][apple-aid-revoked])
-
-### "There is no credential refresh"
-
-Don't go looking for a token refresh API on iOS — there isn't one. The identity token returned in the authorization is short-lived and one-shot. The persistent thing is the **user identifier**, which you store in `Keychain` under your app's bundle. CloudKit handles all "is the user signed in" semantics independently — `iCloud` account presence and `SIWA` are orthogonal. The user can be signed into iCloud without ever having tapped your SIWA button, and vice versa.
-
-### Anonymous → signed-in promotion (the actual UX)
-
-This is the bit most apps get wrong. The pattern that works with SwiftData+CloudKit:
-
-1. **First launch:** App creates a `UserProfile(id: UUID(), appleUserID: nil, ...)`. Stats write to the `mainContext`. SwiftData's CloudKit container is **off** — config built with `cloudKitDatabase: .none`.
-   - **Trap:** if you ship `.automatic` from day 1 and the user is already iCloud-signed-in (which they probably are), SwiftData starts mirroring to their private DB whether they tapped SIWA or not. That's not what we promise. Decide which posture you want; if "no network until SIWA tap", ship with `.none` and switch on sign-in.
-2. **User taps SIWA in intro/Settings:** Save `appleUserID` to Keychain. Tear down the existing `ModelContainer`. Re-create it with `cloudKitDatabase: .automatic`. SwiftData walks the local SQLite store and pushes existing rows up — **no data loss**, this is its native behavior.
-3. **Subsequent launches:** Read Keychain → if `appleUserID` present and credential state `.authorized`, build container with `.automatic`. Otherwise `.none`.
-4. **User revokes on a different device:** `credentialRevokedNotification` fires. Container teardown + rebuild with `.none`. Local rows stay. CloudKit rows on the server stay (don't delete them — re-sign-in restores them).
-
-**Critical caveat / honest hedge:** Container teardown + recreate with a different config inside a running app is supported but has historically been touchy. If issues appear in testing, the alternative is "decide at launch only, require app restart for the toggle to take effect." Not graceful, but bulletproof. **Confidence on hot-swap: MEDIUM. Confidence on launch-only swap: HIGH.**
-
-[apple-aid-revoked]: https://developer.apple.com/documentation/authenticationservices/asauthorizationappleidprovider/credentialstate/revoked
-
----
-
-## 4) Animation Tools — picking the right one for the right effect
-
-The MVP needs four named effects: **reveal cascade**, **flag spring**, **win-board sweep**, **loss-shake**. None of these need Canvas. Mines is a 16×30 grid of views — modest by SwiftUI standards.
-
-### Decision matrix
-
-| Effect | Tool | Why |
-|---|---|---|
-| Reveal cascade (flood-fill expansion) | Per-cell `withAnimation(theme.motion.fast)` triggered by ViewModel mutating each cell's `isRevealed` in BFS order, with `try await Task.sleep(for: .milliseconds(8))` between rings | The cascade IS the BFS; let it animate naturally. No special API needed. `matchedGeometryEffect` is overkill — cells aren't moving, just transitioning state. |
-| Flag spring (long-press to toggle flag) | `.symbolEffect(.bounce, value: cell.isFlagged)` (iOS 17) on the SF Symbol, or a `withAnimation(.spring(response: 0.3, dampingFraction: 0.6))` on a scale modifier | One-shot springy toggle. Built into SwiftUI iOS 17. |
-| Win-board sweep (full board lights up) | `phaseAnimator` with `[.dim, .glow, .settled]` phases driving brightness/saturation across cells | This IS what `phaseAnimator` is for: a fixed multi-step sequence. |
-| Loss-shake (board jiggles + revealed mine flashes) | `keyframeAnimator` for the precise shake (-8, +6, -4, +2, 0 over ~250ms), combined with a `.foregroundStyle(theme.colors.danger)` flash on the mine | `keyframeAnimator` (iOS 17) gives you exact control over timing curves, which `.spring` can't quite hit for a shake. ([Apple Docs][apple-keyframe]) |
-
-### When to reach for each tool
-
-| API | Use when | Don't use when |
-|---|---|---|
-| `withAnimation` + `.transition` | Standard state-driven changes (reveal, flag, score updates) | You need keyframe-precise timing |
-| `matchedGeometryEffect` | A view appears to fly between two parents (none of GameKit's effects need this) | Just changing a state on one stationary view |
-| `phaseAnimator(_:trigger:)` (iOS 17) | A sequence of 2-N visual states triggered once (win sweep, score-up bounce) | Continuous looping animation; the recurring trigger pattern is awkward |
-| `keyframeAnimator` (iOS 17) | Precise multi-keyframe motion (shake, custom bounce, choreographed sequence) | Anything a `.spring` already nails |
-| `Canvas` | High cardinality (>1000 elements) or per-frame redraw needs (particles, generative art) | A 16×30 grid of cells. **Massive overkill** and you lose accessibility per-cell. |
-| `TimelineView` | UI that updates against a clock independently of state (a smooth running timer) | Anything triggered by user action |
-| `drawingGroup()` | Composited heavy effects (blur+shadow+gradient on many views) | Default text/symbol cells |
-
-### Specific call: should the 480-cell Hard board use `Canvas`?
-
-**No.** `LazyVGrid` (or `Grid`) with one view per cell is correct for GameKit because:
-
-- Each cell needs a tappable, accessible, VoiceOver-labeled `View`. Canvas doesn't expose hit-testing or accessibility per-shape.
-- 480 simple cells is well within SwiftUI's diffing budget. Use `Equatable`-conforming cell views and `.id(cell.id)` to avoid spurious redraws.
-- Canvas wins are GPU-side rendering for 1000s of shapes or arbitrary-frame compositing — neither applies.
-- `LazyVGrid` wraps the whole board in a single grid view; on iPhone, the full Hard board fits on-screen (no scrolling required) so "lazy" is fine and not even strictly necessary; either `Grid` or `LazyVGrid` is correct. Pick `LazyVGrid` for consistency with iPad rotated states where the board could exceed viewport.
-
-If perf becomes a problem at the polish phase (it almost certainly won't), the escalation order is: `.equatable()` cell views → `drawingGroup()` on the board container → `Canvas` (last resort, last resort, last resort).
-
-### Reduce Motion respect
-
-Wrap the polish into a `MotionPalette` helper that reads `@Environment(\.accessibilityReduceMotion)` and returns dampened `Animation` values. PROJECT.md A11Y-03 makes this required, not nice-to-have.
-
-[apple-keyframe]: https://developer.apple.com/documentation/swiftui/controlling-the-timing-and-movements-of-your-animations
-
----
-
-## 5) Haptics — what `DKHaptics` should wrap
-
-### The 2026 picture
-
-There are now **three** haptic surfaces on iOS, and they are NOT redundant:
-
-| Surface | Best for | Notes |
-|---|---|---|
-| `UIImpactFeedbackGenerator` / `UISelectionFeedbackGenerator` / `UINotificationFeedbackGenerator` | Standard simple cues | Pre-iOS-17 way; still works; needs `.prepare()` to avoid first-fire latency. |
-| **SwiftUI `.sensoryFeedback(_:trigger:)`** (iOS 17+) | The 90% case in modern SwiftUI | Trigger-driven, declarative, no `prepare()` lifecycle to manage. Has `.success / .warning / .error / .selection / .impact(...) / .increase / .decrease / .start / .stop / .alignment / .levelChange` ([Use Your Loaf][useyourloaf-sensory]) |
-| **CoreHaptics** (`CHHapticEngine`) | Custom multi-event patterns synced with audio (a custom "win" arpeggio of taps) | Manual lifecycle. Worth it for 1-2 marquee moments only. |
-
-### Recommendation for GameKit's `DKHaptics`
+**View model (MainActor):**
 
 ```swift
-public enum DKHapticCue {
-    case tap            // cell tap (.selection)
-    case flag           // long-press flag (.impact(.light))
-    case unflag         // (.selection)
-    case reveal         // (.impact(.medium))
-    case win            // CoreHaptics custom 3-event arpeggio
-    case loss           // (.warning) + a short CoreHaptics rumble
-}
-```
+@Observable @MainActor
+final class StackViewModel {
+    private(set) var engine = StackEngine()
+    private(set) var lifecycle: ArcadeLifecycle = .idle
+    var pendingDrop = false
 
-Implementation strategy:
+    private var accumulator: Double = 0
+    private var lastTickDate: Date? = nil
+    private let fixedDt: Double = 1.0 / 60.0
 
-- **Light/medium/selection cues:** wrap as a SwiftUI modifier `.dkHaptic(cue, trigger: state)` that internally calls `.sensoryFeedback(...)`. This is the path of least resistance and Apple-recommended for iOS 17+.
-- **Win and loss only:** instantiate a single shared `CHHapticEngine` (lazy, on-demand, started just before play) and load 2 pre-built `CHHapticPattern` JSON files (`Win.ahap`, `Loss.ahap`). `.ahap` files are authored once and tweaked by ear.
-- **Settings toggle:** the wrapper consults `SettingsStore.hapticsEnabled` and is a no-op if off. PROJECT.md MINES-09 makes this required.
-- **Reduce motion / Reduce haptics?** iOS doesn't expose a "reduce haptics" environment. The user's Settings app has it, and `UIDevice` doesn't surface it. Just respect the in-app Haptics toggle.
-
-### Promotion to DesignKit
-
-Per CLAUDE.md §2 ("game-specific haptics patterns *unless* the same pattern is reused in 2+ games — only then promote"), `DKHaptics` graduates to DesignKit only when a second game (Merge, Sudoku) needs the same `.win/.loss/.reveal` vocabulary. Until then, keep at `Games/Minesweeper/Haptics.swift` — but write it with the abstraction shape it'll have when promoted, so the move is mechanical.
-
-**Confidence:** HIGH on the SwiftUI-modifier-first approach; HIGH on CoreHaptics for custom patterns; MEDIUM on the exact AHAP file contents (those are tuned by ear, not by docs).
-
-[useyourloaf-sensory]: https://useyourloaf.com/blog/swiftui-sensory-feedback/
-
----
-
-## 6) Sound Effects — `AVAudioPlayer` (preloaded), not `SystemSoundID`
-
-Three short cues: tap, win, loss. Off by default (PROJECT.md MINES-10). Calm, premium-feeling, not arcade-y.
-
-### Why `AVAudioPlayer` wins for this case
-
-| Criterion | `AVAudioPlayer` | `AudioServicesPlaySystemSound` (SystemSoundID) | OpenAL / AVAudioEngine |
-|---|---|---|---|
-| File length supported | Any | ≤ 30s | Any |
-| Format flexibility | WAV/M4A/MP3/AAC/CAF | CAF only practical | Any |
-| Volume control | Yes | No (system volume only) | Yes |
-| Play same cue overlapping | Need multiple instances | No | Yes (mixing engine) |
-| Setup complexity | Low | Lowest | High |
-| First-play latency | High by default; fixed by `prepareToPlay()` | Lowest | Low |
-| Right for games with chord/many overlapping cues | Marginal | No | Yes |
-
-GameKit needs **3 short cues, off by default, never overlapping** (no rapid-fire chord clicks in MVP per PROJECT.md Out-of-Scope). `AVAudioPlayer` with preloading is the simplest correct choice. ([Apple Forum 98401][apple-forum-98401])
-
-### Implementation pattern
-
-```swift
-@MainActor
-final class SFXPlayer {
-    private var players: [SFX: AVAudioPlayer] = [:]
-
-    init() {
-        for cue in SFX.allCases {
-            guard let url = Bundle.main.url(forResource: cue.fileName, withExtension: "m4a"),
-                  let player = try? AVAudioPlayer(contentsOf: url) else { continue }
-            player.prepareToPlay()           // critical — primes buffers
-            player.volume = cue.defaultVolume
-            players[cue] = player
+    func tick(now: Date) {
+        guard lifecycle == .running else { return }
+        guard let last = lastTickDate else { lastTickDate = now; return }
+        let wallDt = min(now.timeIntervalSince(last), 0.1)  // cap at 100ms to prevent spiral-of-death
+        lastTickDate = now
+        accumulator += wallDt
+        while accumulator >= fixedDt {
+            let input = Input(drop: pendingDrop)
+            pendingDrop = false
+            let frame = engine.step(dt: fixedDt, input: input)
+            if frame.gameOver { transition(to: .gameOver) }
+            accumulator -= fixedDt
         }
     }
+}
+```
 
-    func play(_ cue: SFX) {
-        guard SettingsStore.shared.sfxEnabled else { return }
-        let player = players[cue]
-        player?.currentTime = 0
-        player?.play()
+**Engine (pure value type, no SwiftUI, no Foundation async):**
+
+```swift
+struct StackEngine {
+    // All state here — pure value semantics
+    mutating func step(dt: Double, input: Input) -> Frame {
+        // deterministic physics tick
+    }
+}
+
+struct SnakeEngine {
+    mutating func step(dt: Double, input: Input) -> Frame {
+        // deterministic grid tick
     }
 }
 ```
 
-### Asset notes
+**Key design notes:**
+- `wallDt` is capped at 100ms (`min(..., 0.1)`) to prevent the "spiral of death" — if the app was backgrounded for 30 seconds and the accumulator gets fed 30 seconds of dt on resume, the engine would run thousands of ticks before the first frame paints. Cap it.
+- `lastTickDate = nil` on pause/resume so the first tick after resume starts fresh.
+- No interpolation is needed for Snake (grid-snaps are instant) or Stack (block drop is instantaneous; only block sliding needs interpolation, which is handled in the view layer as a visual-only transition, not engine state).
+- The engine's `Frame` type is a simple value struct carrying the view state needed for the next render — no SwiftUI imports.
 
-- **Format:** ship `.m4a` (AAC). Smaller than WAV, fast to decode after `prepareToPlay()`.
-- **Length:** all cues ≤ 1.5s. Tap = ~80ms, win = ~1.2s, loss = ~700ms.
-- **Volume:** ship at 0.6 default; gives headroom and feels calmer.
-- **`AVAudioSession` category:** set to `.ambient` (NOT `.playback`) so the user's music isn't ducked. PROJECT.md's calm posture demands this.
-- **Don't lazy-load.** First-play latency without `prepareToPlay()` runs hundreds of ms on iOS — feels broken.
+### Testability
 
-**What about `.systemSoundID` for the tap?** Tempting because it's one line. But you give up volume control, and you're at the mercy of the user's ringer settings — system sounds inherit ringer/silent state. A "subtle SFX" that goes silent because the user has ringer-off is broken behavior. Reject.
+Because the engine is a pure value type with `step(dt:input:)`:
 
-**Confidence:** MEDIUM-HIGH. The concrete recommendation is solid; the perfect cue assets need iteration during the polish phase.
+```swift
+@Test func snakeGrowsOnFoodCollect() {
+    var engine = SnakeEngine(seed: 42)
+    let _ = engine.step(dt: 1.0/60.0, input: .noInput)
+    // advance to food position, confirm length increase
+    #expect(engine.snakeLength == 2)
+}
+```
 
-[apple-forum-98401]: https://developer.apple.com/forums/thread/98401
-
----
-
-## 7) String Catalogs (`.xcstrings`) — EN-only ship, translation-ready
-
-### The setup (do this once)
-
-1. Add a `Localizable.xcstrings` file (File → New → File → String Catalog) to the app target.
-2. **Project Settings → Localizations:** keep only English at v1. Adding new languages later is a 2-click operation that backfills the catalog.
-3. **Build Settings → Localization → "Use Compiler to Extract Swift Strings" = YES.** This is the workflow's keystone — every build scans Swift sources and merges discovered strings into the catalog. ([SimpleLocalize][simplelocalize-xcstrings])
-4. **App target Info → Localization Native Development Region:** `en`.
-
-### The discipline (apply consistently)
-
-- Every user-facing string uses `String(localized: "key")` or the SwiftUI `Text("key")` initializer (which is implicitly localized when the file exists).
-- Use **descriptive keys** that double as the EN value: `Text("Mines remaining")` not `Text("mines_label_2")`. Catalogs key by the English source.
-- **Always pass a comment** for any non-obvious key. The catalog stores it and translators rely on it: `String(localized: "Best", comment: "Best time label on stats screen")`.
-- **Pluralization:** use `String(localized: "^[\(n) mines](inflect: true)")` syntax (Foundation pluralization) for "1 mine" / "2 mines" — handled in-catalog.
-- **Don't concatenate localized fragments.** Always full sentences with `\(...)` interpolations. Translators need full context.
-- **Avoid `LocalizedStringKey` as a function parameter type** if the parameter could be passed a runtime string — Xcode's extractor won't pick it up. Use `String` + explicit `String(localized:)` at the call site.
-
-### CI sanity
-
-In Xcode's String Catalog editor, statuses to watch:
-- **Stale** = source code no longer references this key → either delete or restore reference.
-- **Needs Review** (amber) = autogenerated/auto-imported, needs human eyes.
-- **Untranslated** = no value in non-EN locales — fine while we're EN-only.
-
-A pre-TestFlight check: open `Localizable.xcstrings`, filter by "Stale", clean. (No CI tooling needed for this small a catalog.)
-
-### Plurals that GameKit will hit
-
-`"%d mines"`, `"%d games played"`, `"%d wins"`, `"%d flags placed"`. Handle all four with the catalog's plural variants from day 1.
-
-**Confidence:** HIGH. String Catalogs are mature in Xcode 16/26; the workflow above is the documented happy path.
-
-[simplelocalize-xcstrings]: https://simplelocalize.io/blog/posts/xcstrings-string-catalog-guide/
+The engine is as deterministic and testable as `BoardGenerator` or `RevealEngine`. Tests replay exact (dt, input) streams. This mirrors the project's existing engine-purity pattern exactly.
 
 ---
 
-## 8) Cold-Start Performance Budget (<1s on a recent device)
+## 3. Rendering — Canvas (Stack) and LazyVGrid (Snake)
 
-PROJECT.md FOUND-01 makes this a P0 bug. The budget is brutal but doable for an app with no third-party SDKs.
+### Stack: SwiftUI Canvas
 
-### The five tactics (do all)
+Stack's board is continuous-coordinate (the block slides across a fractional x position, the overhang is a sub-pixel trim operation). It is NOT a grid. Canvas is the correct renderer because:
 
-1. **Static `LaunchScreen.storyboard`** that visually matches the Home screen background — DesignKit's `theme.colors.background` for the default Classic Forest preset. No code, no logic. Apple recommends static. ([SwiftLee][swiftlee-launch])
-2. **Lazy `ModelContainer`.** Build it inside an `enum AppModelContainer { static let shared = ... }` so it's lazy and built only on first reference — not in `App.init()`.
-3. **Don't fetch on first frame.** The Home screen lists Minesweeper as the only active game (PROJECT.md SHELL-01). It does NOT need to read SwiftData synchronously to render. Defer any `@Query` to detail screens (Stats).
-4. **Hoist `ThemeManager` only.** It's tiny, reads UserDefaults synchronously, and is needed for the first frame. Everything else (ModelContainer, SignInCoordinator, SFXPlayer) is `lazy` or constructed on first-use.
-5. **No `Task.detached` in `App.init`.** Spinning up tasks before the first scene is rendered competes for the same main thread you need for paint. Move any "warm caches" work to `.task` modifier on the Home view.
+- The coordinate space is a real-valued rectangle, not a discrete cell grid.
+- The number of drawable objects per frame is small (≤ 20 tower layers + 1 sliding block). Canvas draw calls are cheap at this scale.
+- No per-block tapping or accessibility affordance is needed during play — the only interaction is a full-board tap.
+- Canvas naturally handles sub-pixel widths for overhang shaving.
 
-### View-tree depth budget
+**DesignKit token integration into Canvas:**
 
-- App → ContentView → TabView/HomeView → DKCard rows → cell content. **4 layers max** to first paint.
-- Don't wrap in `NavigationStack` deeper than necessary. One root `NavigationStack` per major flow.
-- Avoid `AnyView` — type-erasure costs SwiftUI's diffing engine cycles.
+DesignKit tokens are SwiftUI `Color` values. `Canvas`'s `GraphicsContext` accepts them directly via `GraphicsContext.Shading.color(_:)`. The closure captures `theme` from the enclosing view scope:
 
-### What NOT to do at startup
+```swift
+// Confirmed via Apple docs: GraphicsContext.Shading.color(_ color: Color) is valid
+// 'theme' is captured from the enclosing view's @Environment or parent let binding
 
-- Don't initialize `CHHapticEngine` (it does I/O and audio session work; lazy on first haptic).
-- Don't preload all SFX (defer to right after first paint via `.task`).
-- Don't call `getCredentialState` synchronously — it's a network-touchy call. Fire it from `.task` on the root view.
-- Don't read or migrate the JSON export schema unless the user is in the Settings → Export flow.
+Canvas { ctx, size in
+    // current block (sliding)
+    let blockRect = CGRect(...)
+    ctx.fill(Path(blockRect), with: .color(theme.colors.accentPrimary))
 
-### Measurement
+    // tower layers
+    for layer in engine.tower {
+        ctx.fill(Path(layer.rect), with: .color(theme.colors.surface))
+    }
 
-Use Xcode → Product → Profile → **App Launch** template in Instruments. Target: <500ms `didFinishLaunching` → first frame on iPhone 14 / 15. Anything over a second on a 14+ class device is the bug PROJECT.md flags.
+    // danger zone highlight when very narrow
+    if engine.towerWidth < dangerThreshold {
+        ctx.fill(Path(dangerRect), with: .color(theme.colors.danger.opacity(0.2)))
+    }
+}
+```
 
-**Confidence:** HIGH. The tactics are universally accepted; the only variable is asset weight.
+All color decisions use semantic DesignKit tokens — the Canvas renderer is as theme-correct as any other game view. The `GraphicsContext` has an `environment` property that exposes the SwiftUI environment, but in practice it is simpler and cleaner to capture `theme` in the closure scope rather than reading from `context.environment` (the latter requires resolving `EnvironmentKey` types, not just `Color` values).
 
-[swiftlee-launch]: https://www.avanderlee.com/optimization/launch-time-performance-optimization/
+**Confidence:** HIGH. `GraphicsContext.Shading.color(_:)` takes a `SwiftUI.Color`, which is exactly what DesignKit tokens are. Verified in Context7 Apple docs.
+
+### Snake: LazyVGrid
+
+Snake is grid-based. Its board state is `[Position: CellKind]` where CellKind is `.snake / .food / .empty`. This maps naturally to the existing board-game pattern:
+
+```swift
+LazyVGrid(columns: columns, spacing: 0) {
+    ForEach(cells) { cell in
+        Rectangle()
+            .fill(colorForCell(cell, theme: theme))
+            .aspectRatio(1, contentMode: .fit)
+    }
+}
+```
+
+This is the exact pattern used by Minesweeper, Nonogram, and Sudoku. It is proven, accessible (VoiceOver can read cell states if needed), and does not require any new rendering infrastructure.
+
+Alternative: Canvas for Snake is also valid and slightly more efficient (avoids N^2 view objects for a 20x20 grid = 400 views). Choose Canvas if performance profiling reveals issues; default to LazyVGrid for consistency with existing board games.
+
+**Decision: LazyVGrid for Snake, Canvas for Stack.** This gives Snake zero new rendering patterns to learn, and gives Stack the coordinate-space control it needs for continuous sliding.
+
+### Why not SpriteKit
+
+SpriteKit requires `SpriteView` to embed in SwiftUI. `SpriteView` renders in a `SKView` underneath the SwiftUI layer, which means:
+
+- DesignKit's `Color` tokens cannot reach `SKNode` children — SpriteKit uses `UIColor`, not SwiftUI `Color`. Every theme change would require a `UIColor` extraction step and manual propagation to scene nodes.
+- Theme-switching at runtime would require rebuilding or re-tinting the entire scene graph.
+- PhysicsBody / SKActions / SKEmitterNode are irrelevant for Stack (custom pure math) and Snake (grid logic).
+- Adds a second rendering stack (Metal-backed SpriteKit + SwiftUI) to what is currently a pure SwiftUI app.
+- No performance benefit: Stack's 20 rectangles and Snake's 400 grid cells are trivial for Canvas or LazyVGrid.
+
+SpriteKit is the right tool for physics simulations, particle-heavy effects, or tile-map games. It is overkill here and actively harmful to the DesignKit theming requirement.
 
 ---
 
-## 9) Testing — Swift Testing, decisively
+## 4. Input Handling
 
-### The pick: Swift Testing (`@Test` / `#expect`)
+### Stack — tap-to-drop
 
-Swift Testing (the modern macro-based framework that ships with Xcode 16+) is the right tool for testing pure game engines because:
+```swift
+// In StackGameView:
+.onTapGesture {
+    viewModel.pendingDrop = true
+}
+```
 
-1. **Engines are exactly its sweet spot.** Pure value types, deterministic outputs given inputs, parameterized over difficulty — Swift Testing's `@Test(arguments: [...])` was built for this. ([SwiftLang][swift-testing])
-2. **`#expect` produces better diagnostics on failure.** It expands sub-expressions: `#expect(board.minesCount == 10)` failing prints both sides. XCTest's `XCTAssertEqual` is more verbose for less info.
-3. **Parallel execution by default.** Engine tests are pure — they parallelize trivially. Faster CI.
-4. **Suites with `@Suite` give natural namespacing** — `MinesweeperEngineTests` → `BoardGenerationTests`, `RevealEngineTests`, `WinDetectionTests`, `FirstTapSafetyTests`.
-5. **Apple's own forward direction.** Apple positions Swift Testing as the official testing tool of choice as of Xcode 16. XCTest is in maintenance, not deprecated. ([miCoach][micoach-testing])
+`pendingDrop` is a Bool on the `@MainActor` view model. The engine tick reads and clears it:
 
-### Where XCTest is still needed
+```swift
+let input = Input(drop: pendingDrop)
+pendingDrop = false  // cleared after consumption, before step
+```
 
-- `XCUIApplication` UI tests (Swift Testing has no UI testing equivalent yet).
-- `measure { ... }` performance blocks (Swift Testing's perf story is thin).
-- Snapshot testing if you adopt `swift-snapshot-testing` later (it's XCTest-based today, though Swift Testing support is in flight).
+If the player taps multiple times before the engine processes a tick (happens at 120Hz where 2 view redraws may precede 1 engine tick): only one drop fires per tick. That is correct Stack behavior — one drop per tap intent, not per rendered frame.
 
-### Determinism note
+### Snake — swipe-to-turn
 
-Swift Testing **runs tests in randomized order by default**. For pure engines this is fine — they're stateless. But if you ever write a test that mutates a fixture, slap `.serialized` on it. ([SwiftLang][swift-testing])
+```swift
+// In SnakeGameView:
+.gesture(
+    DragGesture(minimumDistance: 20)
+        .onEnded { value in
+            let dx = value.translation.width
+            let dy = value.translation.height
+            let dir: Direction = abs(dx) > abs(dy)
+                ? (dx > 0 ? .right : .left)
+                : (dy > 0 ? .down : .up)
+            viewModel.enqueueDirection(dir)
+        }
+)
+```
 
-The board generator must accept an injected RNG (`RandomNumberGenerator`) so tests can pass a `SeededRNG` for deterministic placement assertions. This isn't a Swift Testing requirement — it's an engine-design requirement that *enables* clean testing in either framework.
+The view model holds a small direction queue:
 
-### Coverage targets at MVP
+```swift
+private var directionQueue: [Direction] = []  // max capacity 2
 
-Per PROJECT.md MINES-03 / CLAUDE.md §5:
-- `BoardGenerator`: first-tap safety (mine never in tapped cell or 8 neighbors), correct mine count per difficulty, deterministic with seed
-- `RevealEngine`: flood-fill stops at numbered borders, no double-reveal, doesn't reveal flagged cells
-- `WinDetector`: win when all non-mines revealed, loss when mine revealed, neither otherwise
-- `Codable` round-trip on `MinesweeperStat` (Export/Import safety per PERSIST-03)
+func enqueueDirection(_ dir: Direction) {
+    // Ignore if it reverses current movement (can't go back on yourself)
+    guard !dir.isOpposite(to: engine.currentDirection) else { return }
+    if directionQueue.count < 2 {
+        directionQueue.append(dir)
+    }
+}
+```
 
-**Confidence:** HIGH on Swift Testing as the pick. HIGH on retaining XCTest for the niches.
+Each engine tick dequeues one direction:
 
-[swift-testing]: https://github.com/swiftlang/swift-testing
-[micoach-testing]: https://blog.micoach.itj.com/swift-testing-vs-xctest
+```swift
+let pendingDir = directionQueue.isEmpty ? nil : directionQueue.removeFirst()
+let input = Input(direction: pendingDir)
+engine.step(dt: fixedDt, input: input)
+```
+
+**Why a queue (not just a single pending value):**
+A player turning right then immediately up before the next engine tick would lose the "up" if there's only one slot. The queue (capacity 2) preserves recent intent without going deeper than needed.
+
+**Alternative: 4 directional buttons.** Valid for accessibility and avoids swipe-detection ambiguity. V1.5 should ship BOTH: swipe gesture primary, directional button row as a secondary control row (per DESIGN.md §5.1 `numberPadOrControls` slot). Some players cannot swipe comfortably.
+
+### Input isolation (Swift 6)
+
+Both `pendingDrop` and `directionQueue` live on the `@MainActor` view model. Gesture callbacks run on the main actor by default in SwiftUI. No cross-actor access. No `Sendable` concerns. The pattern is identical to how existing view models receive user events.
+
+---
+
+## 5. Lifecycle and Pausing
+
+### ArcadeLifecycle enum (new, in Core/)
+
+```swift
+enum ArcadeLifecycle: Equatable {
+    case idle         // tap-to-start affordance shown
+    case running      // loop active, engine ticking
+    case paused       // user-paused or scene backgrounded
+    case gameOver     // terminal, score shown
+}
+```
+
+This enum lives in `Core/` and is shared by both Stack and Snake. It is the analog of `MinesweeperGameState` for real-time games.
+
+### TimelineView pausing
+
+```swift
+TimelineView(.animation(paused: viewModel.lifecycle != .running)) { context in
+    // game board
+}
+```
+
+When `lifecycle != .running`, no entries are generated. CPU cost is zero. No timer to cancel, no `invalidate()` to call.
+
+### ScenePhase integration
+
+Identical to every existing game — verbatim copy of the existing `.onChange(of: scenePhase)` pattern:
+
+```swift
+.onChange(of: scenePhase) { _, newPhase in
+    switch newPhase {
+    case .background:
+        viewModel.pauseForBackground()  // saves lastTickDate = nil, sets lifecycle = .paused
+    case .active:
+        viewModel.resumeFromBackground()  // restores lifecycle = .running if was running
+    case .inactive:
+        break  // no-op: control-center pulls, lock-screen flashes are transient
+    @unknown default:
+        break
+    }
+}
+```
+
+**Background pause stores the pre-pause lifecycle** so `resumeFromBackground()` only resumes if the game was actively running (not idle or game-over):
+
+```swift
+func pauseForBackground() {
+    guard lifecycle == .running else { return }
+    lifecycleBeforeBackground = .running
+    lifecycle = .paused
+    lastTickDate = nil      // reset accumulator anchor — prevents spiral-of-death on resume
+}
+
+func resumeFromBackground() {
+    guard lifecycleBeforeBackground == .running else { return }
+    lifecycleBeforeBackground = nil
+    lifecycle = .running
+}
+```
+
+### Game-over banner pause
+
+When the engine returns `frame.gameOver == true`:
+
+```swift
+lifecycle = .gameOver  // TimelineView pauses immediately (paused: lifecycle != .running)
+// After delay (500ms per DESIGN.md §10.3), show VideoModeBanner
+```
+
+No special timer manipulation. The existing `VideoModeBanner` (DESIGN.md §3.6) is the end-state surface.
+
+---
+
+## 6. High-Score Persistence
+
+### Schema changes required
+
+**GameKind enum** — add two cases (additive, CloudKit-safe, no schemaVersion bump at the model layer):
+
+```swift
+enum GameKind: String, Codable, Sendable, CaseIterable {
+    // existing cases...
+    case stack   // rawValue = "stack"
+    case snake   // rawValue = "snake"
+}
+```
+
+Raw values are the stable serialization key. "stack" and "snake" are correct — never abbreviate or change.
+
+**BestScore model** — no changes. Already accommodates score-based games with CloudKit-safe schema.
+
+**GameRecord model** — no changes. `score: Int?` already exists. Duration (`durationSeconds`) stores `0` for endless games (no run time tracked, just final score).
+
+**JSON export envelope** — bump `schemaVersion` from 2 to 3 at the envelope level to signal the new game kinds in imports. The model layer stays at SwiftData lightweight migration (additive case additions to an enum stored as `String` require no migration).
+
+### Write path
+
+For both games, use the existing score overload of `GameStats.record`:
+
+```swift
+// In StackViewModel / SnakeViewModel, on game over:
+try gameStats?.record(
+    gameKind: .stack,          // or .snake
+    mode: "endless",           // difficultyRaw — no difficulty presets for endless games
+    outcome: .loss,            // always loss in endless (score-until-death)
+    score: engine.score
+)
+```
+
+`BestScore` is automatically evaluated inside `GameStats.record` via `evaluateBestScore` — "higher only" semantics, CloudKit-safe, explicitly saved before returning.
+
+### Stats screen shape
+
+Endless games show a different stats layout than win/loss games. Per the brief's open question on stats shape:
+
+- **High score** (from `BestScore`)
+- **Games played** (count of `GameRecord` rows for this `gameKindRaw`)
+- NO best time (not applicable)
+- NO win/loss ratio (endless games always end in "loss")
+
+The Stats screen adapts to show the `BestScore` view instead of a BestTime view for `.stack` and `.snake` game kinds. This is a view-layer concern — the schema supports it already.
+
+---
+
+## 7. Core/ Substrate — What Goes There
+
+Two new files in `Core/` that are shared by both Stack and Snake (and any future arcade games):
+
+| File | Contents |
+|------|----------|
+| `Core/ArcadeLifecycle.swift` | `ArcadeLifecycle` enum (idle / running / paused / gameOver) |
+| `Core/ArcadeGameInput.swift` | `ArcadeGameInput` struct (pendingDrop: Bool, pendingDirection: Direction?) — or keep this per-game since Stack/Snake input shapes differ |
+
+Everything else stays in `Games/Stack/` or `Games/Snake/`. Do not over-abstract. Two games is not enough to justify a `GameLoopHost` generic view or an `ArcadeViewModel` base class — that would be speculative architecture.
+
+---
+
+## 8. What Does NOT Change or Go Into DesignKit
+
+| Item | Status |
+|------|--------|
+| `TimelineView` for timer display | Already in `Core/VideoModeTimerChip.swift` — the existing periodic timer chip is NOT the game loop driver; they are different uses of `TimelineView` |
+| DesignKit tokens | No new tokens needed. Stack uses existing `accentPrimary`, `surface`, `danger`, `background`. Snake uses `success` (food), `accentPrimary` (snake body), `danger` (self-collision flash). |
+| DesignKit components | No new components. Score display uses the existing generic Info Chip (§3.3). High-score display uses same chip with different label. |
+| DKHaptics | Existing haptic vocabulary covers all arcade events: `.impact(.medium)` for block drop / food eat; `.error` for game over. No new patterns that warrant DesignKit promotion until 3+ arcade games share them. |
+| SFXPlayer | Existing cue system. Consider adding a `drop.m4a` cue for Stack (block placement). Off by default per product posture. |
+| VideoModeBanner | Already in `Core/`. End-state for endless games reuses it with "Game Over — Score: X" content. |
+| Video Mode adoption | Exempt for v1.5 per brief. Continuous-input real-time games cannot pause-and-reflow for PiP. |
 
 ---
 
 ## Alternatives Considered
 
-| Recommended | Alternative | Why we rejected the alternative |
+| Recommended | Alternative | Why Not |
 |---|---|---|
-| SwiftData built-in CloudKit mirror | `CKSyncEngine` (manual sync) | Way more code, no actual benefit for private-DB-only with no shared/public scope. ([Apple Forum 731435][apple-forum-731435]) |
-| SwiftData built-in CloudKit mirror | Core Data + NSPersistentCloudKitContainer | Older but more mature for tricky migrations. Rejected for ecosystem consistency (DesignKit-era apps standardize on SwiftData) and to avoid the API-surface duplication. |
-| `LazyVGrid` of SwiftUI cells | `Canvas` + `drawingGroup` | Loses per-cell accessibility & hit testing. Massive engineering for 480 cells that SwiftUI can render fine. |
-| `withAnimation` + `phaseAnimator`/`keyframeAnimator` | SpriteKit | PROJECT.md explicitly excludes game engines. SpriteKit also bypasses the DesignKit theming surface. |
-| `.sensoryFeedback` + CoreHaptics for marquee | `UIImpactFeedbackGenerator` everywhere | Older surface, requires lifecycle management, can't easily express custom patterns. |
-| `AVAudioPlayer` preloaded | `SystemSoundID` | Inherits ringer state, no volume control, no headroom for premium feel. |
-| `AVAudioPlayer` preloaded | `AVAudioEngine` | Overkill for 3 non-overlapping cues. Right answer if a future game needs simultaneous SFX. |
-| Swift Testing | XCTest | Slower iteration loop, weaker diagnostics, weaker parameterization. XCTest stays for UI/perf only. |
-| Swift Testing | `swift-testing` from `pointfreeco` | Apple's official `swift-testing` IS the testing framework. We don't need an extra pkg. |
-| `String(localized:)` + `.xcstrings` | `.strings` files + `NSLocalizedString` | Old workflow, no auto-extraction, harder to keep in sync. Catalog is strictly better in Xcode 15+. |
-| Sign in with Apple + CloudKit private DB | Firebase Auth, Supabase, custom backend | Banned by PROJECT.md. Also hostile to the privacy posture. |
-| `@MainActor` + pure value engines | `@ModelActor` background actor for everything | Premature complexity. Mines writes are tiny. Add a ModelActor when you have a writer that takes >10ms. ([Massicotte][massicotte-modelactor]) |
-
----
-
-## What NOT to Use
-
-| Avoid | Why | Use Instead |
-|---|---|---|
-| Third-party backends (Firebase, Supabase, custom server) | PROJECT.md absolute exclusion + privacy posture | CloudKit private DB |
-| Ad SDKs (AdMob, AppLovin, Unity Ads) | PROJECT.md absolute exclusion + differentiator | Nothing — no ads ever |
-| Analytics SDKs (Firebase Analytics, Mixpanel, Amplitude, even Apple's `MetricKit` for telemetry) | PROJECT.md no-phone-home rule | Nothing — local stats only |
-| TCA, Redux-likes, Combine-heavy state managers | Excessive ceremony for an app with this state graph | Lightweight MVVM with `@Observable` view models |
-| SpriteKit, RealityKit, GameplayKit | Mines is a UI grid, not an action game; bypasses DesignKit | SwiftUI views + `withAnimation` |
-| `Canvas` for the board | Loses per-cell accessibility and hit-testing | `LazyVGrid` of cell views |
-| `AnyView` in tight render paths | Erases SwiftUI's static type info, slows diffing | Concrete `some View` returns + `@ViewBuilder` |
-| `@Attribute(.unique)` / `#Unique` on synced models | Crashes CloudKit mirror at runtime | Application-level uniqueness via `UUID` ids |
-| Required (non-optional) relationships in synced models | Crashes container init | All relationships optional, defaulted to empty arrays |
-| `Force unwrap` in model init paths used by SwiftData | SwiftData decode-time crashes are gnarly | Optionals + defaults |
-| `AVAudioPlayer` instances created on the play call | First-play latency feels broken | Preload at launch with `prepareToPlay()` |
-| `AudioServicesPlaySystemSoundID` for SFX | No volume control; inherits ringer state | `AVAudioPlayer` |
-| `XCTAssert*` in new test files | Worse diagnostics, less ergonomic | `#expect` in Swift Testing |
-| `LocalizedStringKey` as a fn-parameter type for runtime strings | Xcode extractor misses these — they don't land in the catalog | `String(localized:)` at call site |
-
----
-
-## Stack Patterns by Variant
-
-**If user is signed in with Apple AND iCloud is available:**
-- `ModelContainer` configured `cloudKitDatabase: .automatic`
-- Stats sync silently to iCloud private DB
-- UI surface: a small "Synced via iCloud" disclosure on Stats screen header
-
-**If user has skipped sign-in OR iCloud is unavailable OR credential is `.revoked`:**
-- `ModelContainer` configured `cloudKitDatabase: .none`
-- All data is local-only, exports work via JSON
-- No "sync" UI shown
-
-**If user signs in mid-session (intro skip → later in Settings):**
-- Save Apple `userID` to Keychain
-- Tear down + rebuild `ModelContainer` with `.automatic` (or, if hot-swap proves flaky in testing, prompt "Sign-in active on next launch" — graceful degradation)
-
-**If running on iOS 18+:**
-- Optionally adopt `@Observable` macro improvements
-- `sensoryFeedback` is unchanged (already iOS 17)
-- SwiftData has additional bugfixes around `VersionedSchema` migrations
-
-**If running on iOS 26+ (model inheritance, new at WWDC25):**
-- Future games (Sudoku, Word Grid) might use `@Model` inheritance for shared `Stat` base — defer to that game's research, not MVP. ([Mike Tsai][mjtsai-wwdc25])
-
----
-
-## Version Compatibility
-
-| Package / Capability | Compatible With | Notes |
-|---|---|---|
-| Swift 6.0 | Xcode 16.0+ | Strict concurrency on. |
-| SwiftUI iOS 17 | iOS 17.0+ | `phaseAnimator`, `keyframeAnimator`, `sensoryFeedback`, `symbolEffect` all iOS 17. |
-| SwiftData CloudKit mirror | iOS 17.0+, prefer 17.4+ | Pre-17.2 had non-optional crashes; 17.4 broke a custom-migration workaround. Plan additive migrations only. |
-| `SignInWithAppleButton` (SwiftUI) | iOS 14.0+, fully fine on 17+ | — |
-| Swift Testing | Xcode 16.0+ | Bundled. No `Package.swift` dependency needed for app-target tests. |
-| String Catalogs (`.xcstrings`) | Xcode 15+, format 1.0; Xcode 26 adds format 1.1 features | Stay on 1.0 unless using new auto-comments. |
-| DesignKit (local SPM) | Swift 6.0, iOS 17+ / macOS 14+ | Matches GameKit's floor exactly. |
-
----
-
-## Installation / Project Setup
-
-```bash
-# No npm here — Xcode project + Package.swift refs
-
-# 1. In Xcode: File → Add Package Dependencies → "Add Local..."
-#    Select ../DesignKit folder.
-
-# 2. Capabilities to add to GameKit target (Signing & Capabilities → +):
-#    - iCloud   (check CloudKit, container: iCloud.com.lauterstar.gamekit)
-#    - Background Modes (check "Remote notifications")
-#    - Push Notifications
-#    - Sign in with Apple
-
-# 3. Build Settings:
-#    - Swift Language Version: Swift 6
-#    - Strict Concurrency Checking: Complete
-#    - Use Compiler to Extract Swift Strings: YES
-#    - iOS Deployment Target: 17.0
-
-# 4. Localizable.xcstrings: File → New → File → String Catalog (en only)
-
-# 5. Run the test target — confirm `import Testing` resolves and a stub
-#    `@Test func smoke() { #expect(true) }` runs.
-```
-
----
-
-## Confidence Summary
-
-| Area | Confidence | Why |
-|---|---|---|
-| Swift 6 + SwiftUI + SwiftData stack | HIGH | Apple-canonical, multiply confirmed via Context7 + Apple docs |
-| CloudKit constraints (no unique, no required relationships, defaults required) | HIGH | Confirmed via Apple Developer Forums (multiple threads) + Hacking With Swift + Mike Tsai's WWDC25 roundup |
-| Sign in with Apple lifecycle (credential state, revocation notification) | HIGH | Apple Docs verified |
-| Anonymous → signed-in container hot-swap | MEDIUM | Apple's docs are thin; community reports work but require careful teardown. Recommend launch-only swap as bulletproof fallback. |
-| Animation API selection per effect | HIGH | Apple Docs verified for `phaseAnimator` / `keyframeAnimator` semantics |
-| Haptics (sensoryFeedback first, CoreHaptics for marquee) | HIGH | Apple iOS 17 modifier docs verified |
-| AVAudioPlayer over SystemSoundID | MEDIUM-HIGH | The trade-offs are well-understood; specific cue assets need ear-tuning during polish phase |
-| String Catalog workflow | HIGH | Apple Docs + multiple current guides |
-| Cold-start tactics | HIGH | Universally accepted, no hidden gotchas for an app this size |
-| Swift Testing pick | HIGH | Apple's stated direction; ergonomic fit for pure engines |
+| `TimelineView(.animation(paused:))` | `CADisplayLink` | Swift 6 Sendable friction; no gameplay benefit for Stack/Snake; `paused:` parameter on TimelineView is cleaner |
+| `TimelineView(.animation(paused:))` | `Timer.scheduledTimer` / Combine timer | Not screen-synchronized; causes jitter; fires even when no display update pending |
+| `TimelineView(.animation(paused:))` | `AsyncTimerSequence` | Not screen-synchronized; off-main-thread; no ProMotion adaptivity |
+| Canvas (Stack) | `LazyVGrid` of shapes | Stack's continuous coordinates and sub-pixel overhang shaving need direct coordinate control |
+| `LazyVGrid` (Snake) | Canvas | Consistent with existing board game pattern; 400 cells is not a perf problem on SwiftUI; easier to add VoiceOver if needed later |
+| Fixed-timestep accumulator | Variable dt passed directly to engine | Simulation rate becomes frame-rate dependent; Snake moves at 2× speed on ProMotion; engine tests become non-deterministic |
+| `BestScore` + `GameStats` (existing) | New persistence layer | Unnecessary. The existing schema already handles score-based games. GameKind is the only additive change. |
+| `DragGesture.onEnded` + direction queue | Custom gesture recognizer via `UIGestureRecognizer` bridge | UIKit bridging in a pure SwiftUI app adds complexity. SwiftUI's DragGesture with `minimumDistance: 20` is reliable for 4-directional swipe detection. |
 
 ---
 
 ## Sources
 
 ### Context7 (authoritative, current)
-- `/websites/developer_apple_swiftdata` — `@Model`, `@Unique`, `@Relationship`, `ModelConfiguration` semantics
-- `/websites/developer_apple_swiftui` — `phaseAnimator`, `keyframeAnimator`, `matchedGeometryEffect` API surface and version availability
-- `/swiftlang/swift-testing` — `@Test`, `#expect`, `@Suite`, parameterized, parallel execution
-- `/websites/developer_apple_testing` — Apple's official Swift Testing documentation
+
+- `/websites/developer_apple_swiftui` — `TimelineView`, `AnimationTimelineSchedule`, `AnimationTimelineSchedule.init(minimumInterval:paused:)`, `TimelineView.Context.Cadence`, `Canvas`, `GraphicsContext.Shading.color(_:)`, `DragGesture`, `onTapGesture`
+- Context7 confirmed: `paused: Bool` parameter on `.animation(minimumInterval:paused:)` stops entry generation entirely when `true`. Cadence values: `.live`, `.seconds`, `.minutes` — no auto-background-pause from cadence, that is separate from `paused:`.
 
 ### Apple Developer Documentation
-- [`ModelConfiguration.CloudKitDatabase`](https://developer.apple.com/documentation/swiftdata/modelconfiguration/cloudkitdatabase-swift.struct)
-- [`ASAuthorizationAppleIDProvider`](https://developer.apple.com/documentation/authenticationservices/asauthorizationappleidprovider)
-- [`ASAuthorizationAppleIDProvider.CredentialState.revoked`](https://developer.apple.com/documentation/authenticationservices/asauthorizationappleidprovider/credentialstate/revoked)
-- [`Canvas`](https://developer.apple.com/documentation/swiftui/canvas)
-- [Core Haptics](https://developer.apple.com/documentation/corehaptics)
-- [Localizing and varying text with a string catalog](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog)
-- [Controlling the timing and movements of your animations](https://developer.apple.com/documentation/swiftui/controlling-the-timing-and-movements-of-your-animations)
 
-### Apple Developer Forums (verified pain points)
-- [731334 — SwiftData configurations for Private and Public CloudKit](https://developer.apple.com/forums/thread/731334)
-- [731375 — Disable automatic iCloud sync with SwiftData](https://developer.apple.com/forums/thread/731375)
-- [731435 — CKSyncEngine & SwiftData (incompatibility)](https://developer.apple.com/forums/thread/731435)
-- [744491 — SwiftData with CloudKit failing to mirror](https://developer.apple.com/forums/thread/744491)
-- [756538 — Local SwiftData to CloudKit migration](https://developer.apple.com/forums/thread/756538)
-- [98401 — Why does AVAudioPlayer cause lag](https://developer.apple.com/forums/thread/98401)
+- [AnimationTimelineSchedule.init(minimumInterval:paused:)](https://developer.apple.com/documentation/swiftui/animationtimelineschedule/init%28minimuminterval%3Apaused%3A%29) — verified `paused: Bool` parameter
+- [TimelineView.Context.Cadence](https://developer.apple.com/documentation/swiftui/timelineview/context/cadence-swift.enum) — `.live` / `.seconds` / `.minutes`
+- [GraphicsContext](https://developer.apple.com/documentation/swiftui/graphicscontext) — `resolveSymbol`, `Shading.color(_:)`, `environment` property
+- [DragGesture](https://developer.apple.com/documentation/swiftui/draggesture) — `minimumDistance`, `onChanged`, `onEnded`, `value.translation`
+- [ScenePhase](https://developer.apple.com/documentation/swiftui/scenephase) — `.background` / `.inactive` / `.active` and `.onChange` pattern
 
-### Independent verifications (MEDIUM confidence)
-- [Hacking With Swift — Syncing SwiftData with CloudKit](https://www.hackingwithswift.com/books/ios-swiftui/syncing-swiftdata-with-cloudkit)
-- [Hacking With Swift — How SwiftData works with concurrency](https://www.hackingwithswift.com/quick-start/swiftdata/how-swiftdata-works-with-swift-concurrency)
-- [Hacking With Swift — How to stop SwiftData syncing with CloudKit](https://www.hackingwithswift.com/quick-start/swiftdata/how-to-stop-swiftdata-syncing-with-cloudkit)
-- [Massicotte — ModelActor is Just Weird](https://www.massicotte.org/model-actor/)
-- [Use Your Loaf — SwiftUI Sensory Feedback](https://useyourloaf.com/blog/swiftui-sensory-feedback/)
-- [SwiftLee — App launch time performance](https://www.avanderlee.com/optimization/launch-time-performance-optimization/)
-- [SimpleLocalize — XCStrings guide](https://simplelocalize.io/blog/posts/xcstrings-string-catalog-guide/)
-- [Mike Tsai — SwiftData and Core Data at WWDC25](https://mjtsai.com/blog/2025/06/19/swiftdata-and-core-data-at-wwdc25/)
-- [miCoach — Swift Testing vs XCTest](https://blog.micoach.itj.com/swift-testing-vs-xctest)
-- [swiftlang/swift-testing GitHub](https://github.com/swiftlang/swift-testing)
+### Verified Community Sources (MEDIUM confidence)
+
+- [SwiftUI Lab — TimelineView Part 4](https://swiftui-lab.com/swiftui-animations-part4/) — multiple recompilations per update caveat; `context.date` behavior
+- [NilCoalescing — TimelineView in SwiftUI](https://nilcoalescing.com/blog/TimelineViewInSwiftUI/) — cadence property and detail-level adjustment
+- [Gaffer on Games — Fix Your Timestep](https://gafferongames.com/post/fix_your_timestep/) — fixed-timestep accumulator pattern, spiral-of-death cap
+- [Hacking With Swift — CADisplayLink](https://www.hackingwithswift.com/example-code/system/how-to-synchronize-code-to-drawing-using-cadisplaylink) — CADisplayLink basics; non-Sendable issue surfaced via Swift 6 search
+- [Jacob's Tech Tavern — SwiftUI Game Engine](https://blog.jacobstechtavern.com/p/swiftui-game-engine) — Canvas + TimelineView for a simple game loop (confirms the Canvas + TimelineView pattern works; also confirms it's only for loading-screen-scale games, not full productions)
+- [NSTimer vs CADisplayLink](https://dev.to/fassko/nstimer-vs-cadisplaylink-1086) — CADisplayLink fires at screen refresh; Timer does not
 
 ---
 
-*Stack research for: GameKit (iOS classic logic-games suite, MVP = Minesweeper)*
-*Researched: 2026-04-24*
+*Stack research for: GameKit v1.5 — Real-Time Endless Arcade Primitive*
+*Researched: 2026-06-25*

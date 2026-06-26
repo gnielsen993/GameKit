@@ -1,412 +1,445 @@
-# Feature Research
+# Feature Research — v1.5 Endless Arcade Primitive
 
-**Domain:** iOS Minesweeper (single-game MVP for GameKit suite)
-**Researched:** 2026-04-24
-**Confidence:** HIGH on table stakes / anti-features (well-established iOS Minesweeper market with 15+ years of competitor data); MEDIUM on differentiator nuances (some claims are App Store description-level, not deeply verified review-level).
+**Domain:** Calm endless arcade games (Stack + Snake) added to a shipped premium, ad-free iOS game suite
+**Researched:** 2026-06-25
+**Confidence:** HIGH on core mechanics (established genre conventions, 30+ years of Snake, 10+ years of Stack variants); MEDIUM on specific speed-ramp curves (no canonical public spec — conventions derived from surveyed implementations); HIGH on anti-features (GameKit brand constraints are explicit in PROJECT.md and CLAUDE.md)
+
+---
 
 ## Scope Note
 
-This research is **Minesweeper-only** — the long-term GameKit suite (Merge / Word
-Grid / Solitaire / Sudoku / Nonogram / Flow / Pattern Memory / Chess puzzles) is
-deliberately out of scope. Features that only make sense once a second game
-exists (cross-game home tiles, shared progression, suite-wide stats) are
-explicitly excluded — the brief is "prove one game well first."
+This research covers **Stack and Snake only** — the two calm endless arcade games scoped for v1.5. The seven shipped turn-based games (Minesweeper, Merge, Nonogram, Five Letter, Word Grid, FreeCell, Sudoku) are out of scope here. The **shared real-time substrate** (loop driver, lifecycle shell, high-score persistence) is a prerequisite for both games and is treated as a hard dependency below.
 
-The competitor field surveyed: Minesweeper Q / Minesweeper Q Premium (Spica,
-$2 paid), Mineswifter (no-guess focused), Minesweeper GO (Tapinator,
-freemium), Minesweeper Classic: Retro (Maple Media, freemium), Minesweeper
-Classic (Maple Media), Minesweeper Mobile, Minesweeper: No Guessing,
-Minesweep+, Mine Mine, Accessible Minesweeper (VoiceOver-first), Microsoft
-Minesweeper. App Store review patterns surveyed via web search summaries —
-not direct review scraping.
+Both games are **calm, not twitch**. The product posture is "meditative, geometric, theme-token-perfect, one-more-try without stress." Any feature that tips these games toward rage, frustration coercion, or compulsion loops is an anti-feature by brand definition regardless of whether competitors do it.
 
-## Feature Landscape
+---
 
-### Table Stakes (Users Expect These)
+## Game 1 — Stack
 
-If any of these is missing, the app feels broken or amateurish. Users do not
-give credit for shipping them — they only penalize their absence.
+### Core Mechanic and Exact Rules
+
+Stack is a precision-timing tower game. The player taps to drop a sliding block onto a growing tower.
+
+**Block movement:** A block of the same width as the current tower top oscillates left-to-right (or appears alternating from left/right sides) directly above the topmost placed block. Movement is continuous and automatic — the player does not control the direction, only the moment of drop.
+
+**Drop and overhang trimming:** When the player taps, the block falls. The section of the block directly above the previous block lands cleanly. Any overhang — the portion that extends past the previous block's edge — is trimmed off and falls away. The remaining overlap becomes the new top block, which is necessarily narrower than or equal to the previous one.
+
+**Perfect drop:** A drop where the incoming block aligns exactly with the block below. Overhang is zero. The block lands at full width (no trimming). In most implementations a perfect drop also triggers a bonus: either restoring the block toward a larger size, growing the block incrementally over a streak, or expanding the landing zone after N consecutive perfects (5 consecutive perfects in some variants; a single perfect in the Ketchapp original triggers escalating size reward over a streak). The exact mechanic used should be decided at implementation time — both "single perfect restores" and "N-consecutive perfects expand" are well-established; the former is simpler and more forgiving (fits the calm brand better).
+
+**Block width shrinks over time** as misses accumulate. When the block width reaches zero — i.e., the player taps when no overlap is possible — the game ends.
+
+**Score:** One point per successfully placed block. Score = tower height in blocks. There is no multiplier on the score itself; height is the score. The combo/perfect streak does not multiply score; it affects block width (quality-of-life reward), keeping the score metric clean and honest.
+
+**Speed ramp:** Block sliding speed increases as tower height grows. The Ketchapp original ramps speed approximately every 15–20 blocks and eventually plateaus — speed does not increase indefinitely. A soft cap prevents the game from becoming physically impossible.
+
+**Game over condition:** The block is dropped and lands with zero overlap on the previous block (complete miss), OR the block width has been trimmed to a width that makes placement impossible. In either case the run ends immediately. No lives, no continues.
+
+**Engine shape (per PROJECT.md brief):**
+```
+StackEngine.drop(at:) -> (placed: CGRect, overhang: CGRect, newWidth: CGFloat, gameOver: Bool)
+```
+The engine is pure (Foundation-only, no SwiftUI imports), deterministic given the input stream, and unit-testable.
+
+### Scoring Model
+
+- **Score = blocks placed** (integer count, starts at 0). Simple, honest, instantly understood.
+- **Perfect streak counter** displayed during the run (e.g. "3 perfects in a row") — gives feedback without polluting the primary score.
+- **No fake multipliers, no coins, no gems.** The score is the score.
+- High score = personal best block count. Comparing yesterday's self to today's self is the only leaderboard this app needs.
+
+### Difficulty Ramp
+
+Stack is endless by definition. The ramp is built into the engine, not preset-selected.
+
+| Phase | Tower Height | Sliding Speed | Block Width Behavior |
+|-------|-------------|---------------|---------------------|
+| Opening | 0–15 blocks | Slow | Full starting width; perfects very achievable |
+| Developing | 16–40 blocks | Medium | Width narrows with each partial miss; perfects recover some width |
+| Pressure | 41–80 blocks | Fast | Only clean players maintain width; partial misses compound |
+| Plateau | 80+ blocks | Capped maximum | Speed doesn't increase further; difficulty is now purely the narrow landing zone |
+
+The speed plateau is important for the calm brand. A game that keeps accelerating indefinitely until death is a twitch game. A game where speed plateaus and the challenge becomes purely spatial/precision is a skill game — more meditative. **Speed should cap no later than ~80 blocks.**
+
+Perfects at any height partially restore block width, giving the player a recovery mechanic that keeps long runs viable rather than inevitably doomed. This makes the game satisfying rather than frustrating.
+
+### Table Stakes
+
+Features every Stack implementation must have to feel complete. Missing any of these = the game feels broken.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Three classic difficulties (9×9/10, 16×16/40, 16×30/99) | Microsoft-original preset every Minesweeper player has muscle memory for | LOW | Already MINES-01 |
-| Tap to reveal | Universal touch primitive for grid games | LOW | Already MINES-02 |
-| Long-press to flag | Default touch idiom across every iOS Minesweeper surveyed (Q, GO, Classic Retro, Mineswifter, Minesweep+) | LOW | Already MINES-02 |
-| First-tap safety | First-click loss feels like a bug to users; competitor "Evil Mineswifter" exists *as a joke* about it | LOW | Already MINES-03; mines placed post-tap, exclude tapped cell + 8 neighbors |
-| Flood-fill on empty cells | Without it, the game is unplayable on Medium/Hard | LOW | Already MINES-04 |
-| Mine counter (mines remaining = total − flagged) | Half the strategy depends on it | LOW | Already MINES-05 |
-| Elapsed-game timer | Speed is the implicit second axis after correctness | LOW | Already MINES-05 |
-| Restart button (in-game) | Mid-game "this is a guess, just restart" is core to the loop | LOW | Already MINES-06 |
-| Win-state overlay | Acknowledgment of the win is the dopamine hit users came for | LOW | Already MINES-07 |
-| Loss-state overlay (with restart) | Without it, users feel stranded; the loss must feel resolved, not punitive | LOW | Already MINES-07; reveal all mines on loss is the convention |
-| Best time per difficulty | Single most-asked stat in every Minesweeper surveyed; users *will* leave a 1-star review without it | LOW | Already SHELL-03 |
-| Games played / wins / win % per difficulty | Same — minimum stat triad on every competitor's stats screen | LOW | Already SHELL-03 |
-| Stats persistence across launches / force-quit / reboot | Losing a best time would be a P0 trust-breaker | LOW | Already PERSIST-02 |
-| Number-color scheme (1-blue, 2-green, 3-red, etc.) | The classic palette is mnemonic for muscle-memory players; deviating requires care | LOW | DesignKit semantic tokens must produce a recognizable scheme on Classic preset, with theme-derived variants on others |
-| Reveal-mine-on-loss animation | Explains *why* you lost and which flags were wrong | LOW | Part of MINES-08 |
-| Settings: theme + haptics + SFX + reset stats + about | The expected iOS Settings spine | LOW | Already SHELL-02 |
+| Oscillating block above tower | The entire mechanic — without it there is no game | S | Left-right or alternating sides; both are established |
+| Tap anywhere to drop | Largest possible tap target; no precision required on the gesture | S | One-tap, not two-finger, not a specific zone |
+| Overhang trimming (visual) | Players must see the trimmed piece fall away to understand the penalty | S | A falling chunk with brief animation communicates the rule without text |
+| Width shrinks on imperfect drops | Core feedback loop; without it every drop feels equivalent | S | New block = overlap only |
+| Perfect drop acknowledged visually | Without feedback, players don't know they hit one | S | Flash, color pulse, or brief glow on the top block |
+| Speed increases with height | Without it the game never gets harder; trivially infinitely solvable | S | Ramp per block count, not per time |
+| Speed plateau (hard cap) | Prevents the game from becoming physically impossible and un-calm | S | ~80 blocks as soft guidance |
+| Game over when width = 0 or complete miss | Clear end condition; players must understand why the run ended | S | Show the final miss visually |
+| Score display (block count) during run | Players must be able to see their current height | S | Top of screen or overlay chip |
+| High score display during run | Compare current run to personal best in real time | S | Secondary, smaller than current score |
+| Game over banner with final score and restart | Standard game-over affordance; without it the run just dies awkwardly | S | Matches the v1.2 banner pattern already in the suite |
+| Instant restart (one tap from game over) | "One more try" loop depends on zero friction to restart | S | Tap the banner CTA; no confirmation dialog |
+| Haptics on perfect drop, trim, game over | Tactile game is part of Stack's feel; wrong without it | S | Use DesignKit haptic patterns |
+| Theme-driven block colors | App requires all UI via DesignKit tokens; block colors must derive from theme | M | Every preset must produce visually distinct blocks |
 
-### Differentiators (Competitive Advantage)
+### Differentiators
 
-These are GameKit's competitive surface vs the App Store's free Minesweepers.
-Aligns with PROJECT.md Core Value: *"calm, premium, fully theme-customizable
-gameplay with zero friction."*
+What a calm, premium, theme-customizable version adds beyond the commodity Stack experience.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Zero ads / coins / energy / pushy subs | Direct inverse of the dominant App Store experience users complain about ("ads on every win and loss," "ads got longer and longer," "kicked to the App Store mid-game") | LOW (work avoidance, not work) | The single biggest differentiator. Already PROJECT.md Out of Scope #1 |
-| Full DesignKit theming (34 presets across 6 categories + custom) | No other Minesweeper offers anything close. Competitors offer 3–6 fixed skins (Classic Retro: paid skin packs; Q: a few options) | MEDIUM | Already FOUND-03, THEME-01-03 — work is making the *Minesweeper UI* read every preset |
-| Custom number-color palette (per-numeral) | Power users (and color-blind users) want to override 1-8 colors. Trivial extension on top of DesignKit token mapping | LOW–MEDIUM | Differentiator + accessibility win. Surface as "Number colors" in Settings → Minesweeper section |
-| Subtle, considered animations (DesignKit motion tokens) | Reveal cascade, flag spring, win sweep, loss shake — feel competitors fake with bad ease curves | MEDIUM | Already MINES-08 |
-| First-class haptics (DesignKit haptic patterns) | Tactile differentiation premium iOS users notice immediately | LOW | Already MINES-09 |
-| SFX off by default | Calm-by-default product posture; respects coffee-shop play. Competitors all default-on with intrusive sounds | LOW | Already MINES-10 |
-| 3-step intro (themes → stats → optional sign-in) then never again | Most competitors either skip onboarding (confusing) or pop tutorials repeatedly. One-and-done is rare | LOW | Already SHELL-04 |
-| Optional Sign in with Apple + CloudKit (never required) | Cross-device sync for users who want it; full feature parity for those who don't. Competitors either force accounts or have no sync at all | MEDIUM | Already PERSIST-04-06 |
-| Export / Import JSON of stats | User-owned data; portability. No surveyed competitor offers this | LOW | Already PERSIST-03 |
-| No telemetry / no phone home | Privacy posture. Competitors silently SDK-up | LOW (work avoidance) | Already PROJECT.md Out of Scope |
-| No-guess board generator (every board solvable by pure logic) | Mineswifter / Minesweeper: No Guessing built entire products around this. Eliminates the genuine flaw of classic RNG | HIGH | Defer to v1.1 — see PITFALLS.md (generator can take 0–20s; needs background thread, retries, fallback). PROJECT.md already lists this as deferred |
-| Chord (double-tap a number to reveal neighbors when flagged correctly) | Speedrunners and 3BV/s grinders need this. PROJECT.md lists it as deferred | LOW–MEDIUM | v1.1. Setting toggle so casual players don't accidentally trigger |
-| Rich stats screen (3BV/s, distribution, recent history, streaks) | Competitors stop at win % + best time. Stats-curious users will adopt GameKit just for this | MEDIUM | v1.1 — SwiftData schema sized for it now (PERSIST-01) |
-| Daily seed / daily challenge (deterministic per-day board) | Engagement *without* dark patterns. The seed is the engagement, no streak-shaming required | MEDIUM | v1.1+ — see Anti-Feature note re: streak coercion |
-| VoiceOver-playable Minesweeper | "Accessible Minesweeper" exists as a separate app entirely *because* most are unplayable blind. Shipping it in the main product is rare | MEDIUM | A11Y-02 covers basic labels; cell coordinate announcements + flag/reveal verbs needed for full play |
-| Color-blind-safe number palette (presetable) | Default Microsoft palette has 1-blue/2-green/3-red — green/red is the worst pairing for deuteranopia. A "Color-blind safe" variant is a 30-min win | LOW | Use blue/orange/yellow/dark axis (Wong palette principles) |
-| Reduce Motion compliance | Already A11Y-03 — competitors rarely respect it | LOW | Dampen MINES-08 animations under `accessibilityReduceMotion` |
+| Block colors driven by DesignKit preset | No other Stack game has 34-preset theming; the tower becomes a palette | M | Each block layer gets a graduated hue derived from the theme's accent ramp, so the tower looks like a color gradient specific to the current preset |
+| Satisfying "perfect" visual within Reduce Motion limits | Premium feel without screen shake or scale pops; a clean color pulse or glow | S | Two paths: full motion (scale bounce + particle shimmer) and Reduce Motion (instant color flash only) |
+| Smooth falling animation for trimmed overhang | Makes the trim feel physics-grounded rather than abrupt | S | Short fall + fade-out; skip under Reduce Motion |
+| Width recovery on perfect (generous mechanic) | Calm brand: the game should reward skill, not just punish mistakes | S | A perfect restores a defined amount of width (e.g. +8pt of the original block width, capped at original) |
+| Run summary screen (score + perfect count + best perfect streak) | A moment of reflection before restarting; feels premium vs raw score only | S | Stats surface: final score, perfects hit this run, longest perfect streak this run |
+| Stats history (high score, runs played, best perfect streak overall) | Players want to see growth over time | S | Uses existing SwiftData stats layer extended for score-based games |
+| SFX: a distinct chime or tone per block placed (not per frame) | The Ketchapp original used musical tones; calm and satisfying | S | Off by default; respects SFX toggle in Settings |
+| Gentle slow-motion landing effect on the final block (not Reduce Motion) | The game-over moment deserves a beat; not a sudden cut | S | 0.5s slow-mo effect on the last block before banner; skip under Reduce Motion |
+| Zero-ad interruptions (the entire product's differentiator) | No interstitials between runs; no rewarded video for a "continue" | S (avoidance) | Permanent brand rule |
 
-### Anti-Features (Commonly Requested, Often Problematic)
+### Anti-Features
 
-Each row is grounded in an actual competitor failure mode surfaced in App
-Store review summaries during this research. These are deliberate refusals,
-not omissions.
+Explicit refusals with rationale specific to Stack in this product context.
 
-| Feature | Why Requested | Real Competitor Failure | Why GameKit Refuses | Alternative |
-|---------|---------------|-------------------------|---------------------|-------------|
-| Banner / interstitial / video ads | "Free" monetization | Maple Media's Minesweeper Classic: ads "got longer and longer, sometimes over a minute and requiring 6 or 7 clicks to get back to the game"; users "kicked to App Store mid-game with no warning" | Annihilates the calm, premium feel — the entire reason GameKit exists | One-time unlock or theme-pack tip jar (later) |
-| Aggressive subscription prompts after every game | Recurring revenue | Same Maple Media app: post-update became "an ad for $9.99/mo subscription service even though this was already a paid app"; another: "must say no to buying ad-free version after practically every game" | Pushy UX is permanently barred (CLAUDE.md §1) | One-time price if monetized at all |
-| Coins / fake currency / power-ups | "Engagement loop" | Minesweeper: Collector ships a coin economy with power-ups; Minesweeper Classic: Retro has coins for "optional in-game board reskins" | Dilutes the logic puzzle into a pseudo-progression slot machine | Theming via DesignKit, no economy needed |
-| Energy / hearts / lives / wait-to-play | Force return visits | Common in casual puzzle clones — surveyed Minesweepers mostly don't do this, but it's a known anti-pattern in the broader puzzle category | Logic puzzles played at user pace, period | Unlimited play, always |
-| Required account / forced sign-in | Marketing list / cross-device sync | Some apps gate stats/sync behind mandatory login | Sign-in is *opt-in only*; never blocks gameplay (PERSIST-05) | Anonymous local profile from launch; promote on opt-in |
-| "Streak-or-lose-it" daily-streak shaming | Engagement metric | Duolingo-style coercion is bleeding into puzzle apps | Streaks-as-coercion = engagement bait by another name (PROJECT.md Out of Scope) | Daily seed *available*; missing a day costs nothing; show streak as a stat without a guilt UI |
-| Notifications nagging to come back | DAU goose | Cross-genre dark pattern | App posture is "play when you want." No reminder push notifications in MVP | If reminders ever ship: opt-in once during onboarding, never re-prompted |
-| Pop-up rate-this-app / share-this-app prompts | App Store ranking | Every freemium Minesweeper surveyed has these | Modal interruptions in a calm puzzle violate the product posture | Use Apple's `SKStoreReviewController` rule (system-rate-limited, only at natural pause points like a milestone best-time, never on first launch) |
-| Bigger custom boards (50×50, 100×100, etc.) | Power users | Minesweeper X: Classic Reboot offers 72×72; Minesweeper Q allows arbitrary configs | Thumb-reach + perf-cost + theming-headache for tiny niche; PROJECT.md explicitly defers custom board sizes from MVP | Defer to v1.x; if implemented, cap at a sane upper bound (e.g., 24×40) and require pinch-to-zoom |
-| Question-mark (?) marks | "Microsoft did it" | Most surveyed apps still have it on by default | Adds a third tap-cycle state most modern players don't use; clutters the cell visual under varied themes | Defer; if added later, opt-in toggle, off by default |
-| Hint button / solver button (free, unlimited) | "I'm stuck" | Mineswifter offers AI-driven hints | Tension between *premium feel* and *pure logic puzzle*; offering free unlimited hints turns the game into an autosolver demo | Defer; if shipped, gate behind no-guess mode where it's a teaching tool, not an autoplay button. Track "perfect game" stat (no-hint, no-undo) — same pattern Mineswifter uses |
-| Undo (free, unlimited) | "I misclicked" | Mineswifter offers undo with a 10-second penalty | Undo trivializes the loss state; conflicts with the dopamine of a clean win | Defer; if shipped, time-penalty model OR limit to "undo-the-last-move-if-it-was-a-loss" (post-mortem only). Not in MVP |
-| Multiplayer / leaderboards / social | "Engagement" | Several apps integrate Game Center leaderboards | Out of GameKit posture (no servers we don't own; PROJECT.md Out of Scope) | Personal stats are the social surface |
-| Achievements / badges system | Casual gamification | Microsoft Minesweeper, Minesweeper Online have these | Achievements-as-engagement-bait edge; out of MVP scope. Best times *are* the achievement | Defer past v1.x; if ever shipped, derive automatically from stats, not as a notification carousel |
-| Per-game alt-icon variants | Cool factor | Niche iOS feature | Adds a phase; PROJECT.md explicitly lists as Out of Scope | Defer |
-| Localization beyond EN | Reach | n/a | i18n-ready from day 1 (FOUND-05) but actual translations come later | Defer translations to a later milestone |
-| Question-asking / forced rating modal mid-game | App Store optimization | Universal anti-pattern | Same posture as pop-up prompts | None — never |
-| Analytics SDKs (Firebase, Adjust, etc.) | "Understand users" | Standard practice in freemium | PROJECT.md Out of Scope; CLAUDE.md "no phone home" | Local stats only; user can export if curious |
+| Feature | Why Requested | Why Refuse | Alternative |
+|---------|---------------|------------|-------------|
+| Rewarded video for "continue" after game over | "Feels fair to players who want to keep going" | It normalizes ad interruptions in what must be an ad-free product; monetizes the loss moment which is the worst possible time to interrupt | No continues. Instant restart is the loop. |
+| Lives / heart system | "Gives players more chances" | Artificial gate on play; metered access is a dark pattern by definition (PROJECT.md §1) | Unlimited runs always |
+| Coin reward per block / per perfect | "Engagement loop" | Fake currency is permanently excluded (CLAUDE.md §1); dilutes the score into a pseudo-economy | Score IS the reward |
+| Daily-streak shaming if player misses a day | "Retention metric" | Coercive engagement bait; brand posture is "play when you want" | Show streak as a neutral stat if daily seed is later added; never guilt on miss |
+| Global leaderboard (requires accounts) | "Social competition" | Requires accounts or Game Center auth; out of scope (PROJECT.md §1); social comparison pressure is not the calm brand | Personal high score is the only leaderboard needed |
+| Aggressive speed-up without plateau | "Increasing difficulty" | Endless acceleration turns a calm precision game into a reflex-twitch rage game | Speed plateau at ~80 blocks; difficulty becomes spatial, not purely reaction-speed |
+| Random difficulty spikes (sudden speed burst mid-run) | "Surprise factor" | Manufactured frustration; the player should always understand why a run ended | Smooth deterministic ramp only |
+| Push notifications to return ("Your high score is waiting!") | "Re-engagement" | Brand posture is "play when you want" | Never. No push notifications except explicit opt-in (none in v1.5) |
+| Block skin packs (paid) | "Cosmetic monetization" | In a fully-themed system the preset IS the skin; selling skins would undercut the DesignKit theming story | Theming via DesignKit presets is already the mechanic |
+| Screen shake on game over | "Impact" | Reduces accessibility (vestibular sensitivity); not calm | Color drain + freeze frame under full motion; instant cut to banner under Reduce Motion |
 
-### Stretch (Earned Later, Not v1)
+### Replay Loop and Retention (Without Dark Patterns)
 
-Features that are good ideas, fit the product posture, and *should* exist
-eventually — but are not v1 because they fail the "essential to validate the
-concept" test.
+The calm, no-dark-pattern engagement loop for Stack:
 
-| Feature | Why Stretch | Trigger to Add | Complexity |
-|---------|-------------|----------------|------------|
-| No-guess board generator | Excellent; flagged as v1.1 in PROJECT.md. Algorithmic complexity (SAT/CSP solver, retry loop, background thread) doesn't belong in MVP | After MINES-01..10 stabilize on TestFlight | HIGH |
-| Chord (double-tap to reveal neighbors) | Speedrun-tier feature; PROJECT.md defers explicitly | After basic interaction is solid | LOW–MEDIUM |
-| 3BV / 3BV/s / IOE display in stats | Power-user metric; SwiftData schema in MVP must already support adding these | v1.1 stats expansion phase | MEDIUM (engine must compute 3BV at win-time, not just count clicks) |
-| Win-rate trend chart (7/30/90-day) | Power-user retention; uses Swift Charts via DesignKit | v1.1 retention layer (PROJECT.md Phase 5) | MEDIUM |
-| Time-distribution histogram per difficulty | Power-user stat | Same trigger | MEDIUM |
-| Streak counter (current / longest, displayed neutrally) | Self-reported curiosity, not coercion | v1.1+ when daily-seed mode lands | LOW |
-| Daily seed / daily challenge (deterministic per-day board) | Best engagement mechanic that fits the product posture | v1.1+ | MEDIUM (deterministic seed; render an "already played today" state without scolding) |
-| Daily-seed result share card | Wordle-style spoiler-free emoji grid result | After daily lands and feels right | LOW–MEDIUM |
-| Custom-board-size mode | Some users want 24×30/120 mines etc. PROJECT.md defers explicitly | v1.x | MEDIUM (theming + thumb-reach considerations) |
-| Pinch-to-zoom on Hard board | Helps Hard (16×30) on smaller iPhones | Opportunistic — if review feedback flags Hard as cramped on iPhone SE/mini | LOW–MEDIUM |
-| Swipe-to-flag gesture (alt input) | Some users prefer it to long-press | After watching first-week TestFlight ergonomics | LOW |
-| Tap-mode toggle (reveal-mode vs flag-mode quick switch) | Microsoft Minesweeper-style touch alternative | Same trigger | LOW |
-| Question-mark (?) cell state | Classic-purist users will ask | Opt-in toggle, off by default | LOW |
-| Hint system (gated to no-guess mode) | Teaching aid, not autoplay | After no-guess ships and "perfect game" tracking exists | MEDIUM |
-| Undo with time penalty (gated to no-guess mode) | Same | Same | MEDIUM |
-| App Shortcuts: "Start Easy game" / "Continue last" | iOS-native power-user surface | v1.x polish | LOW |
-| Widgets (small: best times; medium: today's daily seed status) | Calm engagement surface (no nag) | After daily seed exists | MEDIUM |
-| Color-blind palette presets (Wong / IBM) | Accessibility. Cheap if number-color overrides already shipped | v1.1 | LOW |
-| iCloud sync conflict resolution UI | If two devices both make a new best time on the same difficulty offline, which wins? CloudKit handles last-write-wins, but a "merged stats" view is courteous | When a real bug report surfaces | MEDIUM |
-| Achievements (derived, not notification-spammy) | Auto-derived from stats: "first sub-1-min Easy," "100 Hard wins." No popups, no badges drawer that nags | After stats are rich | MEDIUM |
+1. **Instant restart** is the single most powerful retention mechanic. Zero friction from game over to next run.
+2. **In-run high score chip** shows the player exactly how many blocks they need to beat their record. The goal is always specific and just ahead.
+3. **Streak momentum** within a run (consecutive perfects building visible feedback) creates natural internal flow state — the player wants to maintain the streak, not the game nagging them.
+4. **Personal high score as the only external goal.** No leaderboards, no badges. The intrinsic motivation is "beat yourself."
+5. **Optional daily seed (future):** A fixed-seed run for the day where everyone who plays on the same day gets the same block sequence. No compulsion mechanic — missing a day costs nothing. This is a v2+ consideration for this game, not v1.5 scope.
+6. **Run summary micro-moment:** A 2-second summary screen (final score, perfects hit, personal best indicator) before the restart CTA. This creates a small reflection pause that paradoxically increases the desire to restart rather than closing the app.
+
+### Stats Surface
+
+Score-based games show different stats than win/loss games. The existing suite (Minesweeper, Merge, etc.) shows wins/losses/win-rate/best-time. Stack needs:
+
+| Stat | Display | Notes |
+|------|---------|-------|
+| High Score (all-time personal best) | Large, prominent | The primary KPI; always shown on the pre-run idle screen |
+| Current run score | Large, in-run only | Replaces high score display during run; or shown alongside it |
+| Runs Played (total) | Stats screen | Shows investment in the game |
+| Average Score (last N runs or all-time) | Stats screen | Gives sense of consistency vs peak |
+| Best Perfect Streak (all-time) | Stats screen | Secondary skill metric beyond raw height |
+| Last Run Score | Stats screen (or game-over banner) | Gives immediate context after each run |
+
+No win-rate column, no "wins" — this is not a win/loss game. The stats shape differs from the logic games and should not force-fit the same schema visually.
+
+### Accessibility
+
+| Concern | Requirement | Implementation |
+|---------|-------------|----------------|
+| Reduce Motion | Full motion: block slide, trim fall, perfect bounce, slow-mo game-over. Reduce Motion: slide still visible (pure position change, no spring bounce), trim disappears instantly (no fall animation), game-over is instant cut to banner — no slow-mo | Check `accessibilityReduceMotion` at render time; the engine itself is unchanged |
+| Vestibular safety | No screen shake ever (game over or any other event) | A color drain or desaturation on game over is safe; shake is not |
+| Colorblind safety | Block colors are derived from DesignKit theme tokens, which must themselves be colorblind-distinguishable | The block-color gradient relies on hue shift across layers; for monochromatic themes the gradient uses lightness variation instead of hue — both are token-driven |
+| One-handed play | Tap anywhere to drop — no specific zone required | Already achieved by the core mechanic; no additional work needed |
+| Font sizing | Score chip uses a fixed display size (it's a number counter, not body copy); Dynamic Type only applies to non-game UI (banner text, stats screen, home tile) | Standard GameKit rule |
+| VoiceOver | Not meaningfully playable with VoiceOver (the game requires real-time visual tracking); VoiceOver users should see a clear "real-time action game" description on the home tile so they can make an informed choice | Match the convention for other real-time games |
+
+---
+
+## Game 2 — Snake
+
+### Core Mechanic and Exact Rules
+
+Snake is a grid-based endless game. The player controls a snake that moves continuously through a bounded grid, eating food to grow and avoiding collisions.
+
+**Grid:** A rectangular grid of cells (e.g. 20×20 to 30×30 depending on device screen size). The snake occupies a chain of cells. Each tick the snake advances one cell in the current direction.
+
+**Direction input:** The player swipes to change the snake's current direction by 90 degrees. Swiping in the exact reverse direction (180 degrees) is ignored — the snake cannot reverse into itself. Queuing one ahead-of-tick direction change is the standard mechanic (tapping quickly during a tick still registers for the next step).
+
+**Food:** One piece of food exists on the grid at a time, placed at a random empty cell. When the snake's head enters the food cell, the snake grows by one segment (the tail does not retract on that tick), score increments, and new food spawns at a new random empty cell.
+
+**Self-collision:** If the snake's head enters a cell occupied by any body segment, the run ends immediately.
+
+**Wall collision variants:**
+- **Classic (walls kill):** Head entering any cell outside the grid boundary ends the run. This is the harder, more familiar variant.
+- **Wrap (toroidal):** Head exiting one edge appears on the opposite edge. The grid is effectively a torus. This is an easier, calmer variant — the wall can never be a surprise cause of death; only self-collision ends runs.
+
+**Recommended variant for calm brand:** Wrap (toroidal) as the default, with Classic walls as an optional mode. The wrap variant eliminates "I hit a wall I didn't see coming" frustration that contradicts the calm posture.
+
+**Score:** Number of food items eaten = number of times the snake grew. Score starts at 0. This is the cleanest and most universally understood Snake scoring model. High score = personal best food count.
+
+**Tick rate:** The snake moves once per tick. A tick interval of ~200ms (5 moves/sec) is a reasonable starting pace. Speed ramp decreases the tick interval over time.
+
+**Engine shape (per PROJECT.md brief):**
+```
+SnakeEngine.step(dir: Direction) -> Frame
+// Frame: { grid state, score, event: .none | .ate | .died }
+```
+The engine receives one direction input per step, returns the new frame. Pure, deterministic, no SwiftUI.
+
+### Scoring Model
+
+- **Score = food eaten** (integer count, starts at 0). The snake's visible length on screen is score + initial_length, which gives a natural at-a-glance sense of progress.
+- **No multipliers, no coins.** The score is the food count.
+- **Speed bonus scoring (optional variant):** Some Snake implementations add a small time bonus for eating food quickly. This can add nuance but also stress. For the calm brand, keep scoring flat: 1 food = 1 point.
+- High score = personal best food count. The high score displayed during a run gives a concrete target.
+
+### Difficulty Ramp
+
+Snake's ramp is built into the engine — no preset difficulty levels.
+
+| Phase | Score (food eaten) | Tick Interval | Feel |
+|-------|-------------------|---------------|------|
+| Opening | 0–5 | ~250ms (4 steps/sec) | Relaxed; grid feels spacious; mistakes forgiven by wrap |
+| Developing | 6–15 | ~200ms (5 steps/sec) | Snake is noticeably longer; space management starts to matter |
+| Pressure | 16–30 | ~150ms (6.7 steps/sec) | Grid getting crowded; direction changes must be planned ahead |
+| Expert | 31–50 | ~120ms (8.3 steps/sec) | Self-trap avoidance is the core skill; intentional path planning required |
+| Plateau | 50+ | ~100ms (10 steps/sec) | Speed plateaus; difficulty is now purely spatial self-trap avoidance |
+
+**The speed plateau is essential.** At 100ms per tick the game is challenging but not physically impossible for a human. Reducing tick interval below ~100ms makes the game a reflex test rather than a spatial planning game — that's the twitch boundary the calm brand must stay above.
+
+The natural difficulty ramp from self-trap avoidance (a longer snake occupies more space, limiting available paths) provides increasing challenge even after the speed plateau, keeping the game interesting indefinitely without artificial acceleration.
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Grid-based movement (discrete cells) | Snake's defining primitive; without discrete movement collision is ambiguous | M | Cell size must fit the device with at least 20×20 grid (18×18 minimum on small iPhones in landscape is acceptable) |
+| Swipe to change direction | Standard iOS touch idiom for Snake | S | 4-directional swipe; queue one input ahead per tick |
+| Food appears as a single visible cell | Universal expectation | S | Distinct color from snake body; theme-token driven |
+| Snake grows on eating food | Core rule; without it there is no end state | S | Tail stays in place for the tick food is eaten |
+| Self-collision ends the run | Core rule | S | Head enters any body segment cell = game over |
+| Score displayed during run (food count) | Players need to see current progress | S | Top of screen or overlay chip |
+| High score chip during run | Gives a target | S | Secondary to current score |
+| Game over banner with final score and restart | Standard end state | S | Reuses v1.2 banner pattern |
+| Instant restart | Zero-friction loop | S | One tap from banner |
+| Speed increases as score grows | Without it the game is trivially easy; speed provides the time pressure | S | Smooth ramp, plateau at ~50 food eaten |
+| Food spawns at a random empty (not snake-occupied) cell | Without this guarantee food can spawn inside the snake | S | Engine responsibility: filter occupied cells from candidate positions |
+| Haptics on food eaten, game over | Tactile feedback expected | S | DesignKit haptic patterns |
+| Theme-driven snake and food colors | All UI must use DesignKit tokens | M | Snake body: accent color; food: a contrasting token (e.g., theme success or a secondary accent) |
+
+### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Wrap mode as default (toroidal grid) | Eliminates wall-surprise deaths; calmer and more forgiving than classic walls for the GameDrawer brand posture | S | Wall mode available as a toggle for users who want the classic hard experience |
+| Input queue (one direction buffered per tick) | Prevents missed swipes from causing accidental self-reversal during rapid direction changes; reduces frustration | S | Standard in quality Snake implementations; often omitted in quick clones |
+| Snake body rendered with rounded cell corners | Visual polish that makes the snake feel like a continuous object vs discrete squares | S | DesignKit border radius tokens applied to each body cell, with head and tail getting unique cap shapes |
+| Color gradient along the snake body | Head is bright accent; tail fades toward a softer variant of the same hue; visually elegant and helps players track the head | M | Derived from DesignKit theme — every preset makes a different gradient |
+| Food eaten animation (brief pulse/pop) | Acknowledges the eat moment satisfyingly | S | Two paths: bounce + particle under full motion; instant color flash under Reduce Motion |
+| Grid cell count adapts to device size | A 20×20 grid on iPhone SE vs 28×28 on Pro Max; each cell is always a comfortable visual size | M | Dynamic grid sizing at run start based on available screen area |
+| Countermeasure against self-trap awareness (no hint) | The challenge is spatial; the game does not assist or warn about impending self-traps — that's the skill | S (avoidance) | No "danger" indicators or path highlights — those belong to a different game type |
+| Run summary with snake length visualization | The final snake length drawn small on the game-over banner as a visual callback | M | Nice touch; shows visual representation of the run |
+| Stats history (high score, runs, average score) | Tracks growth over sessions | S | Same SwiftData extension as Stack |
+
+### Anti-Features
+
+| Feature | Why Requested | Why Refuse | Alternative |
+|---------|---------------|------------|-------------|
+| Shields / invincibility power-ups | "Extends runs" | Power-ups are a free-to-play monetization onramp; the first shield is free, then they want to sell more | No power-ups; skill is the only path to longer runs |
+| Speed boost collectibles | "Variety" | Sudden speed changes are jarring and un-calm | Speed ramp is smooth and predictable |
+| Obstacle cells spawning mid-run | "Increasing difficulty" | Random obstacles shift the game from spatial planning to reaction avoidance; that's the twitch category | Self-collision from growth is the only obstacle |
+| Revive-for-coins on death | "Second chance" | Introduces fake currency (CLAUDE.md §1 permanent exclusion) | Instant restart; the run ends cleanly |
+| Snake "skins" as IAP | "Cosmetic monetization" | DesignKit presets ARE the skins; selling skins undercuts the theming system | 34 presets give effectively infinite snake appearances |
+| Leaderboard requiring Game Center / account | "Social" | Requires auth; out of scope (PROJECT.md §1) | Personal high score only |
+| Aggressive speed ramp beyond the calm plateau | "Gets harder" | Sub-100ms tick intervals tip Snake from spatial planning to pure reflex; that's the twitch category | Hard speed cap; space constraint provides ongoing challenge |
+| Banner ads between runs | "Monetization" | Permanently excluded (CLAUDE.md §1) | None |
+| Vibration-based haptics on every snake move tick | "Immersion" | Per-tick haptics at 5–10 steps/sec become vibration spam; distracting rather than informative | Haptics only on food eaten and game over |
+| Reverse-direction as "U-turn" power-up | "Fun mechanic" | Breaks the established mental model; players expect the reverse-block rule | Standard reverse-block maintained always |
+
+### Replay Loop and Retention (Without Dark Patterns)
+
+The calm engagement loop for Snake:
+
+1. **Instant restart** — same as Stack; the most powerful mechanic; zero friction.
+2. **In-run high score chip** — gives a specific score target. Players naturally orient toward "I need 3 more food to beat my record."
+3. **Intrinsic spatial challenge** — the longer the snake gets, the harder it becomes to navigate without the game doing anything. The difficulty curve is self-generating. This is the "one more run" engine.
+4. **Wrap mode removes cheap frustrating deaths** — removing wall deaths means the player can always blame themselves rather than the board. This is important for calm engagement; the run ending must feel earned, not arbitrary.
+5. **No friction points** — no interstitials, no confirmation dialogs, no prompts between runs. The game should feel like a loop: run → dead → banner → tap → new run.
+6. **Daily seed (future, v2+):** A fixed food-position sequence for the day. Mild engagement layer. Same no-compulsion rule: missing a day is fine.
+
+### Stats Surface
+
+| Stat | Display | Notes |
+|------|---------|-------|
+| High Score (personal best food eaten) | Large, prominent; shown on idle pre-run screen | Primary KPI |
+| Current Score (food eaten this run) | Large, in-run | Primary in-run display |
+| Runs Played | Stats screen | Investment metric |
+| Average Score (all-time or last 10) | Stats screen | Tracks improvement trend |
+| Longest Run Duration (time) | Stats screen | Optional secondary metric — some players care about session length even if score isn't high |
+| Last Run Score | Game-over banner or stats screen | Immediate post-run feedback |
+
+Like Stack, there are no wins/losses in the traditional sense. Every run ends in death — the framing is "score" not "win/loss."
+
+### Accessibility
+
+| Concern | Requirement | Implementation |
+|---------|-------------|----------------|
+| Reduce Motion | Full motion: smooth snake movement animation between cells, food eat pop, death animation. Reduce Motion: snake teleports cell-to-cell (no between-cell interpolation), food eat is instant color change, death is instant cut to banner | The engine tick governs position; only the renderer interpolates between ticks; Reduce Motion disables interpolation |
+| Vestibular safety | No screen shake at any point (death or otherwise) | Color drain on game over is safe; shake is not |
+| Colorblind safety | Snake body and food must be distinguishable by shape (snake is a chain of cells; food is a single isolated cell) as well as color | Shape difference alone makes them distinguishable even if theme colors are low-contrast; color provides redundant cue, not the only cue |
+| One-handed play | Swipe in any quadrant of the screen to change direction | Standard; already one-handed by nature |
+| Left-handed play | Swipe detection is symmetric; no directional bias in the gesture recognizer | No special work needed beyond standard swipe implementation |
+| Input sensitivity | Allow swipe threshold to be short enough for quick direction changes; too long a swipe threshold causes missed inputs at high speed | Tune swipe detection distance during implementation; flag for testing |
+| VoiceOver | Not meaningfully playable (real-time visual game); label the home tile as "Snake — real-time action game, not optimized for VoiceOver" so users can decide | Same convention as Stack |
+| Smallest device | iPhone SE 3rd gen (~375pt width); grid must not be so dense that cells are untappable; minimum cell size ~14pt recommended | Dynamic grid sizing at engine init time |
+
+---
+
+## Shared Substrate — Feature Implications
+
+Both games depend on a **shared real-time loop substrate** in `Core/`. The feature implications:
+
+| Substrate Feature | Stack Requires | Snake Requires | Notes |
+|------------------|----------------|----------------|-------|
+| Loop driver (TimelineView or CADisplayLink) | Yes — continuous block position update | Yes — tick interval clock | Both games drive off the same driver contract |
+| Fixed-timestep tick engine (`step(dt:input:)`) | Yes — block position is continuous but drop is a discrete event | Yes — movement is discrete per tick | Snake is purely discrete; Stack has a continuous position component for the sliding block |
+| Lifecycle (idle → running → game-over → restart) | Yes | Yes | Shared tap-to-start affordance and game-over banner shape |
+| High-score persistence (SwiftData extension) | Yes | Yes | New `ArcadeGameRecord` or similar; score-based not win/loss |
+| Reduce Motion path | Yes | Yes | Each game handles its own render-layer response; substrate provides the `@Environment` value |
+| Haptics contract | Yes | Yes | Existing DesignKit haptic patterns; event vocabulary is per-game |
+
+**Video Mode:** Both games are likely Video-Mode-exempt for v1.5 (stated in the v1.5 brief as a probable exemption). Real-time continuous-input games cannot pause-and-reflow for PiP the way turn-based games do. Confirm in discuss-phase; document the exemption decision in an ADR.
+
+---
 
 ## Feature Dependencies
 
 ```
-MINES-01 (difficulties) ──┐
-                          ├──> MINES-02 (tap/long-press) ──> MINES-03 (first-tap safety)
-                          │                                        └──> MINES-04 (flood-fill)
-                          │                                                      │
-                          │                                                      v
-                          │                                              MINES-07 (win/loss)
-                          │                                                      │
-                          v                                                      v
-                   MINES-05 (timer + counter) ─────────────────────────> SHELL-03 (stats)
-                                                                                 │
-                                                                                 v
-                                                                          PERSIST-01 (SwiftData)
-                                                                                 │
-                                                                       ┌─────────┼─────────┐
-                                                                       v         v         v
-                                                                PERSIST-02  PERSIST-03  PERSIST-04
-                                                                (durable)   (Export/    (CloudKit)
-                                                                            Import)         │
-                                                                                            v
-                                                                                     PERSIST-05/06
-                                                                                     (anon→signed)
+Shared Substrate (Core/LoopDriver + ArcadeLifecycle + ArcadeStatsStore)
+    ├──required by──> Stack (engine + view + viewmodel)
+    └──required by──> Snake (engine + view + viewmodel)
 
-THEME (FOUND-03, DesignKit) ──> all UI ──> THEME-01..03 (preset legibility pass)
-                                                  │
-                                                  v
-                                          custom number-color palette
-                                                  v
-                                          color-blind safe preset (stretch)
+ArcadeStatsStore (SwiftData extension)
+    ├──required by──> Stack high score persistence
+    └──required by──> Snake high score persistence
 
-A11Y-01 (Dynamic Type) ──> A11Y-02 (VoiceOver labels) ──> stretch: full VoiceOver play
-A11Y-03 (Reduce Motion) ──enhances──> MINES-08 (animations)
+Stack:
+  StackEngine.drop() ──> StackViewModel ──> StackView
+  StackView ──requires──> DesignKit token block colors
+  Haptics (on perfect, on trim, on game over) ──requires──> existing HapticService
+  Reduce Motion path ──requires──> @Environment(\.accessibilityReduceMotion)
 
-No-guess generator (stretch) ──enables──> hint system (stretch)
-                              ──enables──> undo with penalty (stretch)
-                              ──enables──> "perfect game" stat (stretch)
+Snake:
+  SnakeEngine.step() ──> SnakeViewModel ──> SnakeView
+  SnakeView ──requires──> DesignKit token snake/food colors
+  Input queue ──decorates──> SnakeViewModel (between view and engine)
+  Wrap vs Wall mode ──configures──> SnakeEngine at init
+  Grid size ──computed from──> available view geometry at init
 
-Daily seed (stretch) ──enables──> share card (stretch)
-                     ──enables──> daily-seed widget (stretch)
-                     ──enables──> streak stat (stretch)
-
-Chord (stretch) ──enables──> 3BV/s as a meaningful speed metric
-
-Reset stats (SHELL-02) ──conflicts──> CloudKit sync (PERSIST-04):
-   reset must clear local AND prompt user about cloud copy. Solve at sync feature time.
+Shared Substrate ──must ship before──> either game (build order dependency)
 ```
 
-### Dependency Notes
+---
 
-- **MINES-03 (first-tap safety) requires MINES-02:** mine placement is
-  deferred until after the first tap fires. Implementation order: gesture
-  → engine.placeMines(excluding: tappedCell + neighbors) → reveal.
-- **PERSIST-04 (CloudKit) requires PERSIST-01 (SwiftData):** SwiftData's
-  CloudKit integration is the chosen sync path. Don't ship CloudKit before
-  the local schema is stable, or you'll migrate twice.
-- **PERSIST-06 (anon → signed promotion) requires PERSIST-04 + PERSIST-01:**
-  needs the local store as the source of truth at sign-in moment, with a
-  documented "merge rules" decision (last-write-wins on per-stat-row,
-  best-time = `min(local, cloud)`, games-played = `local + cloud` if the
-  user genuinely played on both pre-link, or `max` if conservative).
-- **No-guess generator enables hint + undo:** without solvability guarantee,
-  hints/undo become "bail out of bad luck" instead of "learn from a logic
-  mistake." Don't ship hint/undo before no-guess.
-- **Daily seed enables streak / share / widget stretches:** all three depend
-  on a single deterministic-seed source.
-- **Chord makes 3BV/s honest:** without chord, 3BV/s caps at ~2 because every
-  number-around-flags requires manual neighbor reveals. Speedrunner audience
-  notices instantly.
-- **Theming pass conflicts with hand-picked greys:** every "just one shade
-  darker for unrevealed cells" is a token-system regression. THEME-02 keeps
-  this honest.
-- **Reset stats conflicts with CloudKit:** reset must be explicit about
-  scope ("Reset on this device" vs "Reset everywhere") once sync ships.
+## MVP Definition for v1.5
 
-## MVP Definition
+### Ship with Substrate + Both Games
 
-### Launch With (v1) — The Differentiator-Defining Cut
+- [ ] **SUBSTRATE-01:** Loop driver (TimelineView-based) at device refresh rate
+- [ ] **SUBSTRATE-02:** Fixed-timestep contract `step(dt:input:) -> Frame`
+- [ ] **SUBSTRATE-03:** Idle → running → game-over → restart lifecycle shell
+- [ ] **SUBSTRATE-04:** Tap-to-start affordance on idle state
+- [ ] **SUBSTRATE-05:** Game-over banner reusing v1.2 VideoModeBanner pattern
+- [ ] **SUBSTRATE-06:** SwiftData high-score persistence (score-based, not win/loss)
+- [ ] **STACK-01:** `StackEngine.drop(at:)` pure engine — placed rect, overhang rect, new width, game-over flag
+- [ ] **STACK-02:** Oscillating block visual driven by engine position
+- [ ] **STACK-03:** Overhang trim visual (falling piece)
+- [ ] **STACK-04:** Perfect drop detection + acknowledgment (color pulse)
+- [ ] **STACK-05:** Width recovery on perfect (+fixed amount, capped at original width)
+- [ ] **STACK-06:** Speed ramp (every ~15 blocks, hard cap ~80 blocks)
+- [ ] **STACK-07:** Score chip (block count) + high-score chip during run
+- [ ] **STACK-08:** Block colors derived from DesignKit theme tokens
+- [ ] **STACK-09:** Haptics (perfect, trim, game-over) via DesignKit haptic patterns
+- [ ] **STACK-10:** Reduce Motion path (no spring bounce, no falling trim animation, no slow-mo game-over)
+- [ ] **STACK-11:** Stats screen extension (high score, runs played, average score, best perfect streak)
+- [ ] **SNAKE-01:** `SnakeEngine.step(dir:)` pure engine — grid state, score, event enum
+- [ ] **SNAKE-02:** Grid rendering with rounded body cells and head/tail caps
+- [ ] **SNAKE-03:** Swipe gesture for direction change with input queue (1 ahead)
+- [ ] **SNAKE-04:** Self-collision detection + game-over event
+- [ ] **SNAKE-05:** Wrap (toroidal) mode as default; Wall mode as optional toggle
+- [ ] **SNAKE-06:** Food spawn at random empty cell
+- [ ] **SNAKE-07:** Score chip (food count) + high-score chip during run
+- [ ] **SNAKE-08:** Speed ramp (tick interval decrease from ~250ms to ~100ms floor)
+- [ ] **SNAKE-09:** Snake and food colors derived from DesignKit theme tokens
+- [ ] **SNAKE-10:** Haptics (food eaten, game-over) via DesignKit haptic patterns
+- [ ] **SNAKE-11:** Reduce Motion path (no between-cell interpolation; instant cell-to-cell movement)
+- [ ] **SNAKE-12:** Dynamic grid sizing based on available screen geometry
+- [ ] **SNAKE-13:** Stats screen extension (high score, runs played, average score)
 
-Goal: every requirement currently in PROJECT.md *Active*, nothing more,
-nothing less. Already a tight cut.
+### Deferred to Post-v1.5
 
-- [x] **MINES-01..10** — Three difficulties, tap/long-press, first-tap
-  safety, flood-fill, mine counter, timer, restart, win/loss overlays,
-  animation pass, haptics, SFX-off-by-default. *(Already in active scope.)*
-- [x] **SHELL-01..04** — Home / Settings / Stats / 3-step intro. *(Already
-  in active scope.)*
-- [x] **PERSIST-01..06** — SwiftData stats, durability, export/import, opt-in
-  CloudKit, anonymous→signed promotion. *(Already in active scope.)*
-- [x] **THEME-01..03** — Token-only styling, preset legibility pass, custom
-  overrides. *(Already in active scope.)*
-- [x] **A11Y-01..03** — Dynamic Type, VoiceOver labels, Reduce Motion.
-  *(Already in active scope.)*
-- [x] **FOUND-01..06** — Cold-start <1s, DesignKit dep, ThemeManager,
-  bundle ID, localized strings, placeholder icon. *(Already in active scope.)*
+- [ ] Daily seed for Stack or Snake — v2+; engagement layer, not MVP
+- [ ] Video Mode for either game — confirm exempt in discuss-phase; document ADR
+- [ ] Rich stat charts (trend chart for score over sessions) — v2+
+- [ ] Color gradient along snake body — nice touch, cut if time-pressed
+- [ ] Run summary snake-length visualization — nice touch, cut if time-pressed
+- [ ] Wall mode toggle for Snake (if wrap ships clean, Wall is a low-effort add in v1.5.1)
 
-**Recommendations to add to v1 active scope (genuine table-stakes gaps):**
-
-- [ ] **A11Y-04 (new)**: Number-color palette is verified
-  color-blind-readable on at least one Loud preset. *Trivial work; large
-  inclusion win; aligns with THEME-01.* Complexity: LOW.
-- [ ] **MINES-11 (new)**: On loss, animate revealing all mines and visibly
-  mark incorrect flags (red X) — the dominant convention; without it the
-  loss feels confusing. *Already implied by MINES-08 but worth explicit
-  acceptance criterion.* Complexity: LOW.
-
-### Add After Validation (v1.1) — The Power-User Cut
-
-Trigger: MVP is on TestFlight, stable, and at least one external person has
-played it daily for a week.
-
-- [ ] **No-guess board generator** — biggest single quality-of-play upgrade,
-  but high algorithmic risk. Defer until MVP UX is validated.
-- [ ] **Chord (double-tap a satisfied number)** — speedrunner-grade input.
-- [ ] **Question-mark cell state (opt-in toggle)** — for classic purists.
-- [ ] **Rich stats screen** — 3BV / 3BV/s / win-rate trend chart / time
-  distribution / recent history. SwiftData schema sized for this in MVP, so
-  no migration.
-- [ ] **Color-blind preset(s)** — surface as one or two named palettes
-  derived from the Wong (Nature Methods) palette: blue/orange/yellow/dark.
-
-### Future Consideration (v2+) — Earned by Real Demand
-
-Trigger: a real user (not the maintainer) asks for it more than once.
-
-- [ ] **Daily seed / daily challenge** — engagement layer. Works only if the
-  product is loved enough that *some* engagement layer is welcomed.
-- [ ] **Streak counter (neutral display)** — only after daily seed exists.
-- [ ] **Share-card export of daily result** — Wordle-style.
-- [ ] **Daily-seed widget** — calm engagement surface.
-- [ ] **App Shortcuts** — "Start Easy game", "Continue last game".
-- [ ] **Custom board size mode** — explicitly deferred in PROJECT.md.
-- [ ] **Pinch-to-zoom on Hard** — only if iPhone SE/mini reviews flag Hard
-  as cramped.
-- [ ] **Hint system gated to no-guess mode** — teaching tool, with "perfect
-  game" stat to keep purists honest.
-- [ ] **Undo (time-penalty model)** — same gating as hints.
-- [ ] **Achievements derived from stats (no popups)** — only if stats screen
-  proves engaging.
-- [ ] **Localizations beyond EN** — strings are already i18n-ready; this is
-  a translation-budget call, not an engineering call.
+---
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| First-tap safety (MINES-03) | HIGH | LOW | P1 |
-| Flood-fill (MINES-04) | HIGH | LOW | P1 |
-| Three difficulties (MINES-01) | HIGH | LOW | P1 |
-| Best time per difficulty (SHELL-03) | HIGH | LOW | P1 |
-| Stats persistence (PERSIST-02) | HIGH | LOW | P1 |
-| Win/loss overlay + reveal-on-loss (MINES-07/11) | HIGH | LOW | P1 |
-| DesignKit theming legibility (THEME-01..03) | HIGH | MEDIUM | P1 |
-| Animation pass (MINES-08) | HIGH | MEDIUM | P1 |
-| Haptics (MINES-09) | MEDIUM | LOW | P1 |
-| SFX off-by-default (MINES-10) | MEDIUM | LOW | P1 |
-| 3-step intro (SHELL-04) | MEDIUM | LOW | P1 |
-| Optional Sign-in + CloudKit (PERSIST-04..06) | MEDIUM | MEDIUM | P1 |
-| Export/Import JSON (PERSIST-03) | MEDIUM | LOW | P1 |
-| VoiceOver labels (A11Y-02) | HIGH (for affected users) | LOW | P1 |
-| Dynamic Type (A11Y-01) | MEDIUM | LOW | P1 |
-| Reduce Motion (A11Y-03) | MEDIUM | LOW | P1 |
-| Color-blind-safe number palette default-check | MEDIUM | LOW | P1 |
-| No-guess board generator | HIGH | HIGH | P2 |
-| Chord (double-tap) | MEDIUM | LOW–MEDIUM | P2 |
-| Rich stats screen (3BV/s, charts, history) | MEDIUM | MEDIUM | P2 |
-| Color-blind preset (named) | MEDIUM | LOW | P2 |
-| Question-mark state | LOW | LOW | P2 |
-| Daily seed | MEDIUM | MEDIUM | P3 |
-| Share card | LOW | LOW | P3 |
-| Widgets | LOW | MEDIUM | P3 |
-| Custom board size | LOW | MEDIUM | P3 |
-| Hint system (gated) | LOW | MEDIUM | P3 |
-| Undo (penalty model) | LOW | MEDIUM | P3 |
-| Achievements (derived) | LOW | MEDIUM | P3 |
-| Pinch-to-zoom | LOW | LOW–MEDIUM | P3 |
-| Banner/interstitial/video ads | NEGATIVE | n/a | NEVER |
-| Aggressive sub paywall | NEGATIVE | n/a | NEVER |
-| Coins / energy / hearts | NEGATIVE | n/a | NEVER |
-| Required accounts | NEGATIVE | n/a | NEVER |
-| Streak shaming | NEGATIVE | n/a | NEVER |
-| Push notifications nagging return | NEGATIVE | n/a | NEVER |
-| Telemetry / analytics SDKs | NEGATIVE | n/a | NEVER |
+| Shared substrate (loop driver + lifecycle) | HIGH | MEDIUM | P1 (foundation; nothing ships without it) |
+| ArcadeStatsStore (SwiftData extension) | HIGH | LOW | P1 |
+| StackEngine (pure, deterministic) | HIGH | MEDIUM | P1 |
+| SnakeEngine (pure, deterministic) | HIGH | MEDIUM | P1 |
+| Stack: overhang trim + width shrink | HIGH | LOW | P1 |
+| Stack: perfect detection + width recovery | HIGH | LOW | P1 |
+| Stack: speed ramp + plateau | HIGH | LOW | P1 |
+| Snake: wrap mode (toroidal) | HIGH | LOW | P1 |
+| Snake: input queue | HIGH | LOW | P1 |
+| Snake: speed ramp + plateau | HIGH | LOW | P1 |
+| Snake: dynamic grid sizing | HIGH | MEDIUM | P1 |
+| Reduce Motion path (both games) | HIGH (for affected users) | LOW | P1 |
+| DesignKit theme token block/snake colors | HIGH (brand requirement) | MEDIUM | P1 |
+| Haptics (both games) | MEDIUM | LOW | P1 |
+| Stats screen extension (both games) | MEDIUM | LOW | P1 |
+| Stack color gradient per layer | MEDIUM | LOW | P2 |
+| Snake body gradient head-to-tail | MEDIUM | MEDIUM | P2 |
+| Snake wall mode toggle | LOW | LOW | P2 |
+| Daily seed (either game) | LOW (v1.5 audience too small) | MEDIUM | P3 |
+| Score trend charts | LOW | MEDIUM | P3 |
+| Video Mode adoption (either game) | LOW (likely exempt) | HIGH | P3 or NEVER |
+| Ads / coins / revives / IAP skins | NEGATIVE | n/a | NEVER |
+| Global leaderboards | LOW (requires auth) | MEDIUM | NEVER (v1.5) |
+| Power-ups or shields | NEGATIVE | MEDIUM | NEVER |
+| Screen shake (any event) | NEGATIVE (accessibility) | n/a | NEVER |
+| Push notifications to re-engage | NEGATIVE | LOW | NEVER |
 
-**Priority key:**
-- **P1**: Must have for v1 ship. (Almost entirely already in PROJECT.md Active.)
-- **P2**: v1.1 — power-user cut, after MVP stabilizes on TestFlight.
-- **P3**: v2+ — earned by real user demand.
-- **NEVER**: Refused on principle; documented in PROJECT.md Out of Scope.
-
-## Competitor Feature Analysis
-
-| Feature | Minesweeper Q ($2 paid) | Minesweeper GO (freemium) | Minesweeper Classic: Retro (freemium) | Mineswifter (no-guess) | Accessible Minesweeper | GameKit (planned v1) |
-|---------|-------------------------|---------------------------|---------------------------------------|------------------------|------------------------|---------------------|
-| Three classic difficulties | Yes | Yes | Yes | Yes | Yes | Yes (MINES-01) |
-| Custom board size | Yes (arbitrary) | No | Yes | No | No | Deferred to v1.x |
-| First-tap safety | Yes | Yes | Yes | Yes | Yes | Yes (MINES-03) |
-| No-guess generator | No | Campaign mode (1000+ levels) | Yes (in some modes) | Yes (core feature) | No | v1.1 stretch |
-| Long-press to flag | Yes | Yes | Yes | Yes | Yes (VO-adapted) | Yes (MINES-02) |
-| Chord (double-tap) | Yes | Yes | Yes | Yes | n/a | v1.1 stretch |
-| Swipe-to-flag | No | No | No | No | n/a | v1.x stretch |
-| Hint system | Configurable | No | No | Yes (AI) | No | v2+ (gated to no-guess) |
-| Undo | No | No | No | Yes (10s penalty) | No | v2+ (gated to no-guess) |
-| Question-mark state | Optional | Optional | Optional | No | No | v1.x opt-in |
-| Stats per difficulty | Yes (rich) | Yes | Yes | Yes (incl "perfect game") | Yes | Yes (SHELL-03) |
-| 3BV / 3BV/s | Yes | No | No | Yes | No | v1.1 stretch |
-| Win-rate / streak / history charts | Limited | Limited | Limited | Limited | No | v1.1 stretch |
-| Themes / skins | A few | A few (some paid) | Multiple skin packs (paid) | "Modern beautiful UI" customizable | Audio-first, minimal visual | 34 presets + custom (DesignKit) |
-| Custom number-color palette | No | No | No | No | n/a | v1 (LOW lift) |
-| Color-blind-safe palette preset | No | No | No | No | n/a | v1.1 |
-| Daily challenge / daily seed | No | Yes (campaign-style) | No | No | No | v2+ |
-| iCloud sync | No | Yes (Apple Sign In) | Yes (themes + stats) | No | No | Yes, opt-in (PERSIST-04) |
-| Export/Import JSON | No | No | No | No | No | Yes (PERSIST-03) |
-| VoiceOver-playable | Limited | Limited | Limited | Limited | Yes (only fully accessible app surveyed) | Aim for yes (A11Y-02 + stretch) |
-| Dynamic Type | Limited | Limited | Limited | Limited | n/a | Yes (A11Y-01) |
-| Reduce Motion respect | Unknown | Unknown | Unknown | Unknown | n/a | Yes (A11Y-03) |
-| Ads | None (paid) | Yes (removable for ~$2) | Yes (heavy, monetization changed under users) | None (paid) | None | None, ever |
-| Subscriptions | None | None reported | $9.99/mo prompt added post-launch (1-star reviews) | None | None | None, ever |
-| Coins / power-ups / energy | None | None | Yes (skin economy) | None | None | None, ever |
-| Required account | None | Optional Apple Sign In | Optional | None | None | Optional Sign in with Apple |
-| Telemetry / analytics | Likely | Likely | Likely | Unknown | Unknown | None, ever |
-
-## Open Questions for Roadmap / Phase Research
-
-These are gaps where research couldn't deliver a definitive answer; flag for
-phase-specific research later.
-
-- **No-guess generator perf budget on iOS hardware.** SAT/CSP solvers can
-  take 0–20s per board. iPhone 12-class device behavior unknown without
-  prototyping. Phase that ships no-guess needs a perf spike first.
-- **CloudKit sync conflict UX.** Two devices both setting a new best time
-  for Hard while offline — last-write-wins is wrong here (`min(time)` is the
-  right merge). Needs schema decision *before* PERSIST-04 ships.
-- **Daily-seed time zone & wraparound rules.** Midnight UTC vs midnight
-  local? Affects whether two players "have the same daily." Needs a
-  decision when daily ships.
-- **VoiceOver chord/long-press equivalents.** Long-press has a default
-  VoiceOver gesture (double-tap-and-hold) but it conflicts with chord's
-  double-tap. Need explicit gesture remap when both ship; investigate
-  `.accessibilityActions` SwiftUI API.
-- **Theming the loss state.** Themes that use `theme.colors.danger` close
-  to a number-color (e.g., red 3) make exploded-mine visually noisy. The
-  pass under THEME-01 must explicitly check the *loss* state on Voltage,
-  Dracula, and any high-saturation Loud preset, not just the play state.
-- **First-tap-safe rule edge case on Hard.** 16×30 with 99 mines means the
-  3×3 first-tap-safe region is ~2% of the board; mine placement still
-  fits but generator must guard against the impossible (e.g., a tiny
-  custom board where exclusion = entire board). Defensive check needed,
-  even pre-custom-board feature.
+---
 
 ## Sources
 
-- [Minesweeper Q on App Store](https://apps.apple.com/us/app/minesweeper-q/id421576027)
-- [Minesweeper GO on App Store](https://apps.apple.com/us/app/minesweeper-go-classic-game/id1451053153)
-- [Minesweeper Classic: Retro on App Store](https://apps.apple.com/us/app/minesweeper-classic-retro/id1287818410)
-- [Minesweeper Classic on App Store](https://apps.apple.com/us/app/minesweeper-classic/id306937053)
-- [Mineswifter on App Store](https://apps.apple.com/us/app/mineswifter-minesweeper/id1521190195)
-- [Minesweeper: No Guessing on App Store](https://apps.apple.com/us/app/minesweeper-no-guessing/id6757227897)
-- [Minesweep+ on App Store](https://apps.apple.com/kw/app/minesweep/id6756476910)
-- [Minesweeper: Collector on App Store](https://apps.apple.com/us/app/minesweeper-collector/id1068208194)
-- [Mine Mine on App Store](https://apps.apple.com/us/app/mine-mine-simple-minesweeper/id6741587531)
-- [Accessible Minesweeper on App Store](https://apps.apple.com/us/app/accessible-minesweeper/id405094331)
-- [Accessible Minesweeper on AppleVis](https://www.applevis.com/apps/ios/games/accessible-minesweeper)
-- [Minesweeper Q Premium review (game-solver.com)](https://game-solver.com/minesweeper-q-premium/)
-- [No-Guess generator algorithm overview (minesweeper.house)](https://www.minesweeper.house/docs/gamemodes/no-guess)
-- [SAT-solver no-guess Minesweeper (GitHub: jwang541)](https://github.com/jwang541/Minesweeper-Solver-SAT)
-- [JSMinesweeper solver/analyzer (GitHub: DavidNHill)](https://github.com/DavidNHill/JSMinesweeper)
-- [3BV explainer (Minesweeper Wiki)](https://minesweeper.fandom.com/wiki/3bv)
-- [3BV/s explainer (Minesweeper Wiki)](https://minesweeper.fandom.com/wiki/3bv/s)
-- [Minesweeper Statistics conventions (minesweepergame.com)](https://minesweepergame.com/statistics.php)
-- [Win-streak coefficient (minesweeper.online)](https://minesweeper.online/help/c-ws)
-- [Chording mechanic explainer (Minesweeper Wiki)](https://minesweeper.fandom.com/wiki/Chording)
-- [Onboarding HIG (Apple Developer)](https://developer.apple.com/design/human-interface-guidelines/onboarding)
-- [Wong color-blind-safe palette principles (David Mathlogic)](https://davidmathlogic.com/colorblind/)
-- [Color-blind-safe schemes (NCEAS)](https://www.nceas.ucsb.edu/sites/default/files/2022-06/Colorblind%20Safe%20Color%20Schemes.pdf)
-- [iCloud sync caveats for game data (tabletish.com)](https://tabletish.com/sync-game-data-android-ios/)
-- [Banned dark patterns vs permitted tricks (Adapty)](https://adapty.io/blog/dark-patterns-and-tricks-in-mobile-apps/)
+- [Stack by Ketchapp on App Store](https://apps.apple.com/us/app/stack/id1080487957)
+- [Stack Tips and Tricks — iMore](https://www.imore.com/stack-tips-and-tricks)
+- [Stack Ketchapp Tips & Cheats — Level Winner](https://www.levelwinner.com/stack-ketchapp-tips-tricks-cheats-to-get-a-high-score/)
+- [Stack Block Blast mechanics overview — Firefly Tech](https://thefireflytech.com/blogs/stack-block-blast-stacking-one-tap-mobile-game)
+- [Stack Game — Coolmath Games (5-consecutive-perfects mechanic)](https://www.coolmathgames.com/0-stack-game)
+- [Snake Game Mechanics Tutorial — MonoGame Docs](https://docs.monogame.net/articles/tutorials/building_2d_games/22_snake_game_mechanics/index.html)
+- [How to Play Snake — Coolmath Games](https://www.coolmathgames.com/blog/how-to-play-snake-mastering-a-classic)
+- [Psychology of Snake engagement loop — The Original Snake](https://theoriginalsnake.com/blog/psychology-of-snake)
+- [Google Snake rules — kickthebuddy.app](https://kickthebuddy.app/blog/Snake-Game-Google)
+- [Colorblind game design — Filament Games](https://www.filamentgames.com/blog/color-blindness-accessibility-in-video-games)
+- [Colorblind friendly game design — Chris Fairfield](https://chrisfairfield.com/unlocking-colorblind-friendly-game-design/)
+- [iOS Reduce Motion — Apple Support](https://support.apple.com/guide/iphone/reduce-onscreen-motion-iph0b691d3ed/ios)
+- [Reducing Motion in SwiftUI — Use Your Loaf](https://useyourloaf.com/blog/reducing-motion-of-animations/)
+- GameKit PROJECT.md (v1.5 Endless Arcade Primitive milestone scope)
+- GameKit v1.5-BRIEF.md (brand guard, substrate spec, open decisions)
+- GameKit CLAUDE.md §1 (no ads, no coins, no energy, no aggressive subscriptions — permanent exclusions)
 
 ---
-*Feature research for: iOS Minesweeper, GameKit MVP*
-*Researched: 2026-04-24*
+
+*Feature research for: v1.5 Endless Arcade Primitive — Stack + Snake*
+*Researched: 2026-06-25*
