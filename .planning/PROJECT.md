@@ -1,21 +1,23 @@
 # GameKit
 
-## Current Milestone: v1.2 Video Mode
+## Current Milestone: v1.5 Endless Arcade Primitive
 
-**Goal:** Optional mode that keeps GameDrawer playable while a PiP video floats on screen — user picks the video location, app reflows controls and (when needed) the board to stay out of the way.
+**Goal:** Expand the suite into a new category — real-time endless arcade — by building one reusable game-loop substrate and shipping two *calm* endless games on it.
 
 **Target features:**
-- Settings: Video Mode Off/On + 6-location picker (Large top/bottom, Small TL/TR/BL/BR)
-- Adaptive layout system — small PiP = control-aware, large PiP = board-aware
-- Shared compact control row: Back | primary info | picker | secondary info | settings
-- Per-game adoption: Minesweeper (incl. hard 16×30 prototype), Merge, Nonogram
-- Win/loss banner replacement so end-of-game doesn't cover the board
+- Shared real-time loop substrate (`Core/`): `TimelineView`/`CADisplayLink` driver feeding a pure, deterministic `step(dt:input:)` tick-engine contract; idle→running→game-over→restart lifecycle; tap-to-start affordance + game-over banner.
+- High-score persistence extending the existing SwiftData stats layer (`GameRecord` / `BestTime`) — score-based, not win/loss.
+- **Stack** — flagship calm endless (tap-to-drop block tower, overhang shaving, speed ramp).
+- **Snake** — classic calm endless (grid-based, swipe/tap-to-turn, growth + self-collision).
+- Reduce Motion path for both (motion-heavy games).
 
-**Out of scope for v1.2:**
-- Auto-detect of another app's PiP frame (no public iOS API) — deferred
-- Sudoku adoption — game not built yet
-- Vertical/portrait PiP — v1.3+
-- Other v1.2 plans from `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` outside Video Mode itself
+**Out of scope for v1.5:**
+- Twitch/reflex arcade (renamed Flappy-style, rhythm-tap, falling-blocks) — parked in `.planning/UPCOMING-GAMES.md` for a later, mood-gated milestone.
+- Video Mode adoption for these games — real-time continuous input can't pause-and-reflow for PiP; likely exempt (confirm in discuss-phase).
+- Chess puzzles (own milestone — needs move engine + puzzle DB).
+- Word / Solitaire / Sudoku depth expansion (later "go deep" milestone).
+
+> Shipped prior to v1.5: Minesweeper (v1.0), Merge + Nonogram (v1.1), FreeCell Solitaire + Sudoku (v1.3), Five Letter + Word Grid (v1.4). The "What This Is" / MVP framing below predates the multi-game suite and is refreshed at the next full milestone-complete review.
 
 ## What This Is
 
@@ -199,4 +201,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-12 — v1.2 Video Mode milestone opened*
+*Last updated: 2026-06-25 — v1.5 Endless Arcade Primitive milestone opened*

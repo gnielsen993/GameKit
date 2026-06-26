@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: milestone
-status: shipped
-stopped_at: v1.4 release wrap-up complete (2026-06-22)
-last_updated: "2026-06-22T00:00:00.000Z"
-last_activity: 2026-06-22
+milestone: v1.5
+milestone_name: Endless Arcade Primitive
+status: planning
+last_updated: "2026-06-26T01:24:15.866Z"
+last_activity: 2026-06-26
 progress:
-  total_phases: 15
-  completed_phases: 13
-  total_plans: 91
-  completed_plans: 84
-  percent: 87
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,21 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 ## Current Position
 
-Milestone: v1.4 — Word Games release
-Status: shipped 2026-06-22. Five Letter and Word Grid are playable, included on Home, supported by Video Mode, resume state, stats, and production-sized bundled word lists.
-Last activity: 2026-06-22
-
-Progress: [██████████] 100% (v1.4 shipped)
-
-**Phase 13 — what shipped:** Shared `VideoModeBanner` primitive (Core/) consumed by Mines + Merge + Nonogram. Banner is a centered card with 2-1 button layout (primary CTA + change-X on top row, "View board" dismiss below). Ships on BOTH Video Mode On AND Off (user override during execution — deprecates the v1.x full-screen EndStateCard from the render path). Haptics / SFX / animation gating routes through existing SettingsStore toggles + accessibilityReduceMotion per v1.0 05-03 + 05-06 locks.
-
-**Design deviations from 08-BANNER-PLACEMENT.md (recorded in `Docs/releases/v1.2.md`):**
-
-- Original "edge-docked pill opposite PiP corner" overridden → centered card
-- Single-action D-02 lock relaxed → 2-1 button layout (Restart + Change-X + View board)
-- Off-path byte-identity D-13-OFFPATH relaxed → banner unified across all modes
-
-**Next action:** v1.2 ship workflow (`/gsd-complete-milestone v1.2` if needed) — TestFlight upload, MARKETING_VERSION bump from 1.1 → 1.2, App Store metadata.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-26 — Milestone v1.5 started
 
 ## v1.0 Carry-Over
 
