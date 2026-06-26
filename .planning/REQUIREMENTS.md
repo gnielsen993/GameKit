@@ -148,6 +148,53 @@ Requirements for initial TestFlight → App Store release. MVP scope: **Mineswee
 | Large left / large right PiP | Current observed PiP positions are top and bottom only |
 | Pinch-to-zoom hard board (if not chosen for VIDEO-08) | Stays a v1.3+ candidate if scroll or smaller cells win |
 
+## v1.5 Requirements — Endless Arcade Primitive
+
+Expand the suite into real-time endless arcade with one reusable game-loop
+substrate and two calm games (Stack, Snake) on top of it. Calm-only mood;
+zero monetization. Each requirement maps to a roadmap phase.
+
+### Arcade Substrate (shared)
+
+- [ ] **ARCADE-01**: Shared real-time loop substrate lives in `Core/`, driven by `TimelineView(.animation(paused:))` — declarative pause, ProMotion 60/120Hz adaptive, no CADisplayLink
+- [ ] **ARCADE-02**: A fixed-timestep accumulator with a max-dt clamp (`min(realDt, 0.1)`) feeds pure Foundation-only engine structs via a `mutating func step(dt:input:) -> Frame` contract; engines are deterministic with seeded RNG and unit-tested like the existing logic engines
+- [ ] **ARCADE-03**: Run lifecycle is idle → running → paused → game-over → restart, with a tap-to-start affordance and a game-over banner (reuses/extends the `VideoModeBanner` pattern with a final-score subtitle variant)
+- [ ] **ARCADE-04**: Loop pauses on `scenePhase` `.background`/`.inactive` and on game-over (zero CPU when paused) and resumes with no time drift and no spiral-of-death
+- [ ] **ARCADE-05**: High score and run counts persist via the existing `BestScore` / `GameRecord` SwiftData schema (additive `GameKind` cases + `"endless"` mode key, CloudKit-safe); the save fires on game-over (not per-frame) and survives force-quit
+- [ ] **ARCADE-06**: All arcade haptics, SFX, and animations route through `SettingsStore` toggles and respect `accessibilityReduceMotion` (counter-trigger pattern)
+- [ ] **ARCADE-07**: Stats screen presents a score-based shape for endless games (high score, runs played, average/total) distinct from win/loss columns, with an explicit empty state
+- [ ] **ARCADE-08**: Stack and Snake are exempt from Video Mode (no `.videoModeAware()`); the exemption is recorded in an ADR
+- [ ] **ARCADE-09**: Stack and Snake appear as enabled game cards on Home and launch into their game screens (new accent slots added per existing `GameDescriptor` pattern)
+
+### Stack
+
+- [ ] **STACK-01**: User can play Stack — tap to drop an oscillating block onto the tower; overhang beyond the block below is trimmed and the block narrows
+- [ ] **STACK-02**: Block speed ramps with height then plateaus at a calm cap (no twitch escalation); the run ends when a drop completely misses (width reaches zero)
+- [ ] **STACK-03**: Near-perfect drops restore some block width and build a combo (the recovery mechanic that makes long runs feel earned)
+- [ ] **STACK-04**: Score is blocks placed (height); high score is persisted and best perfect-streak is tracked as a secondary stat
+- [ ] **STACK-05**: Stack renders via `Canvas` using DesignKit tokens only — legible under Classic plus one Loud/Moody preset (§8.12 audit)
+- [ ] **STACK-06**: Reduce Motion path — the block drop is jump-cut (no slide/bounce) while gameplay is unchanged
+
+### Snake
+
+- [ ] **SNAKE-01**: User can play Snake on a grid — swipe or tap-to-turn changes direction; eating food grows the snake
+- [ ] **SNAKE-02**: Default mode is wrap (toroidal, calm); a wall-death mode is selectable via toggle
+- [ ] **SNAKE-03**: An on-screen directional D-pad is available alongside swipe (accessibility / one-handed); both feed a direction queue so rapid turns are not dropped
+- [ ] **SNAKE-04**: Speed ramps with length then plateaus; colliding with self (and walls, in wall mode) ends the run
+- [ ] **SNAKE-05**: Score is food eaten (length − start length); high score is persisted
+- [ ] **SNAKE-06**: Snake renders with DesignKit tokens only — legible under Classic plus one Loud/Moody preset (§8.12 audit)
+- [ ] **SNAKE-07**: Reduce Motion path — movement is jump-cut between cells (no interpolation) while gameplay is unchanged
+
+### Out of Scope for v1.5
+
+| Feature | Reason |
+|---------|--------|
+| Daily seed challenge | Deferred — calm retention idea worth doing later; keeps v1.5 focused on the substrate + two games |
+| Twitch/reflex arcade (renamed Flappy, rhythm-tap, falling-blocks) | Mood-gated for a later milestone; v1.5 is calm-only. Parked in `.planning/UPCOMING-GAMES.md` |
+| Video Mode adoption for arcade games | Real-time continuous input cannot pause-and-reflow for a PiP overlay (ARCADE-08) |
+| Online leaderboards / accounts / any monetization | Violates the no-ads/no-coins/no-accounts core value — permanent exclusion |
+| Chess puzzles; Word/Solitaire/Sudoku depth | Separate future milestones |
+
 ## v2 Requirements
 
 Deferred to a post-MVP milestone. Tracked but not in the current roadmap.
