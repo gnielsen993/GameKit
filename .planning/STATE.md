@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Endless Arcade Primitive
 status: planning
-last_updated: "2026-06-26T01:24:15.866Z"
-last_activity: 2026-06-26
+last_updated: "2026-06-25T00:00:00.000Z"
+last_activity: 2026-06-25
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** v1.4 Word Games release shipped. Next game milestone is not opened yet; Flow, Pattern Memory, and Chess puzzles remain roadmap candidates.
+**Current focus:** v1.5 Endless Arcade Primitive — Phases 15–18. Substrate + Skeleton (Phase 15) first; Stack (Phase 16); Snake (Phase 17); Stats/ADR (Phase 18).
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 15 (Arcade Substrate + Skeleton) — not yet started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-26 — Milestone v1.5 started
+Status: Roadmap created; ready for /gsd:plan-phase 15
+Last activity: 2026-06-25 — v1.5 roadmap written (4 phases, 22 requirements mapped)
 
 ## v1.0 Carry-Over
 
@@ -317,7 +317,8 @@ Recent decisions affecting current work:
 - 06.1-02: CellView + BoardView UNTOUCHED — git diff HEAD~3..HEAD on both files returns 0 lines. LongPressGesture(minimumDuration: 0.25) + .exclusively(before: TapGesture()) + cell-level .sensoryFeedback(.selection / .impact(.light)) all byte-identical preservation. Mode-routing logic lives ENTIRELY in vm.handleTap / vm.handleLongPress (CLAUDE.md §1 lightweight MVVM, ARCHITECTURE Anti-Pattern 1). View tier passes vm.handleTap/handleLongPress closures down via GameView -> BoardView -> CellView with no internal mode awareness
 - 06.1-02: Four-commit shape (test/feat/feat/docs) — aa81374 RED gate -> 9d824c8 VM GREEN -> 6b166f0 GameView FAB -> 7276556 docs+xcstrings. Same precedent as 06.1-03 four-commit shape. Plan §Success Criteria suggested single atomic commit; the body §Task 1 explicitly required RED -> GREEN gate making the four-commit shape the only correct interpretation. Each commit independently bisectable
 - 06.1-02: Phase 6.1 final REQUIREMENTS.md state — Coverage 38/38 (final target REACHED). Wave 1 (06.1-03) shipped A11Y-05 (graduated A11Y-V2-02 -> v1); Wave 2 plans (06.1-01 SHELL-05, 06.1-02 MINES-12) added two new v1 IDs. Each plan's xcstrings + REQ edits disjoint by section (Accessibility / App Shell / Minesweeper); JSON merge clean across all three
-- **2026-05-12 (v1.2 roadmap):** Milestone v1.2 (Video Mode) phases 8–13 appended to ROADMAP.md and REQUIREMENTS.md v1.2 traceability populated 14/14. Phase 8 is a design phase (no app code) per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required" — produces screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row design tokens + win/loss banner sketch consumed by Phases 9–13. Phase numbering continues from v1.0's last integer phase (7); no renumbering of existing phases. Next: `/gsd-plan-phase 8`.
+- **2026-05-12 (v1.2 roadmap):** Milestone v1.2 (Video Mode) phases 8–13 appended to ROADMAP.md and REQUIREMENTS.md v1.2 traceability populated 14/14.
+- **2026-06-25 (v1.5 roadmap):** Milestone v1.5 (Endless Arcade Primitive) phases 15–18 appended to ROADMAP.md and REQUIREMENTS.md v1.5 traceability populated 22/22. Phase 15 = Arcade Substrate + Skeleton (ARCADE-01..06, ARCADE-09); Phase 16 = Stack (STACK-01..06); Phase 17 = Snake (SNAKE-01..07); Phase 18 = Stats/ADR (ARCADE-07..08). Architecture locked by research: TimelineView(.animation(paused:)) loop driver, fixed-timestep accumulator with min(realDt, 0.1) clamp, pure Foundation-only engine contract, reuse existing BestScore/GameRecord schema. All 4 phases proceed directly to planning (no research phase needed — all patterns codebase-verified). Next: /gsd:plan-phase 15. Phase 8 is a design phase (no app code) per `Docs/GameDrawer-v1.2-Video-Mode-Plan.md` §"Design phase required" — produces screenshot-annotated layout doc + Hard-Mines strategy ADR + compact-row design tokens + win/loss banner sketch consumed by Phases 9–13. Phase numbering continues from v1.0's last integer phase (7); no renumbering of existing phases. Next: `/gsd-plan-phase 8`.
 - 08-02: Compact control row tokens locked — picker pill = theme.radii.button (D-05), height = theme.spacing.xl (D-06), gap = theme.spacing.s (D-07); per-game slot mapping for Mines/Merge/Nonogram verbatim from D-08; Sudoku Out of Scope (no game yet); no new radii.pill anchor (CLAUDE.md §2 promotion rule, 1 consumer)
 - 08-02: Design spec docs are token-name-only — 08-COMPACT-ROW-TOKENS.md contains zero pt/px values, grep-gated in acceptance criteria; HTML sketch uses CSS variables (--radii-button, --spacing-xl, etc) that mirror DesignKit token names 1:1 with a legend mapping back
 - 08-03: Banner placement design lock — opposite-of-PiP anchor rule (D-09) as 6-row table; pill shape with radii.button + spacing.m margins (D-10); explicit DKButton inside banner, never tap-anywhere-to-trigger (D-11, VIDEO-11 SC2); Reduce-Motion dampens to identity per v1.0 05-06 D-04 (D-12); banner haptics/SFX guarded by hapticsEnabled/sfxEnabled FIRST inside firing surfaces (v1.0 05-03 D-10 contract). Spec doc + HTML sketch only, zero gamekit/ touches (Phase 8 SC5 holds).
@@ -375,7 +376,8 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- **v1.2 work queued:** Phases 8 (Design) and 9 (Foundation) are **complete** as of 2026-05-12. Next: `/gsd-plan-phase 10` (Layout Primitives — research-flagged: SwiftUI adoption-surface choice between `@Environment` injection / `VideoModeContainer { ... }` / `.videoModeAware()` modifier). Then Phase 11 (Minesweeper adoption — smaller-cells per 08-HARD-MINES-ADR), Phase 12 (Merge + Nonogram adoption), Phase 13 (Win/loss banner + a11y gating + final 1.1→1.2 MARKETING_VERSION bump). See `.planning/ROADMAP.md` §Milestone v1.2 for full phase details.
+- **v1.5 work queued:** Roadmap written 2026-06-25. 4 phases (15–18), 22 requirements. Phase 15 = Arcade Substrate + Skeleton. All phases proceed directly to planning. Next: `/gsd:plan-phase 15` (Arcade Substrate + Skeleton — ARCADE-01..06, ARCADE-09). See `.planning/ROADMAP.md` §Milestone v1.5 for full phase details.
+- **v1.2 work queued:** Phases 8 (Design) and 9 (Foundation) are **complete** as of 2026-05-12. v1.2 shipped 2026-05-14. See `.planning/ROADMAP.md` §Milestone v1.2 for archived details.
 - **P7 work queued (v1.0 carry-over):** Plans 07-02 (icon production), 07-03 (CloudKit Production schema deploy), 07-04 (App Store metadata + privacy policy + screenshots), 07-05 (release checklist + 07-VERIFICATION.md template), 07-06 (TestFlight upload + SC1-SC5 manual sweep + submit). See `.planning/phases/07-release/` for plan files. v1.0 release work runs in parallel as non-coding tasks (DNS / ASC / nutrition label) and is NOT a blocker for v1.2 code work.
 
 ### Blockers/Concerns

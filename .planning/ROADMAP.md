@@ -1,9 +1,9 @@
 # Roadmap: GameKit
 
 **Created:** 2026-04-24
-**Last updated:** 2026-05-14 (Phase 13 planned — 5 plans; v1.2 progress 6/7 phases complete with Phase 13 in flight)
+**Last updated:** 2026-06-25 (v1.5 Endless Arcade Primitive — 4 phases (15–18), 22/22 requirements mapped)
 **Granularity:** standard (5–8 phases, 3–5 plans each)
-**Coverage:** v1.0 — 38/38 requirements mapped ✓ · v1.2 — 14/14 requirements mapped ✓
+**Coverage:** v1.0 — 38/38 requirements mapped ✓ · v1.2 — 14/14 requirements mapped ✓ · v1.5 — 22/22 requirements mapped ✓
 
 ## Milestones
 
@@ -12,7 +12,8 @@ GameKit ships in named, append-only milestones. Phase numbering never resets —
 | Milestone | Phases | Status | Scope |
 |-----------|--------|--------|-------|
 | **v1.0** | 1 → 7 (incl. 6.1) | Phase 7 in progress (pre-flight) | MVP — Minesweeper-only ship to TestFlight / App Store |
-| **v1.2** | 8 → 13 | In progress (Phases 8–10 complete 2026-05-13; 3/6 phases) | Video Mode — optional layout adaptation for PiP video overlays |
+| **v1.2** | 8 → 13 (incl. 12.1) | Complete (2026-05-14) | Video Mode — optional layout adaptation for PiP video overlays |
+| **v1.5** | 15 → 18 | In progress (planning) | Endless Arcade Primitive — real-time loop substrate + Stack + Snake |
 
 v1.1 (Merge / Nonogram graduation) shipped under the v1.0 phase set as a post-MVP follow-up and did not open a new milestone band; both games are in production binary as of 2026-05-12 and become Video-Mode adoption targets in v1.2 Phase 12.
 
@@ -436,3 +437,131 @@ The following are v1.2-deferred per PROJECT.md and REQUIREMENTS.md and are **not
 *Phase sequencing: load-bearing convergence between research/ARCHITECTURE.md and research/PITFALLS.md*
 *Phase 6 planned: 2026-04-26 — 9 plans (3-wave + verification)*
 *Milestone v1.2 (Video Mode) appended: 2026-05-12 — 6 phases (08 design + 09–13 code), 14/14 VIDEO-* requirements mapped*
+
+---
+
+## Milestone v1.5: Endless Arcade Primitive
+
+**Opened:** 2026-06-25
+**Granularity:** standard (5–8 phases, 3–5 plans each)
+**Coverage:** 22/22 v1.5 requirements mapped ✓
+**Phase band:** 15 → 18 (continues from v1.3/v1.4 last integer phase — 14-home-screen-overhaul; numbering never resets per Milestones policy)
+
+### Milestone Overview
+
+v1.5 adds a new interaction primitive to GameDrawer — continuous real-time input + frame loop + score-until-death — that every prior game lacks. The delivery strategy is substrate-first: two new `Core/` files (~160 lines) establish the shared loop driver (`ArcadeLoopDriver`) and lifecycle enum (`ArcadeGameState`), proven by unit tests, before either game compiles against them. Stack then proves the substrate end-to-end (Canvas rendering, drop physics, speed ramp, score persistence). Snake confirms genuine reuse — `Core/` files are unchanged after Snake lands. A final stats-and-polish phase completes the consumer surface: score-based stats screen shape for both games, `DESIGN.md` §12 entries, Video Mode exemption ADR, and cold-start regression check.
+
+Brand constraint is absolute: these are calm endless games, not twitch arcade. Speed plateaus (Stack at ~80 blocks, Snake at ~100ms minimum tick interval), wrap mode default for Snake, no ads/coins/revives/leaderboards. Reduce Motion paths are mandatory — the first continuous-motion games in the suite.
+
+**Architecture decisions locked by research:**
+- `TimelineView(.animation(paused:))` as the frame driver (Swift 6 Sendable-safe, declarative pause, ProMotion-adaptive at no cost)
+- Fixed-timestep accumulator in the VM with `min(realDt, 0.1)` clamp before the while loop (prevents spiral-of-death)
+- `fixedDt = 1/60` for both games (60 Hz simulation; ProMotion renders extra frames without extra engine ticks)
+- Pure `mutating func step(dt: Double, input: Input) -> Frame` engine contract (Foundation-only, no SwiftUI, deterministic, seeded RNG)
+- Reuse existing `BestScore` / `GameRecord` / `GameStats.record(gameKind:mode:outcome:score:)` — no new SwiftData models needed
+- `difficultyRaw = "endless"` for both games (one `BestScore` row per game kind)
+- Video Mode explicitly exempt for v1.5 — continuous input cannot pause-and-reflow for PiP (ARCADE-08 ADR)
+
+### v1.5 Phases
+
+- [ ] **Phase 15: Arcade Substrate + Skeleton** - Shared loop driver, lifecycle enum, fixed-timestep accumulator with spiral-of-death clamp, scenePhase pause/resume wiring, score persistence schema extensions, Home card stubs — all proven with unit tests before either game ships
+- [ ] **Phase 16: Stack** - Tap-to-drop tower game proves the substrate end-to-end; Canvas renderer; overhang trim + combo recovery; speed ramp; score persistence; §8.12 theme audit; Reduce Motion path
+- [ ] **Phase 17: Snake** - Grid-based endless confirms substrate reuse with zero Core/ changes; swipe + D-pad direction queue; wrap/wall toggle; seeded RNG; §8.12 theme audit; Reduce Motion path
+- [ ] **Phase 18: Stats, Design Specs & ADR** - Score-based stats screen shape; DESIGN.md §12 entries (Reduce Motion spec, haptic vocabulary, token map); Video Mode exemption ADR; cold-start regression check; engine purity sign-off
+
+### v1.5 Phase Details
+
+### Phase 15: Arcade Substrate + Skeleton
+**Goal**: The shared real-time loop substrate is in place, tested, and paused-safe — both game cards appear on Home and navigate to placeholder screens, but no gameplay exists yet.
+**Depends on**: v1.2/v1.4 codebase (additive changes to existing Core/ files only)
+**Requirements**: ARCADE-01, ARCADE-02, ARCADE-03, ARCADE-04, ARCADE-05, ARCADE-06, ARCADE-09
+**Success Criteria** (what must be TRUE):
+  1. Two unit tests gate the substrate before any game is written: (a) `ArcadeLoopDriver` fires `onTick` when `isRunning == true` and produces zero ticks when `false` (game-over, idle, paused); (b) a spiral-of-death test injects `dt = 2.0` and asserts at most 15 engine ticks fire and the function exits cleanly without hanging.
+  2. Stack and Snake appear as enabled game cards on Home (via additive `GameKind`, `GameRoute`, `GameDescriptor` cases) and tap-navigate to placeholder game screens; the app compiles with zero Swift 6 strict-concurrency warnings.
+  3. The loop pauses on both `scenePhase == .background` AND `scenePhase == .inactive` (notification banners, incoming calls); on foreground resume the accumulated gap is discarded and no time-jump reaches the engine — verified by manual test: receive a notification banner during the placeholder screen, dismiss, confirm no engine time-spike.
+  4. Score persistence schema extension is CloudKit-safe: adding `.stack` and `.snake` raw-string `GameKind` values passes the existing `ModelContainerSmokeTests` on both a clean simulator install and a prior-schema simulator store, with no migration and no schema-version bump at the model layer.
+  5. Cold-start time on a real device is unchanged from the v1.4 baseline — no `ArcadeLoopDriver` or engine state is allocated at app launch; lazy init verified via Instruments App Launch template before the phase is marked done.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 16: Stack
+**Goal**: Stack is fully playable end-to-end — tap to drop, overhang trim, combo recovery, speed ramp, score persistence — proving the substrate delivers real gameplay through Canvas rendering.
+**Depends on**: Phase 15 (`ArcadeLoopDriver` + `ArcadeGameState` + all 7 additive existing-file edits must exist for Stack to compile)
+**Requirements**: STACK-01, STACK-02, STACK-03, STACK-04, STACK-05, STACK-06
+**Success Criteria** (what must be TRUE):
+  1. User can play Stack: tapping drops the oscillating block; overhang beyond the block below is trimmed and the block narrows; a near-perfect drop recovers block width and increments a visible combo counter; the run ends (game-over banner appears with final score) when block width reaches zero.
+  2. A unit test with a fixed seed runs `StackEngine` at `dt = 1/60` and at `dt = 1/120` for 5 simulated seconds and asserts identical `score`, `isGameOver`, and tower-block widths — confirming ProMotion-safe physics and the fixed-timestep engine contract.
+  3. Block speed ramps with height and plateaus at the calm cap (~80 blocks); the game-over banner appears and the loop is paused (zero CPU); Instruments shows no disk I/O spikes during active gameplay; the high score is persisted to `BestScore` exactly once on game-over (not per-frame); the Stats screen shows a Stack section with high score and runs played.
+  4. Stack's `Canvas` board is legible under Classic preset (Chrome Diner) AND at least one Loud/Moody preset (Voltage or Dracula) per §8.12 — all block colors, overhang trim, and score chip read from DesignKit semantic tokens only (no `Color(red:)`, `Color(hex:)`, or SwiftUI system color names in `Games/Stack/`).
+  5. Reduce Motion path: when `accessibilityReduceMotion == true`, blocks jump-cut to their computed position each tick (no spring or slide interpolation); gameplay mechanics and speed ramp are unchanged.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 17: Snake
+**Goal**: Snake is fully playable — swipe or D-pad turns, grow on food, self-collision ends the run — confirming genuine substrate reuse with zero Core/ changes.
+**Depends on**: Phase 16 (Stack exercises score-persistence path before Snake needs it; substrate is proven on a real game)
+**Requirements**: SNAKE-01, SNAKE-02, SNAKE-03, SNAKE-04, SNAKE-05, SNAKE-06, SNAKE-07
+**Success Criteria** (what must be TRUE):
+  1. User can play Snake on a grid: swiping or tapping the D-pad changes direction; eating food grows the snake; self-collision (and wall collision in wall mode) ends the run with a game-over banner; swiping left from the board's left edge does NOT trigger a NavigationStack pop — verified on device with `.defersSystemGestures(on: .all)`.
+  2. `SnakeEngine` unit tests run twice with the same pinned seed and assert identical food-spawn sequences, grow events, and collision outcomes; a ProMotion equivalence test confirms `dt = 1/60` vs `dt = 1/120` over 5 simulated seconds produces the same cell-move count and collision state.
+  3. After Phase 17 commits land, `git diff HEAD~N -- Core/ArcadeGameState.swift Core/ArcadeLoopDriver.swift` returns empty — zero substrate modifications were needed to accommodate Snake, confirming genuine reuse.
+  4. A direction queue of capacity 2 is functional: rapid swipes queued before the next tick fires are preserved; a 180-degree reversal (swipe left while moving right) is rejected; the on-screen D-pad is visible and operational as a secondary directional control.
+  5. Snake's board is legible under Classic preset AND at least one Loud/Moody preset per §8.12; Reduce Motion path renders the snake as a jump-cut cell teleport each tick (no between-cell interpolation) while gameplay mechanics are unchanged.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 18: Stats, Design Specs & ADR
+**Goal**: Both games are consumer-complete — score-based stats screen shape distinct from turn-based games, DESIGN.md §12 entries written for both games, Video Mode exemption ADR committed, cold-start and engine purity confirmed.
+**Depends on**: Phase 17 (both games fully playable; stats screen shape, haptic vocabulary, and token-per-element map can only be written against real running games)
+**Requirements**: ARCADE-07, ARCADE-08
+**Success Criteria** (what must be TRUE):
+  1. The Stats screen presents a score-based shape for Stack and Snake: "High Score" displayed prominently, "Runs Played" shown below; an explicit empty state ("No runs yet.") appears when no runs have been recorded — distinct from the win/loss/best-time columns shown for turn-based games.
+  2. `DESIGN.md` §12 receives entries for Stack and Snake specifying: (a) Reduce Motion jump-cut spec — visual motion only, never game mechanics, gated via `@Environment(\.accessibilityReduceMotion)` in the View tier; (b) haptic vocabulary — block land / food eaten = `.impact(weight: .light)`, game-over = `.error`, no per-frame haptics ever; (c) per-element DesignKit token map — body/block = `accentPrimary`, food = `success`, game-over state = `danger`, board background = `background`.
+  3. A Video Mode exemption ADR is committed to `.planning/` confirming Stack and Snake are exempt from `.videoModeAware()` in v1.5, with rationale: real-time continuous input cannot pause-and-reflow for a PiP overlay; the exemption call-site in `HomeView.destination(for:)` is documented as the future insertion point if Video Mode is revisited.
+  4. Cold-start time on a real device is unchanged from the v1.4 baseline — Instruments App Launch confirms no substrate or engine state is allocated at app launch (all game views are lazily instantiated via `HomeView` navigation).
+  5. All new Swift files in `Games/Stack/` and `Games/Snake/` are ≤400 lines; `grep -r "import SwiftUI" Games/Stack/Engine Games/Snake/Engine` returns empty — engine purity confirmed across both games before the milestone is closed.
+**Plans**: TBD
+
+### v1.5 Progress
+
+**Execution Order:**
+Phases execute in numeric order: 15 → 16 → 17 → 18
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 15. Arcade Substrate + Skeleton | 0/TBD | Not started | - |
+| 16. Stack | 0/TBD | Not started | - |
+| 17. Snake | 0/TBD | Not started | - |
+| 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
+
+### v1.5 Research Flags
+
+All phases proceed directly to planning (no research phase needed):
+
+- **Phase 15 (Substrate):** All patterns codebase-verified by the research agent. `ViewModifier` shape confirmed against `VideoModeAware.swift`; persistence reuse confirmed by direct `GameStats.swift` source inspection at line 113.
+- **Phase 16 (Stack):** Canvas + TimelineView confirmed via Apple docs; `GraphicsContext.Shading.color(_:)` takes `SwiftUI.Color` so DesignKit tokens feed directly. Speed ramp constants are MEDIUM confidence; tune on device during implementation.
+- **Phase 17 (Snake):** Engine pattern, direction queue, and drag gesture all confirmed. One on-device profiling check early in the phase: LazyVGrid vs. Canvas at 60 Hz for the board — switch is local to `SnakeBoardView.swift` and does not affect engine or VM.
+- **Phase 18 (Stats & Polish):** Checklist and tuning work. No research needed.
+
+### v1.5 Cross-Cutting Invariants
+
+In addition to the v1.0 / v1.2 cross-cutting invariants, v1.5 adds:
+
+- **Engine purity:** `StackEngine` and `SnakeEngine` must have zero `import SwiftUI` and zero `import SwiftData`. Enforced by grep check returning empty at each game phase close. Same invariant as `RevealEngine` / `MergeEngine` — never relaxed.
+- **Fixed-timestep accumulator with max-dt clamp:** Every arcade VM clamps real dt before accumulating: `min(realDt, 0.1)`. Missing this clamp = spiral-of-death on resume from background. Established in Phase 15; each game phase verifies the clamp is intact.
+- **Save exactly once on game-over:** `BestScore` / `GameRecord` writes fire on the game-over state transition only — never inside the frame-tick closure. Disk I/O during active gameplay is a P0 regression (Instruments verifies at phase close).
+- **No per-frame haptics:** Haptics carry information per DESIGN.md §8. Haptics fire only on milestone events (block land, food eaten, game-over). A haptic every tick at 60 Hz is vibration spam.
+- **Reduce Motion = jump-cut, not game halt:** `accessibilityReduceMotion` suppresses visual interpolation only; game speed, rules, and mechanics are unchanged. Gated exclusively in the View tier — engine and VM never read accessibility flags.
+- **Video Mode exempt:** Stack and Snake do not receive `.videoModeAware(minBoardHeight:)` in `HomeView.destination(for:)`. No `+VideoMode.swift` extension files for these games in v1.5. The exemption is documented in the Phase 18 ADR.
+
+### v1.5 Out-of-Scope Reminder
+
+The following are explicitly out of scope for v1.5 per `REQUIREMENTS.md §v1.5 Out of Scope`:
+
+- Daily seed / daily challenge — engagement retention layer; parked for v1.6+
+- Twitch/reflex arcade (Flappy-style, rhythm-tap, falling-blocks) — mood-gated for a later milestone; v1.5 is calm-only
+- Video Mode adoption for Stack and Snake — real-time continuous input cannot pause-and-reflow for PiP (ARCADE-08 ADR closes this)
+- Online leaderboards / accounts / any monetization — permanent exclusion per core value
+
+---
+*Milestone v1.5 (Endless Arcade Primitive) appended: 2026-06-25 — 4 phases (15–18), 22/22 ARCADE/STACK/SNAKE requirements mapped*

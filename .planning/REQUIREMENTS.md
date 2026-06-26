@@ -360,3 +360,48 @@ Populated 2026-05-12 by the roadmapper. Phase numbering continues from v1.0's la
 *Traceability populated: 2026-04-24 — all 35 v1 requirements mapped*
 *v1.2 Video Mode requirements added: 2026-05-12 — VIDEO-01..14*
 *v1.2 Traceability populated: 2026-05-12 — all 14 v1.2 requirements mapped (Phase 8 design gate, Phases 9–13 implementation)*
+
+### v1.5 Traceability
+
+Populated 2026-06-25 by the roadmapper. Phase numbering continues from v1.4's last integer phase (14) — v1.5 occupies the 15–18 band, substrate-first (Phase 15) followed by Stack (Phase 16), Snake (Phase 17), and stats/polish (Phase 18).
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| ARCADE-01 | Phase 15 | Pending |
+| ARCADE-02 | Phase 15 | Pending |
+| ARCADE-03 | Phase 15 | Pending |
+| ARCADE-04 | Phase 15 | Pending |
+| ARCADE-05 | Phase 15 | Pending |
+| ARCADE-06 | Phase 15 | Pending |
+| ARCADE-07 | Phase 18 | Pending |
+| ARCADE-08 | Phase 18 | Pending |
+| ARCADE-09 | Phase 15 | Pending |
+| STACK-01 | Phase 16 | Pending |
+| STACK-02 | Phase 16 | Pending |
+| STACK-03 | Phase 16 | Pending |
+| STACK-04 | Phase 16 | Pending |
+| STACK-05 | Phase 16 | Pending |
+| STACK-06 | Phase 16 | Pending |
+| SNAKE-01 | Phase 17 | Pending |
+| SNAKE-02 | Phase 17 | Pending |
+| SNAKE-03 | Phase 17 | Pending |
+| SNAKE-04 | Phase 17 | Pending |
+| SNAKE-05 | Phase 17 | Pending |
+| SNAKE-06 | Phase 17 | Pending |
+| SNAKE-07 | Phase 17 | Pending |
+
+**v1.5 Coverage:**
+- v1.5 requirements: 22 total
+- Mapped to phases: 22 ✓
+- Unmapped: 0
+
+**Notes on v1.5 placement:**
+- **ARCADE-01..06 and ARCADE-09 in Phase 15**: These are all substrate requirements — loop driver, lifecycle, persistence schema, Home card wiring, feedback routing, scenePhase pause/resume. They must ship together before either game can compile. ARCADE-07 (stats screen shape) and ARCADE-08 (Video Mode exemption ADR) are placed in Phase 18 because they can only be written correctly after both games are running.
+- **ARCADE-07 in Phase 18**: The score-based stats screen shape (High Score + Runs Played, distinct from win/loss columns) can only be finalized once both Stack and Snake are playable and the actual data shapes are confirmed.
+- **ARCADE-08 in Phase 18**: The Video Mode exemption ADR is a documentation deliverable confirming a design decision; it is locked conceptually from the start but committed as a `.planning/` artifact in the final phase.
+- **STACK-01..06 in Phase 16**: All Stack requirements are co-dependent — the oscillating block (STACK-01), speed ramp (STACK-02), recovery mechanic (STACK-03), score persistence (STACK-04), Canvas rendering (STACK-05), and Reduce Motion path (STACK-06) form one coherent playable game. Splitting them would yield unplayable intermediate states.
+- **SNAKE-01..07 in Phase 17**: Same reasoning as Stack — all Snake requirements deliver one coherent playable game and cannot meaningfully ship independently.
+
+---
+*v1.5 Requirements added: 2026-06-25 — ARCADE-01..09, STACK-01..06, SNAKE-01..07*
+*v1.5 Traceability populated: 2026-06-25 — all 22 v1.5 requirements mapped (Phase 15 substrate, Phase 16 Stack, Phase 17 Snake, Phase 18 polish)*
