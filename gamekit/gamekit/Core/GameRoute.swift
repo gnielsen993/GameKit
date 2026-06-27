@@ -32,4 +32,7 @@ enum GameRoute: Hashable, Sendable {
     case klondike(SolitaireDifficulty?)
     case fiveLetter(FiveLetterMode?)
     case wordGrid(WordGridMode?)
+    // Phase 15: plain cases — no associated value (D-09; modes: [], no mode chip deep-links here)
+    case stack
+    case snake
 }
