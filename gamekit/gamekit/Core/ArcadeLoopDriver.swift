@@ -44,8 +44,12 @@ struct ArcadeLoopDriver: ViewModifier {
                     }
                 }
             }
-            .onChange(of: isRunning) { _, running in
-                if !running { lastDate = nil }
+            .onChange(of: isRunning) { _, _ in
+                // Reset the anchor on ANY transition (not just → false) so the first
+                // tick after a (re)start delivers dt = 0. Guards the "no stale anchor
+                // on resume" invariant even against a rapid false→true toggle inside a
+                // single render cycle (PITFALL-P2).
+                lastDate = nil
             }
     }
 }

@@ -52,6 +52,7 @@ final class SnakeHarnessVM {
     }
 
     func start() {
+        accumulator = 0   // clear any carry so a (re)start never replays stale time
         state = .running
     }
 
