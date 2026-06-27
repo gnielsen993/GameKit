@@ -23,6 +23,9 @@ extension GameKind {
         case .freeCell:    return Color(red: 0.643, green: 0.345, blue: 0.933) // #A458EE
         case .fiveLetter:  return Color(red: 0.051, green: 0.659, blue: 0.514) // #0DA883
         case .wordGrid:    return Color(red: 0.871, green: 0.278, blue: 0.522) // #DE4785
+        // Phase 15 (D-07): locked brand accents for endless arcade games.
+        case .stack:       return Color(red: 0.961, green: 0.498, blue: 0.122) // vivid orange
+        case .snake:       return Color(red: 0.176, green: 0.741, blue: 0.490) // calm green
         }
     }
 }
