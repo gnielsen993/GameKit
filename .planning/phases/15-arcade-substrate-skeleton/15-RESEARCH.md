@@ -697,17 +697,17 @@ The existing `ModelContainerSmokeTests` will AUTOMATICALLY cover success criteri
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **SF Symbol verification (A1, A2)**
    - What we know: milestone research suggested `square.stack.fill` and `arrow.triangle.turn.up.right.diamond`
    - What's unclear: whether these exact strings exist in iOS 17's SF Symbols catalog
-   - Recommendation: verify in SF Symbols app during implementation; pick alternatives if needed (Stack → `square.stack.3d.up` or `rectangle.stack`; Snake → `arrow.2.squarepath` or `arrow.triangle.capsulepath`)
+   - RESOLVED: Handled at plan level — 15-04 Task 2 verifies both symbol strings against the iOS 17 SF Symbols catalog before commit and substitutes the closest semantic symbol if absent (Stack → `square.stack.3d.up` or `rectangle.stack`; Snake → `arrow.2.squarepath` or `arrow.triangle.capsulepath`). CONTEXT.md D-09 grants symbol-choice discretion, and the symbol only feeds the upcoming-games list, not the primary tile (which uses GameIconView), so an invalid name is non-blocking.
 
 2. **`Games/Stack/` pbxproj auto-registration (A3)**
    - What we know: CLAUDE.md §8.8 says no edit for subfolders; CONTEXT.md says a one-time edit is needed; STATE.md Phase 2 showed zero edits were needed
    - What's unclear: exact PBXFileSystemSynchronizedRootGroup behavior for new subfolders of an existing synchronized root
-   - Recommendation: build without a pbxproj edit first; add via Xcode UI if build fails to find the file
+   - RESOLVED: Handled at plan level — 15-02 Task 1 builds without a pbxproj edit first and falls back to adding `Games/Stack/` (and `Games/Snake/`) via Xcode's "Add Files" dialog only if the build fails to find the new view (never hand-editing project.pbxproj, per §8.8). Phase 2 precedent indicates auto-registration succeeds without an edit.
 
 ---
 

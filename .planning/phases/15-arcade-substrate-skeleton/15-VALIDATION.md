@@ -41,7 +41,7 @@ created: 2026-06-26
 |-------------|----------|-----------|-------------------|-------------|--------|
 | ARCADE-01 | `TimelineView(.animation(paused:))` driver fires `onTick` on `@MainActor`; no CADisplayLink | unit (SC1a onTick gating) | `xcodebuild test -only-testing:gamekitTests/ArcadeLoopDriverTests/onTickGating` | ❌ W0 | ⬜ pending |
 | ARCADE-02 | Fixed-timestep clamp `min(dt,0.1)`; inject dt=2.0 → ≤15 steps, clean exit | unit (SC1b spiral clamp) | `xcodebuild test -only-testing:gamekitTests/ArcadeLoopDriverTests/spiralOfDeathClamp` | ❌ W0 | ⬜ pending |
-| ARCADE-03 | Lifecycle idle→running→paused→gameOver; harness shows a moving element | manual | launch harness on simulator, observe oscillation | — | ⬜ pending |
+| ARCADE-03 (PARTIAL) | P15 proves: lifecycle enum incl. `.gameOver` + tap-to-start + running/paused. DEFERRED to P16 (no real game-over trigger yet): entering `.gameOver`, `VideoModeBanner` game-over banner, game-over→restart | manual | launch harness on simulator, observe oscillation + tap-to-start | — | ⬜ pending (PARTIAL — lifecycle/tap-to-start/pause in P15; game-over/banner/restart deferred to P16) |
 | ARCADE-04 | Loop pauses on `.inactive` AND `.background`; no time drift on foreground resume | manual (device) | D-04 notification-banner procedure (below) | — | ⬜ pending |
 | ARCADE-05 | CloudKit-safe schema: `.stack`/`.snake` `GameKind` values pass smoke test, no migration | unit (existing) | `xcodebuild test -only-testing:gamekitTests/ModelContainerSmokeTests` | ✅ existing | ⬜ pending |
 | ARCADE-06 | Counter-trigger haptic structure established; no haptic/SFX fires in the Phase 15 harness | N/A | harness has no haptic events to gate yet | — | ⬜ pending |
