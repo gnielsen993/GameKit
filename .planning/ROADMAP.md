@@ -483,7 +483,7 @@ Brand constraint is absolute: these are calm endless games, not twitch arcade. S
   5. Cold-start time on a real device is unchanged from the v1.4 baseline — no `ArcadeLoopDriver` or engine state is allocated at app launch; lazy init verified via Instruments App Launch template before the phase is marked done.
 **Plans**: 5 plans
 - [x] 15-01-PLAN.md — Substrate primitive (ArcadeGameState + ArcadeLoopDriver) + two locked gate tests
-- [ ] 15-02-PLAN.md — Throwaway Stack/Snake live-substrate harness views (pause-safe on .inactive + .background)
+- [x] 15-02-PLAN.md — Throwaway Stack/Snake live-substrate harness views (pause-safe on .inactive + .background)
 - [x] 15-03-PLAN.md — GameKind cases + D-07 accents + GameIconView tile icons + StatsView placeholders (CloudKit-safe schema)
 - [ ] 15-04-PLAN.md — GameRoute + GameDescriptor tiles + HomeView navigation (no .videoModeAware) + Video Mode ADR
 - [ ] 15-05-PLAN.md — Manual gates: D-04 banner pause, D-08 §8.12 tile theme pass, SC5 Instruments cold-start
@@ -534,7 +534,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 15. Arcade Substrate + Skeleton | 2/5 | In Progress|  |
+| 15. Arcade Substrate + Skeleton | 3/5 | In Progress|  |
 | 16. Stack | 0/TBD | Not started | - |
 | 17. Snake | 0/TBD | Not started | - |
 | 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
