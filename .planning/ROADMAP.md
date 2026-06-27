@@ -464,7 +464,7 @@ Brand constraint is absolute: these are calm endless games, not twitch arcade. S
 
 ### v1.5 Phases
 
-- [ ] **Phase 15: Arcade Substrate + Skeleton** - Shared loop driver, lifecycle enum, fixed-timestep accumulator with spiral-of-death clamp, scenePhase pause/resume wiring, score persistence schema extensions, Home card stubs — all proven with unit tests before either game ships
+- [x] **Phase 15: Arcade Substrate + Skeleton** - Shared loop driver, lifecycle enum, fixed-timestep accumulator with spiral-of-death clamp, scenePhase pause/resume wiring, score persistence schema extensions, Home card stubs — all proven with unit tests before either game ships (completed 2026-06-27)
 - [ ] **Phase 16: Stack** - Tap-to-drop tower game proves the substrate end-to-end; Canvas renderer; overhang trim + combo recovery; speed ramp; score persistence; §8.12 theme audit; Reduce Motion path
 - [ ] **Phase 17: Snake** - Grid-based endless confirms substrate reuse with zero Core/ changes; swipe + D-pad direction queue; wrap/wall toggle; seeded RNG; §8.12 theme audit; Reduce Motion path
 - [ ] **Phase 18: Stats, Design Specs & ADR** - Score-based stats screen shape; DESIGN.md §12 entries (Reduce Motion spec, haptic vocabulary, token map); Video Mode exemption ADR; cold-start regression check; engine purity sign-off
@@ -486,7 +486,7 @@ Brand constraint is absolute: these are calm endless games, not twitch arcade. S
 - [x] 15-02-PLAN.md — Throwaway Stack/Snake live-substrate harness views (pause-safe on .inactive + .background)
 - [x] 15-03-PLAN.md — GameKind cases + D-07 accents + GameIconView tile icons + StatsView placeholders (CloudKit-safe schema)
 - [x] 15-04-PLAN.md — GameRoute + GameDescriptor tiles + HomeView navigation (no .videoModeAware) + Video Mode ADR
-- [ ] 15-05-PLAN.md — Manual gates: D-04 banner pause, D-08 §8.12 tile theme pass, SC5 Instruments cold-start
+- [x] 15-05-PLAN.md — Manual gates: D-04 banner pause, D-08 §8.12 tile theme pass, SC5 Instruments cold-start
 **UI hint**: yes
 
 ### Phase 16: Stack
@@ -534,7 +534,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 15. Arcade Substrate + Skeleton | 4/5 | In Progress|  |
+| 15. Arcade Substrate + Skeleton | 5/5 | Complete    | 2026-06-27 |
 | 16. Stack | 0/TBD | Not started | - |
 | 17. Snake | 0/TBD | Not started | - |
 | 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
