@@ -30,6 +30,8 @@ struct GameIconView: View {
             case .freeCell:    drawFreeCell(&ctx, s: s, sw: sw, color: color)
             case .fiveLetter:  drawFiveLetter(&ctx, s: s, color: color)
             case .wordGrid:    drawWordGrid(&ctx, s: s, color: color)
+            case .stack:       drawStack(&ctx, s: s, color: color)
+            case .snake:       drawSnake(&ctx, s: s, color: color)
             }
         }
         .frame(width: size, height: size)
@@ -222,4 +224,52 @@ private func drawWordGrid(_ ctx: inout GraphicsContext, s: CGFloat, color: Color
     path.addLine(to: CGPoint(x: 24 * s, y: 16 * s))
     path.addLine(to: CGPoint(x: 32 * s, y: 24 * s))
     ctx.stroke(path, with: .color(.white.opacity(0.95)), style: StrokeStyle(lineWidth: max(1.6, 2.4 * s), lineCap: .round, lineJoin: .round))
+}
+
+// MARK: - Phase 15: Stack + Snake icons
+
+/// Stack — stacking-blocks glyph: three offset rounded rects suggesting an endless tower.
+/// Uses only the passed `color` (with `.opacity` for depth) — no literal Color.
+private func drawStack(_ ctx: inout GraphicsContext, s: CGFloat, color: Color) {
+    // Three blocks stacked with slight rightward offset to imply a growing tower.
+    // Block dimensions: 24w × 7h, radius 2. Vertical gap 1.5 between blocks.
+    let blockW: CGFloat = 24, blockH: CGFloat = 7, radius: CGFloat = 2
+    let blocks: [(x: CGFloat, y: CGFloat, opacity: CGFloat)] = [
+        (8,    7,    0.35),  // bottom block (furthest, dimmest)
+        (9,   15.5,  0.65),  // middle block
+        (8,   24,    1.00),  // top (most-recently-placed) block
+    ]
+    for block in blocks {
+        let r = CGRect(x: block.x * s, y: block.y * s, width: blockW * s, height: blockH * s)
+        ctx.fill(Path(roundedRect: r, cornerRadius: radius * s),
+                 with: .color(color.opacity(block.opacity)))
+    }
+    // Drop-shadow line under topmost block to show it landing.
+    var shadow = Path()
+    shadow.move(to: CGPoint(x: 10 * s, y: 32 * s))
+    shadow.addLine(to: CGPoint(x: 30 * s, y: 32 * s))
+    ctx.stroke(shadow, with: .color(color.opacity(0.20)),
+               style: StrokeStyle(lineWidth: max(1.0, 1.5 * s), lineCap: .round))
+}
+
+/// Snake — segmented directional glyph: a rounded path of cells turning a corner.
+/// Uses only the passed `color` (with `.opacity` for tail fade) — no literal Color.
+private func drawSnake(_ ctx: inout GraphicsContext, s: CGFloat, color: Color) {
+    // 7 square cells forming an L-shaped snake body (head at top-right corner).
+    // Cell size 7×7, gap 1 between cells.
+    let cell: CGFloat = 7, gap: CGFloat = 1.5, r: CGFloat = 1.5
+    // Segment positions in the 40×40 viewBox (column, row) for a rightward-then-downward path.
+    let segments: [(col: Int, row: Int)] = [
+        (1, 1), (2, 1), (3, 1), (4, 1),  // horizontal run (left→right)
+        (4, 2), (4, 3), (4, 4),           // vertical run (top→bottom) = head end
+    ]
+    let ox: CGFloat = 3, oy: CGFloat = 6
+    for (i, seg) in segments.enumerated() {
+        let x = (ox + CGFloat(seg.col) * (cell + gap)) * s
+        let y = (oy + CGFloat(seg.row) * (cell + gap)) * s
+        let rect = CGRect(x: x, y: y, width: cell * s, height: cell * s)
+        // Head (last segment) is full opacity; tail fades to 0.25.
+        let opacity = 0.25 + 0.75 * CGFloat(i) / CGFloat(segments.count - 1)
+        ctx.fill(Path(roundedRect: rect, cornerRadius: r * s), with: .color(color.opacity(opacity)))
+    }
 }
