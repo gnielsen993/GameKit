@@ -120,6 +120,30 @@ struct StatsView: View {
     @Query(filter: #Predicate<BestScore> { $0.gameKindRaw == "wordGrid" })
     private var wordGridBestScores: [BestScore]
 
+    // Phase 15 (ARCADE-05/09): Stack + Snake @Query pairs.
+    // Score-based shape (BestScore, not BestTime) per ARCADE-07 / 15-PATTERNS.md.
+    // Placeholder sections; replaced by StackStatsCard/SnakeStatsCard in Phase 16/17.
+
+    @Query(
+        filter: #Predicate<GameRecord> { $0.gameKindRaw == "stack" },
+        sort: \.playedAt,
+        order: .reverse
+    )
+    private var stackRecords: [GameRecord]
+
+    @Query(filter: #Predicate<BestScore> { $0.gameKindRaw == "stack" })
+    private var stackBestScores: [BestScore]
+
+    @Query(
+        filter: #Predicate<GameRecord> { $0.gameKindRaw == "snake" },
+        sort: \.playedAt,
+        order: .reverse
+    )
+    private var snakeRecords: [GameRecord]
+
+    @Query(filter: #Predicate<BestScore> { $0.gameKindRaw == "snake" })
+    private var snakeBestScores: [BestScore]
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
     private func shows(_ kind: GameKind) -> Bool {
@@ -191,6 +215,28 @@ struct StatsView: View {
                         if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "WORD GRID")) }
                         DKCard(theme: theme) {
                             WordGridStatsCard(theme: theme, records: wordGridRecords, bestScores: wordGridBestScores)
+                        }
+                    }
+
+                    // Phase 15: Stack placeholder — replaced by StackStatsCard in Phase 16
+                    if shows(.stack) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "STACK")) }
+                        DKCard(theme: theme) {
+                            Text(String(localized: "No Stack games yet."))
+                                .font(theme.typography.body)
+                                .foregroundStyle(theme.colors.textSecondary)
+                                .padding(theme.spacing.m)
+                        }
+                    }
+
+                    // Phase 15: Snake placeholder — replaced by SnakeStatsCard in Phase 17
+                    if shows(.snake) {
+                        if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "SNAKE")) }
+                        DKCard(theme: theme) {
+                            Text(String(localized: "No Snake games yet."))
+                                .font(theme.typography.body)
+                                .foregroundStyle(theme.colors.textSecondary)
+                                .padding(theme.spacing.m)
                         }
                     }
                 }
