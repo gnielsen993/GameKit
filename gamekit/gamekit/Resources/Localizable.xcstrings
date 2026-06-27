@@ -904,10 +904,16 @@
     "No puzzles bundled yet" : {
 
     },
+    "No Snake games yet." : {
+
+    },
     "No Solitaire games played yet." : {
 
     },
     "No solved puzzles yet." : {
+
+    },
+    "No Stack games yet." : {
 
     },
     "No Sudoku games played yet." : {
@@ -1180,6 +1186,12 @@
     "Small  ·  10 × 10" : {
 
     },
+    "Snake" : {
+
+    },
+    "SNAKE" : {
+
+    },
     "Solitaire" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1219,7 +1231,16 @@
     "Solved. New puzzle" : {
 
     },
+    "Stack" : {
+
+    },
+    "STACK" : {
+
+    },
     "Stack: lower rank · opposite colour · King to empty" : {
+
+    },
+    "State: %@" : {
 
     },
     "Stats" : {
@@ -1293,6 +1314,9 @@
     "System" : {
 
     },
+    "Tap to Start" : {
+
+    },
     "Terms of Service" : {
 
     },
@@ -1331,6 +1355,9 @@
           }
         }
       }
+    },
+    "Ticks: %lld" : {
+
     },
     "Tile %lld" : {
 
