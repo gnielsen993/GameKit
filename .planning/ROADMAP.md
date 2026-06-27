@@ -481,7 +481,12 @@ Brand constraint is absolute: these are calm endless games, not twitch arcade. S
   3. The loop pauses on both `scenePhase == .background` AND `scenePhase == .inactive` (notification banners, incoming calls); on foreground resume the accumulated gap is discarded and no time-jump reaches the engine — verified by manual test: receive a notification banner during the placeholder screen, dismiss, confirm no engine time-spike.
   4. Score persistence schema extension is CloudKit-safe: adding `.stack` and `.snake` raw-string `GameKind` values passes the existing `ModelContainerSmokeTests` on both a clean simulator install and a prior-schema simulator store, with no migration and no schema-version bump at the model layer.
   5. Cold-start time on a real device is unchanged from the v1.4 baseline — no `ArcadeLoopDriver` or engine state is allocated at app launch; lazy init verified via Instruments App Launch template before the phase is marked done.
-**Plans**: TBD
+**Plans**: 5 plans
+- [ ] 15-01-PLAN.md — Substrate primitive (ArcadeGameState + ArcadeLoopDriver) + two locked gate tests
+- [ ] 15-02-PLAN.md — Throwaway Stack/Snake live-substrate harness views (pause-safe on .inactive + .background)
+- [ ] 15-03-PLAN.md — GameKind cases + D-07 accents + GameIconView tile icons + StatsView placeholders (CloudKit-safe schema)
+- [ ] 15-04-PLAN.md — GameRoute + GameDescriptor tiles + HomeView navigation (no .videoModeAware) + Video Mode ADR
+- [ ] 15-05-PLAN.md — Manual gates: D-04 banner pause, D-08 §8.12 tile theme pass, SC5 Instruments cold-start
 **UI hint**: yes
 
 ### Phase 16: Stack
