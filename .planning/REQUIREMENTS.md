@@ -156,9 +156,9 @@ zero monetization. Each requirement maps to a roadmap phase.
 
 ### Arcade Substrate (shared)
 
-- [ ] **ARCADE-01**: Shared real-time loop substrate lives in `Core/`, driven by `TimelineView(.animation(paused:))` — declarative pause, ProMotion 60/120Hz adaptive, no CADisplayLink
-- [ ] **ARCADE-02**: A fixed-timestep accumulator with a max-dt clamp (`min(realDt, 0.1)`) feeds pure Foundation-only engine structs via a `mutating func step(dt:input:) -> Frame` contract; engines are deterministic with seeded RNG and unit-tested like the existing logic engines
-- [ ] **ARCADE-03**: Run lifecycle is idle → running → paused → game-over → restart, with a tap-to-start affordance and a game-over banner (reuses/extends the `VideoModeBanner` pattern with a final-score subtitle variant)
+- [x] **ARCADE-01**: Shared real-time loop substrate lives in `Core/`, driven by `TimelineView(.animation(paused:))` — declarative pause, ProMotion 60/120Hz adaptive, no CADisplayLink
+- [x] **ARCADE-02**: A fixed-timestep accumulator with a max-dt clamp (`min(realDt, 0.1)`) feeds pure Foundation-only engine structs via a `mutating func step(dt:input:) -> Frame` contract; engines are deterministic with seeded RNG and unit-tested like the existing logic engines
+- [x] **ARCADE-03**: Run lifecycle is idle → running → paused → game-over → restart, with a tap-to-start affordance and a game-over banner (reuses/extends the `VideoModeBanner` pattern with a final-score subtitle variant)
 - [ ] **ARCADE-04**: Loop pauses on `scenePhase` `.background`/`.inactive` and on game-over (zero CPU when paused) and resumes with no time drift and no spiral-of-death
 - [ ] **ARCADE-05**: High score and run counts persist via the existing `BestScore` / `GameRecord` SwiftData schema (additive `GameKind` cases + `"endless"` mode key, CloudKit-safe); the save fires on game-over (not per-frame) and survives force-quit
 - [ ] **ARCADE-06**: All arcade haptics, SFX, and animations route through `SettingsStore` toggles and respect `accessibilityReduceMotion` (counter-trigger pattern)
@@ -367,9 +367,9 @@ Populated 2026-06-25 by the roadmapper. Phase numbering continues from v1.4's la
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCADE-01 | Phase 15 | Pending |
-| ARCADE-02 | Phase 15 | Pending |
-| ARCADE-03 | Phase 15 | Pending |
+| ARCADE-01 | Phase 15 | Complete |
+| ARCADE-02 | Phase 15 | Complete |
+| ARCADE-03 | Phase 15 | Complete |
 | ARCADE-04 | Phase 15 | Pending |
 | ARCADE-05 | Phase 15 | Pending |
 | ARCADE-06 | Phase 15 | Pending |

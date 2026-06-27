@@ -4,13 +4,13 @@ milestone: v1.5
 milestone_name: Endless Arcade Primitive
 status: executing
 stopped_at: Phase 15 context gathered
-last_updated: "2026-06-27T02:09:21.711Z"
-last_activity: 2026-06-27 -- Phase 15 planning complete
+last_updated: "2026-06-27T02:19:23.862Z"
+last_activity: 2026-06-27
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** v1.5 Endless Arcade Primitive — Phases 15–18. Substrate + Skeleton (Phase 15) first; Stack (Phase 16); Snake (Phase 17); Stats/ADR (Phase 18).
+**Current focus:** Phase 15 — arcade-substrate-skeleton
 
 ## Current Position
 
-Phase: 15 (Arcade Substrate + Skeleton) — not yet started
-Plan: —
+Phase: 15 (arcade-substrate-skeleton) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-06-27 -- Phase 15 planning complete
+Last activity: 2026-06-27
 
 ## v1.0 Carry-Over
 
@@ -134,6 +134,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 12 P05 | 360 | 2 tasks | 2 files |
 | Phase 12-merge-nonogram-adoption P06 | 25 | 4 tasks tasks | 2 files files |
 | Phase 12.1 P01 | 10m | 2 tasks | 2 files |
+| Phase 15-arcade-substrate-skeleton P01 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -396,8 +397,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-27T01:10:05.513Z
+Last session: 2026-06-27T02:19:23.853Z
 Stopped at: Phase 15 context gathered
-Resume file: .planning/phases/15-arcade-substrate-skeleton/15-CONTEXT.md
+Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z

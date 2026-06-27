@@ -482,7 +482,7 @@ Brand constraint is absolute: these are calm endless games, not twitch arcade. S
   4. Score persistence schema extension is CloudKit-safe: adding `.stack` and `.snake` raw-string `GameKind` values passes the existing `ModelContainerSmokeTests` on both a clean simulator install and a prior-schema simulator store, with no migration and no schema-version bump at the model layer.
   5. Cold-start time on a real device is unchanged from the v1.4 baseline — no `ArcadeLoopDriver` or engine state is allocated at app launch; lazy init verified via Instruments App Launch template before the phase is marked done.
 **Plans**: 5 plans
-- [ ] 15-01-PLAN.md — Substrate primitive (ArcadeGameState + ArcadeLoopDriver) + two locked gate tests
+- [x] 15-01-PLAN.md — Substrate primitive (ArcadeGameState + ArcadeLoopDriver) + two locked gate tests
 - [ ] 15-02-PLAN.md — Throwaway Stack/Snake live-substrate harness views (pause-safe on .inactive + .background)
 - [ ] 15-03-PLAN.md — GameKind cases + D-07 accents + GameIconView tile icons + StatsView placeholders (CloudKit-safe schema)
 - [ ] 15-04-PLAN.md — GameRoute + GameDescriptor tiles + HomeView navigation (no .videoModeAware) + Video Mode ADR
@@ -534,7 +534,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 15. Arcade Substrate + Skeleton | 0/TBD | Not started | - |
+| 15. Arcade Substrate + Skeleton | 1/5 | In Progress|  |
 | 16. Stack | 0/TBD | Not started | - |
 | 17. Snake | 0/TBD | Not started | - |
 | 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
