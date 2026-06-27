@@ -40,6 +40,8 @@ enum AccentRole: Sendable {
     case slot6
     case slot7
     case slot8
+    case slot9   // Stack (Phase 15)
+    case slot10  // Snake (Phase 15)
 
     /// Index into `theme.catalogueColor(_:)`.
     var index: Int {
@@ -52,6 +54,8 @@ enum AccentRole: Sendable {
         case .slot6: return 5
         case .slot7: return 6
         case .slot8: return 7
+        case .slot9: return 8
+        case .slot10: return 9
         }
     }
 }
@@ -250,6 +254,27 @@ extension GameDescriptor {
                 GameModeChip(id: "wordgrid-relaxed", labelKey: "Relaxed", detailKey: "No timer", route: .wordGrid(.relaxed))
             ],
             shortMeta: "Trace words"
+        ),
+        // Phase 15: Stack and Snake — enabled tiles; D-06 final caption; D-09 modes: []
+        GameDescriptor(
+            kind: .stack,
+            titleKey: "Stack",
+            captionKey: "Tap to play",
+            symbol: "square.stack.fill",
+            accent: .slot9,
+            route: .stack,
+            modes: [],
+            shortMeta: "Endless tower"
+        ),
+        GameDescriptor(
+            kind: .snake,
+            titleKey: "Snake",
+            captionKey: "Tap to play",
+            symbol: "arrow.triangle.turn.up.right.diamond",
+            accent: .slot10,
+            route: .snake,
+            modes: [],
+            shortMeta: "Endless grid"
         )
     ]
 }
