@@ -158,6 +158,14 @@ struct HomeView: View {
     @ViewBuilder
     private func gameTile(_ descriptor: GameDescriptor, tileSize: CGFloat, showLabel: Bool) -> some View {
         Button {
+            // Modeless games (endless arcade — Stack / Snake, captioned "Tap to play")
+            // have no mode/difficulty picker, so a tap navigates straight to the game
+            // instead of expanding an empty HomeDetailPanel (ARCADE-09).
+            if descriptor.modes.isEmpty {
+                collapse()
+                path.append(descriptor.route)
+                return
+            }
             withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
                 expandedUpcoming = false
                 expandedKind = expandedKind == descriptor.kind ? nil : descriptor.kind
