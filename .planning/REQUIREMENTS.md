@@ -171,7 +171,7 @@ zero monetization. Each requirement maps to a roadmap phase.
 - [x] **STACK-01**: User can play Stack — tap to drop an oscillating block onto the tower; overhang beyond the block below is trimmed and the block narrows
 - [x] **STACK-02**: Block speed ramps with height then plateaus at a calm cap (no twitch escalation); the run ends when a drop completely misses (width reaches zero)
 - [x] **STACK-03**: Near-perfect drops restore some block width and build a combo (the recovery mechanic that makes long runs feel earned)
-- [ ] **STACK-04**: Score is blocks placed (height); high score is persisted and best perfect-streak is tracked as a secondary stat
+- [x] **STACK-04**: Score is blocks placed (height); high score is persisted and best perfect-streak is tracked as a secondary stat
 - [ ] **STACK-05**: Stack renders via `Canvas` using DesignKit tokens only — legible under Classic plus one Loud/Moody preset (§8.12 audit)
 - [ ] **STACK-06**: Reduce Motion path — the block drop is jump-cut (no slide/bounce) while gameplay is unchanged
 
@@ -379,7 +379,7 @@ Populated 2026-06-25 by the roadmapper. Phase numbering continues from v1.4's la
 | STACK-01 | Phase 16 | Complete |
 | STACK-02 | Phase 16 | Complete |
 | STACK-03 | Phase 16 | Complete |
-| STACK-04 | Phase 16 | Pending |
+| STACK-04 | Phase 16 | Complete |
 | STACK-05 | Phase 16 | Pending |
 | STACK-06 | Phase 16 | Pending |
 | SNAKE-01 | Phase 17 | Pending |
