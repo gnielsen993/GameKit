@@ -11,7 +11,8 @@ import Foundation
 
 /// Tuning constants for the Stack engine. All speeds are in sweeps/sec (time-
 /// units, not frames). Coordinates are normalized: playfieldWidth = 1.0.
-struct StackConfig {
+nonisolated struct StackConfig: Sendable {
+    let fixedDt: Double            // fixed sim timestep for the accumulator (HIGH: research-locked)
     let playfieldWidth: Double     // normalized width of the playfield
     let playfieldCenter: Double    // center X in normalized coords
     let startingWidth: Double      // initial block width (HIGH: generous landing zone)
@@ -25,7 +26,8 @@ struct StackConfig {
     let cycleLength: Int           // chart-color cycle length (matches theme.charts count)
 
     /// Default in-game preset — play-test baseline, not gospel.
-    static let `default` = StackConfig(
+    nonisolated static let `default` = StackConfig(
+        fixedDt: 1.0 / 60.0,
         playfieldWidth: 1.0, playfieldCenter: 0.5,
         startingWidth: 0.62, minWidth: 0.015,
         startSpeed: 0.35, maxSpeed: 0.90, plateauScore: 80,
@@ -34,7 +36,8 @@ struct StackConfig {
     )
 
     /// Stable config for unit tests — decoupled from future default calibration.
-    static let testFixed = StackConfig(
+    nonisolated static let testFixed = StackConfig(
+        fixedDt: 1.0 / 60.0,
         playfieldWidth: 1.0, playfieldCenter: 0.5,
         startingWidth: 0.62, minWidth: 0.015,
         startSpeed: 0.35, maxSpeed: 0.90, plateauScore: 80,
