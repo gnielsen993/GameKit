@@ -499,7 +499,16 @@ Brand constraint is absolute: these are calm endless games, not twitch arcade. S
   3. Block speed ramps with height and plateaus at the calm cap (~80 blocks); the game-over banner appears and the loop is paused (zero CPU); Instruments shows no disk I/O spikes during active gameplay; the high score is persisted to `BestScore` exactly once on game-over (not per-frame); the Stats screen shows a Stack section with high score and runs played.
   4. Stack's `Canvas` board is legible under Classic preset (Chrome Diner) AND at least one Loud/Moody preset (Voltage or Dracula) per §8.12 — all block colors, overhang trim, and score chip read from DesignKit semantic tokens only (no `Color(red:)`, `Color(hex:)`, or SwiftUI system color names in `Games/Stack/`).
   5. Reduce Motion path: when `accessibilityReduceMotion == true`, blocks jump-cut to their computed position each tick (no spring or slide interpolation); gameplay mechanics and speed ramp are unchanged.
-**Plans**: TBD
+**Plans**: 7 plans (4 waves)
+
+Plans:
+- [ ] 16-01-PLAN.md — StackEngine + StackConfig + determinism tests (Wave 0, STACK-01/02/03)
+- [ ] 16-02-PLAN.md — GameStats.recordStackRun + persistence test (Wave 0, STACK-04)
+- [ ] 16-03-PLAN.md — StackViewModel: accumulator + counters + save-on-game-over (Wave 1, STACK-01/03/04)
+- [ ] 16-04-PLAN.md — StackPalette + StackBoardCanvas Reduce Motion render (Wave 1, STACK-05/06)
+- [ ] 16-05-PLAN.md — StackGameView + Home swap + delete harness (Wave 2, STACK-01/03/05/06)
+- [ ] 16-06-PLAN.md — StackStatsCard + StatsView wiring (Wave 1, STACK-04)
+- [ ] 16-07-PLAN.md — §8.12 + Reduce Motion + Instruments sign-off + release log (Wave 3)
 **UI hint**: yes
 
 ### Phase 17: Snake
@@ -535,7 +544,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 15. Arcade Substrate + Skeleton | 5/5 | Complete    | 2026-06-27 |
-| 16. Stack | 0/TBD | Not started | - |
+| 16. Stack | 0/7 | Planning | - |
 | 17. Snake | 0/TBD | Not started | - |
 | 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
 
