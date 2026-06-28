@@ -288,3 +288,72 @@ final class GameStats {
         }
     }
 }
+
+// MARK: - Stack write path (Phase 16, STACK-04)
+
+extension GameStats {
+
+    // PERMANENT serialization keys — renaming these breaks persisted data and
+    // CloudKit sync history. Do NOT rename without a migration path.
+    static let stackEndlessMode = "endless"
+    static let stackPerfectStreakMode = "perfectStreak"
+
+    /// Record one Stack game-over event. Inserts exactly ONE `GameRecord`
+    /// (under mode `"endless"`) so runs-played stays honest; evaluates two
+    /// `BestScore` rows (high score + best perfect streak) via the higher-only
+    /// `evaluateBestScore`; then calls `try modelContext.save()` exactly once
+    /// (force-quit survival per Pitfall 12).
+    ///
+    /// Additive — no new `@Model`, no migration, no `schemaVersion` bump.
+    /// CloudKit-safe (D-11). `resetAll()` already deletes all `BestScore`
+    /// rows (GameStats.swift:180), so Stack score + streak clear for free
+    /// with no addition needed to the `resetAll` clear list (Stack persists
+    /// nothing in UserDefaults this phase).
+    func recordStackRun(score: Int, perfectStreak: Int) throws {
+        // 1. Insert exactly ONE GameRecord (runs-played source of truth).
+        let record = GameRecord(
+            gameKind: .stack,
+            difficulty: Self.stackEndlessMode,
+            outcome: .loss,
+            durationSeconds: 0,
+            playedAt: .now,
+            score: score
+        )
+        modelContext.insert(record)
+
+        // 2. Evaluate BestScore for high score (best-effort; GameRecord still
+        //    flushes even if this throws).
+        if score > 0 {
+            do {
+                try evaluateBestScore(
+                    gameKind: .stack,
+                    mode: Self.stackEndlessMode,
+                    score: score
+                )
+            } catch {
+                logger.error(
+                    "Stack BestScore (endless) evaluation failed: \(error.localizedDescription, privacy: .public)"
+                )
+            }
+        }
+
+        // 3. Evaluate BestScore for best perfect streak (higher-only, same
+        //    best-effort guard — a single save() covers both evaluations).
+        if perfectStreak > 0 {
+            do {
+                try evaluateBestScore(
+                    gameKind: .stack,
+                    mode: Self.stackPerfectStreakMode,
+                    score: perfectStreak
+                )
+            } catch {
+                logger.error(
+                    "Stack BestScore (perfectStreak) evaluation failed: \(error.localizedDescription, privacy: .public)"
+                )
+            }
+        }
+
+        // 4. Single synchronous save — force-quit survival (Pitfall 12).
+        try modelContext.save()
+    }
+}

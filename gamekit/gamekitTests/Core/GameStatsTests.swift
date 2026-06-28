@@ -190,4 +190,34 @@ struct GameStatsTests {
         #expect(try ctx.fetch(FetchDescriptor<GameRecord>()).count == 2,
                 "GameRecord still appends every call")
     }
+
+    // MARK: - Stack write path (Phase 16, STACK-04)
+
+    @Test("recordStackRun: one GameRecord (endless) + two higher-only BestScore rows")
+    func recordStackRunWritesStreakWithoutSchemaChange() throws {
+        let (stats, ctx, _) = try makeStats()
+        try stats.recordStackRun(score: 42, perfectStreak: 7)
+
+        // Exactly 1 GameRecord — runs-played stays honest.
+        let records = try ctx.fetch(FetchDescriptor<GameRecord>(
+            predicate: #Predicate { $0.gameKindRaw == "stack" }
+        ))
+        #expect(records.count == 1)
+
+        // Exactly 2 BestScore rows: "endless" (high score) + "perfectStreak".
+        let best = try ctx.fetch(FetchDescriptor<BestScore>(
+            predicate: #Predicate { $0.gameKindRaw == "stack" }
+        ))
+        #expect(best.count == 2)
+        #expect(best.first { $0.difficultyRaw == "endless" }?.score == 42)
+        #expect(best.first { $0.difficultyRaw == "perfectStreak" }?.score == 7)
+
+        // Higher-only: a lower second run must NOT overwrite the streak.
+        try stats.recordStackRun(score: 10, perfectStreak: 3)
+        let streakRow = try ctx.fetch(FetchDescriptor<BestScore>(
+            predicate: #Predicate { $0.gameKindRaw == "stack" && $0.difficultyRaw == "perfectStreak" }
+        ))
+        #expect(streakRow.first?.score == 7,
+                "lower perfectStreak (3) must not replace the existing best (7)")
+    }
 }
