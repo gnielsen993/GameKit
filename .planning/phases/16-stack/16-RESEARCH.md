@@ -534,17 +534,17 @@ No moving target here — the stack is the project's own proven Swift 6 / SwiftU
 
 **All load-bearing claims (D-11 path, engine determinism, token availability, file split, banner reuse) are VERIFIED against source — not in this table.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Gradient token semantics (A2).**
    - What we know: `theme.charts.chart1…6` are public, accent-derived, brightness-varied — the best-fit token-only accent ramp.
    - What's unclear: whether reusing chart tokens for a game board is considered clean by the user, or whether a dedicated `theme.accentRamp(count:)` DesignKit helper is preferred.
-   - Recommendation: ship with `theme.charts.*` (no DesignKit change, CLAUDE.md "promote only when proven"); revisit only if the §8.12 audit fails a specific preset.
+   - **RESOLVED:** ship with `theme.charts.*` (no DesignKit change, CLAUDE.md "promote only when proven"); revisit only if the §8.12 audit fails a specific preset. Adopted in 16-04 (StackPalette).
 
 2. **Camera/scroll feel.**
    - What we know: camera belongs in the view layer, interpolated in Canvas, snapped under RM.
    - What's unclear: exact visible-window size K and whether the base of the tower ever scrolls fully off.
-   - Recommendation: render last ~12–16 blocks; keep current block in upper third. Tune visually in the §8.12 pass.
+   - **RESOLVED:** render last ~12–16 blocks; keep current block in upper third; tune visually in the §8.12 pass. Adopted in 16-04 Task 2.
 
 ## Environment Availability
 
