@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Endless Arcade Primitive
-status: planning
-stopped_at: Phase 16 planned (7 plans, plan-check passed)
-last_updated: "2026-06-28T02:20:49.568Z"
-last_activity: 2026-06-27
+status: executing
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-06-28T18:57:28.670Z"
+last_activity: 2026-06-28
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 12
+  completed_plans: 6
   percent: 25
 ---
 
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 ## Current Position
 
-Phase: 16
-Plan: Not started (7 plans ready)
+Phase: 16 (stack) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-06-27
+Last activity: 2026-06-28
 
 ## v1.0 Carry-Over
 
@@ -139,6 +139,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 15 P03 | 6 | 3 tasks | 4 files |
 | Phase 15 P02 | 7 | 2 tasks | 2 files |
 | Phase 15 P04 | 8 | 3 tasks | 4 files |
+| Phase 16-stack P01 | 57600 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -379,6 +380,9 @@ Recent decisions affecting current work:
 - Plan 12-05: §8.12 audit screenshots NOT persisted to disk — auditor evaluated on running simulator and confirmed pass; Plan 12-06's manual-check doc will capture the final-render parity matrix including the locked Hard rows.
 - Phase 12 closes PARTIAL (gaps_found) — SC1 + SC3 FAIL on small-zone picker/chip routing; P11 carryforward defect, closure via Phase 12.1
 - Phase 12.1-01: SlotAnchorMap extended with headerBar field (D-01 LOCKED) — named-fields shape preserves compile-time exhaustiveness; 6 per-zone values match D-02 matrix; back/settings/picker/fab byte-identical (D-03 lock).
+- [Phase 16-stack]: Closed-form tri() for SC2 ProMotion-equivalence — Closed-form tri(blockElapsed * oscSpeed) ensures position is identical for any dt granularity. Velocity-bounce shifts phase at reflections, causing 60Hz/120Hz divergence.
+- [Phase 16-stack]: nonisolated struct StackConfig to satisfy Swift 6 MainActor isolation — Under -default-isolation MainActor, plain static lets are implicitly @MainActor and cannot be used as default parameter values in nonisolated contexts. Marking the struct and its static presets nonisolated fixes the compiler error without any behavior change.
+- [Phase 16-stack]: proMotionEquivalence uses center-crossing steps for bit-exact width equality — Trim drop widths differ by ~1 ULP between 60Hz/120Hz accumulation paths. Dropping at center-crossing steps ensures all drops are PERFECT (offset << tolerance), making width = top.width (cx-independent) and bit-exact equal. Eliminates ULP noise from different FP accumulation paths.
 
 ### Pending Todos
 
@@ -401,8 +405,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-28T02:20:49.558Z
-Stopped at: Phase 16 context gathered
-Resume file: .planning/phases/16-stack/16-CONTEXT.md
+Last session: 2026-06-28T18:57:28.661Z
+Stopped at: Completed 16-01-PLAN.md
+Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z

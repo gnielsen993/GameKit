@@ -502,7 +502,7 @@ Brand constraint is absolute: these are calm endless games, not twitch arcade. S
 **Plans**: 7 plans (4 waves)
 
 Plans:
-- [ ] 16-01-PLAN.md — StackEngine + StackConfig + determinism tests (Wave 0, STACK-01/02/03)
+- [x] 16-01-PLAN.md — StackEngine + StackConfig + determinism tests (Wave 0, STACK-01/02/03)
 - [ ] 16-02-PLAN.md — GameStats.recordStackRun + persistence test (Wave 0, STACK-04)
 - [ ] 16-03-PLAN.md — StackViewModel: accumulator + counters + save-on-game-over (Wave 1, STACK-01/03/04)
 - [ ] 16-04-PLAN.md — StackPalette + StackBoardCanvas Reduce Motion render (Wave 1, STACK-05/06)
@@ -544,7 +544,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 15. Arcade Substrate + Skeleton | 5/5 | Complete    | 2026-06-27 |
-| 16. Stack | 0/7 | Planned | - |
+| 16. Stack | 1/7 | In Progress|  |
 | 17. Snake | 0/TBD | Not started | - |
 | 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
 
