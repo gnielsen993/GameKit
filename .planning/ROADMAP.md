@@ -544,7 +544,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 15. Arcade Substrate + Skeleton | 5/5 | Complete    | 2026-06-27 |
-| 16. Stack | 0/7 | Planning | - |
+| 16. Stack | 0/7 | Planned | - |
 | 17. Snake | 0/TBD | Not started | - |
 | 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
 
