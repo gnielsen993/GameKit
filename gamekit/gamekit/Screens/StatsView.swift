@@ -218,14 +218,10 @@ struct StatsView: View {
                         }
                     }
 
-                    // Phase 15: Stack placeholder — replaced by StackStatsCard in Phase 16
                     if shows(.stack) {
                         if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "STACK")) }
                         DKCard(theme: theme) {
-                            Text(String(localized: "No Stack games yet."))
-                                .font(theme.typography.body)
-                                .foregroundStyle(theme.colors.textSecondary)
-                                .padding(theme.spacing.m)
+                            StackStatsCard(theme: theme, records: stackRecords, bestScores: stackBestScores)
                         }
                     }
 
