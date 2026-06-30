@@ -34,6 +34,15 @@ final class StackViewModel {
     /// then cleared inside the accumulator loop so one tap = one engine step.
     var pendingDrop: Bool = false
 
+    // MARK: - View-readable engine state (plan 16-05 wiring notes)
+
+    /// Placed-block array forwarded to StackBoardCanvas (engine.placed is private(set)).
+    var placed: [PlacedBlock] { engine.placed }
+
+    /// Gaffer interpolation alpha: accumulator ÷ fixedDt, clamped to [0,1].
+    /// StackBoardCanvas uses this to interpolate the slider between engine ticks.
+    var accumulatorAlpha: Double { fixedDt > 0 ? min(accumulator / fixedDt, 1) : 0 }
+
     // MARK: - Private engine + accumulator
 
     private var engine: StackEngine
