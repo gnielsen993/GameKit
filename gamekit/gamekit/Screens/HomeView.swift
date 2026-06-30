@@ -379,7 +379,7 @@ struct HomeView: View {
         // — continuous input cannot pause-and-reflow mid-run without desync. Klondike is the
         // existing precedent; Stack and Snake follow the same pattern.
         case .stack:
-            StackHarnessView()
+            StackGameView()
                 .disableInteractivePop()
         case .snake:
             SnakeHarnessView()
