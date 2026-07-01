@@ -4,13 +4,13 @@ milestone: v1.5
 milestone_name: Endless Arcade Primitive
 status: executing
 stopped_at: Completed 16-01-PLAN.md
-last_updated: "2026-06-30T01:38:04.034Z"
+last_updated: "2026-06-30T02:19:20.922Z"
 last_activity: 2026-06-30
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 10
+  completed_plans: 11
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 ## Current Position
 
 Phase: 16 (stack) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-06-30
 
@@ -143,6 +143,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 16 P02 | 10 | 2 tasks | 2 files |
 | Phase 16-stack P03 | 291 | 2 tasks | 1 files |
 | Phase 16-stack P04 | 15 | 2 tasks | 2 files |
+| Phase 16-stack P05 | 29 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -386,6 +387,7 @@ Recent decisions affecting current work:
 - [Phase 16-stack]: Closed-form tri() for SC2 ProMotion-equivalence — Closed-form tri(blockElapsed * oscSpeed) ensures position is identical for any dt granularity. Velocity-bounce shifts phase at reflections, causing 60Hz/120Hz divergence.
 - [Phase 16-stack]: nonisolated struct StackConfig to satisfy Swift 6 MainActor isolation — Under -default-isolation MainActor, plain static lets are implicitly @MainActor and cannot be used as default parameter values in nonisolated contexts. Marking the struct and its static presets nonisolated fixes the compiler error without any behavior change.
 - [Phase 16-stack]: proMotionEquivalence uses center-crossing steps for bit-exact width equality — Trim drop widths differ by ~1 ULP between 60Hz/120Hz accumulation paths. Dropping at center-crossing steps ensures all drops are PERFECT (offset << tolerance), making width = top.width (cx-independent) and bit-exact equal. Eliminates ULP noise from different FP accumulation paths.
+- [Phase ?]: StackGameView game-over pre-roll: .grayscale easeOut on Canvas + 500ms sleep before banner (RM/animations-off: instant cut per DESIGN §10.3)
 
 ### Pending Todos
 
