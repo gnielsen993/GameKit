@@ -1,6 +1,6 @@
 # ADR: Stack and Snake are exempt from Video Mode (ARCADE-08)
 
-**Status:** Accepted — 2026-06-26
+**Status:** Accepted — 2026-06-26 · **Amended 2026-07-02 — Stack exemption lifted (see Amendment below); Snake remains exempt**
 **Satisfies:** ARCADE-08 (documentation deliverable)
 
 ---
@@ -100,5 +100,32 @@ for v1.5.
 
 ---
 
+## Amendment — 2026-07-02: Stack exemption lifted
+
+User decision during Phase 16 polish: Stack adopts `.videoModeAware(minBoardHeight: 480)`.
+
+The original rationale does not hold for Stack as built:
+- `StackEngine` is pure normalized-coordinate (playfield width = 1.0) — it has zero pixel
+  knowledge. There is no pixel-derived state to invalidate.
+- `StackBoardCanvas` derives ALL geometry from its size inside the draw closure, every frame.
+  A mid-run reflow rescales the render; the engine's computed frame is untouched. No desync
+  is possible — the "invalid board state" claim assumed pixel-anchored fall physics Stack
+  never had (falls are view-layer FX in normalized coords, scaled at draw time).
+
+Adoption (DESIGN.md §7, mirroring MergeGameView+VideoMode.swift):
+- Large zones: nav bar hidden, `VideoCompactControlRow` opposite the band
+  (Back | ScoreChip | empty picker | StreakChip). No restart in the row — Stack has no
+  mid-run restart by design; the game-over banner carries it.
+- Small zones: existing layout; back chevron via `anchors.back`, score/streak overlay to
+  the `anchors.headerBar` corner.
+- Off-path byte-identical (§7.6).
+
+**Snake remains exempt** — its rationale is real: grid cells are pixel-derived and input is
+continuous steering. The suspend-on-PiP design in **Future** above is still the correct path
+for Snake if adoption is ever desired.
+
+---
+
 *Phase: 15-arcade-substrate-skeleton*
 *Written: 2026-06-27*
+*Amended: 2026-07-02 (Stack adoption — Phase 16 polish)*

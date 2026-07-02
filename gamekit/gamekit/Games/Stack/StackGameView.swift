@@ -10,7 +10,11 @@
 //  slow-mo with full settings/Reduce Motion gating.
 //
 //  Architecture invariants:
-//    - No .videoModeAware() — real-time games are Video Mode exempt (ARCADE-08).
+//    - Video Mode adopted (ARCADE-08 amendment 2026-07-02): the engine is
+//      pure normalized-coordinate and the canvas rescales per frame, so a
+//      PiP reflow cannot desync state. Wrapped with .videoModeAware() in
+//      HomeView; branch layouts live in StackGameView+VideoMode.swift.
+//      Off-path (Video Mode disabled) stays byte-identical (DESIGN §7.6).
 //    - scenePhase .inactive AND .background both call vm.pause() (Pitfall P1).
 //    - hapticsEnabled is the FIRST guard on both .sensoryFeedback triggers (D-10).
 //    - VideoModeBanner fires its own .error haptic — no duplicate here (D-08).
@@ -35,13 +39,14 @@ struct StackGameView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.settingsStore) var settingsStore
     @Environment(\.accessibilityReduceMotion) var reduceMotion
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.videoModeStore) var videoModeStore
+    @Environment(\.dismiss) var dismiss
 
     // MARK: - View state
 
-    @State private var vm = StackViewModel()
+    @State var vm = StackViewModel()
     @State private var didInjectStats = false
-    @State private var showBanner: Bool = false
+    @State var showBanner: Bool = false
 
     // FX state — spawned from engine counter-triggers, drawn by the canvas.
     @State private var lastPlacementAt: Date?
@@ -50,49 +55,27 @@ struct StackGameView: View {
     @State private var landingFlash: LandingFlash?
     @State private var settleGlide: SettleGlide?
 
-    private var theme: Theme { themeManager.theme(using: colorScheme) }
+    var theme: Theme { themeManager.theme(using: colorScheme) }
 
     /// Single gate for every time-based visual effect (D-09).
-    private var fxEnabled: Bool { settingsStore.animationsEnabled && !reduceMotion }
+    var fxEnabled: Bool { settingsStore.animationsEnabled && !reduceMotion }
 
     // MARK: - Body
 
     var body: some View {
-        ZStack {
-            // Board + backdrop share the game-over grayscale drain (D-09).
-            Group {
-                backdrop
-                board
-            }
-            .grayscale(vm.state == .gameOver ? 1.0 : 0.0)
-            .animation(fxEnabled ? .easeOut(duration: 0.5) : nil,
-                       value: vm.state == .gameOver)
-
-            // Score + streak overlay — always visible during running and game-over
-            if vm.state == .running || vm.state == .gameOver {
-                scoreOverlay
-            }
-
-            // Idle / tap-to-start screen (§8.3 explicit empty/idle state)
-            if vm.state == .idle {
-                idleContent
-            }
-
-            // Game-over banner — delayed by pre-roll when animations on
-            if showBanner {
-                VideoModeBanner(
-                    theme: theme,
-                    content: gameOverContent,
-                    location: .largeBottom,
-                    hapticsEnabled: settingsStore.hapticsEnabled,
-                    reduceMotion: reduceMotion,
-                    animationsEnabled: settingsStore.animationsEnabled
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                .videoModeBannerTransition(reduceMotion: reduceMotion,
-                                           animationsEnabled: settingsStore.animationsEnabled)
+        Group {
+            if videoModeStore.isEnabled {
+                // Large/Small-zone branch layouts — StackGameView+VideoMode.swift.
+                videoModeLayout
+            } else {
+                // Off-path — byte-identical to pre-adoption Stack (DESIGN §7.6).
+                coreStack(scoreAlignment: .topTrailing)
+                    .navigationTitle(String(localized: "Stack"))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar { backChevron }
             }
         }
+        .navigationBarBackButtonHidden(true)
         // Tap anywhere: starts from idle, drops the block while running.
         .onTapGesture {
             switch vm.state {
@@ -101,10 +84,6 @@ struct StackGameView: View {
             default:       break
             }
         }
-        .navigationTitle(String(localized: "Stack"))
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar { backChevron }
         // Arcade loop (CONTEXT D-01 / ArcadeLoopDriver contract)
         .arcadeLoop(isRunning: vm.state == .running) { dt in vm.tick(dt: dt) }
         // Lifecycle — BOTH .inactive and .background pause (Pitfall P1)
@@ -184,12 +163,64 @@ struct StackGameView: View {
         }
     }
 
+    // MARK: - Core stack (shared by off-path + both Video Mode branches)
+
+    /// The game surface: backdrop + board under the game-over grayscale
+    /// drain, plus the score overlay / idle card / game-over banner layers.
+    ///
+    /// - Parameter scoreAlignment: corner for the score+streak overlay;
+    ///   `nil` hides it (Large zones — score lives in the compact row).
+    /// - Parameter includeBackdrop: `false` on the Large-zone branch, which
+    ///   draws the backdrop itself behind the compact row + board VStack.
+    @ViewBuilder
+    func coreStack(scoreAlignment: Alignment?, includeBackdrop: Bool = true) -> some View {
+        ZStack {
+            // Board + backdrop share the game-over grayscale drain (D-09).
+            Group {
+                if includeBackdrop {
+                    backdrop
+                }
+                board
+            }
+            .grayscale(vm.state == .gameOver ? 1.0 : 0.0)
+            .animation(fxEnabled ? .easeOut(duration: 0.5) : nil,
+                       value: vm.state == .gameOver)
+
+            // Score + streak overlay — always visible during running and game-over
+            if let scoreAlignment, vm.state == .running || vm.state == .gameOver {
+                scoreOverlay(alignment: scoreAlignment)
+            }
+
+            // Idle / tap-to-start screen (§8.3 explicit empty/idle state)
+            if vm.state == .idle {
+                idleContent
+            }
+
+            // Game-over banner — delayed by pre-roll when animations on.
+            // Centered in ALL modes (user override 2026-05-14 — banner
+            // placement router intentionally not consumed).
+            if showBanner {
+                VideoModeBanner(
+                    theme: theme,
+                    content: gameOverContent,
+                    location: videoModeStore.isEnabled ? videoModeStore.location : .largeBottom,
+                    hapticsEnabled: settingsStore.hapticsEnabled,
+                    reduceMotion: reduceMotion,
+                    animationsEnabled: settingsStore.animationsEnabled
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .videoModeBannerTransition(reduceMotion: reduceMotion,
+                                           animationsEnabled: settingsStore.animationsEnabled)
+            }
+        }
+    }
+
     // MARK: - Board + backdrop
 
     /// TimelineView is the time source for the camera ease and FX. Paused
     /// whenever nothing time-based can be animating — idle, banner shown,
     /// or FX gated off — so it never burns frames for a static board.
-    private var board: some View {
+    var board: some View {
         TimelineView(.animation(paused: !fxEnabled || vm.state == .idle || showBanner)) { tl in
             StackBoardCanvas(
                 placed: vm.placed,
@@ -212,7 +243,7 @@ struct StackGameView: View {
     /// Sky gradient derived from the tower's current palette layer over the
     /// background token — shifts hue gently as the tower climbs (all token
     /// colors; opacity-only derivation).
-    private var backdrop: some View {
+    var backdrop: some View {
         let sky = StackPalette.layer(forIndex: max(vm.placed.count - 1, 0),
                                      theme: theme).base
         return LinearGradient(
@@ -280,25 +311,24 @@ struct StackGameView: View {
 
     // MARK: - Chrome overlays
 
-    /// Score chip (top-trailing) + visible streak counter (D-04).
-    @ViewBuilder private var scoreOverlay: some View {
-        VStack {
-            HStack {
-                Spacer()
-                VStack(alignment: .trailing, spacing: theme.spacing.xs) {
-                    Text("\(vm.frame.score)")
-                        .font(theme.typography.title.monospacedDigit())
-                        .foregroundStyle(theme.colors.textPrimary)
-                    if vm.frame.streak > 0 {
-                        Text(String(localized: "Streak: \(vm.frame.streak)"))
-                            .font(theme.typography.caption.monospacedDigit())
-                            .foregroundStyle(theme.colors.accentPrimary)
-                    }
-                }
-                .padding(theme.spacing.m)
+    /// Score + visible streak counter (D-04). Corner is parameterized for
+    /// Video Mode Small zones (overlay packs opposite the PiP per DESIGN
+    /// §7.2); off-path always passes `.topTrailing` — the v1.5 baseline.
+    @ViewBuilder func scoreOverlay(alignment: Alignment) -> some View {
+        let leadingSide = (alignment == .topLeading || alignment == .bottomLeading)
+        VStack(alignment: leadingSide ? .leading : .trailing, spacing: theme.spacing.xs) {
+            Text("\(vm.frame.score)")
+                .font(theme.typography.title.monospacedDigit())
+                .foregroundStyle(theme.colors.textPrimary)
+            if vm.frame.streak > 0 {
+                Text(String(localized: "Streak: \(vm.frame.streak)"))
+                    .font(theme.typography.caption.monospacedDigit())
+                    .foregroundStyle(theme.colors.accentPrimary)
             }
-            Spacer()
         }
+        .padding(theme.spacing.m)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
+        .allowsHitTesting(false)   // board overlays never intercept taps (DESIGN §7.1)
     }
 
     /// Idle / tap-to-start screen — shown before the first tap and after restart.
@@ -329,17 +359,23 @@ struct StackGameView: View {
 
     @ToolbarContentBuilder private var backChevron: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.backward")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(theme.colors.textPrimary)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Back to The Drawer"))
+            backButton
         }
+    }
+
+    /// Back chevron button body — shared between the off-path toolbar and
+    /// the Small-zone routed toolbar (StackGameView+VideoMode.swift).
+    var backButton: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "chevron.backward")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(theme.colors.textPrimary)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Back to The Drawer"))
     }
 }

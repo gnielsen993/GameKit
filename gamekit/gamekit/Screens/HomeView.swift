@@ -375,11 +375,13 @@ struct HomeView: View {
             WordGridGameView(initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
-        // ADR ARCADE-08 (15-VIDEO-MODE-ADR.md): real-time games are exempt from .videoModeAware()
-        // — continuous input cannot pause-and-reflow mid-run without desync. Klondike is the
-        // existing precedent; Stack and Snake follow the same pattern.
+        // ADR ARCADE-08 amendment (15-VIDEO-MODE-ADR.md, 2026-07-02): Stack adopts Video Mode —
+        // its engine is pure normalized-coordinate and the canvas rescales per frame, so a PiP
+        // reflow cannot desync state. Snake stays exempt (pixel-derived grid cells + continuous
+        // steering); Klondike stays exempt by convention (drag interactions).
         case .stack:
             StackGameView()
+                .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
         case .snake:
             SnakeHarnessView()

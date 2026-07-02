@@ -163,7 +163,7 @@ zero monetization. Each requirement maps to a roadmap phase.
 - [x] **ARCADE-05**: High score and run counts persist via the existing `BestScore` / `GameRecord` SwiftData schema (additive `GameKind` cases + `"endless"` mode key, CloudKit-safe); the save fires on game-over (not per-frame) and survives force-quit
 - [x] **ARCADE-06**: All arcade haptics, SFX, and animations route through `SettingsStore` toggles and respect `accessibilityReduceMotion` (counter-trigger pattern)
 - [ ] **ARCADE-07**: Stats screen presents a score-based shape for endless games (high score, runs played, average/total) distinct from win/loss columns, with an explicit empty state
-- [x] **ARCADE-08**: Stack and Snake are exempt from Video Mode (no `.videoModeAware()`); the exemption is recorded in an ADR
+- [x] **ARCADE-08**: Stack and Snake are exempt from Video Mode (no `.videoModeAware()`); the exemption is recorded in an ADR — *amended 2026-07-02: Stack adopts Video Mode (normalized-coordinate engine makes reflow safe); Snake remains exempt. See 15-VIDEO-MODE-ADR.md Amendment.*
 - [x] **ARCADE-09**: Stack and Snake appear as enabled game cards on Home and launch into their game screens (new accent slots added per existing `GameDescriptor` pattern)
 
 ### Stack
@@ -191,7 +191,7 @@ zero monetization. Each requirement maps to a roadmap phase.
 |---------|--------|
 | Daily seed challenge | Deferred — calm retention idea worth doing later; keeps v1.5 focused on the substrate + two games |
 | Twitch/reflex arcade (renamed Flappy, rhythm-tap, falling-blocks) | Mood-gated for a later milestone; v1.5 is calm-only. Parked in `.planning/UPCOMING-GAMES.md` |
-| Video Mode adoption for arcade games | Real-time continuous input cannot pause-and-reflow for a PiP overlay (ARCADE-08) |
+| Video Mode adoption for arcade games | Real-time continuous input cannot pause-and-reflow for a PiP overlay (ARCADE-08) — *Stack un-scoped from this exclusion 2026-07-02 (ADR amendment); Snake still excluded* |
 | Online leaderboards / accounts / any monetization | Violates the no-ads/no-coins/no-accounts core value — permanent exclusion |
 | Chess puzzles; Word/Solitaire/Sudoku depth | Separate future milestones |
 
