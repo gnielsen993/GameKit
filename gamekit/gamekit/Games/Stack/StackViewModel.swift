@@ -33,6 +33,10 @@ final class StackViewModel {
     private(set) var perfectCount: Int = 0
     /// Counter-trigger for .impact(.light) haptic on trim drop (DESIGN §8.3).
     private(set) var dropCount: Int = 0
+    /// Overhang width severed by the last trim drop — latched here because
+    /// `frame.event` is perishable: a second engine step in the same tick()
+    /// call overwrites it with .none before the view's onChange can read it.
+    private(set) var lastTrimOverhang: Double = 0
     /// SwiftData firewall: opaque GameStats reference (VM never imports SwiftData).
     private(set) var gameStats: GameStats?
 
@@ -124,8 +128,9 @@ final class StackViewModel {
                 perfectCount += 1
                 lastDropCenterX = beforeCenterX
                 prevCenterX = newFrame.currentCenterX
-            case .trim:
+            case .trim(let overhang):
                 dropCount += 1
+                lastTrimOverhang = overhang
                 lastDropCenterX = beforeCenterX
                 prevCenterX = newFrame.currentCenterX
             case .miss:
@@ -164,6 +169,7 @@ final class StackViewModel {
         accumulator = 0
         perfectCount = 0
         dropCount = 0
+        lastTrimOverhang = 0
         pendingDrop = false
         prevCenterX = engine.cfg.playfieldCenter
         lastDropCenterX = engine.cfg.playfieldCenter

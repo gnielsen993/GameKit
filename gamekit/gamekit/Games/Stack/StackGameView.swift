@@ -232,12 +232,14 @@ struct StackGameView: View {
 
     // MARK: - FX helpers
 
-    /// Builds the severed-overhang piece from the latest `.trim` engine event.
-    /// The trimmed block's center sits toward the drop side of the reference
-    /// block, which tells us which edge the overhang broke off.
+    /// Builds the severed-overhang piece from the latest trim drop. Reads the
+    /// VM's latched `lastTrimOverhang` — NOT `frame.event`, which a second
+    /// engine step in the same tick can overwrite with .none before this
+    /// onChange runs. The trimmed block's center sits toward the drop side
+    /// of the reference block, which tells us which edge broke off.
     private func makeTrimPiece() -> FallingTrimPiece? {
-        guard case .trim(let overhang) = vm.frame.event,
-              vm.placed.count >= 2 else { return nil }
+        let overhang = vm.lastTrimOverhang
+        guard overhang > 0, vm.placed.count >= 2 else { return nil }
         let trimmed = vm.placed[vm.placed.count - 1]
         let ref     = vm.placed[vm.placed.count - 2]
         let fallsRight = trimmed.centerX >= ref.centerX
