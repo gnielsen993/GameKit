@@ -21,6 +21,14 @@ final class StackViewModel {
     private(set) var state: ArcadeGameState = .idle
     /// Latest engine snapshot — Canvas reads this each frame.
     private(set) var frame: StackFrame
+    /// Slider center at the previous engine tick — Gaffer interpolation
+    /// anchor for StackBoardCanvas. Reset to the NEW slider's center on
+    /// placement so a fresh block appears cleanly at its spawn edge instead
+    /// of lerping across the screen in one tick.
+    private(set) var prevCenterX: Double
+    /// Rendered drop position of the last placed/missed block — feeds the
+    /// perfect-settle glide and the game-over falling block in the view.
+    private(set) var lastDropCenterX: Double
     /// Counter-trigger for .impact(.medium) haptic on perfect drop (DESIGN §8.3).
     private(set) var perfectCount: Int = 0
     /// Counter-trigger for .impact(.light) haptic on trim drop (DESIGN §8.3).
@@ -55,6 +63,8 @@ final class StackViewModel {
     init(cfg: StackConfig = .default) {
         self.engine = StackEngine(cfg: cfg)
         self.fixedDt = cfg.fixedDt
+        self.prevCenterX = cfg.playfieldCenter
+        self.lastDropCenterX = cfg.playfieldCenter
         // Initial frame mirrors the engine's seeded state (1 base block at centre).
         // Score = 1 because placed.count == 1 after StackEngine.init.
         self.frame = StackFrame(
@@ -98,19 +108,31 @@ final class StackViewModel {
             // Latch input then clear so exactly one engine step consumes the tap.
             let input = StackInput(drop: pendingDrop)
             pendingDrop = false
+            let beforeCenterX = frame.currentCenterX
             let newFrame = engine.step(dt: fixedDt, input: input)
             accumulator -= fixedDt
             frame = newFrame
 
             // Counter-trigger haptics — view attaches .sensoryFeedback to these.
             // NOTE: no game-over counter — VideoModeBanner fires .error itself.
+            // On placement/miss: record the drop position (settle glide /
+            // game-over fall FX) and snap the Gaffer anchor to the NEW
+            // slider's spawn center — otherwise the canvas lerps the fresh
+            // block across the whole screen in a single tick.
             switch newFrame.event {
             case .perfect:
                 perfectCount += 1
+                lastDropCenterX = beforeCenterX
+                prevCenterX = newFrame.currentCenterX
             case .trim:
                 dropCount += 1
-            default:
-                break
+                lastDropCenterX = beforeCenterX
+                prevCenterX = newFrame.currentCenterX
+            case .miss:
+                lastDropCenterX = beforeCenterX
+                prevCenterX = newFrame.currentCenterX
+            case .none:
+                prevCenterX = beforeCenterX
             }
 
             // Game-over transition: save exactly once, then exit (Pitfall 12).
@@ -143,6 +165,8 @@ final class StackViewModel {
         perfectCount = 0
         dropCount = 0
         pendingDrop = false
+        prevCenterX = engine.cfg.playfieldCenter
+        lastDropCenterX = engine.cfg.playfieldCenter
         frame = StackFrame(
             currentCenterX: engine.cfg.playfieldCenter,
             currentWidth: engine.cfg.startingWidth,

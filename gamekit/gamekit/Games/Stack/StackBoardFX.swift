@@ -13,8 +13,13 @@
 
 import Foundation
 
-/// A trimmed overhang piece falling off the tower with gravity, drift,
-/// rotation, and fade. Spawned on a `.trim` engine event.
+/// A severed piece falling off the tower with gravity, drift, rotation,
+/// and fade. Spawned on a `.trim` engine event (the overhang) and on game
+/// over (the whole missed block, so it falls instead of vanishing).
+///
+/// Motion profile is deliberately gentle — gravity/spin tuned so the piece
+/// detaches calmly rather than darting away, and opacity holds full for the
+/// first 40% of the lifetime before fading (see StackBoardCanvas).
 struct FallingTrimPiece: Identifiable, Equatable {
     let id = UUID()
     /// Normalized center X of the severed piece at the moment of the cut.
@@ -28,6 +33,25 @@ struct FallingTrimPiece: Identifiable, Equatable {
     let spawn: Date
 
     static let lifetime: TimeInterval = 0.8
+
+    /// Opacity: hold full until this fraction of lifetime, then fade linearly.
+    static let fadeStart: Double = 0.4
+
+    func age(at now: Date) -> TimeInterval { now.timeIntervalSince(spawn) }
+    func isExpired(at now: Date) -> Bool { age(at: now) >= Self.lifetime }
+}
+
+/// Perfect-drop settle: the placed block glides from its rendered drop
+/// position to the engine's snapped center instead of teleporting — the
+/// alignment correction stays legible without reading as a jump-cut.
+struct SettleGlide: Equatable {
+    /// Tower row of the just-placed block.
+    let rowIndex: Int
+    /// Rendered slider center at the moment of the drop (normalized).
+    let fromCenterX: Double
+    let spawn: Date
+
+    static let lifetime: TimeInterval = 0.14
 
     func age(at now: Date) -> TimeInterval { now.timeIntervalSince(spawn) }
     func isExpired(at now: Date) -> Bool { age(at: now) >= Self.lifetime }

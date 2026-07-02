@@ -41,7 +41,6 @@ struct StackGameView: View {
 
     @State private var vm = StackViewModel()
     @State private var didInjectStats = false
-    @State private var prevCenterX: Double = StackConfig.default.playfieldCenter
     @State private var showBanner: Bool = false
 
     // FX state — spawned from engine counter-triggers, drawn by the canvas.
@@ -49,6 +48,7 @@ struct StackGameView: View {
     @State private var fallingPieces: [FallingTrimPiece] = []
     @State private var perfectPulses: [PerfectPulse] = []
     @State private var landingFlash: LandingFlash?
+    @State private var settleGlide: SettleGlide?
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
 
@@ -115,10 +115,6 @@ struct StackGameView: View {
             @unknown default:              vm.pause()
             }
         }
-        // Track prevCenterX for Gaffer interpolation in StackBoardCanvas
-        .onChange(of: vm.frame.currentCenterX) { old, _ in
-            prevCenterX = old
-        }
         // Placement → camera ease timestamp + landing flash; restart → clear FX.
         .onChange(of: vm.placed.count) { old, new in
             if new > old {
@@ -131,12 +127,16 @@ struct StackGameView: View {
                 clearFX()
             }
         }
-        // Perfect drop → expanding pulse ring on the placed block.
+        // Perfect drop → expanding pulse ring + settle glide from the
+        // rendered drop position to the snapped center (no teleport).
         .onChange(of: vm.perfectCount) { _, _ in
             guard fxEnabled, !vm.placed.isEmpty else { return }
             let now = Date()
             perfectPulses = perfectPulses.filter { !$0.isExpired(at: now) }
                 + [PerfectPulse(rowIndex: vm.placed.count - 1, spawn: now)]
+            settleGlide = SettleGlide(rowIndex: vm.placed.count - 1,
+                                      fromCenterX: vm.lastDropCenterX,
+                                      spawn: now)
         }
         // Trim drop → severed overhang piece falls off the tower.
         .onChange(of: vm.dropCount) { _, _ in
@@ -147,6 +147,16 @@ struct StackGameView: View {
         // Game-over pre-roll gate (D-09): 500ms before banner when animations on
         .onChange(of: vm.state) { _, newState in
             if newState == .gameOver {
+                // The missed block falls off the tower instead of vanishing.
+                if fxEnabled, let top = vm.placed.last {
+                    fallingPieces.append(FallingTrimPiece(
+                        centerX: vm.lastDropCenterX,
+                        width: vm.frame.currentWidth,
+                        rowIndex: vm.placed.count,
+                        fallsRight: vm.lastDropCenterX >= top.centerX,
+                        spawn: Date()
+                    ))
+                }
                 showBanner = false
                 if fxEnabled {
                     Task {
@@ -184,7 +194,7 @@ struct StackGameView: View {
             StackBoardCanvas(
                 placed: vm.placed,
                 frame: vm.frame,
-                prevCenterX: prevCenterX,
+                prevCenterX: vm.prevCenterX,
                 accAlpha: vm.accumulatorAlpha,
                 theme: theme,
                 now: tl.date,
@@ -193,7 +203,8 @@ struct StackGameView: View {
                 lastPlacementAt: lastPlacementAt,
                 fallingPieces: fallingPieces,
                 perfectPulses: perfectPulses,
-                landingFlash: landingFlash
+                landingFlash: landingFlash,
+                settleGlide: settleGlide
             )
         }
     }
@@ -243,6 +254,7 @@ struct StackGameView: View {
         fallingPieces = []
         perfectPulses = []
         landingFlash = nil
+        settleGlide = nil
     }
 
     // MARK: - Game-over banner content
@@ -302,6 +314,13 @@ struct StackGameView: View {
             .frame(maxWidth: 220)
         }
         .padding(theme.spacing.xl)
+        // Card backing — the idle overlay sits on the tower pedestal, so it
+        // needs a surface behind it for contrast on every preset.
+        .background(
+            RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                .fill(theme.colors.surfaceElevated.opacity(0.94))
+        )
+        .padding(theme.spacing.l)
     }
 
     // MARK: - Toolbar

@@ -71,14 +71,19 @@ struct StackBoardCanvas: View {
     /// Brightness flash on the block that just landed.
     let landingFlash: LandingFlash?
 
+    /// Active perfect-drop settle glide (placed block eases to its snapped center).
+    let settleGlide: SettleGlide?
+
     // MARK: - Layout constants (all geometry derives from blockH)
 
     /// Number of block heights visible in the viewport.
     private static let visibleBlocks: CGFloat = 12
 
     /// Screen slot (in block heights from the bottom) where the slider
-    /// settles once the tower is tall enough to scroll.
-    private static let sliderSlot: Double = 7
+    /// settles once the tower is tall enough to scroll. High slot = the
+    /// action line sits near the top and the tower fills the screen below,
+    /// vanishing off the bottom edge — a top-down look at a tall tower.
+    private static let sliderSlot: Double = 9.5
 
     /// Camera ease duration per placement.
     private static let cameraEase: TimeInterval = 0.35
@@ -102,9 +107,26 @@ struct StackBoardCanvas: View {
 
             // Placed tower blocks (bottom-to-top; cull outside the viewport).
             for (i, block) in placed.enumerated() {
-                let rect = rowRect(block, row: i)
+                var rect = rowRect(block, row: i)
                 if rect.minY > size.height { continue }   // scrolled below viewport
                 if rect.maxY < 0 { break }                // above viewport — all higher rows too
+
+                // Base block renders as a pedestal column to the screen
+                // bottom — the tower is never a lone slab floating mid-air.
+                if i == 0 {
+                    rect.size.height = size.height - rect.minY
+                }
+
+                // Perfect-drop settle: glide from the rendered drop position
+                // to the snapped center (ease-out) instead of teleporting.
+                if fxEnabled, let glide = settleGlide, glide.rowIndex == i,
+                   !glide.isExpired(at: now) {
+                    let p = glide.age(at: now) / SettleGlide.lifetime
+                    let eased = 1 - pow(1 - p, 3)
+                    let cx = glide.fromCenterX + (block.centerX - glide.fromCenterX) * eased
+                    rect.origin.x = CGFloat(cx - block.width / 2) * playW
+                }
+
                 let layer = StackPalette.layer(forIndex: i, theme: theme)
                 drawShadedBlock(ctx, rect: rect, depthX: depthX, depthY: depthY, layer: layer)
 
@@ -149,17 +171,18 @@ struct StackBoardCanvas: View {
 
     // MARK: - Camera
 
-    /// Camera offset in block heights. Target keeps the slider at
-    /// `sliderSlot` block heights above the viewport bottom; each placement
-    /// eases the last block-height of travel over `cameraEase` seconds.
+    /// Camera offset in block heights (may be negative early game). The
+    /// target pins the slider at `sliderSlot` block heights above the
+    /// viewport bottom from the very first block — the base block renders
+    /// as a pedestal column down to the screen edge, so the tower always
+    /// reads as tall and viewed from above. Each placement eases the last
+    /// block-height of travel over `cameraEase` seconds.
     private func cameraBlocks() -> CGFloat {
-        let target = max(0, Double(placed.count + 1) - Self.sliderSlot)
-        guard fxEnabled, target > 0, let t0 = lastPlacementAt else {
-            return CGFloat(target)
-        }
+        let target = Double(placed.count + 1) - Self.sliderSlot
+        guard fxEnabled, let t0 = lastPlacementAt else { return CGFloat(target) }
         let progress = now.timeIntervalSince(t0) / Self.cameraEase
         guard progress < 1 else { return CGFloat(target) }
-        let from = max(0, target - 1)
+        let from = target - 1
         let eased = 1 - pow(1 - max(progress, 0), 3)   // ease-out cubic
         return CGFloat(from + (target - from) * eased)
     }
@@ -206,14 +229,16 @@ struct StackBoardCanvas: View {
 
     // MARK: - FX rendering
 
-    /// Severed overhang: gravity fall + outward drift + rotation + fade.
+    /// Severed piece: gentle gravity fall + outward drift + slow rotation.
+    /// Opacity holds full for the first 40% of the lifetime, then fades —
+    /// the piece visibly detaches and drops instead of darting away.
     private func drawFallingPiece(_ ctx: GraphicsContext, _ piece: FallingTrimPiece,
                                   blockH: CGFloat, playW: CGFloat, camPx: CGFloat,
                                   depthX: CGFloat, depthY: CGFloat, size: CGSize) {
         let t = piece.age(at: now)
         let dir: CGFloat = piece.fallsRight ? 1 : -1
-        let fall  = CGFloat(0.5 * 26 * t * t) * blockH          // gravity, blockH/s²
-        let drift = dir * CGFloat(t) * blockH * 1.2
+        let fall  = CGFloat(0.5 * 18 * t * t) * blockH          // gravity, blockH/s²
+        let drift = dir * CGFloat(t) * blockH * 0.6
         let rect = CGRect(
             x: CGFloat(piece.centerX - piece.width / 2) * playW + drift,
             y: size.height - CGFloat(piece.rowIndex + 1) * blockH + camPx + fall,
@@ -221,10 +246,14 @@ struct StackBoardCanvas: View {
             height: blockH
         )
 
+        let life = t / FallingTrimPiece.lifetime
+        let fade = max(0, 1 - max(0, life - FallingTrimPiece.fadeStart)
+                            / (1 - FallingTrimPiece.fadeStart))
+
         var pctx = ctx
-        pctx.opacity = max(0, 1 - t / FallingTrimPiece.lifetime)
+        pctx.opacity = fade
         pctx.translateBy(x: rect.midX, y: rect.midY)
-        pctx.rotate(by: .radians(Double(dir) * t * 2.0))
+        pctx.rotate(by: .radians(Double(dir) * t * 1.4))
         pctx.translateBy(x: -rect.midX, y: -rect.midY)
         drawShadedBlock(pctx, rect: rect, depthX: depthX, depthY: depthY,
                         layer: StackPalette.layer(forIndex: piece.rowIndex, theme: theme))
@@ -250,7 +279,7 @@ struct StackBoardCanvas: View {
     private func drawLandingFlash(_ ctx: GraphicsContext, rect: CGRect,
                                   depthX: CGFloat, depthY: CGFloat,
                                   layer: StackPalette.Layer, age: TimeInterval) {
-        let strength = (1 - age / LandingFlash.lifetime) * 0.8
+        let strength = (1 - age / LandingFlash.lifetime) * 0.6
         let top = polygon([
             CGPoint(x: rect.minX, y: rect.minY),
             CGPoint(x: rect.minX + depthX, y: rect.minY - depthY),
