@@ -2,12 +2,12 @@
 //  StackGameView.swift
 //  gamekit
 //
-//  Chrome + lifecycle shell for the Stack game. Hosts StackBoardCanvas,
-//  drives the arcade loop, wires tap-to-drop input, shows the idle screen
-//  and the VideoModeBanner game-over surface, and routes per-drop haptics
-//  plus the game-over slow-mo with full settings/Reduce Motion gating.
-//
-//  Plan 16-05 — replaces StackHarnessView (throwaway, deleted this plan).
+//  Chrome + lifecycle shell for the Stack game. Hosts StackBoardCanvas
+//  inside a TimelineView (time source for camera ease + FX), owns the
+//  visual-effect state spawned from engine events, drives the arcade loop,
+//  wires tap-to-drop input, shows the idle screen and the VideoModeBanner
+//  game-over surface, and routes per-drop haptics plus the game-over
+//  slow-mo with full settings/Reduce Motion gating.
 //
 //  Architecture invariants:
 //    - No .videoModeAware() — real-time games are Video Mode exempt (ARCADE-08).
@@ -16,6 +16,8 @@
 //    - VideoModeBanner fires its own .error haptic — no duplicate here (D-08).
 //    - Game-over pre-roll (500ms grayscale drain) runs only when
 //      animationsEnabled && !reduceMotion; instant cut otherwise (D-09).
+//    - All FX (camera ease, trim fall, pulses, flashes) are gated by
+//      animationsEnabled && !reduceMotion — gated off, everything snaps.
 //    - NEVER screen shake (any setting, any preset).
 //
 
@@ -42,31 +44,29 @@ struct StackGameView: View {
     @State private var prevCenterX: Double = StackConfig.default.playfieldCenter
     @State private var showBanner: Bool = false
 
+    // FX state — spawned from engine counter-triggers, drawn by the canvas.
+    @State private var lastPlacementAt: Date?
+    @State private var fallingPieces: [FallingTrimPiece] = []
+    @State private var perfectPulses: [PerfectPulse] = []
+    @State private var landingFlash: LandingFlash?
+
     private var theme: Theme { themeManager.theme(using: colorScheme) }
+
+    /// Single gate for every time-based visual effect (D-09).
+    private var fxEnabled: Bool { settingsStore.animationsEnabled && !reduceMotion }
 
     // MARK: - Body
 
     var body: some View {
         ZStack {
-            theme.colors.background
-                .ignoresSafeArea()
-
-            StackBoardCanvas(
-                placed: vm.placed,
-                frame: vm.frame,
-                prevCenterX: prevCenterX,
-                accAlpha: vm.accumulatorAlpha,
-                theme: theme,
-                reduceMotion: reduceMotion
-            )
-            // Color-drain pre-roll: desaturate on game-over (D-09).
-            // Animated when animationsEnabled && !reduceMotion; instant cut otherwise.
+            // Board + backdrop share the game-over grayscale drain (D-09).
+            Group {
+                backdrop
+                board
+            }
             .grayscale(vm.state == .gameOver ? 1.0 : 0.0)
-            .animation(
-                (settingsStore.animationsEnabled && !reduceMotion)
-                    ? .easeOut(duration: 0.5) : nil,
-                value: vm.state == .gameOver
-            )
+            .animation(fxEnabled ? .easeOut(duration: 0.5) : nil,
+                       value: vm.state == .gameOver)
 
             // Score + streak overlay — always visible during running and game-over
             if vm.state == .running || vm.state == .gameOver {
@@ -93,9 +93,13 @@ struct StackGameView: View {
                                            animationsEnabled: settingsStore.animationsEnabled)
             }
         }
-        // Tap drops the block during running state; idle state button handles its own tap.
+        // Tap anywhere: starts from idle, drops the block while running.
         .onTapGesture {
-            if vm.state == .running { vm.pendingDrop = true }
+            switch vm.state {
+            case .idle:    vm.start()
+            case .running: vm.pendingDrop = true
+            default:       break
+            }
         }
         .navigationTitle(String(localized: "Stack"))
         .navigationBarTitleDisplayMode(.inline)
@@ -115,11 +119,36 @@ struct StackGameView: View {
         .onChange(of: vm.frame.currentCenterX) { old, _ in
             prevCenterX = old
         }
+        // Placement → camera ease timestamp + landing flash; restart → clear FX.
+        .onChange(of: vm.placed.count) { old, new in
+            if new > old {
+                let stamp = Date()
+                lastPlacementAt = stamp
+                if fxEnabled {
+                    landingFlash = LandingFlash(rowIndex: new - 1, spawn: stamp)
+                }
+            } else {
+                clearFX()
+            }
+        }
+        // Perfect drop → expanding pulse ring on the placed block.
+        .onChange(of: vm.perfectCount) { _, _ in
+            guard fxEnabled, !vm.placed.isEmpty else { return }
+            let now = Date()
+            perfectPulses = perfectPulses.filter { !$0.isExpired(at: now) }
+                + [PerfectPulse(rowIndex: vm.placed.count - 1, spawn: now)]
+        }
+        // Trim drop → severed overhang piece falls off the tower.
+        .onChange(of: vm.dropCount) { _, _ in
+            guard fxEnabled, let piece = makeTrimPiece() else { return }
+            let now = Date()
+            fallingPieces = fallingPieces.filter { !$0.isExpired(at: now) } + [piece]
+        }
         // Game-over pre-roll gate (D-09): 500ms before banner when animations on
         .onChange(of: vm.state) { _, newState in
             if newState == .gameOver {
                 showBanner = false
-                if settingsStore.animationsEnabled && !reduceMotion {
+                if fxEnabled {
                     Task {
                         try? await Task.sleep(for: .milliseconds(500))
                         withAnimation(.easeOut(duration: 0.3)) { showBanner = true }
@@ -143,6 +172,77 @@ struct StackGameView: View {
             let stats = GameStats(modelContext: modelContext)
             vm.attachGameStats(stats)
         }
+    }
+
+    // MARK: - Board + backdrop
+
+    /// TimelineView is the time source for the camera ease and FX. Paused
+    /// whenever nothing time-based can be animating — idle, banner shown,
+    /// or FX gated off — so it never burns frames for a static board.
+    private var board: some View {
+        TimelineView(.animation(paused: !fxEnabled || vm.state == .idle || showBanner)) { tl in
+            StackBoardCanvas(
+                placed: vm.placed,
+                frame: vm.frame,
+                prevCenterX: prevCenterX,
+                accAlpha: vm.accumulatorAlpha,
+                theme: theme,
+                now: tl.date,
+                fxEnabled: fxEnabled,
+                reduceMotion: reduceMotion,
+                lastPlacementAt: lastPlacementAt,
+                fallingPieces: fallingPieces,
+                perfectPulses: perfectPulses,
+                landingFlash: landingFlash
+            )
+        }
+    }
+
+    /// Sky gradient derived from the tower's current palette layer over the
+    /// background token — shifts hue gently as the tower climbs (all token
+    /// colors; opacity-only derivation).
+    private var backdrop: some View {
+        let sky = StackPalette.layer(forIndex: max(vm.placed.count - 1, 0),
+                                     theme: theme).base
+        return LinearGradient(
+            stops: [
+                .init(color: sky.opacity(0.22), location: 0.0),
+                .init(color: sky.opacity(0.06), location: 0.45),
+                .init(color: theme.colors.textPrimary.opacity(0.0), location: 0.7),
+                .init(color: theme.colors.textPrimary.opacity(0.07), location: 1.0),
+            ],
+            startPoint: .top, endPoint: .bottom
+        )
+        .background(theme.colors.background)
+        .ignoresSafeArea()
+        .animation(fxEnabled ? .easeInOut(duration: 0.8) : nil,
+                   value: vm.placed.count / StackPalette.blocksPerStop)
+    }
+
+    // MARK: - FX helpers
+
+    /// Builds the severed-overhang piece from the latest `.trim` engine event.
+    /// The trimmed block's center sits toward the drop side of the reference
+    /// block, which tells us which edge the overhang broke off.
+    private func makeTrimPiece() -> FallingTrimPiece? {
+        guard case .trim(let overhang) = vm.frame.event,
+              vm.placed.count >= 2 else { return nil }
+        let trimmed = vm.placed[vm.placed.count - 1]
+        let ref     = vm.placed[vm.placed.count - 2]
+        let fallsRight = trimmed.centerX >= ref.centerX
+        let pieceCenter = fallsRight
+            ? trimmed.centerX + trimmed.width / 2 + overhang / 2
+            : trimmed.centerX - trimmed.width / 2 - overhang / 2
+        return FallingTrimPiece(centerX: pieceCenter, width: overhang,
+                                rowIndex: vm.placed.count - 1,
+                                fallsRight: fallsRight, spawn: Date())
+    }
+
+    private func clearFX() {
+        lastPlacementAt = nil
+        fallingPieces = []
+        perfectPulses = []
+        landingFlash = nil
     }
 
     // MARK: - Game-over banner content
@@ -193,15 +293,15 @@ struct StackGameView: View {
             Text(String(localized: "Stack"))
                 .font(theme.typography.titleLarge)
                 .foregroundStyle(theme.colors.textPrimary)
-            Text(String(localized: "Tap to start"))
+            Text(String(localized: "Tap anywhere to start"))
                 .font(theme.typography.body)
                 .foregroundStyle(theme.colors.textSecondary)
-            Button(String(localized: "Start")) {
+            DKButton(String(localized: "Start"), theme: theme) {
                 vm.start()
             }
-            .font(theme.typography.headline)
-            .foregroundStyle(theme.colors.accentPrimary)
+            .frame(maxWidth: 220)
         }
+        .padding(theme.spacing.xl)
     }
 
     // MARK: - Toolbar

@@ -335,6 +335,12 @@
     "Best %lld" : {
 
     },
+    "Best perfect streak: %@" : {
+
+    },
+    "Best Streak" : {
+
+    },
     "BEST TIMES" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -686,6 +692,12 @@
         }
       }
     },
+    "High Score" : {
+
+    },
+    "High score: %@" : {
+
+    },
     "HISTORY" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -913,7 +925,7 @@
     "No solved puzzles yet." : {
 
     },
-    "No Stack games yet." : {
+    "No Stack games played yet." : {
 
     },
     "No Sudoku games played yet." : {
@@ -1116,6 +1128,12 @@
         }
       }
     },
+    "Runs Played" : {
+
+    },
+    "Runs played: %lld" : {
+
+    },
     "Score" : {
 
     },
@@ -1240,6 +1258,9 @@
     "Stack: lower rank · opposite colour · King to empty" : {
 
     },
+    "Start" : {
+
+    },
     "State: %@" : {
 
     },
@@ -1259,6 +1280,9 @@
 
     },
     "Step 2 of 3. Welcome to GameDrawer." : {
+
+    },
+    "Streak: %lld" : {
 
     },
     "Strict mode off" : {
@@ -1312,6 +1336,12 @@
 
     },
     "System" : {
+
+    },
+    "Tap anywhere to start" : {
+
+    },
+    "Tap to start" : {
 
     },
     "Tap to Start" : {

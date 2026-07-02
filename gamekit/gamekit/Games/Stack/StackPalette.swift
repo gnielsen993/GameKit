@@ -10,10 +10,12 @@
 //  Background: DesignKit ColorDerivation.derivedCharts builds chart1…6
 //  by rotating hue around the active accent and varying brightness/saturation,
 //  so the tower literally becomes the current preset's accent palette (D-05).
-//  Brightness variation also gives visibly distinct steps on low-saturation
-//  presets (D-07 low-hue fallback — no special-casing needed).
 //
-//  Cycle length 6 (tuning constant — matches theme.charts count, D-06).
+//  Smooth ramp: instead of hard-cycling the 6 chart tokens per layer, each
+//  layer exposes a (base, next, blend) triple. The renderer composites
+//  `next` over `base` at `blend` opacity — an alpha-blend lerp that keeps
+//  every drawn color a pure token derivation while the tower shifts hue
+//  gradually, one layer at a time (period = 6 stops × blocksPerStop).
 //
 
 import SwiftUI
@@ -21,25 +23,29 @@ import DesignKit
 
 /// Accent-derived per-layer color ramp for the Stack tower.
 ///
-/// Cycles `theme.charts.chart1…chart6` by block index:
 /// - D-05: tower becomes the active preset's accent palette.
-/// - D-06: color is fixed by index and cycles every 6 layers. A placed
-///   block never changes color as the tower grows.
+/// - D-06: color is fixed by index — a placed block never changes color
+///   as the tower grows. The ramp cycles smoothly through chart1…6.
 /// - D-07: brightness variation in `derivedCharts` provides lightness
 ///   steps even on monochrome presets; no special-casing required.
-///
-/// All colors come from DesignKit semantic tokens only.
 enum StackPalette {
 
-    /// Returns the token color for a block at the given index.
-    ///
-    /// - Parameters:
-    ///   - i: Block index (0-based from the base block). Cycles every 6.
-    ///   - theme: Active DesignKit theme; tokens update on preset changes.
-    /// - Returns: A `Color` from `theme.charts.chart1…chart6`.
-    static func color(forIndex i: Int, theme: Theme) -> Color {
-        // Cycle length 6 — tuning constant matching the chart token count.
-        // Only DesignKit semantic tokens appear here (D-07 purity rule).
+    /// Layers per chart stop — the ramp crossfades to the next chart token
+    /// over this many blocks, so adjacent layers differ subtly instead of
+    /// jumping between tokens.
+    static let blocksPerStop = 4
+
+    /// One tower layer's color as a token pair + blend factor.
+    /// Renderers draw `base`, then `next` at `blend` opacity on top —
+    /// an exact alpha-blend lerp using only token colors.
+    struct Layer {
+        let base: Color
+        let next: Color
+        let blend: Double   // 0…1
+    }
+
+    /// Returns the blended layer colors for a block at the given index.
+    static func layer(forIndex i: Int, theme: Theme) -> Layer {
         let ramp: [Color] = [
             theme.charts.chart1,
             theme.charts.chart2,
@@ -48,6 +54,11 @@ enum StackPalette {
             theme.charts.chart5,
             theme.charts.chart6,
         ]
-        return ramp[i % ramp.count]   // D-06: color fixed by index, cycles (length 6)
+        let pos = Double(max(i, 0)) / Double(blocksPerStop)
+        let seg = Int(pos) % ramp.count
+        let frac = pos - pos.rounded(.down)
+        return Layer(base: ramp[seg],
+                     next: ramp[(seg + 1) % ramp.count],
+                     blend: frac)
     }
 }
