@@ -24,19 +24,24 @@ final class StackViewModel {
     /// Slider center at the previous engine tick — Gaffer interpolation
     /// anchor for StackBoardCanvas. Reset to the NEW slider's center on
     /// placement so a fresh block appears cleanly at its spawn edge instead
-    /// of lerping across the screen in one tick.
+    /// of lerping across the screen in one tick. Both axes are tracked; the
+    /// inactive axis is constant so its lerp is a no-op.
     private(set) var prevCenterX: Double
+    private(set) var prevCenterZ: Double
     /// Rendered drop position of the last placed/missed block — feeds the
     /// perfect-settle glide and the game-over falling block in the view.
     private(set) var lastDropCenterX: Double
+    private(set) var lastDropCenterZ: Double
     /// Counter-trigger for .impact(.medium) haptic on perfect drop (DESIGN §8.3).
     private(set) var perfectCount: Int = 0
     /// Counter-trigger for .impact(.light) haptic on trim drop (DESIGN §8.3).
     private(set) var dropCount: Int = 0
-    /// Overhang width severed by the last trim drop — latched here because
-    /// `frame.event` is perishable: a second engine step in the same tick()
-    /// call overwrites it with .none before the view's onChange can read it.
+    /// Overhang severed by the last trim drop + the axis it was cut on —
+    /// latched here because `frame.event` is perishable: a second engine
+    /// step in the same tick() call overwrites it with .none before the
+    /// view's onChange can read it.
     private(set) var lastTrimOverhang: Double = 0
+    private(set) var lastTrimAxis: StackAxis = .x
     /// SwiftData firewall: opaque GameStats reference (VM never imports SwiftData).
     private(set) var gameStats: GameStats?
 
@@ -68,12 +73,21 @@ final class StackViewModel {
         self.engine = StackEngine(cfg: cfg)
         self.fixedDt = cfg.fixedDt
         self.prevCenterX = cfg.playfieldCenter
+        self.prevCenterZ = cfg.playfieldCenter
         self.lastDropCenterX = cfg.playfieldCenter
-        // Initial frame mirrors the engine's seeded state (1 base block at centre).
-        // Score = 1 because placed.count == 1 after StackEngine.init.
-        self.frame = StackFrame(
+        self.lastDropCenterZ = cfg.playfieldCenter
+        self.frame = Self.initialFrame(cfg: cfg)
+    }
+
+    /// Mirrors the engine's seeded state (1 base block at centre, slider on X).
+    /// Score = 1 because placed.count == 1 after StackEngine.init.
+    private static func initialFrame(cfg: StackConfig) -> StackFrame {
+        StackFrame(
             currentCenterX: cfg.playfieldCenter,
+            currentCenterZ: cfg.playfieldCenter,
             currentWidth: cfg.startingWidth,
+            currentDepth: cfg.startingDepth,
+            axis: .x,
             score: 1,
             streak: 0,
             bestStreak: 0,
@@ -113,6 +127,7 @@ final class StackViewModel {
             let input = StackInput(drop: pendingDrop)
             pendingDrop = false
             let beforeCenterX = frame.currentCenterX
+            let beforeCenterZ = frame.currentCenterZ
             let newFrame = engine.step(dt: fixedDt, input: input)
             accumulator -= fixedDt
             frame = newFrame
@@ -126,18 +141,19 @@ final class StackViewModel {
             switch newFrame.event {
             case .perfect:
                 perfectCount += 1
-                lastDropCenterX = beforeCenterX
-                prevCenterX = newFrame.currentCenterX
-            case .trim(let overhang):
+                (lastDropCenterX, lastDropCenterZ) = (beforeCenterX, beforeCenterZ)
+                (prevCenterX, prevCenterZ) = (newFrame.currentCenterX, newFrame.currentCenterZ)
+            case .trim(let overhang, let axis):
                 dropCount += 1
                 lastTrimOverhang = overhang
-                lastDropCenterX = beforeCenterX
-                prevCenterX = newFrame.currentCenterX
+                lastTrimAxis = axis
+                (lastDropCenterX, lastDropCenterZ) = (beforeCenterX, beforeCenterZ)
+                (prevCenterX, prevCenterZ) = (newFrame.currentCenterX, newFrame.currentCenterZ)
             case .miss:
-                lastDropCenterX = beforeCenterX
-                prevCenterX = newFrame.currentCenterX
+                (lastDropCenterX, lastDropCenterZ) = (beforeCenterX, beforeCenterZ)
+                (prevCenterX, prevCenterZ) = (newFrame.currentCenterX, newFrame.currentCenterZ)
             case .none:
-                prevCenterX = beforeCenterX
+                (prevCenterX, prevCenterZ) = (beforeCenterX, beforeCenterZ)
             }
 
             // Game-over transition: save exactly once, then exit (Pitfall 12).
@@ -170,18 +186,13 @@ final class StackViewModel {
         perfectCount = 0
         dropCount = 0
         lastTrimOverhang = 0
+        lastTrimAxis = .x
         pendingDrop = false
         prevCenterX = engine.cfg.playfieldCenter
+        prevCenterZ = engine.cfg.playfieldCenter
         lastDropCenterX = engine.cfg.playfieldCenter
-        frame = StackFrame(
-            currentCenterX: engine.cfg.playfieldCenter,
-            currentWidth: engine.cfg.startingWidth,
-            score: 1,
-            streak: 0,
-            bestStreak: 0,
-            gameOver: false,
-            event: .none
-        )
+        lastDropCenterZ = engine.cfg.playfieldCenter
+        frame = Self.initialFrame(cfg: engine.cfg)
         state = .idle   // tap-to-start affordance re-shows after restart
     }
 }

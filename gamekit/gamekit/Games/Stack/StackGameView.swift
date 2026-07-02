@@ -115,6 +115,7 @@ struct StackGameView: View {
                 + [PerfectPulse(rowIndex: vm.placed.count - 1, spawn: now)]
             settleGlide = SettleGlide(rowIndex: vm.placed.count - 1,
                                       fromCenterX: vm.lastDropCenterX,
+                                      fromCenterZ: vm.lastDropCenterZ,
                                       spawn: now)
         }
         // Trim drop → severed overhang piece falls off the tower.
@@ -128,11 +129,18 @@ struct StackGameView: View {
             if newState == .gameOver {
                 // The missed block falls off the tower instead of vanishing.
                 if fxEnabled, let top = vm.placed.last {
+                    let axis = vm.frame.axis
+                    let fallsPositive = axis == .x
+                        ? vm.lastDropCenterX >= top.centerX
+                        : vm.lastDropCenterZ >= top.centerZ
                     fallingPieces.append(FallingTrimPiece(
                         centerX: vm.lastDropCenterX,
+                        centerZ: vm.lastDropCenterZ,
                         width: vm.frame.currentWidth,
+                        depth: vm.frame.currentDepth,
                         rowIndex: vm.placed.count,
-                        fallsRight: vm.lastDropCenterX >= top.centerX,
+                        axis: axis,
+                        fallsPositive: fallsPositive,
                         spawn: Date()
                     ))
                 }
@@ -220,23 +228,37 @@ struct StackGameView: View {
     /// TimelineView is the time source for the camera ease and FX. Paused
     /// whenever nothing time-based can be animating — idle, banner shown,
     /// or FX gated off — so it never burns frames for a static board.
+    ///
+    /// Video Mode large-bottom: the canvas extends UNDER the reserved band
+    /// (ignoresSafeArea) and receives the band height as `bottomObscured`,
+    /// so gameplay framing stays above the PiP while the tower pedestal
+    /// paints down to the physical screen bottom — no blank strip under the
+    /// board. Off-path and every other zone pass 0 and ignore nothing, so
+    /// their layout is unchanged (DESIGN §7.6).
     var board: some View {
-        TimelineView(.animation(paused: !fxEnabled || vm.state == .idle || showBanner)) { tl in
-            StackBoardCanvas(
-                placed: vm.placed,
-                frame: vm.frame,
-                prevCenterX: vm.prevCenterX,
-                accAlpha: vm.accumulatorAlpha,
-                theme: theme,
-                now: tl.date,
-                fxEnabled: fxEnabled,
-                reduceMotion: reduceMotion,
-                lastPlacementAt: lastPlacementAt,
-                fallingPieces: fallingPieces,
-                perfectPulses: perfectPulses,
-                landingFlash: landingFlash,
-                settleGlide: settleGlide
-            )
+        GeometryReader { proxy in
+            let obscured = videoModeStore.isEnabled && videoModeStore.location == .largeBottom
+                ? proxy.safeAreaInsets.bottom : 0
+            TimelineView(.animation(paused: !fxEnabled || vm.state == .idle || showBanner)) { tl in
+                StackBoardCanvas(
+                    placed: vm.placed,
+                    frame: vm.frame,
+                    prevCenterX: vm.prevCenterX,
+                    prevCenterZ: vm.prevCenterZ,
+                    accAlpha: vm.accumulatorAlpha,
+                    theme: theme,
+                    now: tl.date,
+                    fxEnabled: fxEnabled,
+                    reduceMotion: reduceMotion,
+                    lastPlacementAt: lastPlacementAt,
+                    fallingPieces: fallingPieces,
+                    perfectPulses: perfectPulses,
+                    landingFlash: landingFlash,
+                    settleGlide: settleGlide,
+                    bottomObscured: obscured
+                )
+            }
+            .ignoresSafeArea(.container, edges: obscured > 0 ? .bottom : [])
         }
     }
 
@@ -264,22 +286,39 @@ struct StackGameView: View {
     // MARK: - FX helpers
 
     /// Builds the severed-overhang piece from the latest trim drop. Reads the
-    /// VM's latched `lastTrimOverhang` — NOT `frame.event`, which a second
-    /// engine step in the same tick can overwrite with .none before this
-    /// onChange runs. The trimmed block's center sits toward the drop side
-    /// of the reference block, which tells us which edge broke off.
+    /// VM's latched `lastTrimOverhang` / `lastTrimAxis` — NOT `frame.event`,
+    /// which a second engine step in the same tick can overwrite with .none
+    /// before this onChange runs. The trimmed block's center sits toward the
+    /// drop side of the reference block along the trim axis, which tells us
+    /// which edge broke off.
     private func makeTrimPiece() -> FallingTrimPiece? {
         let overhang = vm.lastTrimOverhang
         guard overhang > 0, vm.placed.count >= 2 else { return nil }
         let trimmed = vm.placed[vm.placed.count - 1]
         let ref     = vm.placed[vm.placed.count - 2]
-        let fallsRight = trimmed.centerX >= ref.centerX
-        let pieceCenter = fallsRight
-            ? trimmed.centerX + trimmed.width / 2 + overhang / 2
-            : trimmed.centerX - trimmed.width / 2 - overhang / 2
-        return FallingTrimPiece(centerX: pieceCenter, width: overhang,
-                                rowIndex: vm.placed.count - 1,
-                                fallsRight: fallsRight, spawn: Date())
+        let axis    = vm.lastTrimAxis
+
+        if axis == .x {
+            let fallsPositive = trimmed.centerX >= ref.centerX
+            let pieceCenter = fallsPositive
+                ? trimmed.centerX + trimmed.width / 2 + overhang / 2
+                : trimmed.centerX - trimmed.width / 2 - overhang / 2
+            return FallingTrimPiece(centerX: pieceCenter, centerZ: trimmed.centerZ,
+                                    width: overhang, depth: trimmed.depth,
+                                    rowIndex: vm.placed.count - 1,
+                                    axis: .x, fallsPositive: fallsPositive,
+                                    spawn: Date())
+        } else {
+            let fallsPositive = trimmed.centerZ >= ref.centerZ
+            let pieceCenter = fallsPositive
+                ? trimmed.centerZ + trimmed.depth / 2 + overhang / 2
+                : trimmed.centerZ - trimmed.depth / 2 - overhang / 2
+            return FallingTrimPiece(centerX: trimmed.centerX, centerZ: pieceCenter,
+                                    width: trimmed.width, depth: overhang,
+                                    rowIndex: vm.placed.count - 1,
+                                    axis: .z, fallsPositive: fallsPositive,
+                                    spawn: Date())
+        }
     }
 
     private func clearFX() {

@@ -10,12 +10,14 @@
 import Foundation
 
 /// Tuning constants for the Stack engine. All speeds are in sweeps/sec (time-
-/// units, not frames). Coordinates are normalized: playfieldWidth = 1.0.
+/// units, not frames). Coordinates are normalized: the ground plane is a
+/// playfieldWidth × playfieldWidth square (X and Z share the same extent).
 nonisolated struct StackConfig: Sendable {
     let fixedDt: Double            // fixed sim timestep for the accumulator (HIGH: research-locked)
-    let playfieldWidth: Double     // normalized width of the playfield
-    let playfieldCenter: Double    // center X in normalized coords
-    let startingWidth: Double      // initial block width (HIGH: generous landing zone)
+    let playfieldWidth: Double     // normalized extent of the playfield (both axes)
+    let playfieldCenter: Double    // center coordinate in normalized coords (both axes)
+    let startingWidth: Double      // initial block extent along X (HIGH: generous landing zone)
+    let startingDepth: Double      // initial block extent along Z
     let minWidth: Double           // overlap below this = complete miss
     let startSpeed: Double         // sweep speed at score 0 (sweeps/sec)
     let maxSpeed: Double           // sweep speed after plateau (sweeps/sec)
@@ -31,7 +33,7 @@ nonisolated struct StackConfig: Sendable {
     nonisolated static let `default` = StackConfig(
         fixedDt: 1.0 / 60.0,
         playfieldWidth: 1.0, playfieldCenter: 0.5,
-        startingWidth: 0.62, minWidth: 0.015,
+        startingWidth: 0.62, startingDepth: 0.62, minWidth: 0.015,
         startSpeed: 0.35, maxSpeed: 0.90, plateauScore: 80,
         perfectTolerance: 0.015, streakThreshold: 5, expandAmount: 0.04,
         cycleLength: 6
@@ -41,7 +43,7 @@ nonisolated struct StackConfig: Sendable {
     nonisolated static let testFixed = StackConfig(
         fixedDt: 1.0 / 60.0,
         playfieldWidth: 1.0, playfieldCenter: 0.5,
-        startingWidth: 0.62, minWidth: 0.015,
+        startingWidth: 0.62, startingDepth: 0.62, minWidth: 0.015,
         startSpeed: 0.35, maxSpeed: 0.90, plateauScore: 80,
         perfectTolerance: 0.025, streakThreshold: 5, expandAmount: 0.04,
         cycleLength: 6

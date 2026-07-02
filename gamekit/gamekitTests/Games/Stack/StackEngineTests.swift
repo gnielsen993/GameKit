@@ -3,7 +3,8 @@
 //  gamekitTests
 //
 //  Determinism + edge-case suite for StackEngine. Locked Wave 0 gate — covers
-//  STACK-01/02/03 mechanics and SC2 ProMotion equivalence.
+//  STACK-01/02/03 mechanics, SC2 ProMotion equivalence, and the 3D footprint
+//  model (alternating slide axes, per-axis trims).
 //
 //  nonisolated: engine is Foundation-only; no actor isolation needed
 //  (mirrors MergeEngineTests.swift convention, 02-04 nonisolated lesson).
@@ -19,13 +20,17 @@ nonisolated struct StackEngineTests {
     // MARK: - Helpers
 
     /// Advance engine in 1 ms steps until the sliding block is within half the
-    /// perfect-tolerance of the top block's center, then drop (dt=0 to hold position).
-    /// Uses inout so the caller's engine is mutated.
+    /// perfect-tolerance of the top block's center on the ACTIVE axis, then
+    /// drop (dt=0 to hold position). Uses inout so the caller's engine is mutated.
     private func landPerfect(engine: inout StackEngine, cfg: StackConfig) -> StackFrame {
-        let topCenter = engine.placed.last?.centerX ?? cfg.playfieldCenter
+        let top = engine.placed.last!
+        func offset(_ f: StackFrame) -> Double {
+            f.axis == .x ? abs(f.currentCenterX - top.centerX)
+                         : abs(f.currentCenterZ - top.centerZ)
+        }
         var f = engine.step(dt: 0.001, input: StackInput(drop: false))
         var attempts = 0
-        while abs(f.currentCenterX - topCenter) > cfg.perfectTolerance * 0.5 && attempts < 10_000 {
+        while offset(f) > cfg.perfectTolerance * 0.5 && attempts < 10_000 {
             f = engine.step(dt: 0.001, input: StackInput(drop: false))
             attempts += 1
         }
@@ -35,16 +40,17 @@ nonisolated struct StackEngineTests {
     // MARK: - SC2: ProMotion equivalence
 
     /// SC2: same fixed config, drops at center-crossing step counts, dt=1/60 vs dt=1/120
-    /// over 5 simulated seconds ⇒ identical score / gameOver / tower widths.
+    /// over 5 simulated seconds ⇒ identical score / gameOver / tower footprints.
     ///
     /// Design: all 5 drops are scheduled at center-crossing steps — blockElapsed ≈
-    /// 0.25/oscSpeed at each block's speed — so cx falls at the exact oscillation midpoint
-    /// (offset ≈ 0.0006–0.002, all << perfectTolerance=0.025). For PERFECT drops,
-    /// width = top.width (no cx-dependent FP arithmetic), so widths are bit-exact equal
-    /// regardless of the ULP-scale difference in accumulated blockElapsed between runs.
+    /// 0.25/oscSpeed at each block's speed — so the active-axis center falls at the
+    /// exact oscillation midpoint (offset ≈ 0.0006–0.002, all << perfectTolerance=0.025).
+    /// For PERFECT drops, the footprint is inherited (no center-dependent FP
+    /// arithmetic), so extents are bit-exact equal regardless of the ULP-scale
+    /// difference in accumulated blockElapsed between runs.
     ///
     /// Keystone: a velocity-bounce model would shift the oscillation phase at each reflection
-    /// point by a dt-dependent error, producing different cx values and thus different drop
+    /// point by a dt-dependent error, producing different centers and thus different drop
     /// types (perfect vs trim) between 60 Hz and 120 Hz. Closed-form tri() prevents this.
     @Test("ProMotion equivalence: 60 Hz step stream ≡ 120 Hz step stream")
     func proMotionEquivalence() {
@@ -74,30 +80,62 @@ nonisolated struct StackEngineTests {
         #expect(a.score == b.score)
         #expect(a.gameOver == b.gameOver)
         #expect(a.placed.map(\.width) == b.placed.map(\.width))
+        #expect(a.placed.map(\.depth) == b.placed.map(\.depth))
+    }
+
+    // MARK: - 3D footprint: axis alternation + per-axis trims
+
+    /// Slide axis alternates X → Z → X per placement, and an imperfect drop
+    /// trims ONLY the axis the block was travelling along — the other extent
+    /// carries over unchanged.
+    @Test("axes alternate per placement; a trim only cuts the active axis")
+    func axisAlternationAndPerAxisTrim() {
+        let cfg = StackConfig.testFixed
+        var engine = StackEngine(cfg: cfg)
+
+        // Block 1 slides on X. Drop at blockElapsed=0 (extreme edge) → X trim.
+        let f1 = engine.step(dt: 0, input: StackInput(drop: true))
+        #expect(f1.event == .trim(overhangWidth: engine.cfg.startingWidth
+                                    - engine.placed.last!.width, axis: .x))
+        #expect(engine.placed.last!.width < cfg.startingWidth, "X trim narrows width")
+        #expect(engine.placed.last!.depth == cfg.startingDepth, "Z extent untouched by an X trim")
+        #expect(f1.axis == .z, "next slider travels along Z")
+
+        // Block 2 slides on Z. Extreme drop → Z trim; width carries over.
+        let widthAfterX = engine.placed.last!.width
+        let f2 = engine.step(dt: 0, input: StackInput(drop: true))
+        if case .trim(_, let axis) = f2.event {
+            #expect(axis == .z)
+        } else {
+            Issue.record("expected a Z-axis trim, got \(f2.event)")
+        }
+        #expect(engine.placed.last!.depth < cfg.startingDepth, "Z trim narrows depth")
+        #expect(engine.placed.last!.width == widthAfterX, "X extent untouched by a Z trim")
+        #expect(f2.axis == .x, "axis alternates back to X")
     }
 
     // MARK: - STACK-01: complete miss ends the run
 
-    /// Drive drops at blockElapsed=0 (extreme edge positions) to narrow the tower
-    /// rapidly until a complete miss (overlapW ≤ minWidth).
+    /// Drive drops at blockElapsed=0 (extreme edge positions) to narrow the
+    /// footprint until a complete miss (overlap ≤ minWidth). With alternating
+    /// axes each extreme drop trims one dimension, so the run must still end
+    /// within a bounded number of drops.
     @Test("complete miss (no overlap) ends the run")
     func completeMissGameOver() {
         var engine = StackEngine(cfg: .testFixed)
 
-        // Drop 1: block at left extreme → large trim, width narrows from 0.62 to ~0.43
-        let trim1 = engine.step(dt: 0, input: StackInput(drop: true))
-        #expect(trim1.event != .miss)
-        #expect(!engine.gameOver)
-
-        // Drop 2: block at right extreme (startSide flipped) → trim reduces to ~0.05
-        let trim2 = engine.step(dt: 0, input: StackInput(drop: true))
-        #expect(trim2.event != .miss)
-        #expect(!engine.gameOver)
-
-        // Drop 3: block back at left extreme, tower is now too narrow to overlap → miss
-        let missFrame = engine.step(dt: 0, input: StackInput(drop: true))
-        #expect(missFrame.event == .miss)
+        var missFrame: StackFrame?
+        for _ in 0..<20 {
+            let f = engine.step(dt: 0, input: StackInput(drop: true))
+            if f.event == .miss { missFrame = f; break }
+        }
+        #expect(missFrame != nil, "extreme drops must reach a complete miss within 20 drops")
         #expect(engine.gameOver)
+
+        // Both dimensions were narrowed on the way down.
+        let top = engine.placed.last!
+        #expect(top.width < engine.cfg.startingWidth)
+        #expect(top.depth < engine.cfg.startingDepth)
 
         // Post-gameOver steps are no-ops (gameOver guard returns .none)
         let noOp = engine.step(dt: 1.0, input: StackInput(drop: true))
@@ -105,11 +143,11 @@ nonisolated struct StackEngineTests {
         #expect(noOp.gameOver)
     }
 
-    // MARK: - STACK-03 / D-01: streak-based width recovery
+    // MARK: - STACK-03 / D-01: streak-based footprint recovery
 
-    /// N consecutive perfects expand width only after reaching streakThreshold.
-    /// One imperfect resets streak to 0 with no recovery.
-    @Test("N consecutive perfects expand width; one imperfect resets streak")
+    /// N consecutive perfects regrow the footprint only after reaching
+    /// streakThreshold. One imperfect resets streak to 0 with no recovery.
+    @Test("N consecutive perfects expand the footprint; one imperfect resets streak")
     func streakRecoveryAndReset() {
         let cfg = StackConfig.testFixed
         var engine = StackEngine(cfg: cfg)
@@ -120,7 +158,7 @@ nonisolated struct StackEngineTests {
         #expect(narrowedWidth < cfg.startingWidth, "trim must narrow below startingWidth")
         #expect(engine.streak == 0)
 
-        // Phase B: (streakThreshold - 1) perfect drops — width must NOT expand yet
+        // Phase B: (streakThreshold - 1) perfect drops — footprint must NOT expand yet
         for _ in 0..<(cfg.streakThreshold - 1) {
             _ = landPerfect(engine: &engine, cfg: cfg)
         }
@@ -128,11 +166,12 @@ nonisolated struct StackEngineTests {
         #expect(engine.placed.last!.width == narrowedWidth,
                 "width must stay unchanged before streak threshold is reached")
 
-        // Phase C: Nth perfect — width MUST expand (D-01 streak threshold)
+        // Phase C: Nth perfect — footprint MUST expand (D-01 streak threshold)
         _ = landPerfect(engine: &engine, cfg: cfg)
         let expandedWidth = engine.placed.last!.width
         #expect(expandedWidth > narrowedWidth, "width expands after N consecutive perfects")
         #expect(expandedWidth <= cfg.startingWidth, "width never exceeds startingWidth cap")
+        #expect(engine.placed.last!.depth <= cfg.startingDepth, "depth never exceeds startingDepth cap")
         #expect(engine.streak == cfg.streakThreshold)
 
         // Phase D: one imperfect (drop at blockElapsed=0 → extreme, imperfect position)

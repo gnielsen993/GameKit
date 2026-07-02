@@ -22,14 +22,18 @@ import Foundation
 /// first 40% of the lifetime before fading (see StackBoardCanvas).
 struct FallingTrimPiece: Identifiable, Equatable {
     let id = UUID()
-    /// Normalized center X of the severed piece at the moment of the cut.
+    /// Normalized ground-plane center of the severed piece at the cut.
     let centerX: Double
-    /// Normalized width of the severed piece.
+    let centerZ: Double
+    /// Normalized footprint of the severed piece.
     let width: Double
+    let depth: Double
     /// Tower row the piece broke off (drives start Y and color).
     let rowIndex: Int
-    /// True when the overhang was on the right side of the tower.
-    let fallsRight: Bool
+    /// Axis the piece drifts along as it falls (the trim axis).
+    let axis: StackAxis
+    /// True when the overhang was on the positive side of that axis.
+    let fallsPositive: Bool
     let spawn: Date
 
     static let lifetime: TimeInterval = 0.8
@@ -49,6 +53,7 @@ struct SettleGlide: Equatable {
     let rowIndex: Int
     /// Rendered slider center at the moment of the drop (normalized).
     let fromCenterX: Double
+    let fromCenterZ: Double
     let spawn: Date
 
     static let lifetime: TimeInterval = 0.14
