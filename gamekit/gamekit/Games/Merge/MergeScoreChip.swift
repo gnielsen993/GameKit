@@ -46,6 +46,7 @@ struct MergeScoreChip: View {
             RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
                 .stroke(theme.colors.border, lineWidth: 1)
         )
+        .chipShadow()
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Score \(score)"))
     }

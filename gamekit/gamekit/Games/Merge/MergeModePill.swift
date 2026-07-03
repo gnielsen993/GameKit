@@ -45,6 +45,7 @@ struct MergeModePill: View {
             .padding(theme.spacing.xs)
             .background(Capsule().fill(theme.colors.surface))
             .overlay(Capsule().stroke(theme.colors.border, lineWidth: 1))
+            .chipShadow()
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)

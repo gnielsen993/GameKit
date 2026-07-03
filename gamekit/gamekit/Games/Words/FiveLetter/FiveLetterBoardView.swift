@@ -124,6 +124,7 @@ struct FiveLetterTileView: View {
                 RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
                     .stroke(content.stroke, lineWidth: 1)
             )
+            .chipShadow()
             .animation(
                 animated
                     ? .easeInOut(duration: theme.motion.normal).delay(Double(column) * 0.06)

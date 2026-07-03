@@ -61,6 +61,7 @@ struct SudokuNumberPad: View {
                 RoundedRectangle(cornerRadius: theme.radii.chip)
                     .stroke(theme.colors.border, lineWidth: 1)
             )
+            .chipShadow()
             .overlay {
                 if isExhausted {
                     GeometryReader { g in

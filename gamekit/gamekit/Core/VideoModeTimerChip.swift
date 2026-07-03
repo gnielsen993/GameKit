@@ -54,6 +54,7 @@ struct VideoModeTimerChip: View {
                 RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
                     .stroke(theme.colors.border, lineWidth: 1)
             )
+            .chipShadow()
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text("Time elapsed"))
             .accessibilityValue(Text(formatElapsedSpoken(displayedElapsed(at: context.date))))

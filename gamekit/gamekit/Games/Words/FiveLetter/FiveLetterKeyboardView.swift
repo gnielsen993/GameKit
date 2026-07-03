@@ -39,6 +39,7 @@ struct FiveLetterKeyboardView: View {
                 .frame(height: 42)
                 .background(keyFill(letter))
                 .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
+                .chipShadow()
         }
         .buttonStyle(.pressable)
         .accessibilityLabel(Text("Letter \(String(letter))"))
@@ -56,6 +57,7 @@ struct FiveLetterKeyboardView: View {
                 .frame(height: 42)
                 .background(theme.colors.surface)
                 .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
+                .chipShadow()
         }
         .buttonStyle(.pressable)
     }
@@ -70,6 +72,7 @@ struct FiveLetterKeyboardView: View {
                 .frame(height: 42)
                 .background(theme.colors.surface)
                 .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
+                .chipShadow()
         }
         .buttonStyle(.pressable)
         .accessibilityLabel(Text("Delete"))

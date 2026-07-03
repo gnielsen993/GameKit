@@ -90,6 +90,26 @@ uses `accentPrimary`; a peer cell uses a separate, lower-opacity overlay.
 
 ## 3. Component Dictionary
 
+### 3.0 Depth rules
+Interactive surfaces carry a consistent, physical depth treatment from
+`Core/SurfaceDepth.swift` — light always comes from the top, on every preset:
+
+| Treatment | Helper | Applies to |
+|-----------|--------|-----------|
+| Ambient shadow | `.chipShadow()` — black 10%, radius 5, y 2 | Info chips, mode pills, pad keys, keyboard keys, board tiles that sit "on" the board |
+| Raised sheen | `SurfaceDepth.raisedSheen` overlay — white 16% top edge → black 8% bottom edge | Tiles that read as pressable caps: Merge tiles, Minesweeper hidden cells, Home game tiles |
+| Active glow | `.activeGlow(color, active:)` — accent 45%, radius 8 | The element currently under the player's finger (Word Grid trace) |
+
+Rules:
+- These are **lighting effects, not theme colors** — the white/black literals
+  live only in `Core/SurfaceDepth.swift`. Game views consume the helpers and
+  never write a color literal.
+- Flat stays flat: board backgrounds, empty wells, and revealed cells carry
+  no sheen or shadow — depth marks *interactivity*, not decoration.
+- `VideoModeBanner` stays shadow-free by design (it is chrome, not a modal).
+- One treatment per element: never stack `chipShadow` under `activeGlow`
+  (the glow helper already carries the resting shadow in its inactive state).
+
 Every game must draw its chrome from this set of shared primitives.
 Do not build game-specific variants of these components unless the
 game-specific behavior is genuinely different (e.g. Sudoku's erase button

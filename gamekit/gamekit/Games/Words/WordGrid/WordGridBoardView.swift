@@ -62,7 +62,9 @@ struct WordGridBoardView: View {
                     .stroke(theme.colors.border, lineWidth: 1)
             )
             // Tiles lift as the trace picks them up and settle on release —
-            // makes the drag feel physical (DESIGN.md §10.2).
+            // makes the drag feel physical (DESIGN.md §10.2). The accent
+            // glow marks the tile as held (DESIGN.md §3 depth rules).
+            .activeGlow(theme.colors.accentPrimary, active: selected)
             .scaleEffect(selected ? 1.08 : 1)
             .feedbackAnimation(.spring(response: 0.22, dampingFraction: 0.6), value: selected)
     }

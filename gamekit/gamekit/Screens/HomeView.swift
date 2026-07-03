@@ -185,6 +185,10 @@ struct HomeView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: tileSize * 0.26, style: .continuous)
                         .fill(descriptor.kind.accentColor)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: tileSize * 0.26, style: .continuous)
+                                .fill(SurfaceDepth.raisedSheen)
+                        )
                         .shadow(
                             color: descriptor.kind.accentColor.opacity(
                                 expandedKind == descriptor.kind ? 0.55 : 0.38

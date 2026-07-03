@@ -210,6 +210,7 @@ struct WordGridGameView: View {
         .padding(.vertical, theme.spacing.xs)
         .background(theme.colors.surface)
         .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
+        .chipShadow()
     }
 
     @ToolbarContentBuilder

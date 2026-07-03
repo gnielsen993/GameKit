@@ -27,6 +27,12 @@ struct MergeTileView: View {
             RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
                 .fill(backgroundFill)
 
+            // Raised-tile lighting on real tiles only — empty wells stay flat.
+            if tile != nil {
+                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                    .fill(SurfaceDepth.raisedSheen)
+            }
+
             if let tile {
                 Text("\(tile.value)")
                     .font(theme.typography.title)
@@ -41,6 +47,10 @@ struct MergeTileView: View {
             }
         }
         .frame(width: sideLength, height: sideLength)
+        .shadow(
+            color: tile == nil ? SurfaceDepth.shadow.opacity(0) : SurfaceDepth.shadow,
+            radius: 4, x: 0, y: 2
+        )
         .keyframeAnimator(initialValue: 1.0, trigger: popCount) { content, scale in
             content.scaleEffect(scale)
         } keyframes: { _ in

@@ -120,8 +120,12 @@ struct MinesweeperCellView: View {
             // Hidden/flagged cells get a strong textPrimary tint so they
             // stand out against the surface across every preset (tested
             // on Paper / Cream / Classic where surface ≈ background).
+            // The raised sheen on top makes unrevealed cells read as
+            // pressable caps against the flat revealed floor (DESIGN.md §3
+            // depth rules).
             if needsHiddenTint {
                 Rectangle().fill(theme.colors.textPrimary.opacity(0.22))
+                Rectangle().fill(SurfaceDepth.raisedSheen)
             }
         }
     }

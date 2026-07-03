@@ -49,6 +49,7 @@ struct SudokuModePill: View {
             .overlay(
                 Capsule().stroke(theme.colors.border, lineWidth: 1)
             )
+            .chipShadow()
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
