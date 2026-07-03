@@ -23,6 +23,8 @@ import DesignKit
 struct HomeView: View {
     @EnvironmentObject private var themeManager: ThemeManager
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.settingsStore) private var settingsStore
 
     @State private var path: [GameRoute] = []
     @State private var expandedKind: GameKind?
@@ -34,6 +36,14 @@ struct HomeView: View {
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
     private var isExpanded: Bool { expandedKind != nil || expandedUpcoming }
+
+    /// Expansion spring, hard-cut to instant under Reduce Motion or when
+    /// animations are disabled in Settings (DESIGN.md §10.2).
+    private var expansionSpring: Animation? {
+        settingsStore.animationsEnabled && !reduceMotion
+            ? .spring(response: 0.42, dampingFraction: 0.78)
+            : nil
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -72,8 +82,8 @@ struct HomeView: View {
                     .padding(.horizontal, theme.spacing.m)
                     .padding(.top, theme.spacing.s)
                     .frame(maxWidth: .infinity, alignment: .top)
-                    .animation(.spring(response: 0.42, dampingFraction: 0.78), value: expandedKind)
-                    .animation(.spring(response: 0.42, dampingFraction: 0.78), value: expandedUpcoming)
+                    .animation(expansionSpring, value: expandedKind)
+                    .animation(expansionSpring, value: expandedUpcoming)
                 }
             }
             .scrollBounceBehavior(.basedOnSize)
@@ -115,7 +125,7 @@ struct HomeView: View {
     // MARK: - Collapse helper
 
     private func collapse() {
-        withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+        withAnimation(expansionSpring) {
             expandedKind = nil
             expandedUpcoming = false
         }
@@ -166,7 +176,7 @@ struct HomeView: View {
                 path.append(descriptor.route)
                 return
             }
-            withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+            withAnimation(expansionSpring) {
                 expandedUpcoming = false
                 expandedKind = expandedKind == descriptor.kind ? nil : descriptor.kind
             }
@@ -194,7 +204,7 @@ struct HomeView: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressableSubtle)
         .accessibilityLabel(Text(descriptor.titleKey))
     }
 
@@ -202,7 +212,7 @@ struct HomeView: View {
 
     private var upcomingGridTile: some View {
         Button {
-            withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+            withAnimation(expansionSpring) {
                 expandedKind = nil
                 expandedUpcoming = true
             }
@@ -223,7 +233,7 @@ struct HomeView: View {
                     .lineLimit(1)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressableSubtle)
         .accessibilityLabel(Text("Upcoming games"))
     }
 
@@ -233,7 +243,7 @@ struct HomeView: View {
         let isSelected = expandedUpcoming
         let size: CGFloat = isSelected ? 96 : 44
         return Button {
-            withAnimation(.spring(response: 0.42, dampingFraction: 0.78)) {
+            withAnimation(expansionSpring) {
                 if isSelected {
                     expandedUpcoming = false
                 } else {
@@ -265,7 +275,7 @@ struct HomeView: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressableSubtle)
         .opacity(isSelected ? 1 : (expandedKind != nil ? 0.45 : 0.55))
         .accessibilityLabel(Text("Upcoming games"))
     }

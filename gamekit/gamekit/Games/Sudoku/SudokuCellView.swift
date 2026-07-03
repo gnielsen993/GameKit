@@ -39,6 +39,7 @@ struct SudokuCellView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .overlay(wrongFlashOverlay)
+        .feedbackAnimation(.spring(response: 0.25, dampingFraction: 0.7), value: cell)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityText)
@@ -80,6 +81,9 @@ struct SudokuCellView: View {
             Text("\(v)")
                 .font(theme.typography.title.weight(.regular))
                 .foregroundStyle(theme.colors.accentPrimary)
+                // Placed digits scale in (gated via feedbackAnimation on the
+                // cell container below); erased/replaced digits cut instantly.
+                .transition(.scale(scale: 0.55).combined(with: .opacity))
         case .empty(let notes):
             if notes.isEmpty {
                 Color.clear

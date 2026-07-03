@@ -104,7 +104,7 @@ struct WordGridGameView: View {
 
     private func infoRow(compact: Bool) -> some View {
         HStack(spacing: theme.spacing.s) {
-            chip(systemName: "number", text: "\(viewModel.score)", compact: compact)
+            chip(systemName: "number", text: "\(viewModel.score)", compact: compact, numericValue: Double(viewModel.score))
             Spacer()
             if viewModel.mode == .timed {
                 chip(systemName: "clock", text: formatTime(viewModel.remainingSeconds), compact: compact)
@@ -197,10 +197,12 @@ struct WordGridGameView: View {
         }
     }
 
-    private func chip(systemName: String, text: String, compact: Bool) -> some View {
+    private func chip(systemName: String, text: String, compact: Bool, numericValue: Double? = nil) -> some View {
         HStack(spacing: theme.spacing.xs) {
             Image(systemName: systemName)
             Text(text)
+                .contentTransition(numericValue != nil ? .numericText(value: numericValue ?? 0) : .identity)
+                .feedbackAnimation(theme.motion.ease, value: numericValue)
         }
         .font(compact ? theme.typography.caption : theme.typography.body)
         .foregroundStyle(theme.colors.textPrimary)

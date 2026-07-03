@@ -35,6 +35,8 @@ struct MinesRemainingChip: View {
                 .font(compact ? theme.typography.caption : theme.typography.monoNumber)
                 .foregroundStyle(theme.colors.textPrimary)
                 .monospacedDigit()
+                .contentTransition(.numericText(value: Double(minesRemaining)))
+                .feedbackAnimation(theme.motion.ease, value: minesRemaining)
         }
         .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.m)
         .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)

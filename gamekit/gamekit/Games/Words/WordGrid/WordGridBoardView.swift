@@ -50,16 +50,21 @@ struct WordGridBoardView: View {
     }
 
     private func tile(_ position: WordGridPosition) -> some View {
-        Text(letter(row: position.row, column: position.column))
+        let selected = isSelected(position)
+        return Text(letter(row: position.row, column: position.column))
             .font(theme.typography.title.weight(.bold))
-            .foregroundStyle(isSelected(position) ? theme.colors.background : theme.colors.textPrimary)
+            .foregroundStyle(selected ? theme.colors.background : theme.colors.textPrimary)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(isSelected(position) ? theme.colors.accentPrimary : theme.colors.surface)
+            .background(selected ? theme.colors.accentPrimary : theme.colors.surface)
             .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
                     .stroke(theme.colors.border, lineWidth: 1)
             )
+            // Tiles lift as the trace picks them up and settle on release —
+            // makes the drag feel physical (DESIGN.md §10.2).
+            .scaleEffect(selected ? 1.08 : 1)
+            .feedbackAnimation(.spring(response: 0.22, dampingFraction: 0.6), value: selected)
     }
 
     private func letter(row: Int, column: Int) -> String {

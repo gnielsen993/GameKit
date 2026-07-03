@@ -80,6 +80,7 @@ struct SudokuNumberPad: View {
         }
         .scaleEffect(pulsing.contains(digit) ? 1.12 : 1.0)
         .animation(.spring(response: 0.25, dampingFraction: 0.5), value: pulsing.contains(digit))
+        .buttonStyle(.pressable)
         .disabled(isExhausted)
         .accessibilityLabel("Place \(digit), \(remaining) remaining")
     }

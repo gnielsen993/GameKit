@@ -483,8 +483,17 @@ a "softer" or "reduced" animation. Skip it entirely.
 | Win wash | `.phaseAnimator([0, 0.25, 0])` easeInOut `theme.motion.slow`, success tint | Immediately on win, before banner | both |
 | Confetti | `ConfettiView`, `.opacity` transition, fires before banner | Win only | both |
 | End-state appear | `.easeOut(duration: 0.3)` + `.opacity.combined(with: .scale(0.96))` | After win/loss pre-roll delay | `animationsEnabled` only (the overlay itself is functional) |
-| Mode pill transition | Immediate (no animation) | Mode toggle | — |
-| Chip count update | Immediate (no animation) | Any counter change | — |
+| Mode pill transition | Active-segment thumb slides via `matchedGeometryEffect`, `.spring(response: 0.3, dampingFraction: 0.82)` | Mode toggle | both (hard-cut to instant) |
+| Chip count update | Numeric roll via `.contentTransition(.numericText(value:))` + `theme.motion.ease` | Any counter change (score, best, mines, found words) | both (hard-cut to instant) |
+| Press feedback | `PressableButtonStyle` (`Core/`) — scale 0.94 (0.97 large surfaces) + slight dim, spring back on release | Finger down on pads, keyboards, Home tiles | both (dim stays; scale cuts) |
+| Tile slide (Merge) | Position glide keyed by `MergeTile.id`, `.spring(response: 0.24, dampingFraction: 0.9)`; spawn scales in delayed 90ms; merged tile pops 1.15× keyframe | Every swipe | both (hard-cut to instant) |
+| Placement pop | Placed value scales in (`.scale(0.55) + .opacity` transition, spring ~0.25s) — Sudoku digits, Five Letter typing (1.12× keyframe) | On placement / letter entry | both |
+| Guess reveal (Five Letter) | Mark colors sweep the row left→right, `theme.motion.normal` easeInOut, 60ms/column stagger | On guess submit | both |
+
+The shared gate idiom is `feedbackAnimation(_:value:)` (`Core/MotionGate.swift`)
+— it reads both gates from the environment so props-only leaf views stay
+prop-driven. Imperative `withAnimation` call sites read the same two
+environment values and pass `nil` when gated.
 
 ### 10.3 Pre-roll sequencing
 Significant end states have a deliberate delay before the banner appears.
@@ -518,8 +527,10 @@ visual state first, then add the animation on top.
 When adding a new game state or interaction, answer these questions:
 
 1. **Is this a consequential state change?** (wrong move, milestone, win, loss)
-   — It should have an animation. Optional-feeling feedback (mode toggle,
-   simple tap) should NOT have an animation — instant response is correct.
+   — It should have an animation. Lightweight UI state changes (mode toggle,
+   press feedback) get the short micro-motions in the §10.2 vocabulary —
+   never longer than ~0.3s, never blocking input. Anything beyond that
+   (flourishes on simple taps) is decoration and should be cut.
 2. **What does the animation communicate?** Write the sentence. "This
    animation says: ___." If you can't fill in the blank, the animation
    is decoration and should be cut.
@@ -536,12 +547,12 @@ haptic, animation. Document all three when designing a new event.
 
 | Event | Visual | Haptic | Animation |
 |-------|--------|--------|-----------|
-| Normal move | Cell fills / digit appears | `.light(0.7)` | None |
+| Normal move | Cell fills / digit appears | `.light(0.7)` | Placement pop (§10.2) |
 | Wrong move | Cell flashes `danger`, lives decrement | `.error` | Board shake |
 | Row/box completion | Hint row/col dims or highlights | `.medium(1.0)` | Optional flash |
 | Win | Board locks, end banner queues | `.success` | Wash + confetti → banner |
 | Loss | Board locks, end banner queues | None (error already fired on last wrong move) | Banner only |
-| Mode toggle | Pill segment activates | `.light` | None (instant) |
+| Mode toggle | Pill segment activates | `.light` | Thumb slides (§10.2) |
 
 ---
 

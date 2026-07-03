@@ -25,6 +25,10 @@ struct MergeModePill: View {
     /// and get the v1.1 pill byte-identical (D-12-OFFRESTORE).
     var compact: Bool = false
 
+    /// Namespace for the sliding active-segment thumb (DESIGN.md §10.2 —
+    /// hard-cuts to instant when animations are gated off).
+    @Namespace private var pillNamespace
+
     var body: some View {
         Button {
             onSelect(toggledMode)
@@ -37,6 +41,7 @@ struct MergeModePill: View {
                         glyph: "infinity",
                         label: String(localized: "Infinite"))
             }
+            .feedbackAnimation(.spring(response: 0.3, dampingFraction: 0.82), value: mode)
             .padding(theme.spacing.xs)
             .background(Capsule().fill(theme.colors.surface))
             .overlay(Capsule().stroke(theme.colors.border, lineWidth: 1))
@@ -63,9 +68,13 @@ struct MergeModePill: View {
         .padding(.horizontal, compact ? theme.spacing.s : theme.spacing.l)
         .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
         .frame(minHeight: compact ? theme.spacing.l : 44)
-        .background(
-            Capsule().fill(isActive ? theme.colors.accentPrimary : Color.clear)
-        )
+        .background {
+            if isActive {
+                Capsule()
+                    .fill(theme.colors.accentPrimary)
+                    .matchedGeometryEffect(id: "activeSegment", in: pillNamespace)
+            }
+        }
     }
 
     private var toggledMode: MergeMode {

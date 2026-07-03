@@ -22,6 +22,8 @@ struct WordGridFoundWordsPanel: View {
                     .font(theme.typography.caption)
                     .monospacedDigit()
                     .foregroundStyle(theme.colors.textSecondary)
+                    .contentTransition(.numericText(value: Double(words.count)))
+                    .feedbackAnimation(theme.motion.ease, value: words.count)
             }
 
             if words.isEmpty {
@@ -36,14 +38,18 @@ struct WordGridFoundWordsPanel: View {
                         VStack(alignment: .leading, spacing: theme.spacing.xs) {
                             ForEach(words, id: \.self) { word in
                                 wordRow(word)
+                                    .transition(.scale(scale: 0.85).combined(with: .opacity))
                             }
                         }
+                        .feedbackAnimation(.spring(response: 0.3, dampingFraction: 0.75), value: words)
                     } else {
                         HStack(spacing: theme.spacing.xs) {
                             ForEach(words, id: \.self) { word in
                                 wordPill(word)
+                                    .transition(.scale(scale: 0.85).combined(with: .opacity))
                             }
                         }
+                        .feedbackAnimation(.spring(response: 0.3, dampingFraction: 0.75), value: words)
                     }
                 }
             }

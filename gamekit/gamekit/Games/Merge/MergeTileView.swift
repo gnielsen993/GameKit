@@ -14,6 +14,13 @@ struct MergeTileView: View {
     let theme: Theme
     let tile: MergeTile?
     let sideLength: CGFloat
+    /// When true (the animated tile layer), a value change — i.e. this tile
+    /// just absorbed another — jolts to 1.15× and springs back. The static
+    /// empty-cell layer leaves this false. Gate resolved by the parent
+    /// (DESIGN.md §10.2).
+    var animated: Bool = false
+
+    @State private var popCount = 0
 
     var body: some View {
         ZStack {
@@ -30,9 +37,22 @@ struct MergeTileView: View {
                     .foregroundStyle(MergeTilePalette.textColor(forValue: tile.value, theme: theme))
                     .padding(theme.spacing.xs)
                     .scaleEffect(MergeTilePalette.fontScale(forValue: tile.value))
+                    .contentTransition(.identity)
             }
         }
         .frame(width: sideLength, height: sideLength)
+        .keyframeAnimator(initialValue: 1.0, trigger: popCount) { content, scale in
+            content.scaleEffect(scale)
+        } keyframes: { _ in
+            KeyframeTrack {
+                CubicKeyframe(1.15, duration: 0.08)
+                SpringKeyframe(1.0, duration: 0.28, spring: Spring(response: 0.22, dampingRatio: 0.6))
+            }
+        }
+        .onChange(of: tile?.value) { oldValue, newValue in
+            guard animated, oldValue != nil, newValue != nil else { return }
+            popCount += 1
+        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
     }

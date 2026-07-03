@@ -72,7 +72,7 @@ struct FiveLetterGameView: View {
             VStack(spacing: theme.spacing.s) {
                 infoRow(compact: false)
                     .padding(.vertical, theme.spacing.xs)
-                FiveLetterBoardView(theme: theme, guesses: viewModel.guesses, currentGuess: viewModel.currentGuess)
+                FiveLetterBoardView(theme: theme, guesses: viewModel.guesses, currentGuess: viewModel.currentGuess, invalidCount: viewModel.invalidCount)
                 messageLine
                 FiveLetterKeyboardView(
                     theme: theme,
@@ -104,7 +104,7 @@ struct FiveLetterGameView: View {
                     compactControlRow
                 }
                 infoRow(compact: true)
-                FiveLetterBoardView(theme: theme, guesses: viewModel.guesses, currentGuess: viewModel.currentGuess)
+                FiveLetterBoardView(theme: theme, guesses: viewModel.guesses, currentGuess: viewModel.currentGuess, invalidCount: viewModel.invalidCount)
                 FiveLetterKeyboardView(
                     theme: theme,
                     guesses: viewModel.guesses,
@@ -139,6 +139,8 @@ struct FiveLetterGameView: View {
             Text("\(viewModel.guesses.count)/6")
                 .font(compact ? theme.typography.caption : theme.typography.body)
                 .foregroundStyle(theme.colors.textPrimary)
+                .contentTransition(.numericText(value: Double(viewModel.guesses.count)))
+                .feedbackAnimation(theme.motion.ease, value: viewModel.guesses.count)
                 .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.s)
                 .padding(.vertical, theme.spacing.xs)
                 .background(theme.colors.surface)

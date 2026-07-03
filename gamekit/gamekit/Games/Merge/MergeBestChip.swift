@@ -28,6 +28,8 @@ struct MergeBestChip: View {
                 .font(compact ? theme.typography.caption : theme.typography.monoNumber)
                 .monospacedDigit()
                 .foregroundStyle(theme.colors.textPrimary)
+                .contentTransition(.numericText(value: Double(bestScore)))
+                .feedbackAnimation(theme.motion.ease, value: bestScore)
         }
         .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.m)
         .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)

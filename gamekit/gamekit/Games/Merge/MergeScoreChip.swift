@@ -35,6 +35,8 @@ struct MergeScoreChip: View {
                 .font(compact ? theme.typography.caption : theme.typography.monoNumber)
                 .monospacedDigit()
                 .foregroundStyle(theme.colors.textPrimary)
+                .contentTransition(.numericText(value: Double(score)))
+                .feedbackAnimation(theme.motion.ease, value: score)
         }
         .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.m)
         .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
