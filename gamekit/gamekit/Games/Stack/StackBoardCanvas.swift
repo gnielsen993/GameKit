@@ -84,11 +84,12 @@ struct StackBoardCanvas: View {
     /// Active perfect-drop settle glide (placed block eases to its snapped center).
     let settleGlide: SettleGlide?
 
-    /// Height of an overlay region at the canvas bottom that gameplay must
-    /// stay above (Video Mode large-bottom band). The playfield anchors to
-    /// the logical bottom (`size.height - bottomObscured`); the base pedestal
+    /// Height of the region at the canvas bottom that gameplay must stay
+    /// above — the home-indicator inset in normal mode, plus the reserved
+    /// video band in Video Mode large-bottom. The playfield anchors to the
+    /// logical bottom (`size.height - bottomObscured`); the base pedestal
     /// keeps drawing past it so the tower fills the physical bottom instead
-    /// of floating over blank space. 0 everywhere except large-bottom zones.
+    /// of floating over a background strip.
     var bottomObscured: CGFloat = 0
 
     // MARK: - Layout constants (all geometry derives from blockH / isoW)

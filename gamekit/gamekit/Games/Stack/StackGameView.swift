@@ -229,16 +229,15 @@ struct StackGameView: View {
     /// whenever nothing time-based can be animating — idle, banner shown,
     /// or FX gated off — so it never burns frames for a static board.
     ///
-    /// Video Mode large-bottom: the canvas extends UNDER the reserved band
-    /// (ignoresSafeArea) and receives the band height as `bottomObscured`,
-    /// so gameplay framing stays above the PiP while the tower pedestal
-    /// paints down to the physical screen bottom — no blank strip under the
-    /// board. Off-path and every other zone pass 0 and ignore nothing, so
-    /// their layout is unchanged (DESIGN §7.6).
+    /// The canvas always extends UNDER the bottom safe-area inset — the
+    /// home indicator in normal mode, plus the reserved video band in Video
+    /// Mode large-bottom — and receives that inset as `bottomObscured`.
+    /// Gameplay framing anchors to the logical height above it while the
+    /// tower pedestal paints down to the physical screen bottom, so no mode
+    /// leaves a background strip under the board.
     var board: some View {
         GeometryReader { proxy in
-            let obscured = videoModeStore.isEnabled && videoModeStore.location == .largeBottom
-                ? proxy.safeAreaInsets.bottom : 0
+            let obscured = proxy.safeAreaInsets.bottom
             TimelineView(.animation(paused: !fxEnabled || vm.state == .idle || showBanner)) { tl in
                 StackBoardCanvas(
                     placed: vm.placed,
@@ -258,7 +257,7 @@ struct StackGameView: View {
                     bottomObscured: obscured
                 )
             }
-            .ignoresSafeArea(.container, edges: obscured > 0 ? .bottom : [])
+            .ignoresSafeArea(.container, edges: .bottom)
         }
     }
 
