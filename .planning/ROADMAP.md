@@ -521,7 +521,13 @@ Plans:
   3. After Phase 17 commits land, `git diff HEAD~N -- Core/ArcadeGameState.swift Core/ArcadeLoopDriver.swift` returns empty — zero substrate modifications were needed to accommodate Snake, confirming genuine reuse.
   4. A direction queue of capacity 2 is functional: rapid swipes queued before the next tick fires are preserved; a 180-degree reversal (swipe left while moving right) is rejected; the on-screen D-pad is visible and operational as a secondary directional control.
   5. Snake's board is legible under Classic preset AND at least one Loud/Moody preset per §8.12; Reduce Motion path renders the snake as a jump-cut cell teleport each tick (no between-cell interpolation) while gameplay mechanics are unchanged.
-**Plans**: TBD
+**Plans**: 6 plans (3 waves)
+- [ ] 17-01-PLAN.md — SnakeEngine + SnakeConfig + determinism/ProMotion tests (wave 1)
+- [ ] 17-02-PLAN.md — Promote StackPalette to Core/ArcadePalette (wave 1)
+- [ ] 17-06-PLAN.md — SnakeStatsCard + StatsView wiring (wave 1)
+- [ ] 17-03-PLAN.md — SnakeViewModel: accumulator, direction queue, persistence, wall-mode (wave 2)
+- [ ] 17-04-PLAN.md — SnakeBoardCanvas: continuous body path, Gaffer lerp, RM jump-cut (wave 2)
+- [ ] 17-05-PLAN.md — SnakeGameView assembly + Home routing + §8.12/SC1 human-verify (wave 3)
 **UI hint**: yes
 
 ### Phase 18: Stats, Design Specs & ADR
