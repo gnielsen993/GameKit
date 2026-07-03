@@ -94,16 +94,20 @@ struct StackBoardCanvas: View {
 
     // MARK: - Layout constants (all geometry derives from blockH / isoW)
 
-    /// Number of block heights visible in the viewport. Higher = slimmer
-    /// tiers relative to the footprint — the tower leans slim, not bulky.
-    private static let visibleBlocks: CGFloat = 16
+    /// Tier thickness as a fraction of the footprint half-width (`isoW`).
+    /// Tied to the canvas WIDTH, not height — canvas heights differ wildly
+    /// between normal and Video Mode layouts (full screen vs. shortened
+    /// board), and deriving thickness from height made normal-mode tiers
+    /// render fat while Video Mode's rendered thin. Width is stable across
+    /// modes, so every layout gets the same slim tier proportions.
+    private static let tierAspect: CGFloat = 0.18
 
-    /// Screen slot (in block heights from the bottom) where the slider
-    /// settles once the tower is tall enough to scroll. Just above center:
-    /// the action line holds mid-screen and the tower fills the screen
-    /// below it. Early game the camera clamps at 0 — the tower starts near
-    /// the screen bottom and grows up to this slot before any scrolling.
-    private static let sliderSlot: Double = 8.5
+    /// Fraction of the logical height where the slider settles once the
+    /// tower is tall enough to scroll. Just above center: the action line
+    /// holds mid-screen and the tower fills the screen below it. Early game
+    /// the camera clamps at 0 — the tower starts near the screen bottom and
+    /// grows up to this slot before any scrolling.
+    private static let sliderSlotFraction: Double = 0.53
 
     /// Camera ease duration per placement.
     private static let cameraEase: TimeInterval = 0.35
@@ -138,14 +142,16 @@ struct StackBoardCanvas: View {
             // obscured bottom band); the pedestal still paints the full
             // physical height below it.
             let logicalH = size.height - bottomObscured
-            let blockH = logicalH / Self.visibleBlocks
             let isoW = size.width * Self.isoWidthFraction
+            let blockH = isoW * Self.tierAspect
+            let visibleBlocks = logicalH / blockH
+            let sliderSlot = Double(visibleBlocks) * Self.sliderSlotFraction
             let iso = Iso(midX: size.width / 2,
                           baseY: logicalH - isoW * 0.5,
                           isoW: isoW,
                           isoH: isoW * 0.5,       // classic 2:1 dimetric
                           blockH: blockH,
-                          camPx: cameraBlocks() * blockH)
+                          camPx: cameraBlocks(slot: sliderSlot) * blockH)
 
             // Placed tower blocks (bottom-to-top; cull outside the viewport).
             for (i, block) in placed.enumerated() {
@@ -171,7 +177,7 @@ struct StackBoardCanvas: View {
 
                 // Base block renders as a pedestal column extending below the
                 // screen — the tower is never a lone slab floating mid-air.
-                let hBottom = i == 0 ? -Double(Self.visibleBlocks) : Double(i)
+                let hBottom = i == 0 ? -Double(visibleBlocks) : Double(i)
 
                 let layer = StackPalette.layer(forIndex: i, theme: theme)
                 drawShadedBox(ctx, iso: iso, cx: cx, cz: cz,
@@ -221,13 +227,14 @@ struct StackBoardCanvas: View {
 
     /// Camera offset in block heights, clamped at 0. Early game the tower
     /// grows up from the screen bottom with no scrolling; once the slider
-    /// would pass `sliderSlot`, each placement scrolls the world down one
-    /// block-height so the action line holds that slot. The scroll eases
-    /// over `cameraEase` seconds (snap when FX are gated off).
-    private func cameraBlocks() -> CGFloat {
-        let target = max(0, Double(placed.count + 1) - Self.sliderSlot)
+    /// would pass `slot` (block heights from the bottom, derived from
+    /// `sliderSlotFraction` per draw pass), each placement scrolls the world
+    /// down one block-height so the action line holds that slot. The scroll
+    /// eases over `cameraEase` seconds (snap when FX are gated off).
+    private func cameraBlocks(slot: Double) -> CGFloat {
+        let target = max(0, Double(placed.count + 1) - slot)
         guard fxEnabled, let t0 = lastPlacementAt else { return CGFloat(target) }
-        let from = max(0, Double(placed.count) - Self.sliderSlot)
+        let from = max(0, Double(placed.count) - slot)
         guard from < target else { return CGFloat(target) }   // still below the slot — nothing to ease
         let progress = now.timeIntervalSince(t0) / Self.cameraEase
         guard progress < 1 else { return CGFloat(target) }
