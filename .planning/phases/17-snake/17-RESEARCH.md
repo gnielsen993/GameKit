@@ -899,20 +899,23 @@ func recordSnakeRunHigherOnly() throws {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Food token: `accentPrimary` vs `success`**
    - What we know: D-02 says planner picks after checking §8.12 contrast. Food must be "clearly contrasting" against the body ramp (which uses `charts.chart1…6`).
    - What's unclear: under which preset does each token fail to contrast. This requires a visual audit on Classic (Chrome Diner) + Voltage/Dracula.
    - Recommendation: start with `success` (a distinct semantic: "positive event, not player choice") and verify in §8.12 pass. If `success` is too close to `charts.chart2` on a specific Loud preset, switch to `accentPrimary` for that comparison only, but keep `success` as the default (color is never the only channel — food is a CIRCLE vs body path).
+   - RESOLVED: Plan 17-04 T1 adopts `theme.colors.success` as the default food fill; the §8.12 checkpoint in Plan 17-05 T3 may flip to `accentPrimary` if a preset fails contrast.
 
 2. **ArcadePalette promotion: refactor Stack or forward-wrapper?**
    - What we know: both approaches satisfy the 2+ games rule. Forward-wrapper keeps StackPalette intact (zero Stack file changes). Full promotion removes duplication entirely.
    - Recommendation: Use a forward-wrapper in Phase 17 to minimize Stack regression risk. The wrapper is 3 lines: `typealias StackPalette = ArcadePalette` plus a `blocksPerStop` alias. If Phase 18 touches Stack for any reason, do the full rename then.
+   - RESOLVED: Plan 17-02 implements the forward-wrapper (`typealias StackPalette = ArcadePalette` shim); full rename deferred to a future phase that touches Stack.
 
 3. **Wrap-boundary lerp: skip stroke or adjust coordinates?**
    - What we know: both approaches prevent the diagonal-streak artifact. Skip-stroke is simpler but leaves a tiny visual gap at the boundary. Coordinate adjustment is invisible but slightly more complex.
    - Recommendation: Skip-stroke with rounded caps. The rounded cap on each endpoint at the boundary naturally reads as "the snake disappears at the edge and reappears on the other side," which is the correct toroidal metaphor. The gap is at the boundary pixel — imperceptible at normal cell sizes.
+   - RESOLVED: Plan 17-04 T2 implements skip-stroke with rounded caps; visual confirmation folded into the Plan 17-05 T3 human-verify checkpoint.
 
 ---
 
