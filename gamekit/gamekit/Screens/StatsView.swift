@@ -225,14 +225,10 @@ struct StatsView: View {
                         }
                     }
 
-                    // Phase 15: Snake placeholder — replaced by SnakeStatsCard in Phase 17
                     if shows(.snake) {
                         if focusedKind == nil { settingsSectionHeader(theme: theme, String(localized: "SNAKE")) }
                         DKCard(theme: theme) {
-                            Text(String(localized: "No Snake games yet."))
-                                .font(theme.typography.body)
-                                .foregroundStyle(theme.colors.textSecondary)
-                                .padding(theme.spacing.m)
+                            SnakeStatsCard(theme: theme, records: snakeRecords, bestScores: snakeBestScores)
                         }
                     }
                 }
