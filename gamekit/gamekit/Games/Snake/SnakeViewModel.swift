@@ -161,9 +161,15 @@ final class SnakeViewModel {
             }
 
             // Game-over transition: persist score exactly once, then halt loop.
-            // Persistence call (GameStats.record) wired in Task 2.
+            // "endless" and "snake" are PERMANENT serialization keys — renaming = data break (D-12).
             if newFrame.gameOver {
                 state = .gameOver
+                try? gameStats?.record(
+                    gameKind: .snake,
+                    mode: "endless",    // PERMANENT KEY — D-12 data-break lock
+                    outcome: .loss,     // snake runs always end in loss (no win state)
+                    score: engine.score // food eaten count (SNAKE-05)
+                )
                 return   // halts the while loop; state != .running on next call
             }
         }
