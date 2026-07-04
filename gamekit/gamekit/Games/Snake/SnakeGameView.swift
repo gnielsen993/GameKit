@@ -58,8 +58,19 @@ struct SnakeGameView: View {
             // 1. Background
             theme.colors.background.ignoresSafeArea()
 
-            // 2. Main layout: board + D-pad column (DESIGN §5.1 skeleton)
+            // 2. Main layout: info row → board → D-pad (DESIGN §5.1 skeleton)
             VStack(spacing: theme.spacing.s) {
+                // Info row: score chip (DESIGN §5.2 — separate header row for score;
+                // Snake has no timer or lives, so score is the sole info element).
+                // Hidden during idle so the start card is uncluttered.
+                if vm.state == .running || vm.state == .gameOver {
+                    HStack {
+                        Spacer()
+                        SnakeScoreChip(theme: theme, score: vm.frame.score)
+                    }
+                    .padding(.horizontal, theme.spacing.m)
+                }
+
                 boardArea
                     .padding(.horizontal, theme.spacing.m)
 
@@ -162,7 +173,9 @@ struct SnakeGameView: View {
 
     // MARK: - Board area
 
-    /// Board canvas with swipe gesture, grayscale drain, and score chip overlay.
+    /// Board canvas with swipe gesture and grayscale drain.
+    /// Score chip lives in the info row above the board — never overlaid here
+    /// (DESIGN §5.2: score goes in a separate header row, board unobstructed).
     ///
     /// The TimelineView drives 60 fps canvas redraws when the loop is running.
     /// Pausing it when idle / showing the banner prevents wasted GPU frames for
@@ -209,13 +222,6 @@ struct SnakeGameView: View {
             // left-edge swipe as a navigation-pop back-gesture.
             .defersSystemGestures(on: .all)
 
-            // Score chip: top-trailing overlay during active run and game-over (D-08 roll)
-            if vm.state == .running || vm.state == .gameOver {
-                SnakeScoreChip(theme: theme, score: vm.frame.score)
-                    .padding(theme.spacing.m)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-                    .allowsHitTesting(false)
-            }
         }
         // Constrain to 20:32 grid proportions so cellSize = size.width / cols
         // gives a board height exactly equal to cellSize × rows (no blank strip).
