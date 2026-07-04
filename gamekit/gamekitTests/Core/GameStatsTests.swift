@@ -220,4 +220,54 @@ struct GameStatsTests {
         #expect(streakRow.first?.score == 7,
                 "lower perfectStreak (3) must not replace the existing best (7)")
     }
+
+    // MARK: - Snake write path (Phase 17, SNAKE-05)
+
+    @Test("recordSnakeRunHigherOnly: score 15 then 8 leaves BestScore at 15 (higher-only)")
+    func recordSnakeRunHigherOnly() throws {
+        let (stats, ctx, _) = try makeStats()
+
+        // Run 1: score 15 — should create GameRecord + BestScore("snake","endless",15)
+        try stats.record(
+            gameKind: .snake,
+            mode: "endless",    // PERMANENT key — D-12 data-break lock
+            outcome: .loss,     // snake runs always end in loss
+            score: 15
+        )
+
+        // Exactly 1 GameRecord for snake.
+        let recordsAfterFirst = try ctx.fetch(FetchDescriptor<GameRecord>(
+            predicate: #Predicate { $0.gameKindRaw == "snake" }
+        ))
+        #expect(recordsAfterFirst.count == 1)
+
+        // BestScore row exists at 15.
+        let bestAfterFirst = try ctx.fetch(FetchDescriptor<BestScore>(
+            predicate: #Predicate { $0.gameKindRaw == "snake" && $0.difficultyRaw == "endless" }
+        ))
+        #expect(bestAfterFirst.count == 1)
+        #expect(bestAfterFirst.first?.score == 15)
+
+        // Run 2: score 8 — lower; BestScore must NOT update (higher-only semantics).
+        try stats.record(
+            gameKind: .snake,
+            mode: "endless",
+            outcome: .loss,
+            score: 8
+        )
+
+        // GameRecord count increments to 2 (one row per run).
+        let recordsAfterSecond = try ctx.fetch(FetchDescriptor<GameRecord>(
+            predicate: #Predicate { $0.gameKindRaw == "snake" }
+        ))
+        #expect(recordsAfterSecond.count == 2, "exactly one GameRecord per run")
+
+        // BestScore stays at 15 — lower score must not replace existing best.
+        let bestAfterSecond = try ctx.fetch(FetchDescriptor<BestScore>(
+            predicate: #Predicate { $0.gameKindRaw == "snake" && $0.difficultyRaw == "endless" }
+        ))
+        #expect(bestAfterSecond.count == 1, "must NOT insert a second BestScore row")
+        #expect(bestAfterSecond.first?.score == 15,
+                "lower score (8) must not replace existing best (15)")
+    }
 }
