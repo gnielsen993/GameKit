@@ -61,4 +61,40 @@ struct SnakeViewModelTests {
         #expect(result == false, "third enqueue must be rejected when queue is full (maxQueueDepth=2)")
         #expect(vm.enqueueCount == 2, "only 2 accepted enqueues should have incremented count")
     }
+
+    // MARK: - Idle-start regression tests
+    //
+    // Root cause: start() did not clear directionQueue, so directions queued
+    // while the game was idle (from D-pad/swipe before Start was tapped) would
+    // persist into the first cell moves, filling the capacity-2 queue and making
+    // early in-run input feel dropped. Fix: start() sets directionQueue = [].
+    //
+    // These tests reproduce the failure mode before the fix was applied.
+
+    @Test("start: clears direction queue so idle-phase input does not affect the run")
+    func startClearsDirectionQueue() {
+        let vm = SnakeViewModel()
+        // Simulate D-pad taps during idle phase — fills the capacity-2 queue.
+        _ = vm.tryEnqueueDirection(.up)
+        _ = vm.tryEnqueueDirection(.left)
+        #expect(vm.enqueueCount == 2, "precondition: idle-phase taps should fill the queue")
+        // start() must flush the queue so the first in-run input has capacity.
+        vm.start()
+        // Queue is now empty: two fresh post-start inputs must both be accepted.
+        let first  = vm.tryEnqueueDirection(.up)
+        let second = vm.tryEnqueueDirection(.left)
+        #expect(first  == true, "start() must have cleared the queue; first post-start input must be accepted")
+        #expect(second == true, "start() must have cleared the queue; second post-start input must be accepted")
+    }
+
+    @Test("start: does not affect enqueueCount (counter-trigger integrity)")
+    func startDoesNotMutateEnqueueCount() {
+        let vm = SnakeViewModel()
+        _ = vm.tryEnqueueDirection(.up)
+        #expect(vm.enqueueCount == 1)
+        vm.start()
+        // enqueueCount must remain 1 — start() clearing the queue must not
+        // decrement the haptic counter-trigger (the view only increments).
+        #expect(vm.enqueueCount == 1, "start() must not modify enqueueCount")
+    }
 }
