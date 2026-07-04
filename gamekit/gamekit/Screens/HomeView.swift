@@ -398,7 +398,10 @@ struct HomeView: View {
                 .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
         case .snake:
-            SnakeHarnessView()
+            // NOTE: NO Video Mode modifier — Snake exempt per 15-VIDEO-MODE-ADR.md
+            // (pixel-derived grid cells + continuous steering; PiP reflow would desync state).
+            // Compare Stack above: StackGameView().videoModeAware(...).disableInteractivePop()
+            SnakeGameView()
                 .disableInteractivePop()
         }
     }
