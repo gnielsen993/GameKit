@@ -167,6 +167,23 @@ final class GameStats {
         return Set(records.compactMap { $0.puzzleIdRaw })
     }
 
+    /// Returns the persisted best score for a (gameKind, mode) pair.
+    /// Returns 0 if no record exists. Used by SnakeViewModel to snapshot
+    /// the once-per-run high-score crossing at game start (D-09: mid-run
+    /// high-score haptic). Best-effort — returns 0 on any fetch error.
+    ///
+    /// Capture-let per RESEARCH §Pattern 4 — `#Predicate` cannot capture
+    /// `self` in a KeyPath.
+    func bestScore(gameKind: GameKind, mode: String) -> Int {
+        let kindRaw = gameKind.rawValue
+        let descriptor = FetchDescriptor<BestScore>(
+            predicate: #Predicate {
+                $0.gameKindRaw == kindRaw && $0.difficultyRaw == mode
+            }
+        )
+        return (try? modelContext.fetch(descriptor).first)?.score ?? 0
+    }
+
     /// Atomic reset of all stats — deletes every `GameRecord`, every
     /// `BestTime`, and every `BestScore` inside one
     /// `modelContext.transaction { ... }` block (D-13). Partial reset is
