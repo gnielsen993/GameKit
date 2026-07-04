@@ -865,6 +865,18 @@
     "Move %@" : {
 
     },
+    "Move down" : {
+
+    },
+    "Move left" : {
+
+    },
+    "Move right" : {
+
+    },
+    "Move up" : {
+
+    },
     "New %@ Game" : {
 
     },
@@ -916,7 +928,7 @@
     "No puzzles bundled yet" : {
 
     },
-    "No Snake games yet." : {
+    "No Snake games played yet." : {
 
     },
     "No Solitaire games played yet." : {
@@ -972,6 +984,9 @@
     "OK" : {
 
     },
+    "Options" : {
+
+    },
     "Out of lives" : {
 
     },
@@ -994,6 +1009,9 @@
           }
         }
       }
+    },
+    "Perfect streak %lld" : {
+
     },
     "Pick a theme that fits your mood. Five Classic palettes here, dozens more in Settings." : {
 
@@ -1261,9 +1279,6 @@
     "Start" : {
 
     },
-    "State: %@" : {
-
-    },
     "Stats" : {
       "comment" : "Stats tab + nav title",
       "extractionState" : "manual",
@@ -1280,6 +1295,9 @@
 
     },
     "Step 2 of 3. Welcome to GameDrawer." : {
+
+    },
+    "Streak" : {
 
     },
     "Streak: %lld" : {
@@ -1317,7 +1335,13 @@
     "Support" : {
 
     },
+    "Swipe or tap D-pad to start" : {
+
+    },
     "Switching modes resets the board. Your current score will be lost." : {
+
+    },
+    "Switching modes resets the run. Your current score will be lost." : {
 
     },
     "SYNC" : {
@@ -1339,12 +1363,6 @@
 
     },
     "Tap anywhere to start" : {
-
-    },
-    "Tap to start" : {
-
-    },
-    "Tap to Start" : {
 
     },
     "Terms of Service" : {
@@ -1385,9 +1403,6 @@
           }
         }
       }
-    },
-    "Ticks: %lld" : {
-
     },
     "Tile %lld" : {
 
@@ -1660,6 +1675,12 @@
 
     },
     "View Intro" : {
+
+    },
+    "Wall mode: Off" : {
+
+    },
+    "Wall mode: On" : {
 
     },
     "Welcome to" : {
