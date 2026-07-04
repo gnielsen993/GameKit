@@ -183,7 +183,7 @@ zero monetization. Each requirement maps to a roadmap phase.
 - [x] **SNAKE-04**: Speed ramps with length then plateaus; colliding with self (and walls, in wall mode) ends the run
 - [x] **SNAKE-05**: Score is food eaten (length − start length); high score is persisted
 - [x] **SNAKE-06**: Snake renders with DesignKit tokens only — legible under Classic plus one Loud/Moody preset (§8.12 audit)
-- [ ] **SNAKE-07**: Reduce Motion path — movement is jump-cut between cells (no interpolation) while gameplay is unchanged
+- [x] **SNAKE-07**: Reduce Motion path — movement is jump-cut between cells (no interpolation) while gameplay is unchanged
 
 ### Out of Scope for v1.5
 
@@ -388,7 +388,7 @@ Populated 2026-06-25 by the roadmapper. Phase numbering continues from v1.4's la
 | SNAKE-04 | Phase 17 | Complete |
 | SNAKE-05 | Phase 17 | Complete |
 | SNAKE-06 | Phase 17 | Complete |
-| SNAKE-07 | Phase 17 | Pending |
+| SNAKE-07 | Phase 17 | Complete |
 
 **v1.5 Coverage:**
 - v1.5 requirements: 22 total
