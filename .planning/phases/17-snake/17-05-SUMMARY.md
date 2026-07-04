@@ -25,6 +25,9 @@ key_files:
   modified:
     - gamekit/gamekit/Screens/HomeView.swift
     - Docs/releases/v1.4.md
+    - gamekit/gamekit/Games/Snake/SnakeEngine.swift
+    - gamekit/gamekit/Games/Snake/SnakeViewModel.swift
+    - gamekit/gamekitTests/Games/Snake/SnakeViewModelTests.swift
   deleted:
     - gamekit/gamekit/Games/Snake/SnakeHarnessView.swift
 decisions:
@@ -32,11 +35,15 @@ decisions:
   - "SnakeConfig.default.cols / .rows used directly in view (not via VM computed props) since these values are compile-time invariants (wallMode only changes cfg.wallMode, not grid dimensions)"
   - "Bindable(vm).showingAbandonAlert — canonical Swift 6 @Observable binding pattern; no local @State mirror needed"
   - "Comment reworded from 'No .videoModeAware()' to 'HomeView routing carries no Video Mode modifier' to avoid tripping the token-discipline grep (same pattern as Plan 17-04 Rule 1 deviation)"
+  - "SnakeFrame gained didMoveCell so the VM pops the direction queue per cell move, not per fixed step (checkpoint fix — queued turns survived only ~1 in 12 fixed steps at the 0.2s starting interval)"
+  - "handleDirectionInput unifies swipe + D-pad entry: starts the run from idle (matching the 'Swipe or tap D-pad to start' copy) then enqueues; the idle card carries the swipe gesture since it overlays the board"
+  - "start() clears directionQueue so idle-phase input cannot poison the capacity-2 queue"
+  - "Score chip relocated from board overlay into the info row above the board (checkpoint feedback, DESIGN §5.2)"
 metrics:
-  duration_seconds: 1057
+  duration_seconds: 5400
   completed_date: "2026-07-04"
-  tasks_completed: 2
-  files_changed: 7
+  tasks_completed: 3
+  files_changed: 10
 ---
 
 # Phase 17 Plan 05: SnakeGameView Summary
@@ -50,6 +57,10 @@ metrics:
 | 1 TDD RED | SnakeGameViewTests — failing view-type contract tests | cf7b708 | gamekitTests/Games/Snake/SnakeGameViewTests.swift (new) |
 | 1 TDD GREEN | SnakeScoreChip + SnakeGameView + chrome | 304933c | SnakeScoreChip.swift, SnakeGameView.swift, SnakeGameView+Chrome.swift (new) |
 | 2 | HomeView routing swap, harness delete, SC3 gate, release log | ece35ad | HomeView.swift (+5 lines), SnakeHarnessView.swift (deleted), v1.4.md |
+| 3 (fix) | Checkpoint fixes: start() clears queue | 3796260, 18fe4b4 | SnakeViewModel.swift, SnakeViewModelTests.swift |
+| 3 (fix) | Checkpoint fix: score chip → info row | f363506 | SnakeGameView.swift, SnakeGameView+Chrome.swift |
+| 3 (fix) | Checkpoint fix: pop queue per cell move + idle input starts run | 849ccf9 | SnakeEngine.swift, SnakeViewModel.swift, SnakeGameView.swift, SnakeViewModelTests.swift |
+| 3 | Human-verify checkpoint — device test APPROVED 2026-07-04 | — | — |
 
 ## What Was Built
 
@@ -145,7 +156,18 @@ None. The view is fully wired:
 - abandon alert binds to Bindable(vm).showingAbandonAlert
 - GameStats injection fires via .task
 
-The human-verify checkpoint (Task 3) is the remaining gate before this plan can be marked complete.
+## Task 3 — Human-Verify Checkpoint (APPROVED)
+
+The first device test failed with "swipe and D-pad rarely work" and "score covers the board". Fix pass root causes:
+
+1. **Per-fixed-step queue pop (dominant input bug):** `tick()` popped one queued direction on every 1/60s fixed step, but `SnakeEngine.step()` discards `nextDirection` on non-cell-move steps. At the 0.2s starting interval a cell move spans 12 fixed steps, so a queued turn survived only ~1 in 12 times. Fixed with `SnakeFrame.didMoveCell` + peek-then-pop in the VM (849ccf9).
+2. **Idle input dead:** only the Start button called `start()` despite the "Swipe or tap D-pad to start" copy, and the idle card swallowed board-bound drags. Fixed with `handleDirectionInput` (starts from idle, then enqueues) and the swipe gesture attached to the idle card (849ccf9).
+3. **Stale queue at start:** `start()` now flushes idle-phase input (18fe4b4).
+4. **Score chip** moved from the board overlay to the info row (f363506).
+
+Video Mode absence confirmed intentional (ADR ARCADE-08 — Snake remains exempt).
+
+4 new input-regression tests added; full `gamekitTests` suite green (344 tests, `-parallel-testing-enabled NO` after simulator clone Mach -308 flakes). Human re-tested on device and **approved** (idle swipe-to-start, in-run responsiveness, SC1 no nav-pop, §8.12 legibility, Reduce Motion jump-cut).
 
 ## Threat Flags
 
