@@ -179,7 +179,7 @@ zero monetization. Each requirement maps to a roadmap phase.
 
 - [x] **SNAKE-01**: User can play Snake on a grid — swipe or tap-to-turn changes direction; eating food grows the snake
 - [x] **SNAKE-02**: Default mode is wrap (toroidal, calm); a wall-death mode is selectable via toggle
-- [ ] **SNAKE-03**: An on-screen directional D-pad is available alongside swipe (accessibility / one-handed); both feed a direction queue so rapid turns are not dropped
+- [x] **SNAKE-03**: An on-screen directional D-pad is available alongside swipe (accessibility / one-handed); both feed a direction queue so rapid turns are not dropped
 - [x] **SNAKE-04**: Speed ramps with length then plateaus; colliding with self (and walls, in wall mode) ends the run
 - [x] **SNAKE-05**: Score is food eaten (length − start length); high score is persisted
 - [x] **SNAKE-06**: Snake renders with DesignKit tokens only — legible under Classic plus one Loud/Moody preset (§8.12 audit)
@@ -384,7 +384,7 @@ Populated 2026-06-25 by the roadmapper. Phase numbering continues from v1.4's la
 | STACK-06 | Phase 16 | Complete |
 | SNAKE-01 | Phase 17 | Complete |
 | SNAKE-02 | Phase 17 | Complete |
-| SNAKE-03 | Phase 17 | Pending |
+| SNAKE-03 | Phase 17 | Complete |
 | SNAKE-04 | Phase 17 | Complete |
 | SNAKE-05 | Phase 17 | Complete |
 | SNAKE-06 | Phase 17 | Complete |
