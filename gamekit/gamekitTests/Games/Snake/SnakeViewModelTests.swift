@@ -97,4 +97,64 @@ struct SnakeViewModelTests {
         // decrement the haptic counter-trigger (the view only increments).
         #expect(vm.enqueueCount == 1, "start() must not modify enqueueCount")
     }
+
+    // MARK: - Input-consumption regression tests (checkpoint fix)
+    //
+    // Root cause: tick() popped one queued direction on EVERY 1/60s fixed step
+    // and passed it to engine.step(), but the engine discards nextDirection on
+    // non-cell-move steps (early return before the direction is applied). At
+    // startTickInterval = 0.2s a cell move spans 12 fixed steps, so a queued
+    // turn survived only if enqueued in the single step before a cell move —
+    // ~1-in-12 odds. Fix: peek the queue head and pop only when the returned
+    // frame reports didMoveCell.
+
+    @Test("tick: mid-interval input is not discarded — applies at the next cell move")
+    func midIntervalInputSurvives() {
+        let vm = SnakeViewModel()
+        vm.start()
+        vm.tick(dt: 3.0 / 60.0)             // 3 fixed steps — well inside the 0.2s cell interval
+        _ = vm.tryEnqueueDirection(.up)     // enqueued mid-interval
+        vm.tick(dt: 12.0 / 60.0)            // crosses the first cell-move boundary (15 steps total)
+        #expect(vm.frame.currentDirection == .up,
+                "queued turn must survive until the cell move consumes it")
+    }
+
+    @Test("tick: consumes at most one queued direction per cell move")
+    func oneDirectionPerCellMove() {
+        let vm = SnakeViewModel()
+        vm.start()
+        _ = vm.tryEnqueueDirection(.up)
+        _ = vm.tryEnqueueDirection(.left)
+        vm.tick(dt: 13.0 / 60.0)            // first cell move
+        #expect(vm.frame.currentDirection == .up,
+                "first cell move consumes only the first queued direction")
+        vm.tick(dt: 12.0 / 60.0)            // second cell move
+        #expect(vm.frame.currentDirection == .left,
+                "second queued direction applies on the following cell move")
+    }
+
+    // MARK: - Idle-input start (checkpoint fix)
+    //
+    // The idle card promises "Swipe or tap D-pad to start", but only the Start
+    // button called start(). handleDirectionInput is the unified view entry:
+    // it starts the run from idle, then queues the turn.
+
+    @Test("handleDirectionInput: starts the run from idle and applies the turn at the first cell move")
+    func idleInputStartsRun() {
+        let vm = SnakeViewModel()
+        vm.handleDirectionInput(.up)
+        #expect(vm.state == .running, "swipe/D-pad input from idle must start the run")
+        vm.tick(dt: 13.0 / 60.0)
+        #expect(vm.frame.currentDirection == .up,
+                "the starting input must be the first applied turn")
+    }
+
+    @Test("handleDirectionInput: while running, behaves as a plain enqueue")
+    func runningInputEnqueues() {
+        let vm = SnakeViewModel()
+        vm.start()
+        vm.handleDirectionInput(.up)
+        #expect(vm.state == .running)
+        #expect(vm.enqueueCount == 1, "running-state input routes through tryEnqueueDirection")
+    }
 }

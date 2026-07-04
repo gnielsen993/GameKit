@@ -52,6 +52,10 @@ nonisolated struct SnakeFrame: Equatable, Sendable {
     var cellMoveAlpha: Double       // cellAccumulator / tickInterval — Gaffer alpha for view
     var gameOver: Bool
     var event: SnakeEvent
+    // True only on steps that crossed a cell-move boundary (including death
+    // steps). The VM pops its direction queue only when this is true — on all
+    // other steps nextDirection is untouched, so queued input is never lost.
+    var didMoveCell: Bool = false
 }
 
 // MARK: - Engine
@@ -131,7 +135,7 @@ nonisolated struct SnakeEngine {
             if newHead.col < 0 || newHead.col >= cfg.cols ||
                newHead.row < 0 || newHead.row >= cfg.rows {
                 gameOver = true
-                return frame(event: .died)
+                return frame(event: .died, didMoveCell: true)
             }
         } else {
             // Toroidal wrap (default — SNAKE-02)
@@ -143,7 +147,7 @@ nonisolated struct SnakeEngine {
         let bodyWithoutTail = body.dropLast()
         if bodyWithoutTail.contains(newHead) {
             gameOver = true
-            return frame(event: .died)
+            return frame(event: .died, didMoveCell: true)
         }
 
         // Grow or slide
@@ -152,12 +156,12 @@ nonisolated struct SnakeEngine {
             body.insert(newHead, at: 0)
             score += 1
             spawnFood()
-            return frame(event: .ate(food: food))
+            return frame(event: .ate(food: food), didMoveCell: true)
         } else {
             // Slide: insert new head, remove tail
             body.insert(newHead, at: 0)
             body.removeLast()
-            return frame(event: .none)
+            return frame(event: .none, didMoveCell: true)
         }
     }
 
@@ -173,7 +177,7 @@ nonisolated struct SnakeEngine {
         food = candidates[idx]
     }
 
-    private func frame(event: SnakeEvent) -> SnakeFrame {
+    private func frame(event: SnakeEvent, didMoveCell: Bool = false) -> SnakeFrame {
         SnakeFrame(
             body: body,
             prevBody: prevBody,
@@ -182,7 +186,8 @@ nonisolated struct SnakeEngine {
             score: score,
             cellMoveAlpha: min(cellAccumulator / tickInterval, 1.0),
             gameOver: gameOver,
-            event: event
+            event: event,
+            didMoveCell: didMoveCell
         )
     }
 }

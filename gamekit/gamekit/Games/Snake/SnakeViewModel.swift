@@ -124,6 +124,14 @@ final class SnakeViewModel {
 
     /// Returns true if the direction was accepted into the queue.
     /// A false return means the input was silently rejected (no haptic — D-07).
+    /// Unified entry point for swipe and D-pad input. The idle card promises
+    /// "Swipe or tap D-pad to start" — so directional input from idle starts
+    /// the run, then queues the turn like any in-run input.
+    func handleDirectionInput(_ dir: SnakeDirection) {
+        if state == .idle { start() }
+        tryEnqueueDirection(dir)
+    }
+
     @discardableResult
     func tryEnqueueDirection(_ dir: SnakeDirection) -> Bool {
         let effectiveCurrent = directionQueue.last ?? engine.currentDirection
@@ -142,9 +150,15 @@ final class SnakeViewModel {
         guard state == .running else { return }
         accumulator += dt
         while accumulator >= fixedDt {
-            // Pop one queued direction per cell move.
-            let nextDir = directionQueue.isEmpty ? nil : directionQueue.removeFirst()
+            // Peek the queue head; pop only if this step crossed a cell-move
+            // boundary. The engine ignores nextDirection on non-cell-move
+            // steps, so popping per fixed step would silently discard queued
+            // input (~11 of every 12 turns at the 0.2s starting interval).
+            let nextDir = directionQueue.first
             let newFrame = engine.step(dt: fixedDt, nextDirection: nextDir)
+            if newFrame.didMoveCell && !directionQueue.isEmpty {
+                directionQueue.removeFirst()
+            }
             accumulator -= fixedDt
             // Gaffer anchor: update prevBody to the body BEFORE this cell move.
             prevBody = newFrame.prevBody

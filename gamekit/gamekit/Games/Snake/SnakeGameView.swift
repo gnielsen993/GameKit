@@ -78,14 +78,18 @@ struct SnakeGameView: View {
                 // Always visible; each button is a silent no-op for reverse
                 // direction (queue rule rejects 180° in the VM — D-07).
                 SnakeDPad(theme: theme) { dir in
-                    vm.tryEnqueueDirection(dir)
+                    vm.handleDirectionInput(dir)
                 }
             }
             .padding(.bottom, theme.spacing.l)
 
             // 3. Idle / tap-to-start screen (DESIGN §8.3 explicit idle state)
+            // The card overlays the board and would swallow drags, so it
+            // carries the same swipe gesture — "Swipe … to start" must work
+            // when the swipe lands on the card itself.
             if vm.state == .idle {
                 idleContent
+                    .gesture(swipeGesture)
             }
 
             // 4. Game-over banner — 500ms pre-roll when animations on (DESIGN §10.3)
@@ -206,18 +210,7 @@ struct SnakeGameView: View {
             .grayscale(vm.state == .gameOver ? 1.0 : 0.0)
             .animation(fxEnabled ? .easeOut(duration: 0.5) : nil, value: vm.state == .gameOver)
             // Swipe gesture: dominant axis maps to direction (DESIGN Pattern 5)
-            .gesture(
-                DragGesture(minimumDistance: 10, coordinateSpace: .local)
-                    .onEnded { value in
-                        let dx = value.translation.width
-                        let dy = value.translation.height
-                        if abs(dx) > abs(dy) {
-                            vm.tryEnqueueDirection(dx > 0 ? .right : .left)
-                        } else {
-                            vm.tryEnqueueDirection(dy > 0 ? .down : .up)
-                        }
-                    }
-            )
+            .gesture(swipeGesture)
             // SC1: board claims all swipes so the system cannot interpret a
             // left-edge swipe as a navigation-pop back-gesture.
             .defersSystemGestures(on: .all)
@@ -231,5 +224,21 @@ struct SnakeGameView: View {
         )
         .frame(maxWidth: .infinity)
         .layoutPriority(1)
+    }
+
+    /// Shared swipe recognizer — attached to both the board and the idle card
+    /// (the card overlays the board, so it must handle swipe-to-start itself).
+    /// One enqueue per completed drag: .onEnded only, never .onChanged.
+    var swipeGesture: some Gesture {
+        DragGesture(minimumDistance: 10, coordinateSpace: .local)
+            .onEnded { value in
+                let dx = value.translation.width
+                let dy = value.translation.height
+                if abs(dx) > abs(dy) {
+                    vm.handleDirectionInput(dx > 0 ? .right : .left)
+                } else {
+                    vm.handleDirectionInput(dy > 0 ? .down : .up)
+                }
+            }
     }
 }
