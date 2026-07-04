@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Endless Arcade Primitive
 status: executing
-stopped_at: Phase 17 context gathered
-last_updated: "2026-07-03T21:42:41.897Z"
-last_activity: 2026-07-03 -- Phase 17 planning complete
+stopped_at: Completed 17-01-PLAN.md
+last_updated: "2026-07-04T01:54:13.590Z"
+last_activity: 2026-07-04
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 18
-  completed_plans: 11
+  completed_plans: 12
   percent: 25
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 16 — stack
+**Current focus:** Phase 17 — snake
 
 ## Current Position
 
-Phase: 16 (stack) — EXECUTING
-Plan: 7 of 7
+Phase: 17 (snake) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-07-03 -- Phase 17 planning complete
+Last activity: 2026-07-04
 
 ## v1.0 Carry-Over
 
@@ -144,6 +144,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 16-stack P03 | 291 | 2 tasks | 1 files |
 | Phase 16-stack P04 | 15 | 2 tasks | 2 files |
 | Phase 16-stack P05 | 29 | 2 tasks | 4 files |
+| Phase 17-snake P01 | 236 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -388,6 +389,8 @@ Recent decisions affecting current work:
 - [Phase 16-stack]: nonisolated struct StackConfig to satisfy Swift 6 MainActor isolation — Under -default-isolation MainActor, plain static lets are implicitly @MainActor and cannot be used as default parameter values in nonisolated contexts. Marking the struct and its static presets nonisolated fixes the compiler error without any behavior change.
 - [Phase 16-stack]: proMotionEquivalence uses center-crossing steps for bit-exact width equality — Trim drop widths differ by ~1 ULP between 60Hz/120Hz accumulation paths. Dropping at center-crossing steps ensures all drops are PERFECT (offset << tolerance), making width = top.width (cx-independent) and bit-exact equal. Eliminates ULP noise from different FP accumulation paths.
 - [Phase ?]: StackGameView game-over pre-roll: .grayscale easeOut on Canvas + 500ms sleep before banner (RM/animations-off: instant cut per DESIGN §10.3)
+- [Phase ?]: 17-01: SnakeEngine stores rng as any RandomNumberGenerator existential — SeededGenerator (test) and SystemRandomNumberGenerator (prod) inject through some RandomNumberGenerator init parameter
+- [Phase ?]: 17-01: Self-collision check uses body.dropLast() tail-exclusion — sliding move never falsely collides on the vacating tail cell; startLength=5 required in selfCollision test for loop body > perimeter
 
 ### Pending Todos
 
@@ -410,8 +413,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-03T19:51:03.992Z
-Stopped at: Phase 17 context gathered
-Resume file: .planning/phases/17-snake/17-CONTEXT.md
+Last session: 2026-07-04T01:54:13.579Z
+Stopped at: Completed 17-01-PLAN.md
+Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
