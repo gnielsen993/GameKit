@@ -4,13 +4,13 @@ milestone: v1.5
 milestone_name: Endless Arcade Primitive
 status: executing
 stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-07-04T01:54:13.590Z"
+last_updated: "2026-07-04T02:00:48.763Z"
 last_activity: 2026-07-04
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 18
-  completed_plans: 12
+  completed_plans: 13
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 ## Current Position
 
 Phase: 17 (snake) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-07-04
 
@@ -145,6 +145,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 16-stack P04 | 15 | 2 tasks | 2 files |
 | Phase 16-stack P05 | 29 | 2 tasks | 4 files |
 | Phase 17-snake P01 | 236 | 3 tasks | 3 files |
+| Phase 17-snake P02 | 180 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -391,6 +392,8 @@ Recent decisions affecting current work:
 - [Phase ?]: StackGameView game-over pre-roll: .grayscale easeOut on Canvas + 500ms sleep before banner (RM/animations-off: instant cut per DESIGN §10.3)
 - [Phase ?]: 17-01: SnakeEngine stores rng as any RandomNumberGenerator existential — SeededGenerator (test) and SystemRandomNumberGenerator (prod) inject through some RandomNumberGenerator init parameter
 - [Phase ?]: 17-01: Self-collision check uses body.dropLast() tail-exclusion — sliding move never falsely collides on the vacating tail cell; startLength=5 required in selfCollision test for loop body > perimeter
+- [Phase ?]: 17-02
+- [Phase ?]: 17-02
 
 ### Pending Todos
 
@@ -413,7 +416,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-04T01:54:13.579Z
+Last session: 2026-07-04T02:00:48.754Z
 Stopped at: Completed 17-01-PLAN.md
 Resume file: None
 

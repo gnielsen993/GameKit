@@ -523,7 +523,7 @@ Plans:
   5. Snake's board is legible under Classic preset AND at least one Loud/Moody preset per §8.12; Reduce Motion path renders the snake as a jump-cut cell teleport each tick (no between-cell interpolation) while gameplay mechanics are unchanged.
 **Plans**: 6 plans (3 waves)
 - [x] 17-01-PLAN.md — SnakeEngine + SnakeConfig + determinism/ProMotion tests (wave 1)
-- [ ] 17-02-PLAN.md — Promote StackPalette to Core/ArcadePalette (wave 1)
+- [x] 17-02-PLAN.md — Promote StackPalette to Core/ArcadePalette (wave 1)
 - [ ] 17-06-PLAN.md — SnakeStatsCard + StatsView wiring (wave 1)
 - [ ] 17-03-PLAN.md — SnakeViewModel: accumulator, direction queue, persistence, wall-mode (wave 2)
 - [ ] 17-04-PLAN.md — SnakeBoardCanvas: continuous body path, Gaffer lerp, RM jump-cut (wave 2)
@@ -551,7 +551,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 |-------|----------------|--------|-----------|
 | 15. Arcade Substrate + Skeleton | 5/5 | Complete    | 2026-06-27 |
 | 16. Stack | 6/7 | In Progress|  |
-| 17. Snake | 1/6 | In Progress|  |
+| 17. Snake | 2/6 | In Progress|  |
 | 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
 
 ### v1.5 Research Flags
