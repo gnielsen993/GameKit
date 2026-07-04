@@ -91,7 +91,9 @@ final class SnakeViewModel {
     // MARK: - Lifecycle (mirrors StackViewModel.swift discipline)
 
     func start() {
-        accumulator = 0   // clear carry so a (re)start never replays stale time
+        accumulator = 0      // clear carry so a (re)start never replays stale time
+        directionQueue = []  // flush idle-phase input so it doesn't fill the
+                             // capacity-2 queue before the first real in-run tap
         state = .running
     }
 
