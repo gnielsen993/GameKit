@@ -4,13 +4,13 @@ milestone: v1.5
 milestone_name: Endless Arcade Primitive
 status: executing
 stopped_at: Phase 18 context gathered
-last_updated: "2026-07-05T20:56:09.532Z"
-last_activity: 2026-07-05 -- Phase 18 planning complete
+last_updated: "2026-07-05T21:12:07.136Z"
+last_activity: 2026-07-05
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 22
-  completed_plans: 17
+  completed_plans: 18
   percent: 50
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 18 — stats, design specs & adr
+**Current focus:** Phase 18 — stats-design-specs-adr
 
 ## Current Position
 
-Phase: 18
-Plan: Not started
+Phase: 18 (stats-design-specs-adr) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-05 -- Phase 18 planning complete
+Last activity: 2026-07-05
 
 ## v1.0 Carry-Over
 
@@ -149,6 +149,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 17-snake P02 | 180 | 2 tasks | 2 files |
 | Phase 17-snake P06 | 249 | 2 tasks | 2 files |
 | Phase 17-snake P03 | 1122 | 2 tasks | 4 files |
+| Phase 18-stats-design-specs-adr P01 | 11 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -419,8 +420,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-05T15:00:13.054Z
+Last session: 2026-07-05T21:12:07.127Z
 Stopped at: Phase 18 context gathered
-Resume file: .planning/phases/18-stats-design-specs-adr/18-CONTEXT.md
+Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z

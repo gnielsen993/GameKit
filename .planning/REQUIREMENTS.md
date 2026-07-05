@@ -162,7 +162,7 @@ zero monetization. Each requirement maps to a roadmap phase.
 - [x] **ARCADE-04**: Loop pauses on `scenePhase` `.background`/`.inactive` and on game-over (zero CPU when paused) and resumes with no time drift and no spiral-of-death
 - [x] **ARCADE-05**: High score and run counts persist via the existing `BestScore` / `GameRecord` SwiftData schema (additive `GameKind` cases + `"endless"` mode key, CloudKit-safe); the save fires on game-over (not per-frame) and survives force-quit
 - [x] **ARCADE-06**: All arcade haptics, SFX, and animations route through `SettingsStore` toggles and respect `accessibilityReduceMotion` (counter-trigger pattern)
-- [ ] **ARCADE-07**: Stats screen presents a score-based shape for endless games (high score, runs played, average/total) distinct from win/loss columns, with an explicit empty state
+- [x] **ARCADE-07**: Stats screen presents a score-based shape for endless games (high score, runs played, average/total) distinct from win/loss columns, with an explicit empty state
 - [x] **ARCADE-08**: Stack and Snake are exempt from Video Mode (no `.videoModeAware()`); the exemption is recorded in an ADR — *amended 2026-07-02: Stack adopts Video Mode (normalized-coordinate engine makes reflow safe); Snake remains exempt. See 15-VIDEO-MODE-ADR.md Amendment.*
 - [x] **ARCADE-09**: Stack and Snake appear as enabled game cards on Home and launch into their game screens (new accent slots added per existing `GameDescriptor` pattern)
 
@@ -373,7 +373,7 @@ Populated 2026-06-25 by the roadmapper. Phase numbering continues from v1.4's la
 | ARCADE-04 | Phase 15 | Complete |
 | ARCADE-05 | Phase 15 | Complete |
 | ARCADE-06 | Phase 15 | Complete |
-| ARCADE-07 | Phase 18 | Pending |
+| ARCADE-07 | Phase 18 | Complete |
 | ARCADE-08 | Phase 18 | Complete |
 | ARCADE-09 | Phase 15 | Complete |
 | STACK-01 | Phase 16 | Complete |
