@@ -75,10 +75,11 @@ struct SnakeBoardCanvas: View {
         Canvas { ctx, size in
             let cellSize = size.width / CGFloat(cols)
 
-            // SNAKE-07: Reduce Motion → force alpha 0.0 (jump-cut, no interpolation).
-            // alpha = 0.0 → segPos returns the cell-snapped position (prev == curr when
-            // alpha is 0) so every segment renders at its cell center, not between cells.
-            let alpha = reduceMotion ? 0.0 : cellMoveAlpha
+            // SNAKE-07: Reduce Motion → force alpha 1.0 (jump-cut, no interpolation).
+            // alpha = 1.0 resolves segPos to the CURRENT body position. 0.0 would
+            // resolve to prevBody — the pre-move snapshot — leaving RM users one
+            // cell move behind the engine on every frame (CR-01).
+            let alpha = reduceMotion ? 1.0 : cellMoveAlpha
 
             // ── 1. Board well (D-03) ─────────────────────────────────────────────
             // Flat border-tinted rounded rectangle — no fill, no sheen, no grid lines
