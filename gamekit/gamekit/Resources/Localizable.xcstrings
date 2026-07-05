@@ -281,6 +281,9 @@
     "Auto-Save" : {
 
     },
+    "Average score: %@" : {
+
+    },
     "Avg" : {
 
     },
@@ -698,6 +701,9 @@
     "High score: %@" : {
 
     },
+    "HIGH SCORE" : {
+
+    },
     "HISTORY" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -928,16 +934,13 @@
     "No puzzles bundled yet" : {
 
     },
-    "No Snake games played yet." : {
+    "No runs yet." : {
 
     },
     "No Solitaire games played yet." : {
 
     },
     "No solved puzzles yet." : {
-
-    },
-    "No Stack games played yet." : {
 
     },
     "No Sudoku games played yet." : {

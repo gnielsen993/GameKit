@@ -2,14 +2,16 @@
 //  SnakeStatsCard.swift
 //  gamekit
 //
-//  Phase 17 (SNAKE-05): props-only Snake stats card for StatsView.
-//  Two metrics only (Phase 17 scope, minimal): high score · runs played.
-//  Full shape deferred to Phase 18.
+//  Phase 18 (ARCADE-07, D-08): Thin wrapper over ScoreStatsCard for the
+//  Snake game. Derives High Score, Average Score, and Runs Played from
+//  pre-queried props; delegates layout to ScoreStatsCard.
 //
-//  Token discipline: zero Color(...) literals; all fonts / spacing from theme.
+//  Snake omits the perfect-streak metric (D-07 — Stack-only).
+//
+//  Token discipline: zero hard-coded color literals; all fonts / spacing from theme.
 //  No queries here — StatsView owns the existing snakeRecords / snakeBestScores queries.
 //
-//  Empty state first (CLAUDE.md §8.3): "No Snake games played yet."
+//  Empty state: "No runs yet." (D-03 — replaces old per-game phrasing).
 //
 
 import SwiftUI
@@ -20,10 +22,11 @@ struct SnakeStatsCard: View {
     let records: [GameRecord]
     let bestScores: [BestScore]
 
-    // MARK: - Derived values (17-PATTERNS.md field derivation)
+    // MARK: - Derived values (18-PATTERNS.md field derivation)
 
     /// Returns the raw score string or "—" when no row exists.
-    /// Key "endless" matches Plan 03 write path exactly (D-12: renaming = data break).
+    /// Key "endless" matches Plan 17 write path exactly (D-12: renaming = data break).
+    /// NOT a GameStats constant — do not promote to one.
     private var highScoreText: String {
         guard let score = bestScores.first(where: {
             $0.difficultyRaw == "endless"
@@ -31,70 +34,37 @@ struct SnakeStatsCard: View {
         return "\(score)"
     }
 
+    /// Integer average of per-run scores (derivation only — no schema change, D-06).
+    /// Guards nil scores and the empty denominator (T-18-03 mitigation).
+    private var averageScoreText: String {
+        let scores = records.compactMap { $0.score }.filter { $0 > 0 }
+        guard !scores.isEmpty else { return "—" }
+        let avg = scores.reduce(0, +) / scores.count
+        return "\(avg)"
+    }
+
     private var runsPlayed: Int { records.count }
 
     // MARK: - Body
 
     var body: some View {
-        if records.isEmpty {
-            emptyState
-        } else {
-            metricsGrid
-        }
-    }
-
-    // MARK: - Empty state (§8.3 — explicit copy, no blank screen)
-
-    @ViewBuilder
-    private var emptyState: some View {
-        Text(String(localized: "No Snake games played yet."))
-            .font(theme.typography.body)
-            .foregroundStyle(theme.colors.textTertiary)
-            .frame(maxWidth: .infinity)
-    }
-
-    // MARK: - Metrics grid (2-column: label | value)
-
-    @ViewBuilder
-    private var metricsGrid: some View {
-        Grid(
-            alignment: .leading,
-            horizontalSpacing: theme.spacing.m,
-            verticalSpacing: theme.spacing.s
-        ) {
-            metricRow(
-                label: String(localized: "High Score"),
-                value: highScoreText,
-                a11yLabel: String(localized: "High score: \(highScoreText)")
-            )
-
-            Rectangle()
-                .fill(theme.colors.border)
-                .frame(height: 1)
-                .gridCellColumns(2)
-
-            metricRow(
-                label: String(localized: "Runs Played"),
-                value: "\(runsPlayed)",
-                a11yLabel: String(localized: "Runs played: \(runsPlayed)")
-            )
-        }
-    }
-
-    @ViewBuilder
-    private func metricRow(label: String, value: String, a11yLabel: String) -> some View {
-        GridRow {
-            Text(label)
-                .font(theme.typography.body)
-                .foregroundStyle(theme.colors.textPrimary)
-                .gridColumnAlignment(.leading)
-            Text(value)
-                .font(theme.typography.monoNumber)
-                .monospacedDigit()
-                .foregroundStyle(theme.colors.textPrimary)
-                .gridColumnAlignment(.trailing)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text(a11yLabel))
+        ScoreStatsCard(
+            theme: theme,
+            heroValue: highScoreText,
+            metrics: [
+                ScoreMetric(
+                    label: String(localized: "Average Score"),
+                    value: averageScoreText,
+                    a11yLabel: String(localized: "Average score: \(averageScoreText)")
+                ),
+                ScoreMetric(
+                    label: String(localized: "Runs Played"),
+                    value: "\(runsPlayed)",
+                    a11yLabel: String(localized: "Runs played: \(runsPlayed)")
+                ),
+            ],
+            emptyStateCopy: String(localized: "No runs yet."),
+            isEmpty: records.isEmpty
+        )
     }
 }
