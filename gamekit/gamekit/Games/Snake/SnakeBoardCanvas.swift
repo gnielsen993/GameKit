@@ -36,7 +36,7 @@ import DesignKit
 ///
 /// The parent view (`SnakeGameView`, Plan 17-05) owns all state and passes it in as props
 /// on every 60 Hz frame tick. The Gaffer alpha (`cellMoveAlpha`) drives smooth segment
-/// interpolation between cell moves; setting `reduceMotion: true` forces alpha to 0.0,
+/// interpolation between cell moves; setting `reduceMotion: true` forces alpha to 1.0,
 /// producing a jump-cut teleport each tick (SNAKE-07).
 struct SnakeBoardCanvas: View {
 
@@ -46,7 +46,7 @@ struct SnakeBoardCanvas: View {
     let snakeBody: [SnakeCell]
     /// Body snapshot BEFORE the most-recent cell move — Gaffer interpolation anchor.
     let prevBody: [SnakeCell]
-    /// Gaffer alpha in [0, 1]. Forced to 0.0 under Reduce Motion (SNAKE-07 jump-cut).
+    /// Gaffer alpha in [0, 1]. Forced to 1.0 under Reduce Motion (SNAKE-07 jump-cut).
     let cellMoveAlpha: Double
     /// Current food cell.
     let food: SnakeCell
@@ -54,7 +54,7 @@ struct SnakeBoardCanvas: View {
     let currentDirection: SnakeDirection
     /// Active DesignKit theme — all colors come from its tokens only (SNAKE-06).
     let theme: Theme
-    /// When true, `alpha` is clamped to 0.0 → jump-cut teleport per cell move (SNAKE-07).
+    /// When true, `alpha` is clamped to 1.0 → jump-cut teleport per cell move (SNAKE-07).
     let reduceMotion: Bool
     /// True when time-based FX are allowed (animationsEnabled && !reduceMotion).
     let fxEnabled: Bool
@@ -162,8 +162,8 @@ struct SnakeBoardCanvas: View {
 
     /// Lerps `prevBody[i]` → `snakeBody[i]` at `alpha`, returning the cell-center CGPoint.
     ///
-    /// - `alpha = 0.0` → returns the cell-snapped position (SNAKE-07 RM jump-cut).
-    /// - `alpha = 1.0` → returns the fully advanced post-move position.
+    /// - `alpha = 0.0` → returns the pre-move (`prevBody`) position.
+    /// - `alpha = 1.0` → returns the fully advanced post-move position (SNAKE-07 RM jump-cut).
     /// - Falls back to `snakeBody[i]` as `prev` when `prevBody` is shorter than `snakeBody`
     ///   (growth step: the engine appended a new tail cell this move).
     private func segPos(_ i: Int, cellSize: CGFloat, alpha: Double) -> CGPoint {
