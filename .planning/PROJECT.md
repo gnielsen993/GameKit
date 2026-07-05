@@ -201,4 +201,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-25 — v1.5 Endless Arcade Primitive milestone opened*
+*Last updated: 2026-07-05 — Phase 17 complete: Snake playable (SNAKE-01…07 verified 19/19); substrate reuse confirmed with zero arcade-Core changes*
