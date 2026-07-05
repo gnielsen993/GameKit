@@ -653,6 +653,51 @@ When in doubt, check these before changing chrome for a specific game.
 - Remaining-count badge under each digit: dims to `textSecondary` and disables
   when count reaches 0.
 
+### 12.6 Stack
+- Video Mode: adopted (15-VIDEO-MODE-ADR.md amendment 2026-07-02). `StackGameView`
+  carries `.videoModeAware(minBoardHeight: 480)`. Stack's engine is pure
+  normalized-coordinate — the canvas rescales per frame, so a PiP reflow cannot
+  desync state (amendment rationale).
+- No lives chip. No timer chip. Score chip: `StackScoreChip` (compact: true in
+  Video Mode compact row slot 2, alongside `StackStreakChip`).
+- Per-layer accent ramp (16-CONTEXT D-05/D-07): block color cycles through
+  `accentPrimary → accentSecondary → success → …` via `StackPalette` — never
+  hardcoded. Board background = `background` token (DESIGN.md §2).
+- Perfect-drop celebration (16-CONTEXT D-08): color pulse/glow + light haptic tick
+  + animated combo-streak counter. Gated by `hapticsEnabled` + `feedbackAnimation`.
+  Reduce Motion: pulse collapses to instant fill; no glow.
+- Game-over choreography (16-CONTEXT D-09): ~0.5 s slow-mo on losing final block +
+  tower fade + banner. Game-over banner = `danger` token (DESIGN.md §2: danger =
+  errors/game-over). Reduce Motion: instant cut to `danger`-token banner. No screen
+  shake (brand rule). View-tier `@Environment(\.accessibilityReduceMotion)` only —
+  engine/VM never read the accessibility flag.
+- Haptic vocabulary: normal block land = `.impact(weight: .light)`; perfect drop =
+  distinct `.light` tick; game over = `.error`. No per-frame haptics ever.
+- Stats shape: `StackStatsCard` (Phase 18 D-08). Hero = High Score; rows = Average
+  Score + Runs Played + Best Streak (Stack-only, persisted via `"perfectStreak"`
+  BestScore row, 16-CONTEXT D-10/D-11).
+
+### 12.7 Snake
+- Video Mode: **exempt** (15-VIDEO-MODE-ADR.md, Accepted 2026-06-26). Pixel-derived
+  grid cells + continuous steering — a PiP reflow mid-run would snap the snake to a
+  different cell position and desync state. `SnakeGameView` has no `.videoModeAware`
+  modifier. Snake remains exempt after the 2026-07-02 Stack amendment.
+- No lives chip. No timer chip. Score chip: `SnakeScoreChip` (no compact row —
+  exempt from Video Mode, no compact variant needed).
+- Body ramp (17-CONTEXT D-02): head = `accentPrimary`; body segments fade toward
+  `surface` via opacity steps. Food = `success` (green) or `accentPrimary` fallback.
+  Board background = `background` token (DESIGN.md §2).
+- Direction input (17-CONTEXT D-04): swipe gesture + optional D-pad overlay. One
+  direction lock per tick — reversal rejected silently (no haptic for rejected input).
+- Haptic vocabulary (17-CONTEXT D-07/D-08/D-09/D-10): valid direction = `.selection`;
+  food eaten = `.impact(weight: .light)`; new high score mid-run = `.success` once
+  per run (17-CONTEXT D-09); game over = `.error`. Per-frame haptics: none.
+- Death + eat animations gated by `feedbackAnimation` / `hapticsEnabled`. Reduce
+  Motion: death drain + eat animations cut instantly to banner/state (no screen
+  shake — brand rule). View-tier `@Environment(\.accessibilityReduceMotion)` only.
+- Stats shape: `SnakeStatsCard` (Phase 18 D-08). Hero = High Score; rows = Average
+  Score + Runs Played. No streak row (streak is Stack-only per 16-CONTEXT D-10).
+
 ### 12.5 Future games
 When adding a new game, verify against this checklist:
 - [ ] Lives chip uses hearts if the game has a lives mode.
