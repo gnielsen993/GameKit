@@ -551,7 +551,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 |-------|----------------|--------|-----------|
 | 15. Arcade Substrate + Skeleton | 5/5 | Complete    | 2026-06-27 |
 | 16. Stack | 6/7 | In Progress|  |
-| 17. Snake | 6/6 | Complete   | 2026-07-04 |
+| 17. Snake | 6/6 | Complete    | 2026-07-05 |
 | 18. Stats, Design Specs & ADR | 0/TBD | Not started | - |
 
 ### v1.5 Research Flags

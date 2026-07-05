@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Endless Arcade Primitive
-status: executing
-stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-07-04T05:22:30.728Z"
+status: ready_to_plan
+stopped_at: Phase 17 complete (6/6) — ready to discuss Phase 18
+last_updated: 2026-07-05T03:57:54.622Z
 last_activity: 2026-07-04
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 18
-  completed_plans: 17
+  completed_plans: 101
   percent: 50
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Phase 17 — snake
+**Current focus:** Phase 18 — stats, design specs & adr
 
 ## Current Position
 
-Phase: 17 (snake) — EXECUTING
-Plan: 6 of 6
-Status: Ready to execute
-Last activity: 2026-07-04
+Phase: 18
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-07-05
 
 ## v1.0 Carry-Over
 
@@ -47,7 +47,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 
 **Velocity:**
 
-- Total plans completed: 35
+- Total plans completed: 41
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -61,6 +61,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | 08 | 6 | - | - |
 | 09 | 8 | - | - |
 | 15 | 5 | - | - |
+| 17 | 6 | - | - |
 
 **Recent Trend:**
 
