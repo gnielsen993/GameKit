@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Endless Arcade Primitive
 status: executing
-stopped_at: Phase 18 context gathered
-last_updated: "2026-07-05T21:12:07.136Z"
+stopped_at: Completed 18-03-PLAN.md
+last_updated: "2026-07-05T21:19:07.984Z"
 last_activity: 2026-07-05
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 22
-  completed_plans: 18
+  completed_plans: 19
   percent: 50
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 ## Current Position
 
 Phase: 18 (stats-design-specs-adr) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-05
 
@@ -150,6 +150,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 17-snake P06 | 249 | 2 tasks | 2 files |
 | Phase 17-snake P03 | 1122 | 2 tasks | 4 files |
 | Phase 18-stats-design-specs-adr P01 | 11 | 3 tasks | 5 files |
+| Phase 18 P03 | 4 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -398,6 +399,9 @@ Recent decisions affecting current work:
 - [Phase ?]: 17-01: Self-collision check uses body.dropLast() tail-exclusion — sliding move never falsely collides on the vacating tail cell; startLength=5 required in selfCollision test for loop body > perimeter
 - [Phase ?]: 17-02
 - [Phase ?]: 17-02
+- [Phase ?]: DESIGN.md §12.6 Stack: Video Mode adopted; haptic vocabulary and Reduce Motion jump-cut spec documented as-built
+- [Phase ?]: DESIGN.md §12.7 Snake: Video Mode exempt; body-ramp token map and stats shape documented
+- [Phase ?]: Engine purity gate SC5 verified against flat files (Games/Stack/ and Games/Snake/) — not the non-existent Games/*/Engine subdir
 
 ### Pending Todos
 
@@ -420,8 +424,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-05T21:12:07.127Z
-Stopped at: Phase 18 context gathered
+Last session: 2026-07-05T21:19:07.977Z
+Stopped at: Completed 18-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
