@@ -467,7 +467,7 @@ Brand constraint is absolute: these are calm endless games, not twitch arcade. S
 - [x] **Phase 15: Arcade Substrate + Skeleton** - Shared loop driver, lifecycle enum, fixed-timestep accumulator with spiral-of-death clamp, scenePhase pause/resume wiring, score persistence schema extensions, Home card stubs — all proven with unit tests before either game ships (completed 2026-06-27)
 - [ ] **Phase 16: Stack** - Tap-to-drop tower game proves the substrate end-to-end; Canvas renderer; overhang trim + combo recovery; speed ramp; score persistence; §8.12 theme audit; Reduce Motion path
 - [x] **Phase 17: Snake** - Grid-based endless confirms substrate reuse with zero Core/ changes; swipe + D-pad direction queue; wrap/wall toggle; seeded RNG; §8.12 theme audit; Reduce Motion path (completed 2026-07-04)
-- [ ] **Phase 18: Stats, Design Specs & ADR** - Score-based stats screen shape; DESIGN.md §12 entries (Reduce Motion spec, haptic vocabulary, token map); Video Mode exemption ADR; cold-start regression check; engine purity sign-off
+- [x] **Phase 18: Stats, Design Specs & ADR** - Score-based stats screen shape; DESIGN.md §12 entries (Reduce Motion spec, haptic vocabulary, token map); Video Mode exemption ADR; cold-start regression check; engine purity sign-off (completed 2026-07-06)
 
 ### v1.5 Phase Details
 
@@ -542,9 +542,9 @@ Plans:
   5. All new Swift files in `Games/Stack/` and `Games/Snake/` are ≤400 lines; `grep -r "import SwiftUI" Games/Stack/Engine Games/Snake/Engine` returns empty — engine purity confirmed across both games before the milestone is closed.
 **Plans**: 4 plans
 - [x] 18-01-PLAN.md — Score-based stats redesign: shared ScoreStatsCard + Stack/Snake wrappers + release log
-- [ ] 18-02-PLAN.md — Stats card §8.12 theme + Dynamic Type overflow audit (human-verify)
+- [x] 18-02-PLAN.md — Stats card §8.12 theme + Dynamic Type overflow audit (human-verify)
 - [x] 18-03-PLAN.md — DESIGN.md §12.6/§12.7 entries + ADR call-site / engine-purity / file-size gates
-- [ ] 18-04-PLAN.md — Cold-start verification: structural lazy-init proof + Instruments baseline (human-verify)
+- [x] 18-04-PLAN.md — Cold-start verification: structural lazy-init proof + Instruments baseline (human-verify)
 
 ### v1.5 Progress
 
@@ -556,7 +556,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 | 15. Arcade Substrate + Skeleton | 5/5 | Complete    | 2026-06-27 |
 | 16. Stack | 6/7 | In Progress|  |
 | 17. Snake | 6/6 | Complete    | 2026-07-05 |
-| 18. Stats, Design Specs & ADR | 2/4 | In Progress|  |
+| 18. Stats, Design Specs & ADR | 4/4 | Complete   | 2026-07-06 |
 
 ### v1.5 Research Flags
 
