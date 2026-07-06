@@ -86,7 +86,23 @@ PASS
 
 ## Result
 
-_(Awaiting human judgment — see Task 2 checkpoint)_
+**Verdict:** PASS (after one bug fix)
+
+| Capture | Config | Outcome |
+|---------|--------|---------|
+| 01 — Classic preset, default DT | classicMuted, Large | PASS — hero numeral, caption, border rule, and metric rows all legible; contrast reads as premium |
+| 02 — Voltage preset, default DT | voltage, Large | PASS — all elements legible on Loud palette; hero numeral does not vanish into background (§8.12 satisfied) |
+| 03a — Classic preset, AccessibilityXXL | classicMuted, AXXXL | DEFECT (fixed) — Average Score metric value `770325` was wrapping mid-number (`77032` on line 1, `5` on line 2). Fixed by adding `.lineLimit(1)` + `.minimumScaleFactor(0.7)` to metric value `Text` in `ScoreStatsCard.metricRow`. Re-captured as `03c-fixed-axxxl-stack.png` — value renders on one line. |
+| 04 — Empty store, Classic preset | classicMuted, Large | PASS — "No runs yet." shows in textTertiary, centered; no blank card |
+
+**D-04 overflow:** 7-digit hero numeral (`1234567`) does not clip or wrap at any DT size (fixed `titleLarge` = 32pt).
+**§8.12 Loud preset:** Voltage (`02`) confirmed legible — no element disappears into background.
+
+**Observation (hierarchy inversion — recorded, no action):** At AccessibilityXXL, DT-responsive metric row labels (`body` font) grow larger than the fixed 32pt hero numeral, reversing the intended visual hierarchy. This is an inherent consequence of the fixed `titleLarge` token. The hero numeral sizing is intentionally NOT changed per human reviewer instruction.
+
+**Fix commit:** `fix(18-02): prevent metric value mid-number wrap at large Dynamic Type`
+**Fix file:** `gamekit/Screens/ScoreStatsCard.swift` — added `.lineLimit(1)` + `.minimumScaleFactor(0.7)` to metric value `Text` in `metricRow` (D-04, ARCADE-07)
+**Re-capture:** `screenshots/03-classic-large-dt/03c-fixed-axxxl-stack.png` — shows Stack card at AccessibilityXXL with Average Score `770325` on one line
 
 ---
 

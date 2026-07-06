@@ -119,6 +119,11 @@ struct ScoreStatsCard: View {
                 .font(theme.typography.monoNumber)
                 .monospacedDigit()
                 .foregroundStyle(theme.colors.textPrimary)
+                // Prevent mid-number line breaks at large Dynamic Type sizes (D-04).
+                // Numbers must always read as a single value; .minimumScaleFactor
+                // lets the font shrink rather than wrap when column width is tight.
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .gridColumnAlignment(.trailing)
         }
         .accessibilityElement(children: .combine)
