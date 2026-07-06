@@ -1,0 +1,17 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "C4F04A59-D773-4E23-B4E7-4986DD2FEB32",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "3449FAE1-43C3-448E-8FEC-CE8CFAF1296F.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "02-voltage-seeded_0_8F2F9919-E1E6-4846-84D7-F91E719700FD.png",
+        "timestamp" : 1783306328.276
+      }
+    ],
+    "testIdentifier" : "StatsAuditUITest/testCapture02_VoltageSeeded()",
+    "testIdentifierURL" : "test://com.apple.xcode/gamekit/gamekitUITests/StatsAuditUITest/testCapture02_VoltageSeeded"
+  }
+]

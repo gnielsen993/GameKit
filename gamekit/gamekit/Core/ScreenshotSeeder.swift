@@ -8,8 +8,12 @@
 // Usage (see scripts/screenshot_seed.sh for the one-command flow):
 //   xcrun simctl launch <device> com.lauterstar.gamekit --screenshots
 //
+// --screenshots-arcade: same as --screenshots, PLUS Stack + Snake arcade
+//   data (including 6-7 digit high scores for the Phase 18 D-04 overflow
+//   audit). Stack/Snake sections show "No runs yet." under plain --screenshots.
+//
 // What it seeds:
-//   - SwiftData: GameRecord + BestTime + BestScore rows for all 6 games
+//   - SwiftData: GameRecord + BestTime + BestScore rows for all 6 base games
 //   - UserDefaults: in-progress save states for Minesweeper Easy, Merge
 //     win-mode, FreeCell deal #1, Solitaire Easy, Sudoku easy/free
 //   - Nonogram skipped — puzzle IDs are library-coupled; existing wins
@@ -26,16 +30,24 @@ enum ScreenshotSeeder {
         CommandLine.arguments.contains("--screenshots")
     }
 
-    static func seed(container: ModelContainer) {
+    /// Activated by --screenshots-arcade. Seeds everything --screenshots seeds
+    /// PLUS Stack and Snake arcade data (6-7 digit scores for D-04 overflow check).
+    static var isArcadeActive: Bool {
+        CommandLine.arguments.contains("--screenshots-arcade")
+    }
+
+    static func seed(container: ModelContainer, includeArcade: Bool = false) {
         let context = container.mainContext
         do {
             try context.delete(model: GameRecord.self)
             try context.delete(model: BestTime.self)
             try context.delete(model: BestScore.self)
             seedStats(context: context)
+            if includeArcade { seedArcadeStats(context: context) }
             try context.save()
             seedSaveStates()
-            print("📸 ScreenshotSeeder: wiped + reseeded all 6 games + save states.")
+            let label = includeArcade ? "6 base games + arcade (Stack/Snake)" : "6 base games"
+            print("📸 ScreenshotSeeder: wiped + reseeded \(label) + save states.")
         } catch {
             print("❌ ScreenshotSeeder failed: \(error)")
         }
@@ -119,6 +131,46 @@ enum ScreenshotSeeder {
         }
         for (o, s, d) in [(Outcome.win,387.0,5.0),(.win,423,12),(.loss,234,3),(.loss,312,9),(.loss,278,16)] {
             context.insert(GameRecord(gameKind: .klondike, difficulty: "medium", outcome: o, durationSeconds: s, playedAt: ago(d)))
+        }
+    }
+
+    // MARK: - Arcade stats (Stack + Snake) — Phase 18 D-04 overflow audit
+
+    /// Seeds Stack and Snake arcade data. Called only under --screenshots-arcade.
+    /// Includes a 7-digit Stack high score and 6-digit Snake high score to exercise
+    /// the D-04 hero-numeral wrap/clip check in ScoreStatsCard.
+    private static func seedArcadeStats(context: ModelContext) {
+        let now = Date()
+        func ago(_ days: Double) -> Date { now.addingTimeInterval(-days * 86_400) }
+
+        // Stack — 7-digit hero score (D-04 overflow-check target).
+        // Keys must match GameStats.stackEndlessMode ("endless") and
+        // GameStats.stackPerfectStreakMode ("perfectStreak") — renaming = data break.
+        context.insert(BestScore(gameKind: .stack, difficulty: "endless",       score: 1_234_567, achievedAt: ago(1)))
+        context.insert(BestScore(gameKind: .stack, difficulty: "perfectStreak", score: 42,        achievedAt: ago(3)))
+        for (sc, d) in [(1_234_567, 1.0), (987_321, 4.0), (765_432, 8.0), (543_210, 12.0), (321_098, 19.0)] {
+            context.insert(GameRecord(
+                gameKind: .stack,
+                difficulty: "endless",
+                outcome: .loss,
+                durationSeconds: 120,
+                playedAt: ago(d),
+                score: sc
+            ))
+        }
+
+        // Snake — 6-digit hero score.
+        // Key "endless" matches SnakeStatsCard literal lookup (D-12 — no GameStats constant).
+        context.insert(BestScore(gameKind: .snake, difficulty: "endless", score: 987_654, achievedAt: ago(2)))
+        for (sc, d) in [(987_654, 2.0), (743_210, 5.0), (512_345, 10.0), (298_765, 15.0)] {
+            context.insert(GameRecord(
+                gameKind: .snake,
+                difficulty: "endless",
+                outcome: .loss,
+                durationSeconds: 90,
+                playedAt: ago(d),
+                score: sc
+            ))
         }
     }
 

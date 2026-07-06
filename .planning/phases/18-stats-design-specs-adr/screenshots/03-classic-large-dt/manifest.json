@@ -1,0 +1,26 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "C4F04A59-D773-4E23-B4E7-4986DD2FEB32",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "ED5EA014-2B92-44D9-A42A-AC6DA0FCD1FC.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "03b-classic-large-dt-snake_0_B4690C18-AD32-43B6-BE01-B4AD316730FF.png",
+        "timestamp" : 1783306701.866
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "C4F04A59-D773-4E23-B4E7-4986DD2FEB32",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "10B626F8-CB11-4E4A-AB10-9E87DB6F9B99.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "03a-classic-large-dt-stack_0_BC64E75D-608E-4E6F-B029-DB052BDE0185.png",
+        "timestamp" : 1783306701.05
+      }
+    ],
+    "testIdentifier" : "StatsAuditUITest/testCapture03_ClassicLargeDT()",
+    "testIdentifierURL" : "test://com.apple.xcode/gamekit/gamekitUITests/StatsAuditUITest/testCapture03_ClassicLargeDT"
+  }
+]

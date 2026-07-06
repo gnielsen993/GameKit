@@ -1,0 +1,17 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "C4F04A59-D773-4E23-B4E7-4986DD2FEB32",
+        "deviceName" : "iPhone 17 Pro",
+        "exportedFileName" : "766560EC-17ED-45B3-BF70-2DFE437652D0.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "04-empty-store_0_6F76575A-9734-4779-88E3-40AB44F8192D.png",
+        "timestamp" : 1783306433.85
+      }
+    ],
+    "testIdentifier" : "StatsAuditUITest/testCapture04_EmptyStore()",
+    "testIdentifierURL" : "test://com.apple.xcode/gamekit/gamekitUITests/StatsAuditUITest/testCapture04_EmptyStore"
+  }
+]

@@ -135,8 +135,10 @@ struct GameKitApp: App {
         // account). Reset command + reseed instructions live in
         // App/DummyDataSeeder.swift.
         #if DEBUG
-        if ScreenshotSeeder.isActive {
-            ScreenshotSeeder.seed(container: sharedContainer)
+        if ScreenshotSeeder.isActive || ScreenshotSeeder.isArcadeActive {
+            // --screenshots: wipe + seed 6 base games (Stack/Snake remain empty — "No runs yet.")
+            // --screenshots-arcade: same + Stack/Snake with 6-7 digit scores (Phase 18 D-04 audit)
+            ScreenshotSeeder.seed(container: sharedContainer, includeArcade: ScreenshotSeeder.isArcadeActive)
         } else {
             DummyDataSeeder.seedIfNeeded(
                 container: sharedContainer,
