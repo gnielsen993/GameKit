@@ -177,12 +177,12 @@ final class SnakeViewModel {
             }
 
             // Game-over transition: persist score exactly once, then halt loop.
-            // "endless" and "snake" are PERMANENT serialization keys — renaming = data break (D-12).
+            // GameStats.snakeEndlessMode is the PERMANENT serialization key — renaming = data break (D-12).
             if newFrame.gameOver {
                 state = .gameOver
                 try? gameStats?.record(
                     gameKind: .snake,
-                    mode: "endless",    // PERMANENT KEY — D-12 data-break lock
+                    mode: GameStats.snakeEndlessMode,    // PERMANENT KEY — D-12 data-break lock
                     outcome: .loss,     // snake runs always end in loss (no win state)
                     score: engine.score // food eaten count (SNAKE-05)
                 )
@@ -199,7 +199,7 @@ final class SnakeViewModel {
         guard !didAttachStats else { return }
         didAttachStats = true
         gameStats = stats
-        bestScoreAtStart = stats.bestScore(gameKind: .snake, mode: "endless")
+        bestScoreAtStart = stats.bestScore(gameKind: .snake, mode: GameStats.snakeEndlessMode)
     }
 
     // MARK: - Restart
@@ -216,7 +216,7 @@ final class SnakeViewModel {
         highScoreCount = 0
         directionQueue = []
         didCrossHighScore = false
-        bestScoreAtStart = gameStats?.bestScore(gameKind: .snake, mode: "endless") ?? 0
+        bestScoreAtStart = gameStats?.bestScore(gameKind: .snake, mode: GameStats.snakeEndlessMode) ?? 0
         prevBody = engine.body
         frame = SnakeFrame(
             body: engine.body,

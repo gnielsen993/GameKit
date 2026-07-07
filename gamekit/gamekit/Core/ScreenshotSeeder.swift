@@ -160,12 +160,12 @@ enum ScreenshotSeeder {
         }
 
         // Snake — 6-digit hero score.
-        // Key "endless" matches SnakeStatsCard literal lookup (D-12 — no GameStats constant).
-        context.insert(BestScore(gameKind: .snake, difficulty: "endless", score: 987_654, achievedAt: ago(2)))
+        // Key matches GameStats.snakeEndlessMode (D-12 — renaming = data break).
+        context.insert(BestScore(gameKind: .snake, difficulty: GameStats.snakeEndlessMode, score: 987_654, achievedAt: ago(2)))
         for (sc, d) in [(987_654, 2.0), (743_210, 5.0), (512_345, 10.0), (298_765, 15.0)] {
             context.insert(GameRecord(
                 gameKind: .snake,
-                difficulty: "endless",
+                difficulty: GameStats.snakeEndlessMode,
                 outcome: .loss,
                 durationSeconds: 90,
                 playedAt: ago(d),

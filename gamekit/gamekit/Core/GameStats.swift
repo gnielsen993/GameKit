@@ -314,6 +314,7 @@ extension GameStats {
     // CloudKit sync history. Do NOT rename without a migration path.
     static let stackEndlessMode = "endless"
     static let stackPerfectStreakMode = "perfectStreak"
+    static let snakeEndlessMode = "endless"   // PERMANENT KEY — D-12 data-break lock
 
     /// Record one Stack game-over event. Inserts exactly ONE `GameRecord`
     /// (under mode `"endless"`) so runs-played stays honest; evaluates two

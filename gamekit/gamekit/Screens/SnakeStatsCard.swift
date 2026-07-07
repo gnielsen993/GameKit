@@ -25,11 +25,10 @@ struct SnakeStatsCard: View {
     // MARK: - Derived values (18-PATTERNS.md field derivation)
 
     /// Returns the raw score string or "—" when no row exists.
-    /// Key "endless" matches Plan 17 write path exactly (D-12: renaming = data break).
-    /// NOT a GameStats constant — do not promote to one.
+    /// Key matches GameStats.snakeEndlessMode (D-12: renaming = data break).
     private var highScoreText: String {
         guard let score = bestScores.first(where: {
-            $0.difficultyRaw == "endless"
+            $0.difficultyRaw == GameStats.snakeEndlessMode
         })?.score else { return "—" }
         return "\(score)"
     }

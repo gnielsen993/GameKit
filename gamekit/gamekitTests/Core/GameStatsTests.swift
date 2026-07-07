@@ -227,10 +227,10 @@ struct GameStatsTests {
     func recordSnakeRunHigherOnly() throws {
         let (stats, ctx, _) = try makeStats()
 
-        // Run 1: score 15 — should create GameRecord + BestScore("snake","endless",15)
+        // Run 1: score 15 — should create GameRecord + BestScore("snake", snakeEndlessMode, 15)
         try stats.record(
             gameKind: .snake,
-            mode: "endless",    // PERMANENT key — D-12 data-break lock
+            mode: GameStats.snakeEndlessMode,    // PERMANENT key — D-12 data-break lock
             outcome: .loss,     // snake runs always end in loss
             score: 15
         )
@@ -242,8 +242,9 @@ struct GameStatsTests {
         #expect(recordsAfterFirst.count == 1)
 
         // BestScore row exists at 15.
+        let snakeKey = GameStats.snakeEndlessMode
         let bestAfterFirst = try ctx.fetch(FetchDescriptor<BestScore>(
-            predicate: #Predicate { $0.gameKindRaw == "snake" && $0.difficultyRaw == "endless" }
+            predicate: #Predicate { $0.gameKindRaw == "snake" && $0.difficultyRaw == snakeKey }
         ))
         #expect(bestAfterFirst.count == 1)
         #expect(bestAfterFirst.first?.score == 15)
@@ -251,7 +252,7 @@ struct GameStatsTests {
         // Run 2: score 8 — lower; BestScore must NOT update (higher-only semantics).
         try stats.record(
             gameKind: .snake,
-            mode: "endless",
+            mode: GameStats.snakeEndlessMode,
             outcome: .loss,
             score: 8
         )
@@ -264,7 +265,7 @@ struct GameStatsTests {
 
         // BestScore stays at 15 — lower score must not replace existing best.
         let bestAfterSecond = try ctx.fetch(FetchDescriptor<BestScore>(
-            predicate: #Predicate { $0.gameKindRaw == "snake" && $0.difficultyRaw == "endless" }
+            predicate: #Predicate { $0.gameKindRaw == "snake" && $0.difficultyRaw == snakeKey }
         ))
         #expect(bestAfterSecond.count == 1, "must NOT insert a second BestScore row")
         #expect(bestAfterSecond.first?.score == 15,
