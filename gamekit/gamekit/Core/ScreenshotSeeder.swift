@@ -243,7 +243,11 @@ enum ScreenshotSeeder {
 
     private static func makeSudokuCells(givens: String, solution: String, playerFilledCount: Int) -> [SudokuCell] {
         let g = givens.map   { $0 == "0" ? 0 : Int(String($0))! }
-        let s = solution.map { Int(String($0))! }
+        let s = solution.compactMap { Int(String($0)) }
+        guard s.count == 81 else {
+            print("❌ ScreenshotSeeder: invalid solution string (count \(s.count)); Sudoku save state skipped.")
+            return []
+        }
         var filled = 0
         return (0..<81).map { i in
             if g[i] != 0 { return .given(g[i]) }
