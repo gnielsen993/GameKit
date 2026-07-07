@@ -1,7 +1,7 @@
 # Cold-Start Baseline — Phase 18 (Plan 04)
 
-**Date:** 2026-07-05
-**Status:** Structural proof complete · Canonical timing baseline PENDING (Task 2 blocking checkpoint)
+**Date:** 2026-07-05 (structural proof) · 2026-07-06 (timing baseline recorded)
+**Status:** Complete — structural proof + subjective timing baseline recorded
 
 ---
 
@@ -79,24 +79,52 @@ modified.
 
 ## Canonical Baseline
 
-> **Status: PENDING — blocking human-verification checkpoint (Task 2)**
+> **Status: RECORDED — 2026-07-06**
 
-This section will be filled in after the real-device Instruments App Launch
-session (Task 2). The session records the **first canonical cold-start baseline**
-for GameDrawer — no prior v1.4 numeric baseline exists anywhere in `.planning/`
-(D-10). The result is the new canonical number, not a comparison against a
-phantom figure.
+This is the **first canonical cold-start baseline** for GameDrawer. No prior v1.4
+numeric baseline exists anywhere in `.planning/` (D-10). This record is the new
+canonical reference, not a comparison against a phantom figure.
 
-Fields to be recorded:
+### Method and honesty note
+
+**This baseline was NOT obtained from a formal Instruments App Launch session.**
+The plan originally called for a real-device Instruments trace (3–5 runs, median
+ms, device model, iOS version). The developer instead provided a subjective
+self-estimate: the app feels like it launches in roughly 200 ms, and the launch
+is fast enough that manual timing is imprecise.
+
+No device model or iOS version was captured this session.
+
+This is recorded honestly as a subjective sanity-check, not a rigorous benchmark.
 
 | Field | Value |
 |-------|-------|
-| Median launch time (ms) | PENDING |
-| Device model | PENDING |
-| iOS version | PENDING |
-| Date of session | PENDING |
-| Runs measured | PENDING |
-| Subjective quality | PENDING |
+| Launch time estimate | ~200 ms (approximate) |
+| Measurement method | Developer subjective self-estimate |
+| Device model | Not captured |
+| iOS version | Not captured |
+| Date | 2026-07-06 |
+| Runs measured | N/A (subjective impression) |
+| Subjective quality | Fast — developer noted timing manually is difficult at this speed |
+
+### What is load-bearing
+
+The **primary evidence** for SC4 (cold-start unchanged) is the **structural proof**
+from Task 1 (see above): zero arcade engine or game-view state is allocated at
+app launch — all game views are lazily instantiated inside SwiftUI's
+`navigationDestination` closure, which SwiftUI does not evaluate until the user
+navigates. This is a structural guarantee, not a measurement.
+
+The ~200 ms figure is a corroborating sanity-check confirming the app does not
+feel slow to a human observer. It is not the primary basis for closing SC4.
+
+### Future supersession
+
+A formal Instruments App Launch session (with device model, iOS version, and
+3–5 run median) may supersede this baseline if a hard numeric anchor is ever
+needed — for example, to detect a cold-start regression in a future phase. If that
+happens, replace this section with the Instruments-measured result and update the
+date and method accordingly.
 
 ---
 
@@ -118,7 +146,9 @@ No rewrites needed. (D-12 confirmed.)
 
 ## Phase 15 UAT Retirement
 
-> **Status: PENDING — will be recorded when Task 2 completes.**
+> **Status: COMPLETE — 2026-07-06**
 
-Once the timing half is closed, `15-HUMAN-UAT.md` will be updated to mark
-the pending SC5 Instruments item as **retired**, pointing to this document.
+`15-HUMAN-UAT.md` has been updated to mark the pending SC5 Instruments item as
+**retired**, pointing to this document. Retirement is honest: the closure is via
+the structural allocation proof (Task 1) plus a subjective ~200 ms developer
+estimate — NOT a formal Instruments session.
