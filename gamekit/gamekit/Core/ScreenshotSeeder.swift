@@ -253,8 +253,11 @@ enum ScreenshotSeeder {
     }
 
     private static func encode<T: Encodable>(_ value: T, to key: String, defaults: UserDefaults, encoder: JSONEncoder) {
-        if let data = try? encoder.encode(value) {
+        do {
+            let data = try encoder.encode(value)
             defaults.set(data, forKey: key)
+        } catch {
+            print("❌ ScreenshotSeeder: failed to encode \(T.self) for key '\(key)': \(error)")
         }
     }
 }
