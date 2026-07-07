@@ -19,7 +19,9 @@ import DesignKit
 
 /// A single label | value row in the score stats grid.
 /// The `a11yLabel` should read naturally (e.g. "Average score: 120").
-struct ScoreMetric {
+/// `label` is unique within any given card instance, so it serves as the stable identity.
+struct ScoreMetric: Identifiable {
+    var id: String { label }
     let label: String
     let value: String
     let a11yLabel: String
@@ -96,11 +98,11 @@ struct ScoreStatsCard: View {
                 .gridCellColumns(2)
 
             // 3. One GridRow per ScoreMetric (label | value).
-            ForEach(metrics.indices, id: \.self) { index in
+            ForEach(metrics) { metric in
                 metricRow(
-                    label: metrics[index].label,
-                    value: metrics[index].value,
-                    a11yLabel: metrics[index].a11yLabel
+                    label: metric.label,
+                    value: metric.value,
+                    a11yLabel: metric.a11yLabel
                 )
             }
         }
