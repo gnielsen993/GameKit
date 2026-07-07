@@ -281,6 +281,9 @@
     "Auto-Save" : {
 
     },
+    "Average Score" : {
+
+    },
     "Average score: %@" : {
 
     },
@@ -694,12 +697,6 @@
           }
         }
       }
-    },
-    "High Score" : {
-
-    },
-    "High score: %@" : {
-
     },
     "HIGH SCORE" : {
 
