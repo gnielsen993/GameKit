@@ -34,6 +34,6 @@ enum GameKitClassic {
         surface: Color(hex: "#262019"),
         accent: Color(hex: "#E85A4D"),
         textPrimary: Color(hex: "#F5F1E8"),
-        gameNumberPalette: PresetTheme.classicGameNumberPalette
+        gameNumberPalette: PresetTheme.classicGameNumberPaletteDark
     )
 }
