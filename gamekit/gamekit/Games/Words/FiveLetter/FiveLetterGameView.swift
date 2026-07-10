@@ -23,12 +23,11 @@ struct FiveLetterGameView: View {
 
     var body: some View {
         Group {
-            if videoModeStore.isEnabled, videoModeStore.location.isLarge {
-                largeZoneLayout
-                    .toolbar(.hidden, for: .navigationBar)
+            if videoModeStore.isEnabled {
+                videoModeLayout
             } else {
-                normalLayout
-                    .toolbar { toolbarContent }
+                normalLayout()
+                    .toolbar { gameToolbar() }
             }
         }
         .navigationTitle(String(localized: "Five Letter"))
@@ -65,12 +64,58 @@ struct FiveLetterGameView: View {
         }
     }
 
+    /// Chip packing for Video Mode small-top zones — chips slide away from
+    /// the covered corner; `.spread` is the off-path arrangement.
+    enum InfoPack { case spread, leading, trailing }
+
+    /// ~192pt system small-PiP height + margin (mirrors
+    /// SudokuGameView+VideoMode.smallPipFootprint) — lifts the keyboard above
+    /// a bottom-corner PiP so every key stays tappable.
+    private static let smallPipFootprint: CGFloat = 200
+
+    /// Necessity principle (2026-07-09, DESIGN §7.7): chrome changes from its
+    /// off-path form only where the selected PiP zone actually covers it.
     @ViewBuilder
-    private var normalLayout: some View {
+    private var videoModeLayout: some View {
+        switch videoModeStore.location {
+        case .largeTop:
+            // Band covers the nav bar — compact row at the bottom edge.
+            largeZoneLayout
+                .toolbar(.hidden, for: .navigationBar)
+        case .largeBottom:
+            // Band covers only the bottom; the videoModeAware inset lifts the
+            // keyboard above it — nav bar + full info row stay off-path.
+            normalLayout()
+                .toolbar { gameToolbar() }
+        case .smallTopLeft:
+            // PiP covers the leading nav corner + timer chip: back/restart
+            // join the (uncovered) menu at trailing; info chips pack trailing.
+            normalLayout(infoPack: .trailing)
+                .toolbar { gameToolbar(itemsAtLeading: false) }
+        case .smallTopRight:
+            // PiP covers the trailing nav corner + guesses chip: the menu
+            // joins back/restart at leading; info chips pack leading.
+            normalLayout(infoPack: .leading)
+                .toolbar { gameToolbar(menuAtTrailing: false) }
+        case .smallBottomLeft, .smallBottomRight:
+            // PiP sits on the keyboard's bottom corner — the only genuinely
+            // covered element. Lift the stack above the PiP footprint; top
+            // chrome stays byte-identical to off-path.
+            normalLayout(bottomClearance: Self.smallPipFootprint)
+                .toolbar { gameToolbar() }
+        }
+    }
+
+    /// Off-path layout. Video Mode zones whose PiP leaves the chrome
+    /// unobstructed reuse it verbatim; parameters adjust only the covered
+    /// element (defaults reproduce off-path exactly).
+    @ViewBuilder
+    private func normalLayout(infoPack: InfoPack = .spread,
+                              bottomClearance: CGFloat = 0) -> some View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
             VStack(spacing: theme.spacing.s) {
-                infoRow(compact: false)
+                infoRow(compact: false, pack: infoPack)
                     .padding(.vertical, theme.spacing.xs)
                 FiveLetterBoardView(theme: theme, guesses: viewModel.guesses, currentGuess: viewModel.currentGuess, invalidCount: viewModel.invalidCount)
                 messageLine
@@ -84,7 +129,7 @@ struct FiveLetterGameView: View {
                 .opacity(viewModel.isTerminal ? 0.45 : 1)
                 .allowsHitTesting(!viewModel.isTerminal)
             }
-            .padding(.bottom, theme.spacing.l)
+            .padding(.bottom, bottomClearance > 0 ? bottomClearance : theme.spacing.l)
 
             if viewModel.isTerminal && !bannerDismissed {
                 endBanner
@@ -95,14 +140,14 @@ struct FiveLetterGameView: View {
         .sensoryFeedback(.success, trigger: settingsStore.hapticsEnabled ? viewModel.winCount : 0)
     }
 
+    /// Large-top only — the band genuinely displaces the nav bar, so the
+    /// compact row (at the bottom edge, opposite the band) hosts its roles.
+    /// `.largeBottom` renders `normalLayout()` instead (necessity principle).
     @ViewBuilder
     private var largeZoneLayout: some View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
             VStack(spacing: theme.spacing.s) {
-                if videoModeStore.location == .largeBottom {
-                    compactControlRow
-                }
                 infoRow(compact: true)
                 FiveLetterBoardView(theme: theme, guesses: viewModel.guesses, currentGuess: viewModel.currentGuess, invalidCount: viewModel.invalidCount)
                 FiveLetterKeyboardView(
@@ -114,9 +159,7 @@ struct FiveLetterGameView: View {
                 )
                 .opacity(viewModel.isTerminal ? 0.45 : 1)
                 .allowsHitTesting(!viewModel.isTerminal)
-                if videoModeStore.location == .largeTop {
-                    compactControlRow
-                }
+                compactControlRow
             }
             .padding(.bottom, theme.spacing.l)
 
@@ -127,15 +170,16 @@ struct FiveLetterGameView: View {
     }
 
     @ViewBuilder
-    private func infoRow(compact: Bool) -> some View {
+    private func infoRow(compact: Bool, pack: InfoPack = .spread) -> some View {
         HStack(spacing: theme.spacing.s) {
+            if pack == .trailing { Spacer() }
             VideoModeTimerChip(
                 theme: theme,
                 timerAnchor: viewModel.timerAnchor,
                 pausedElapsed: viewModel.pausedElapsed,
                 compact: compact
             )
-            Spacer()
+            if pack == .spread { Spacer() }
             Text("\(viewModel.guesses.count)/6")
                 .font(compact ? theme.typography.caption : theme.typography.body)
                 .foregroundStyle(theme.colors.textPrimary)
@@ -146,6 +190,7 @@ struct FiveLetterGameView: View {
                 .background(theme.colors.surface)
                 .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
                 .chipShadow()
+            if pack == .leading { Spacer() }
         }
         .padding(.horizontal, theme.spacing.m)
     }
@@ -174,16 +219,20 @@ struct FiveLetterGameView: View {
         }
     }
 
+    /// Off-path toolbar shape with per-side parameters — Video Mode small-top
+    /// zones move only the items whose corner the PiP covers (defaults
+    /// reproduce off-path exactly).
     @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
-        ToolbarItemGroup(placement: .topBarLeading) {
+    private func gameToolbar(itemsAtLeading: Bool = true,
+                             menuAtTrailing: Bool = true) -> some ToolbarContent {
+        ToolbarItemGroup(placement: itemsAtLeading ? .topBarLeading : .topBarTrailing) {
             Button { dismiss() } label: { Image(systemName: "chevron.left") }
                 .accessibilityLabel(Text("Back to The Drawer"))
             Button { viewModel.restart() } label: { Image(systemName: "arrow.counterclockwise") }
                 .disabled(!viewModel.canRestart)
                 .accessibilityLabel(Text("Restart puzzle"))
         }
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: menuAtTrailing ? .topBarTrailing : .topBarLeading) {
             Menu {
                 ForEach(FiveLetterMode.allCases, id: \.self) { mode in
                     Button(mode.displayName) { viewModel.setMode(mode) }

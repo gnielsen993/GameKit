@@ -375,7 +375,13 @@ struct HomeView: View {
                 .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
         case .klondike(let difficulty):
+            // Adopted 2026-07-09: SolitaireGameView has always branched on the
+            // env store (its +VideoMode file predates this), but without the
+            // modifier the large-zone band was never reserved — the PiP sat on
+            // the tableau. Drag math is view-local (geo-derived card sizes +
+            // the "solitaire-tableau" named space), so a band rescale is safe.
             SolitaireGameView(initialDifficulty: difficulty ?? .easy)
+                .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
         case .freeCell(let mode):
             FreeCellGameView(initialMode: mode ?? .random(.easy))
@@ -389,19 +395,18 @@ struct HomeView: View {
             WordGridGameView(initialMode: mode)
                 .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
-        // ADR ARCADE-08 amendment (15-VIDEO-MODE-ADR.md, 2026-07-02): Stack adopts Video Mode —
-        // its engine is pure normalized-coordinate and the canvas rescales per frame, so a PiP
-        // reflow cannot desync state. Snake stays exempt (pixel-derived grid cells + continuous
-        // steering); Klondike stays exempt by convention (drag interactions).
+        // ADR ARCADE-08 amendments (15-VIDEO-MODE-ADR.md): Stack adopted 2026-07-02 —
+        // its engine is pure normalized-coordinate and the canvas rescales per frame, so a
+        // PiP reflow cannot desync state. Snake adopted 2026-07-09 — the old "pixel-derived
+        // grid" rationale was stale (SnakeConfig fixes a logical 20×32 grid; the canvas
+        // rescales per frame the same way). Klondike adopted 2026-07-09 (see .klondike case).
         case .stack:
             StackGameView()
                 .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
         case .snake:
-            // NOTE: NO Video Mode modifier — Snake exempt per 15-VIDEO-MODE-ADR.md
-            // (pixel-derived grid cells + continuous steering; PiP reflow would desync state).
-            // Compare Stack above: StackGameView().videoModeAware(...).disableInteractivePop()
             SnakeGameView()
+                .videoModeAware(minBoardHeight: 480)
                 .disableInteractivePop()
         }
     }

@@ -9,9 +9,13 @@
 //  pre-roll with full settings/Reduce Motion gating.
 //
 //  Architecture invariants:
-//    - NO Video Mode adoption — Snake is exempt per 15-VIDEO-MODE-ADR.md (pixel-
-//      derived grid cells + continuous steering; PiP reflow would desync state).
-//      No @Environment(\.videoModeStore). HomeView routing carries no Video Mode modifier.
+//    - Video Mode adopted (exemption lifted 2026-07-09; see 15-VIDEO-MODE-ADR.md
+//      amendment). The old "pixel-derived grid" rationale was stale — SnakeConfig
+//      defines a FIXED logical 20×32 grid and SnakeBoardCanvas derives cellSize
+//      from its own size per frame, so a PiP band reflow only rescales the render
+//      and cannot desync engine state (same property that lifted Stack's
+//      exemption). Wrapped with .videoModeAware() in HomeView; branch layouts in
+//      SnakeGameView+VideoMode.swift. Off-path stays byte-identical (DESIGN §7.6).
 //    - scenePhase .inactive AND .background both call vm.pause() (Common Pitfall 2).
 //    - hapticsEnabled is the FIRST guard on all three .sensoryFeedback triggers.
 //    - VideoModeBanner fires its own .error haptic — no duplicate here.
@@ -37,7 +41,7 @@ struct SnakeGameView: View {
     @Environment(\.settingsStore) var settingsStore
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @Environment(\.dismiss) var dismiss
-    // NOTE: NO @Environment(\.videoModeStore) — Snake exempt per 15-VIDEO-MODE-ADR.md
+    @Environment(\.videoModeStore) var videoModeStore
 
     // MARK: - View state
 
@@ -54,63 +58,16 @@ struct SnakeGameView: View {
     // MARK: - Body
 
     var body: some View {
-        ZStack {
-            // 1. Background
-            theme.colors.background.ignoresSafeArea()
-
-            // 2. Main layout: info row → board → D-pad (DESIGN §5.1 skeleton)
-            VStack(spacing: theme.spacing.s) {
-                // Info row: score chip (DESIGN §5.2 — separate header row for score;
-                // Snake has no timer or lives, so score is the sole info element).
-                // Hidden during idle so the start card is uncluttered.
-                if vm.state == .running || vm.state == .gameOver {
-                    HStack {
-                        Spacer()
-                        SnakeScoreChip(theme: theme, score: vm.frame.score)
-                    }
-                    .padding(.horizontal, theme.spacing.m)
-                }
-
-                boardArea
-                    .padding(.horizontal, theme.spacing.m)
-
-                // D-pad occupies the mode-pill slot (DESIGN §5.4).
-                // Always visible; each button is a silent no-op for reverse
-                // direction (queue rule rejects 180° in the VM — D-07).
-                SnakeDPad(theme: theme) { dir in
-                    vm.handleDirectionInput(dir)
-                }
-            }
-            .padding(.bottom, theme.spacing.l)
-
-            // 3. Idle / tap-to-start screen (DESIGN §8.3 explicit idle state)
-            // The card overlays the board and would swallow drags, so it
-            // carries the same swipe gesture — "Swipe … to start" must work
-            // when the swipe lands on the card itself.
-            if vm.state == .idle {
-                idleContent
-                    .gesture(swipeGesture)
-            }
-
-            // 4. Game-over banner — 500ms pre-roll when animations on (DESIGN §10.3)
-            if showBanner {
-                VideoModeBanner(
-                    theme: theme,
-                    content: gameOverContent,
-                    location: .largeBottom,   // Video Mode exempt — always largeBottom
-                    hapticsEnabled: settingsStore.hapticsEnabled,
-                    reduceMotion: reduceMotion,
-                    animationsEnabled: settingsStore.animationsEnabled
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                .videoModeBannerTransition(reduceMotion: reduceMotion,
-                                           animationsEnabled: settingsStore.animationsEnabled)
+        Group {
+            if videoModeStore.isEnabled {
+                // Zone branch layouts — SnakeGameView+VideoMode.swift.
+                videoModeLayout
+            } else {
+                // Off-path — byte-identical to pre-adoption Snake (DESIGN §7.6).
+                standardLayout()
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationTitle(String(localized: "Snake"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar { backChevron; wallModeToolbar }
         // Arcade loop (ArcadeLoopDriver contract — ARCADE-02; no second dt clamp)
         .arcadeLoop(isRunning: vm.state == .running) { dt in vm.tick(dt: dt) }
         // Scene phase: BOTH .inactive AND .background call vm.pause() (Common Pitfall 2:
@@ -172,6 +129,102 @@ struct SnakeGameView: View {
             }
         } message: {
             Text(String(localized: "Switching modes resets the run. Your current score will be lost."))
+        }
+    }
+
+    // MARK: - Standard layout (off-path + unobstructed Video Mode zones)
+
+    /// The off-path chrome: nav bar (back chevron leading, wall-mode menu
+    /// trailing), trailing score chip, board, D-pad. Video Mode zones whose
+    /// PiP leaves this chrome unobstructed reuse it verbatim (necessity
+    /// principle — DESIGN §7.7); small-top zones pass a moved placement for
+    /// only the element their PiP corner actually covers.
+    func standardLayout(scoreOnLeading: Bool = false,
+                        backPlacement: ToolbarItemPlacement = .topBarLeading,
+                        menuPlacement: ToolbarItemPlacement = .topBarTrailing) -> some View {
+        coreContent(scoreOnLeading: scoreOnLeading)
+            .navigationTitle(String(localized: "Snake"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: backPlacement) { backButton }
+                ToolbarItem(placement: menuPlacement) { wallModeMenu }
+            }
+    }
+
+    // MARK: - Core content (shared by off-path + all Video Mode branches)
+
+    /// The game surface: background, info row, board, D-pad, idle card, and
+    /// game-over banner.
+    ///
+    /// - Parameter scoreOnLeading: info-row side for the score chip —
+    ///   `.smallTopRight` moves it leading because its PiP covers the
+    ///   trailing corner; every other path keeps the off-path trailing side.
+    /// - Parameter showScoreRow: `false` on the Large-top branch, where the
+    ///   score lives in the compact row instead.
+    /// - Parameter includeCompactRow: `true` on the Large-top branch only —
+    ///   appends `compactRowComposed` under the D-pad at the bottom edge
+    ///   (opposite the reserved band, DESIGN §7.1).
+    @ViewBuilder
+    func coreContent(scoreOnLeading: Bool = false,
+                     showScoreRow: Bool = true,
+                     includeCompactRow: Bool = false) -> some View {
+        ZStack {
+            // 1. Background
+            theme.colors.background.ignoresSafeArea()
+
+            // 2. Main layout: info row → board → D-pad (DESIGN §5.1 skeleton)
+            VStack(spacing: theme.spacing.s) {
+                // Info row: score chip (DESIGN §5.2 — separate header row for score;
+                // Snake has no timer or lives, so score is the sole info element).
+                // Hidden during idle so the start card is uncluttered.
+                if showScoreRow, vm.state == .running || vm.state == .gameOver {
+                    HStack {
+                        if !scoreOnLeading { Spacer() }
+                        SnakeScoreChip(theme: theme, score: vm.frame.score)
+                        if scoreOnLeading { Spacer() }
+                    }
+                    .padding(.horizontal, theme.spacing.m)
+                }
+
+                boardArea
+                    .padding(.horizontal, theme.spacing.m)
+
+                // D-pad occupies the mode-pill slot (DESIGN §5.4).
+                // Always visible; each button is a silent no-op for reverse
+                // direction (queue rule rejects 180° in the VM — D-07).
+                SnakeDPad(theme: theme) { dir in
+                    vm.handleDirectionInput(dir)
+                }
+
+                if includeCompactRow {
+                    compactRowComposed
+                }
+            }
+            .padding(.bottom, theme.spacing.l)
+
+            // 3. Idle / tap-to-start screen (DESIGN §8.3 explicit idle state)
+            // The card overlays the board and would swallow drags, so it
+            // carries the same swipe gesture — "Swipe … to start" must work
+            // when the swipe lands on the card itself.
+            if vm.state == .idle {
+                idleContent
+                    .gesture(swipeGesture)
+            }
+
+            // 4. Game-over banner — 500ms pre-roll when animations on (DESIGN §10.3)
+            if showBanner {
+                VideoModeBanner(
+                    theme: theme,
+                    content: gameOverContent,
+                    location: videoModeStore.isEnabled ? videoModeStore.location : .largeBottom,
+                    hapticsEnabled: settingsStore.hapticsEnabled,
+                    reduceMotion: reduceMotion,
+                    animationsEnabled: settingsStore.animationsEnabled
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .videoModeBannerTransition(reduceMotion: reduceMotion,
+                                           animationsEnabled: settingsStore.animationsEnabled)
+            }
         }
     }
 

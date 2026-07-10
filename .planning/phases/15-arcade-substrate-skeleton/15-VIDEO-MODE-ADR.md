@@ -122,10 +122,46 @@ Adoption (DESIGN.md §7, mirroring MergeGameView+VideoMode.swift):
 
 **Snake remains exempt** — its rationale is real: grid cells are pixel-derived and input is
 continuous steering. The suspend-on-PiP design in **Future** above is still the correct path
-for Snake if adoption is ever desired.
+for Snake if adoption is ever desired. *(Superseded by Amendment 2, 2026-07-09 — the
+"pixel-derived" claim was wrong; see below.)*
+
+---
+
+## Amendment 2 — 2026-07-09: Snake exemption lifted
+
+User decision during the Video Mode compliance audit: Snake adopts
+`.videoModeAware(minBoardHeight: 480)`.
+
+The 2026-07-02 amendment's closing claim ("grid cells are pixel-derived") was stale —
+it did not survive contact with Snake as actually built in Phase 17:
+- `SnakeConfig` fixes a LOGICAL 20×32 grid (`cols`/`rows` constants). Snake body and food
+  positions are logical cell coordinates in `SnakeEngine` — zero pixel knowledge.
+- `SnakeBoardCanvas` derives `cellSize = size.width / cols` inside the draw closure, every
+  frame. A mid-run band reflow rescales the render; engine state is untouched. This is the
+  exact property that lifted Stack's exemption.
+- Continuous steering is unaffected: swipe direction mapping and the D-pad are
+  size-independent; the direction queue lives in the VM.
+
+The suspend-on-PiP design in **Future** is therefore unnecessary — no suspend is added.
+
+Adoption (DESIGN.md §7.7 necessity principle, mirroring StackGameView+VideoMode.swift):
+- `.largeTop`: nav bar hidden, `VideoCompactControlRow` at the bottom edge
+  (Back | SnakeScoreChip compact | empty picker | row-height wall-mode menu).
+- `.largeBottom` + small-bottom zones: off-path chrome unchanged — the band inset
+  compresses the stack; the centered D-pad clears corner PiPs on both sides.
+- Small-top zones: per-corner moves only (back/menu re-anchor away from the covered
+  corner; the score chip moves only when `.smallTopRight` covers it).
+- Off-path byte-identical (§7.6).
+
+With this amendment the ARCADE-08 exemption class is empty — every shipped game is Video
+Mode aware. Klondike's separate never-formalized exemption ("drag interactions, by
+convention") was closed the same day: its drag math is view-local, and its +VideoMode
+branches had shipped without the band-reserving modifier, leaving large-zone layouts
+under the real PiP.
 
 ---
 
 *Phase: 15-arcade-substrate-skeleton*
 *Written: 2026-06-27*
 *Amended: 2026-07-02 (Stack adoption — Phase 16 polish)*
+*Amended: 2026-07-09 (Snake adoption — Video Mode compliance audit; exemption class now empty)*

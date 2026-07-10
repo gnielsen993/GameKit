@@ -24,12 +24,11 @@ struct WordGridGameView: View {
 
     var body: some View {
         Group {
-            if videoModeStore.isEnabled, videoModeStore.location.isLarge {
-                largeZoneLayout
-                    .toolbar(.hidden, for: .navigationBar)
+            if videoModeStore.isEnabled {
+                videoModeLayout
             } else {
-                normalLayout
-                    .toolbar { toolbarContent }
+                normalLayout()
+                    .toolbar { gameToolbar() }
             }
         }
         .navigationTitle(String(localized: "Word Grid"))
@@ -56,18 +55,64 @@ struct WordGridGameView: View {
         }
     }
 
+    /// Chip packing for Video Mode small-top zones — chips slide away from
+    /// the covered corner; `.spread` is the off-path arrangement.
+    enum InfoPack { case spread, leading, trailing }
+
+    /// ~192pt system small-PiP height + margin (mirrors
+    /// SudokuGameView+VideoMode.smallPipFootprint) — lifts the Clear/Submit/
+    /// Finish control row above a bottom-corner PiP so it stays tappable.
+    private static let smallPipFootprint: CGFloat = 200
+
+    /// Necessity principle (2026-07-09, DESIGN §7.7): chrome changes from its
+    /// off-path form only where the selected PiP zone actually covers it.
     @ViewBuilder
-    private var normalLayout: some View {
+    private var videoModeLayout: some View {
+        switch videoModeStore.location {
+        case .largeTop:
+            // Band covers the nav bar — compact row at the bottom edge.
+            largeZoneLayout
+                .toolbar(.hidden, for: .navigationBar)
+        case .largeBottom:
+            // Band covers only the bottom; the videoModeAware inset lifts the
+            // control row above it — nav bar + full info row stay off-path.
+            normalLayout()
+                .toolbar { gameToolbar() }
+        case .smallTopLeft:
+            // PiP covers the leading nav corner + score chip: back/restart
+            // join the (uncovered) menu at trailing; info chips pack trailing.
+            normalLayout(infoPack: .trailing)
+                .toolbar { gameToolbar(itemsAtLeading: false) }
+        case .smallTopRight:
+            // PiP covers the trailing nav corner + timer/mode chip: the menu
+            // joins back/restart at leading; info chips pack leading.
+            normalLayout(infoPack: .leading)
+                .toolbar { gameToolbar(menuAtTrailing: false) }
+        case .smallBottomLeft, .smallBottomRight:
+            // PiP sits on the control row's bottom corner — the only
+            // genuinely covered element. Lift the stack above the PiP
+            // footprint; top chrome stays byte-identical to off-path.
+            normalLayout(bottomClearance: Self.smallPipFootprint)
+                .toolbar { gameToolbar() }
+        }
+    }
+
+    /// Off-path layout. Video Mode zones whose PiP leaves the chrome
+    /// unobstructed reuse it verbatim; parameters adjust only the covered
+    /// element (defaults reproduce off-path exactly).
+    @ViewBuilder
+    private func normalLayout(infoPack: InfoPack = .spread,
+                              bottomClearance: CGFloat = 0) -> some View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
             VStack(spacing: theme.spacing.s) {
-                infoRow(compact: false)
+                infoRow(compact: false, pack: infoPack)
                     .padding(.vertical, theme.spacing.xs)
                 playArea
                 currentWordRow
                 controlRow
             }
-            .padding(.bottom, theme.spacing.l)
+            .padding(.bottom, bottomClearance > 0 ? bottomClearance : theme.spacing.l)
 
             if viewModel.state == .finished && !bannerDismissed {
                 endBanner
@@ -78,21 +123,19 @@ struct WordGridGameView: View {
         .sensoryFeedback(.success, trigger: settingsStore.hapticsEnabled ? viewModel.finishCount : 0)
     }
 
+    /// Large-top only — the band genuinely displaces the nav bar, so the
+    /// compact row (at the bottom edge, opposite the band) hosts its roles.
+    /// `.largeBottom` renders `normalLayout()` instead (necessity principle).
     @ViewBuilder
     private var largeZoneLayout: some View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
             VStack(spacing: theme.spacing.s) {
-                if videoModeStore.location == .largeBottom {
-                    compactControlRow
-                }
                 infoRow(compact: true)
                 playArea
                 currentWordRow
                 controlRow
-                if videoModeStore.location == .largeTop {
-                    compactControlRow
-                }
+                compactControlRow
             }
             .padding(.bottom, theme.spacing.l)
 
@@ -102,15 +145,17 @@ struct WordGridGameView: View {
         }
     }
 
-    private func infoRow(compact: Bool) -> some View {
+    private func infoRow(compact: Bool, pack: InfoPack = .spread) -> some View {
         HStack(spacing: theme.spacing.s) {
+            if pack == .trailing { Spacer() }
             chip(systemName: "number", text: "\(viewModel.score)", compact: compact, numericValue: Double(viewModel.score))
-            Spacer()
+            if pack == .spread { Spacer() }
             if viewModel.mode == .timed {
                 chip(systemName: "clock", text: formatTime(viewModel.remainingSeconds), compact: compact)
             } else {
                 chip(systemName: "infinity", text: viewModel.mode.displayName, compact: compact)
             }
+            if pack == .leading { Spacer() }
         }
             .padding(.horizontal, theme.spacing.m)
     }
@@ -213,15 +258,19 @@ struct WordGridGameView: View {
         .chipShadow()
     }
 
+    /// Off-path toolbar shape with per-side parameters — Video Mode small-top
+    /// zones move only the items whose corner the PiP covers (defaults
+    /// reproduce off-path exactly).
     @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
-        ToolbarItemGroup(placement: .topBarLeading) {
+    private func gameToolbar(itemsAtLeading: Bool = true,
+                             menuAtTrailing: Bool = true) -> some ToolbarContent {
+        ToolbarItemGroup(placement: itemsAtLeading ? .topBarLeading : .topBarTrailing) {
             Button { dismiss() } label: { Image(systemName: "chevron.left") }
                 .accessibilityLabel(Text("Back to The Drawer"))
             Button { viewModel.restart() } label: { Image(systemName: "arrow.counterclockwise") }
                 .accessibilityLabel(Text("New grid"))
         }
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: menuAtTrailing ? .topBarTrailing : .topBarLeading) {
             Menu {
                 ForEach(WordGridMode.allCases, id: \.self) { mode in
                     Button(mode.displayName) { viewModel.setMode(mode) }

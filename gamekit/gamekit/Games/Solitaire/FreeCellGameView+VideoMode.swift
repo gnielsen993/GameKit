@@ -23,9 +23,16 @@ extension FreeCellGameView {
 
     @ViewBuilder
     var videoModeLayout: some View {
-        if videoModeStore.location.isLarge {
+        if videoModeStore.location == .largeTop {
             largeZoneLayout
                 .toolbar(.hidden, for: .navigationBar)
+        } else if videoModeStore.location == .largeBottom {
+            // Necessity principle (2026-07-09, DESIGN §7.7): the bottom band
+            // covers no top chrome — nav bar + header stay byte-identical to
+            // off-path (mirrors Klondike, which already routes .largeBottom to
+            // normalLayout); the videoModeAware band inset rescales the cards.
+            normalLayout
+                .toolbar { toolbarContent }
         } else if videoModeStore.location.isTopSmall {
             topSmallZoneLayout
                 .navigationBarBackButtonHidden(true)

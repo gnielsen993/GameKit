@@ -4,28 +4,42 @@
 //
 //  Video Mode branch layouts for StackGameView (ARCADE-08 amendment
 //  2026-07-02 — Stack's exemption lifted; see 15-VIDEO-MODE-ADR.md).
-//  Mirrors MergeGameView+VideoMode.swift, the closest analog: score-based
-//  game, no mid-game mode picker.
+//
+//  Necessity principle (user directive 2026-07-09, DESIGN §7.7): chrome
+//  changes from its off-path form ONLY where the selected PiP zone actually
+//  covers it. Zones that leave an element unobstructed render it exactly
+//  as off-path — the premium score overlay is never demoted to a compact
+//  chip unless the band genuinely displaces it.
 //
 //  Owns:
-//    - `videoModeLayout` — zone dispatch (Large vs Small).
-//    - `largeZoneLayout` — nav bar hidden (DESIGN §7.1); compact row at the
-//      edge OPPOSITE the reserved video band; score/streak migrate from the
-//      floating overlay into the row (`coreStack(scoreAlignment: nil)`).
+//    - `videoModeLayout` — zone dispatch.
+//    - `largeTopLayout` — band covers the top, so the nav bar is genuinely
+//      displaced: nav bar hidden (DESIGN §7.1), compact row at the bottom
+//      edge, score/streak migrate into the row (`coreStack(scoreAlignment:
+//      nil)`).
+//    - `.largeBottom` → `standardChromeLayout` — the band covers only the
+//      bottom; the nav bar + premium `.topTrailing` score overlay stay
+//      byte-identical to off-path and the `videoModeAware` safeAreaInset
+//      alone shrinks the board. Board math (393×852 reference): 852 − 59
+//      status/safe − 44 nav − 273 band ≈ 476pt of canvas — StackBoardCanvas
+//      is fully scale-free, so no floor is broken.
+//    - `smallTopZoneLayout` — per-corner necessity: smallTopLeft covers the
+//      back chevron (moves to topBarTrailing; score stays .topTrailing);
+//      smallTopRight covers the score overlay (packs to .bottomTrailing per
+//      the VideoModeSlotRouter headerBar anchor; back chevron stays put).
+//    - `.smallBottomLeft` / `.smallBottomRight` → `standardChromeLayout` —
+//      bottom PiP corners cover no Stack chrome (tap-anywhere input, tower
+//      centered), so the layout is byte-identical to off-path.
 //    - `compactRowComposed` — Back | StackScoreChip | (empty picker) |
 //      StackStreakChip (streak > 0 only). NO restart button — Stack has no
 //      mid-run restart affordance by design (a restart mid-run forfeits the
 //      run); the game-over banner carries Restart. `onSettings: nil` —
 //      Stack has no in-game settings.
-//    - `smallZoneLayout` — existing layout; back chevron repositioned via
-//      VideoModeSlotRouter `anchors.back`, score/streak overlay packs to
-//      the `anchors.headerBar` corner (opposite the PiP, DESIGN §7.2).
 //
 //  Reflow safety: StackEngine is pure normalized-coordinate (playfield
 //  width = 1.0) and StackBoardCanvas derives all geometry from its size
 //  every frame — a mid-run band reflow rescales the render and cannot
-//  desync engine state. This is why the ARCADE-08 rationale (pixel-derived
-//  state) never applied to Stack; it still applies to Snake.
+//  desync engine state.
 //
 
 import SwiftUI
@@ -33,27 +47,43 @@ import DesignKit
 
 extension StackGameView {
 
-    // MARK: - Zone dispatch
+    // MARK: - Zone dispatch (necessity principle — DESIGN §7.7)
 
     @ViewBuilder
     var videoModeLayout: some View {
         switch videoModeStore.location {
-        case .largeTop, .largeBottom:
-            largeZoneLayout
-        case .smallTopLeft, .smallTopRight, .smallBottomLeft, .smallBottomRight:
-            smallZoneLayout
+        case .largeTop:
+            largeTopLayout
+        case .largeBottom, .smallBottomLeft, .smallBottomRight:
+            // Bottom PiP covers no Stack chrome — off-path chrome preserved.
+            standardChromeLayout
+        case .smallTopLeft, .smallTopRight:
+            smallTopZoneLayout
         }
     }
 
-    // MARK: - Large zones (DESIGN §7.1)
+    // MARK: - Off-path chrome (shared by .largeBottom + small bottom zones)
 
-    /// Nav bar hidden; compact row at the edge opposite the reserved band
-    /// (`.largeTop` band → row at bottom; `.largeBottom` band → row at top).
+    /// The exact off-path chrome stack (StackGameView.body's else-branch):
+    /// nav bar + back chevron + premium `.topTrailing` score overlay. On
+    /// `.largeBottom` the `videoModeAware` band inset shrinks the content
+    /// area from below; on small bottom zones nothing changes at all.
+    @ViewBuilder
+    var standardChromeLayout: some View {
+        coreStack(scoreAlignment: .topTrailing)
+            .navigationTitle(String(localized: "Stack"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { backChevron }
+    }
+
+    // MARK: - Large top (DESIGN §7.1 — band genuinely displaces the nav bar)
+
+    /// Nav bar hidden; compact row at the bottom edge (opposite the band).
     /// The backdrop paints the full screen behind row + board and joins the
     /// game-over grayscale drain, matching the off-path treatment. The
     /// compact row stays un-grayscaled — it is chrome, like the banner.
     @ViewBuilder
-    var largeZoneLayout: some View {
+    var largeTopLayout: some View {
         ZStack {
             backdrop
                 .grayscale(vm.state == .gameOver ? 1.0 : 0.0)
@@ -61,15 +91,8 @@ extension StackGameView {
                            value: vm.state == .gameOver)
 
             VStack(spacing: theme.spacing.m) {
-                if videoModeStore.location == .largeBottom {
-                    compactRowComposed
-                }
-
                 coreStack(scoreAlignment: nil, includeBackdrop: false)
-
-                if videoModeStore.location == .largeTop {
-                    compactRowComposed
-                }
+                compactRowComposed
             }
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -97,54 +120,25 @@ extension StackGameView {
         }
     }
 
-    // MARK: - Small zones (DESIGN §7.2)
+    // MARK: - Small top zones (per-corner necessity)
 
-    /// Existing layout, chrome repositioned: back chevron follows
-    /// `anchors.back`; the score/streak overlay (Stack's headerBar
-    /// equivalent) packs to the `anchors.headerBar` corner — always
-    /// opposite the covered PiP corner.
+    /// Only the element under the covered corner moves:
+    /// - `.smallTopLeft`: PiP covers the back chevron → it re-anchors to
+    ///   `.topBarTrailing`; the `.topTrailing` score overlay is unobstructed
+    ///   and keeps its off-path premium form.
+    /// - `.smallTopRight`: PiP covers the score overlay → it packs to
+    ///   `.bottomTrailing` (VideoModeSlotRouter headerBar anchor for this
+    ///   zone); the back chevron is unobstructed and stays `.topBarLeading`.
     @ViewBuilder
-    var smallZoneLayout: some View {
-        let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
-        coreStack(scoreAlignment: Self.overlayAlignment(for: anchors.headerBar))
+    var smallTopZoneLayout: some View {
+        let pipCoversLeading = videoModeStore.location == .smallTopLeft
+        coreStack(scoreAlignment: pipCoversLeading ? .topTrailing : .bottomTrailing)
             .navigationTitle(String(localized: "Stack"))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { smallZoneToolbarContent }
-    }
-
-    @ToolbarContentBuilder
-    var smallZoneToolbarContent: some ToolbarContent {
-        let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
-        ToolbarItem(placement: Self.toolbarPlacement(for: anchors.back)) {
-            backButton
-        }
-    }
-
-    // MARK: - Anchor mapping
-
-    /// Maps a VideoModeSlotRouter SlotAnchor to a ToolbarItemPlacement.
-    /// Copied verbatim from MergeGameView+VideoMode.toolbarPlacement(for:) —
-    /// only `.topLeading` / `.topTrailing` are reachable on Small zones.
-    static func toolbarPlacement(for anchor: SlotAnchor) -> ToolbarItemPlacement {
-        switch anchor {
-        case .topLeading:        return .topBarLeading
-        case .topTrailing:       return .topBarTrailing
-        case .bottomLeading,
-             .bottomTrailing:    return .bottomBar
-        case .inCompactRow,
-             .hidden:            return .topBarLeading      // defensive
-        }
-    }
-
-    /// Maps a SlotAnchor to the score-overlay frame alignment.
-    static func overlayAlignment(for anchor: SlotAnchor) -> Alignment {
-        switch anchor {
-        case .topLeading:        return .topLeading
-        case .topTrailing:       return .topTrailing
-        case .bottomLeading:     return .bottomLeading
-        case .bottomTrailing:    return .bottomTrailing
-        case .inCompactRow,
-             .hidden:            return .topTrailing        // defensive — unreachable on Small zones
-        }
+            .toolbar {
+                ToolbarItem(placement: pipCoversLeading ? .topBarTrailing : .topBarLeading) {
+                    backButton
+                }
+            }
     }
 }

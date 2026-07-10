@@ -131,9 +131,10 @@ struct FreeCellGameView: View {
         }
     }
 
-    // MARK: - Normal layout (off Video Mode path)
+    // MARK: - Normal layout (off Video Mode path + .largeBottom / bottom
+    // small zones — see FreeCellGameView+VideoMode.videoModeLayout)
 
-    private var normalLayout: some View {
+    var normalLayout: some View {
         GeometryReader { geo in
             let boardPad: CGFloat  = 10
             let colGap: CGFloat    = 4

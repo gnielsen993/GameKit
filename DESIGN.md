@@ -359,10 +359,18 @@ The ZStack centers the pill regardless of the action button's width.
 ## 7. Video Mode Rules
 
 ### 7.1 Large zones (.largeTop / .largeBottom)
-- Hide the nav bar entirely (`.toolbar(.hidden, for: .navigationBar)`).
-- Replace it with `VideoCompactControlRow` or a game-specific equivalent
-  following the §3.5 rules exactly.
-- Compact row at the edge **opposite** the PiP band.
+- **`.largeTop`** (band covers the nav bar): hide the nav bar entirely
+  (`.toolbar(.hidden, for: .navigationBar)`) and replace it with
+  `VideoCompactControlRow` or a game-specific equivalent following the §3.5
+  rules exactly. Compact row at the **bottom** edge (opposite the band).
+- **`.largeBottom`** (band covers only the bottom): render the **off-path
+  chrome unchanged** — nav bar, full header/score, full mode pill. The
+  `videoModeAware` band inset alone shrinks the board (§7.7 necessity
+  principle, 2026-07-09). Consolidate into a compact row ONLY when keeping
+  the off-path chrome would push the board below its §7.5 floor or make a
+  bottom input surface unusable — show the arithmetic in the file header
+  when invoking this (current escape-hatch holder: Sudoku, whose board +
+  number pad + pill stack genuinely doesn't fit under a nav bar + header).
 - Key game info that would be hidden in the compact row (e.g. lives, timer)
   moves to **board corner overlays** — `topLeading` for lives, `topTrailing`
   for timer — padded inside the board's horizontal margin.
@@ -396,6 +404,31 @@ The ZStack centers the pill regardless of the action button's width.
 ### 7.6 Off-path contract
 - `videoModeStore.isEnabled == false` must be byte-identical to the non-Video
   Mode layout. No size changes, no layout shifts, no chip changes.
+
+### 7.7 Necessity principle (2026-07-09)
+User directive; overrides §7.1's original unconditional consolidation and the
+`VideoModeSlotRouter` blanket anchors wherever they conflict:
+
+> **Chrome may only change from its off-path form when the selected PiP zone
+> actually covers it, or when keeping it would push the board below its
+> documented floor.**
+
+- Bottom-PiP zones (`.largeBottom`, `.smallBottomLeft`, `.smallBottomRight`)
+  cover no top chrome — nav bar, back chevron, and top-anchored score/header
+  elements stay byte-identical to off-path there.
+- Top-PiP zones cover no bottom chrome; same logic mirrored (bottom-anchored
+  inputs like Sudoku's numpad or the word-game keyboards ARE threatened by
+  bottom zones — that's a legitimate reason to adapt them).
+- Never demote a premium element (full-size score overlay, full header, full
+  mode pill) to a compact variant in a zone where its off-path position is
+  unobstructed and space isn't needed.
+- Apply per-corner in small zones: `.smallTopLeft` covers only leading top
+  chrome; `.smallTopRight` covers only trailing top chrome. Move the covered
+  element, leave its neighbor alone. Per-game divergence from the router's
+  anchors happens in the game view (the router encodes the common case).
+- Exception: small-zone layouts that were explicitly user-tuned in the
+  2026-05-14 feedback rounds (Minesweeper / Merge / Nonogram compact
+  small-zone chrome) predate this principle and stay as shipped.
 
 ---
 
@@ -658,6 +691,12 @@ When in doubt, check these before changing chrome for a specific game.
   carries `.videoModeAware(minBoardHeight: 480)`. Stack's engine is pure
   normalized-coordinate — the canvas rescales per frame, so a PiP reflow cannot
   desync state (amendment rationale).
+- Video Mode zone map (§7.7 necessity principle, 2026-07-09): `.largeTop` →
+  compact row at bottom (score/streak as compact chips). `.largeBottom` +
+  both small-bottom zones → off-path chrome unchanged (nav bar + premium
+  `.topTrailing` score overlay; the band inset alone shrinks the canvas).
+  `.smallTopLeft` → only the back chevron moves (to `.topBarTrailing`);
+  `.smallTopRight` → only the score overlay moves (to `.bottomTrailing`).
 - No lives chip. No timer chip. Score chip: `StackScoreChip` (compact: true in
   Video Mode compact row slot 2, alongside `StackStreakChip`).
 - Per-layer accent ramp (16-CONTEXT D-05/D-07): block color cycles through
@@ -678,12 +717,23 @@ When in doubt, check these before changing chrome for a specific game.
   BestScore row, 16-CONTEXT D-10/D-11).
 
 ### 12.7 Snake
-- Video Mode: **exempt** (15-VIDEO-MODE-ADR.md, Accepted 2026-06-26). Pixel-derived
-  grid cells + continuous steering — a PiP reflow mid-run would snap the snake to a
-  different cell position and desync state. `SnakeGameView` has no `.videoModeAware`
-  modifier. Snake remains exempt after the 2026-07-02 Stack amendment.
-- No lives chip. No timer chip. Score chip: `SnakeScoreChip` (no compact row —
-  exempt from Video Mode, no compact variant needed).
+- Video Mode: **adopted** (exemption lifted 2026-07-09; 15-VIDEO-MODE-ADR.md
+  amendment 2). The original "pixel-derived grid cells" rationale was stale —
+  `SnakeConfig` fixes a logical 20×32 grid and `SnakeBoardCanvas` derives
+  cellSize from its own size per frame, so a PiP reflow only rescales the
+  render (same property that lifted Stack's exemption). `SnakeGameView`
+  carries `.videoModeAware(minBoardHeight: 480)` in HomeView; branch layouts
+  in `SnakeGameView+VideoMode.swift`.
+- Video Mode zone map (§7.7 necessity principle): `.largeTop` → nav bar
+  hidden, compact row at bottom (compact `SnakeScoreChip` + row-height
+  wall-mode menu). `.largeBottom` + both small-bottom zones → off-path chrome
+  unchanged (the band inset compresses the stack; the centered ~140pt D-pad
+  clears the ~108pt corner PiP on both sides). `.smallTopLeft` → back + wall
+  menu re-anchor trailing, score chip stays; `.smallTopRight` → wall menu
+  joins back at leading, score chip packs leading. The D-pad stays fully
+  visible and tappable in every zone.
+- No lives chip. No timer chip. Score chip: `SnakeScoreChip` (compact: true
+  in the large-top compact row; full-size everywhere else).
 - Body ramp (17-CONTEXT D-02): head = `accentPrimary`; body segments fade toward
   `surface` via opacity steps. Food = `success` (green) or `accentPrimary` fallback.
   Board background = `background` token (DESIGN.md §2).

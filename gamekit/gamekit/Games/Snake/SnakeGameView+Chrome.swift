@@ -61,44 +61,44 @@ extension SnakeGameView {
 
     // MARK: Toolbar (DESIGN §6)
 
-    @ToolbarContentBuilder var backChevron: some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.backward")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(theme.colors.textPrimary)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Back to The Drawer"))
+    /// Back chevron button body — placement is parameterized in
+    /// `standardLayout(backPlacement:)` so Video Mode small-top zones can
+    /// re-anchor it away from a covering PiP (necessity principle, §7.7).
+    var backButton: some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(systemName: "chevron.backward")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(theme.colors.textPrimary)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Back to The Drawer"))
     }
 
     /// Wall-mode toggle menu (D-11). The label shows the current state so the
     /// player can see at a glance which mode is active. Tapping always calls
     /// requestWallModeToggle() — if a run is in progress the VM surfaces the
-    /// abandon alert; if idle it applies the toggle immediately.
-    @ToolbarContentBuilder var wallModeToolbar: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            Menu {
-                Button(vm.wallMode
-                       ? String(localized: "Wall mode: On")
-                       : String(localized: "Wall mode: Off")) {
-                    vm.requestWallModeToggle()
-                }
-            } label: {
-                Image(systemName: "ellipsis.circle")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(theme.colors.textPrimary)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
+    /// abandon alert; if idle it applies the toggle immediately. Placement is
+    /// parameterized in `standardLayout(menuPlacement:)` (see backButton).
+    var wallModeMenu: some View {
+        Menu {
+            Button(vm.wallMode
+                   ? String(localized: "Wall mode: On")
+                   : String(localized: "Wall mode: Off")) {
+                vm.requestWallModeToggle()
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Options"))
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(theme.colors.textPrimary)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Options"))
     }
 }
 

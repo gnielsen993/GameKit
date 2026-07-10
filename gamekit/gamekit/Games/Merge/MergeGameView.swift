@@ -67,9 +67,16 @@ struct MergeGameView: View {
             if !videoModeStore.isEnabled {
                 existingLayout
                     .toolbar { existingToolbarContent }
-            } else if videoModeStore.location.isLarge {
+            } else if videoModeStore.location == .largeTop {
                 largeZoneLayout
                     .toolbar(.hidden, for: .navigationBar)
+            } else if videoModeStore.location == .largeBottom {
+                // Necessity principle (2026-07-09, DESIGN §7.7): the bottom
+                // band covers no top chrome — nav bar + full HeaderBar +
+                // ModePill stay byte-identical to off-path; the videoModeAware
+                // band inset alone shrinks the (width-bound) board.
+                existingLayout
+                    .toolbar { existingToolbarContent }
             } else if videoModeStore.location.isTopSmall {
                 // Phase 12.1, Plan 12.1-06 round 2 — Top L/R Small zones use
                 // v1.1 existingLayout shape (HeaderBar top → Board → ModePill
