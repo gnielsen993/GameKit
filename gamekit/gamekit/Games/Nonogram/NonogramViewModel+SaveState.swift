@@ -36,11 +36,18 @@ extension NonogramViewModel {
         timerAnchor = clock()
         pendingSaveState = nil
         refreshCrossOff()
+        // Defensive: an in-progress puzzle is by definition seen. Saves
+        // written before the mark-on-first-move change were already
+        // marked at pick time; this keeps the invariant either way.
+        NonogramPicker.markSeen(puzzleId: puzzle.id, difficulty: d, userDefaults: userDefaults)
+        prefetchNextPuzzleIfNeeded()
     }
 
     func discardSaveAndLoadNew() {
         clearSavedState()
-        // Puzzle was already picked in init — nothing more to load.
+        // Init's instant pick usually filled the slot already; when the
+        // curated pool is exhausted this kicks off async generation.
+        ensurePuzzleLoaded()
     }
 
     func saveCurrentState() {

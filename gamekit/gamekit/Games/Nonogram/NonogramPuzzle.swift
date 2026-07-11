@@ -15,7 +15,7 @@
 
 import Foundation
 
-struct NonogramPuzzle: Codable, Identifiable, Hashable, Sendable {
+nonisolated struct NonogramPuzzle: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let title: String
     /// Row-major "0"/"1" string of length difficulty.size * difficulty.size.

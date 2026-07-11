@@ -100,6 +100,11 @@ struct NonogramGameView: View {
                     .toolbar { smallZoneToolbarContent }
             }
         }
+        .overlay {
+            if viewModel.isGeneratingPuzzle && viewModel.currentPuzzle == nil {
+                puzzleGeneratingOverlay
+            }
+        }
         .onChange(of: viewModel.state) { _, newState in
             switch newState {
             case .won:
@@ -182,6 +187,30 @@ struct NonogramGameView: View {
             let stats = GameStats(modelContext: modelContext)
             viewModel.attachGameStats(stats)
         }
+    }
+
+    /// Shown while a procedural puzzle generates off the main thread
+    /// (curated pool exhausted, no prefetch cached). Scrim blocks board
+    /// taps; the empty board stays visible behind so layout doesn't jump.
+    private var puzzleGeneratingOverlay: some View {
+        ZStack {
+            Rectangle()
+                .fill(theme.colors.background.opacity(0.6))
+                .ignoresSafeArea()
+            VStack(spacing: theme.spacing.m) {
+                ProgressView()
+                    .tint(theme.colors.accentPrimary)
+                Text(String(localized: "Building a fresh puzzle…"))
+                    .font(theme.typography.body)
+                    .foregroundStyle(theme.colors.textSecondary)
+            }
+            .padding(theme.spacing.l)
+            .background(
+                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                    .fill(theme.colors.surface)
+            )
+        }
+        .transition(.opacity)
     }
 
     @ViewBuilder

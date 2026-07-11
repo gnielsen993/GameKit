@@ -14,7 +14,7 @@
 
 import Foundation
 
-enum NonogramLineSolver {
+nonisolated enum NonogramLineSolver {
 
     /// Per-cell state during line-solver iteration.
     enum CellState: UInt8 {

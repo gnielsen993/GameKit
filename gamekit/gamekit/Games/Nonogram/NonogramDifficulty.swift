@@ -10,7 +10,7 @@
 
 import Foundation
 
-enum NonogramDifficulty: String, Codable, Sendable, CaseIterable, Hashable {
+nonisolated enum NonogramDifficulty: String, Codable, Sendable, CaseIterable, Hashable {
     case tiny    // 5x5
     case small   // 10x10
     case medium  // 15x15

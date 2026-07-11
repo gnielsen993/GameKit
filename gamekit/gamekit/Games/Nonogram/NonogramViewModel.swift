@@ -7,11 +7,18 @@
 //  private(set), GameStats firewall — no SwiftData import here).
 //
 //  Lifecycle:
-//    - init: pick a random puzzle for the chosen difficulty, board empty,
-//      state = .idle, hints visible.
-//    - first tap → state = .playing, timer starts.
+//    - init: instant-pick a puzzle (unseen curated or prefetched
+//      procedural) — cheap, side-effect-free. When the curated pool is
+//      exhausted and no prefetch exists, `currentPuzzle` stays nil and
+//      `ensurePuzzleLoaded()` generates OFF the main thread
+//      (`isGeneratingPuzzle` drives the view's loading state). Never
+//      generate synchronously — 20×20 generation blocked the main
+//      thread for 30s+ before the 2026-07-10 fix.
+//    - first move → state = .playing, timer starts, puzzle marked seen
+//      (NOT at pick time — see NonogramPicker header).
 //    - on every successful mutation: re-check win → state = .won.
-//    - restart() picks a fresh random puzzle and resets the board + timer.
+//    - restart() keeps the puzzle; newPuzzle() instant-picks + falls
+//      back to async generation the same way init does.
 //
 
 import Foundation
@@ -68,6 +75,16 @@ final class NonogramViewModel {
 
     // Save state prompt
     var pendingSaveState: NonogramSaveState?
+
+    /// True while a procedural puzzle is being generated off-main for
+    /// the CURRENT slot (curated pool exhausted, no prefetch available).
+    /// The view shows a lightweight loading state over the empty board.
+    private(set) var isGeneratingPuzzle = false
+
+    /// In-flight generation for the current puzzle slot. One at a time.
+    @ObservationIgnored private var generationTask: Task<Void, Never>?
+    /// In-flight background prefetch of the NEXT procedural puzzle.
+    @ObservationIgnored private var prefetchTask: Task<Void, Never>?
 
     // Lives mode state
     var livesRemaining: Int = NonogramGameMode.livesPerPuzzle
@@ -150,10 +167,14 @@ final class NonogramViewModel {
         self.gameMode = resolvedMode
 
         // Two-step init: empty board first so all stored properties are set
-        // before we touch `&self.rng` for puzzle selection.
+        // before we touch `&self.rng` for puzzle selection. Instant-only —
+        // nil when generation is needed; the view's `.task` →
+        // attachGameStats → ensurePuzzleLoaded() handles that async, so
+        // SwiftUI re-constructing the view struct never costs more than
+        // a library lookup.
         self.board = .empty(size: resolved.size)
         self.currentPuzzle = nil
-        self.currentPuzzle = pickPuzzle(for: resolved)
+        self.currentPuzzle = pickInstantPuzzle(for: resolved)
         refreshCrossOff()
     }
 
@@ -162,7 +183,37 @@ final class NonogramViewModel {
     func attachGameStats(_ stats: GameStats) {
         guard self.gameStats == nil else { return }
         self.gameStats = stats
+        mergeSeenFromRecords()
         checkAndLoadOrRestoreState()
+        refreshFrontierAfterMerge()
+        if pendingSaveState == nil {
+            ensurePuzzleLoaded()
+        }
+        prefetchNextPuzzleIfNeeded()
+    }
+
+    /// Rebuild the per-difficulty "seen" frontier from synced GameRecord
+    /// wins. UserDefaults dies with an app delete; the SwiftData records
+    /// survive via iCloud sync / stats import — without this merge a
+    /// reinstall restarts the curated rotation and re-serves puzzles the
+    /// player already solved.
+    private func mergeSeenFromRecords() {
+        guard let stats = gameStats else { return }
+        for d in NonogramDifficulty.allCases {
+            let won = stats.wonPuzzleIDs(gameKind: .nonogram, difficulty: d.rawValue)
+            NonogramPicker.mergeSeen(ids: won, difficulty: d, userDefaults: userDefaults)
+        }
+    }
+
+    /// After merging synced wins, the puzzle instant-picked at init may
+    /// turn out to be one the player already solved (fresh install +
+    /// iCloud restore). If the session hasn't started, swap it out.
+    private func refreshFrontierAfterMerge() {
+        guard state == .idle, pendingSaveState == nil,
+              let p = currentPuzzle,
+              NonogramPicker.isSeen(p.id, difficulty: difficulty, userDefaults: userDefaults)
+        else { return }
+        newPuzzle()
     }
 
     // MARK: - Public API
@@ -221,17 +272,21 @@ final class NonogramViewModel {
     func restart() {
         let preserved = currentPuzzle
         resetSessionState()
-        currentPuzzle = preserved ?? pickPuzzle(for: difficulty)
+        currentPuzzle = preserved ?? pickInstantPuzzle(for: difficulty)
         refreshCrossOff()
+        ensurePuzzleLoaded()
     }
 
     /// Pick a fresh random puzzle and reset the session. Used by the win-
     /// state "New puzzle" button + by setDifficulty (size changes always
-    /// imply a new puzzle).
+    /// imply a new puzzle). Instant when the curated pool or prefetch
+    /// cache can serve; otherwise generates off-main (loading state).
     func newPuzzle() {
         resetSessionState()
-        currentPuzzle = pickPuzzle(for: difficulty)
+        currentPuzzle = pickInstantPuzzle(for: difficulty)
         refreshCrossOff()
+        ensurePuzzleLoaded()
+        prefetchNextPuzzleIfNeeded()
     }
 
     func resetSessionState() {
@@ -281,9 +336,82 @@ final class NonogramViewModel {
         timerAnchor = clock()
     }
 
+    // MARK: - Puzzle loading
+
+    /// Generate a puzzle for the current slot when nothing instant was
+    /// available. Runs `NonogramGenerator` on a detached task — never on
+    /// the main thread (20×20 generation cost froze the UI before the 2026-07-10 fix).
+    /// Safe to call whenever; no-ops when a puzzle is present or a
+    /// generation is already in flight.
+    func ensurePuzzleLoaded() {
+        guard currentPuzzle == nil, generationTask == nil else { return }
+        isGeneratingPuzzle = true
+        let d = difficulty
+        let seed = UInt64.random(in: .min ... .max, using: &rng)
+        generationTask = Task { [weak self] in
+            let puzzle = await Self.generateDetached(difficulty: d, seed: seed)
+            guard let self else { return }
+            self.generationTask = nil
+            self.isGeneratingPuzzle = false
+            guard self.difficulty == d else {
+                // Player switched sizes mid-generation — discard and
+                // re-evaluate for the new difficulty.
+                self.ensurePuzzleLoaded()
+                return
+            }
+            // A save-state restore may have filled the slot meanwhile.
+            guard self.currentPuzzle == nil else { return }
+            self.currentPuzzle = puzzle
+            self.refreshCrossOff()
+            self.prefetchNextPuzzleIfNeeded()
+        }
+    }
+
+    /// Background-generate the NEXT procedural puzzle once the curated
+    /// pool for the current difficulty is exhausted and no prefetch is
+    /// cached — so the player never waits on the generator again.
+    func prefetchNextPuzzleIfNeeded() {
+        guard prefetchTask == nil,
+              NonogramPicker.needsGeneration(for: difficulty, userDefaults: userDefaults)
+        else { return }
+        let d = difficulty
+        let seed = UInt64.random(in: .min ... .max, using: &rng)
+        prefetchTask = Task(priority: .utility) { [weak self] in
+            let puzzle = await Self.generateDetached(difficulty: d, seed: seed)
+            guard let self else { return }
+            NonogramPicker.storeCachedProcPuzzle(puzzle, for: d, userDefaults: self.userDefaults)
+            self.prefetchTask = nil
+        }
+    }
+
+    private nonisolated static func generateDetached(
+        difficulty: NonogramDifficulty,
+        seed: UInt64
+    ) async -> NonogramPuzzle {
+        await Task.detached(priority: .userInitiated) {
+            NonogramGenerator.generate(difficulty: difficulty, seed: seed)
+        }.value
+    }
+
     // MARK: - Private
 
+    /// idle → playing transition: start the timer and — the ONLY place
+    /// this happens — mark the puzzle as seen. Marking on first move
+    /// (not at pick time) keeps screen opens, save restores, and SwiftUI
+    /// re-inits from draining the curated pool.
+    private func beginPlayingIfNeeded() {
+        guard state == .idle else { return }
+        state = .playing
+        timerAnchor = clock()
+        pausedElapsed = 0
+        if let id = currentPuzzle?.id {
+            NonogramPicker.markSeen(puzzleId: id, difficulty: difficulty, userDefaults: userDefaults)
+        }
+        prefetchNextPuzzleIfNeeded()
+    }
+
     private func applyMutation(at row: Int, col: Int, next: NonogramCellState) {
+        guard currentPuzzle != nil else { return }  // still generating
         let prev = board.cell(row: row, col: col)
         guard prev != next else { return }
 
@@ -301,11 +429,7 @@ final class NonogramViewModel {
                 if !solutionBit {
                     // Wrong fill — auto-mark with X, lock, lose a life,
                     // record the wrong-attempt for the visual flash.
-                    if state == .idle {
-                        state = .playing
-                        timerAnchor = clock()
-                        pausedElapsed = 0
-                    }
+                    beginPlayingIfNeeded()
                     board = board.setting(.marked, atRow: row, col: col)
                     lockedCells.insert(idx)
                     recordWrongAttempt(at: idx)
@@ -323,11 +447,7 @@ final class NonogramViewModel {
                 if solutionBit {
                     // Player marked an actually-filled cell. Wrong call —
                     // auto-fill it correctly + lock + life lost.
-                    if state == .idle {
-                        state = .playing
-                        timerAnchor = clock()
-                        pausedElapsed = 0
-                    }
+                    beginPlayingIfNeeded()
                     board = board.setting(.filled, atRow: row, col: col)
                     lockedCells.insert(idx)
                     recordWrongAttempt(at: idx)
@@ -346,11 +466,7 @@ final class NonogramViewModel {
         }
 
         // First-action transition: idle → playing, start timer.
-        if state == .idle {
-            state = .playing
-            timerAnchor = clock()
-            pausedElapsed = 0
-        }
+        beginPlayingIfNeeded()
 
         board = board.setting(next, atRow: row, col: col)
 
@@ -429,13 +545,12 @@ final class NonogramViewModel {
         )
     }
 
-    /// Next puzzle for `difficulty`. Delegates to `NonogramPicker` so the
-    /// curated-unseen-first → procedural fallback rule lives in one place.
-    /// Always returns a valid puzzle (procedural Unlimited tier never
-    /// runs out).
-    private func pickPuzzle(for difficulty: NonogramDifficulty) -> NonogramPuzzle? {
+    /// Instant next puzzle for `difficulty` — unseen curated or cached
+    /// prefetch, side-effect-free. Returns nil when procedural generation
+    /// is required; callers follow up with `ensurePuzzleLoaded()`.
+    private func pickInstantPuzzle(for difficulty: NonogramDifficulty) -> NonogramPuzzle? {
         var any: any RandomNumberGenerator = rng
-        let p = NonogramPicker.next(
+        let p = NonogramPicker.nextInstant(
             difficulty: difficulty,
             userDefaults: userDefaults,
             rng: &any
