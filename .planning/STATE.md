@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 Phase: 18
 Plan: Not started
-Status: Milestone complete
-Last activity: 2026-07-06
+Status: Milestone complete — shipped as v1.5 (2026-07-10)
+Last activity: 2026-07-10
 
 ## v1.0 Carry-Over
 

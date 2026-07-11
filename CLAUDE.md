@@ -32,7 +32,7 @@ Ordered by how often a session needs them.
 | Repo / target name | `gamekit` | locked |
 | Target iOS | 17+ | — |
 | Swift / UI | Swift 6 + SwiftUI | — |
-| Current milestone | `v1.4` shipped — Word Games release | 2026-06-22 |
+| Current milestone | `v1.5` shipped — Arcade release (Stack + Snake) | 2026-07-10 |
 | Current MVP game | Minesweeper | — |
 | Next game (post-MVP) | TBD — Flow / Pattern Memory / Chess puzzles remain roadmap candidates | 2026-06-22 |
 | Icon | Stack-of-three-game-boxes (light / dark / tinted) | 2026-04-30 ev. |
