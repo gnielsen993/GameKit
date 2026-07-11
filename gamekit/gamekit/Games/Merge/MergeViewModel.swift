@@ -28,11 +28,14 @@ final class MergeViewModel {
     /// True once the user has dismissed the win banner via `continuePastWin()`.
     /// Suppresses re-firing the win banner for every subsequent merge above 2048.
     private(set) var hasContinuedPastWin: Bool = false
-    /// Trigger counter for `.sensoryFeedback(.impact(.light))` on each merge.
+    /// Trigger counter for milestone-strength feedback on each merge.
     /// Bumped once per slide that produced any merges (not per individual merge —
     /// a single swipe with two merges fires one haptic per the canonical
     /// `.sensoryFeedback` value-change semantic).
     private(set) var mergeCount: Int = 0
+    /// Trigger counter for valid slides that do not merge. Kept separate from
+    /// `mergeCount` so one swipe produces exactly one feedback class.
+    private(set) var slideCount: Int = 0
     /// Trigger counter for the optional .winSweep / .gameOver effects.
     private(set) var terminalCount: Int = 0
     /// Highest tile value on the board, surfaced for the header bar.
@@ -111,7 +114,11 @@ final class MergeViewModel {
 
         score += result.scoreDelta
         if score > bestScore { bestScore = score }
-        if !result.merges.isEmpty { mergeCount += 1 }
+        if result.merges.isEmpty {
+            slideCount += 1
+        } else {
+            mergeCount += 1
+        }
 
         // Win check (winMode only; suppress after continuePastWin).
         if mode == .winMode,
@@ -153,6 +160,7 @@ final class MergeViewModel {
         state = .playing
         hasContinuedPastWin = false
         mergeCount = 0
+        slideCount = 0
         terminalCount = 0
     }
 

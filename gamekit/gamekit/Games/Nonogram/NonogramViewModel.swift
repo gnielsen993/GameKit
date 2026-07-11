@@ -470,17 +470,22 @@ final class NonogramViewModel {
 
         board = board.setting(next, atRow: row, col: col)
 
-        switch next {
-        case .filled: placeCount += 1
-        case .marked: markCount += 1
-        case .empty:
-            if prev == .filled { placeCount += 1 } else { markCount += 1 }
-        }
-
         // Refresh cross-off ONCE per mutation; both the line-completion
         // detector below and the view layer reuse the cached masks.
         refreshCrossOff()
-        updateLineCompletions(touchedRow: row, touchedCol: col)
+        let completedLine = updateLineCompletions(touchedRow: row, touchedCol: col)
+
+        // A line milestone owns the action's tactile response. Ordinary
+        // fills/marks fire only when no row or column completed, preventing
+        // two simultaneous haptics for a single mutation.
+        if !completedLine {
+            switch next {
+            case .filled: placeCount += 1
+            case .marked: markCount += 1
+            case .empty:
+                if prev == .filled { placeCount += 1 } else { markCount += 1 }
+            }
+        }
 
         if let puzzle = currentPuzzle, NonogramWinDetector.isWon(board: board, puzzle: puzzle) {
             recordWin()

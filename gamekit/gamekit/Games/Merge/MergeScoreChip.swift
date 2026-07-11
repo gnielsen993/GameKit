@@ -3,7 +3,8 @@
 //  gamekit
 //
 //  Props-only score chip extracted from MergeHeaderBar (Plan 12-01 / D-12-CHIPS).
-//  Renders the chip surface; carries no @State, no @Environment reads.
+//  Renders a floating readout at full size and a bounded chip only in
+//  constrained Video Mode chrome; carries no state or environment reads.
 //  Consumed by:
 //    - MergeHeaderBar (off-path / Small PiP zones) with compact: false
 //    - MergeGameView Large-zone branch via VideoCompactControlRow slot 2
@@ -22,8 +23,7 @@ struct MergeScoreChip: View {
     /// P11-04 round 2 polish). When `true`, drops one Dynamic Type step,
     /// reduces horizontal + vertical padding to `theme.spacing.xs` so the
     /// chip fits inside `theme.spacing.xl` (the compact-row's pill-height
-    /// anchor). Off-path callers (MergeHeaderBar) leave defaulted to
-    /// `false` and get the v1.1 chip byte-identical (D-12-OFFRESTORE).
+    /// anchor). Off-path callers leave it false for the floating hierarchy.
     var compact: Bool = false
 
     var body: some View {
@@ -32,21 +32,13 @@ struct MergeScoreChip: View {
                 .font(theme.typography.caption.weight(.semibold))
                 .foregroundStyle(theme.colors.textSecondary)
             Text("\(score)")
-                .font(compact ? theme.typography.caption : theme.typography.monoNumber)
+                .font(compact ? theme.typography.caption : theme.typography.title)
                 .monospacedDigit()
                 .foregroundStyle(theme.colors.textPrimary)
                 .contentTransition(.numericText(value: Double(score)))
                 .feedbackAnimation(theme.motion.ease, value: score)
         }
-        .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.m)
-        .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
-        .background(theme.colors.surface)
-        .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
-                .stroke(theme.colors.border, lineWidth: 1)
-        )
-        .chipShadow()
+        .gameInfoReadout(theme: theme, compact: compact)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Score \(score)"))
     }

@@ -38,15 +38,7 @@ struct MinesRemainingChip: View {
                 .contentTransition(.numericText(value: Double(minesRemaining)))
                 .feedbackAnimation(theme.motion.ease, value: minesRemaining)
         }
-        .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.m)
-        .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
-        .background(theme.colors.surface)
-        .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
-                .stroke(theme.colors.border, lineWidth: 1)
-        )
-        .chipShadow()
+        .gameInfoReadout(theme: theme, compact: compact)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("\(minesRemaining) mines remaining"))
     }

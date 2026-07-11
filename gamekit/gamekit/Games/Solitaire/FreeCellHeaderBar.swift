@@ -11,11 +11,6 @@ struct FreeCellHeaderBar: View {
     let dealNumber:   Int
     let difficulty:   FreeCellDifficulty?  // nil = Deal # mode
 
-    private var dealLabel: String {
-        if let d = difficulty { return "Deal #\(dealNumber) · \(d.label)" }
-        return "Deal #\(dealNumber)"
-    }
-
     var body: some View {
         HStack(spacing: theme.spacing.s) {
             VideoModeTimerChip(
@@ -24,10 +19,16 @@ struct FreeCellHeaderBar: View {
                 pausedElapsed: pausedElapsed
             )
             Spacer()
-            Text(dealLabel)
-                .font(theme.typography.caption)
-                .foregroundStyle(theme.colors.textSecondary)
-                .lineLimit(1)
+            HStack(spacing: theme.spacing.xs) {
+                Text("Deal #\(dealNumber)")
+                    .foregroundStyle(theme.colors.textPrimary)
+                if let difficulty {
+                    Text(difficulty.label)
+                        .foregroundStyle(theme.colors.textSecondary)
+                }
+            }
+            .font(theme.typography.caption.weight(.semibold))
+            .lineLimit(1)
         }
         .padding(.horizontal, theme.spacing.m)
         .padding(.vertical, theme.spacing.s)

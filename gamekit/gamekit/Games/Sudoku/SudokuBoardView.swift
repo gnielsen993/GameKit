@@ -38,7 +38,9 @@ struct SudokuBoardView: View {
                 thinDividerOverlay(side: side)
                 boxBorderOverlay(side: side)
                 outerBorder(side: side)
+                completionOverlay(side: side)
             }
+            .feedbackAnimation(theme.motion.ease, value: viewModel.state == .won)
             .frame(width: side, height: side)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -130,6 +132,25 @@ struct SudokuBoardView: View {
             .stroke(theme.colors.border, lineWidth: 2)
             .frame(width: side, height: side)
             .allowsHitTesting(false)
+    }
+
+    /// A solved board gets one quiet success wash before the end-state banner.
+    /// It reinforces the board as the cause of the win without covering digits.
+    @ViewBuilder
+    private func completionOverlay(side: CGFloat) -> some View {
+        if viewModel.state == .won {
+            ZStack {
+                Rectangle()
+                    .fill(theme.colors.success.opacity(0.12))
+                Rectangle()
+                    .inset(by: 1)
+                    .stroke(theme.colors.success, lineWidth: 2)
+            }
+            .frame(width: side, height: side)
+            .transition(.opacity)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
     }
 
     private func highlightTier(row: Int, col: Int) -> SudokuCellView.HighlightTier {

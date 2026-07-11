@@ -96,7 +96,7 @@ Interactive surfaces carry a consistent, physical depth treatment from
 
 | Treatment | Helper | Applies to |
 |-----------|--------|-----------|
-| Ambient shadow | `.chipShadow()` — black 10%, radius 5, y 2 | Info chips, mode pills, pad keys, keyboard keys, board tiles that sit "on" the board |
+| Ambient shadow | `.chipShadow()` — black 10%, radius 5, y 2 | Compact chrome, mode pills, pad keys, keyboard keys, board tiles that sit "on" the board |
 | Raised sheen | `SurfaceDepth.raisedSheen` overlay — white 16% top edge → black 8% bottom edge | Tiles that read as pressable caps: Merge tiles, Minesweeper hidden cells, Home game tiles |
 | Active glow | `.activeGlow(color, active:)` — accent 45%, radius 8 | The element currently under the player's finger (Word Grid trace) |
 
@@ -104,6 +104,10 @@ Rules:
 - These are **lighting effects, not theme colors** — the white/black literals
   live only in `Core/SurfaceDepth.swift`. Game views consume the helpers and
   never write a color literal.
+- Passive game information floats: full-size score, timer, mine-count, size,
+  and lives readouts use `gameInfoReadout(theme:)` with no card, border, or
+  shadow. Compact Video Mode rows pass `compact: true` and retain a bounded
+  surface for separation in constrained chrome.
 - Flat stays flat: board backgrounds, empty wells, and revealed cells carry
   no sheen or shadow — depth marks *interactivity*, not decoration.
 - `VideoModeBanner` stays shadow-free by design (it is chrome, not a modal).
@@ -125,11 +129,11 @@ is game-specific; `SudokuLivesChip` is not — it should look identical to
 | Glyph empty | `heart` — `theme.colors.textTertiary` |
 | Font size (full) | 14pt semibold |
 | Font size (compact) | 11pt semibold |
-| Padding (full) | `theme.spacing.s` H + V |
+| Padding (full) | `theme.spacing.xs` H + V; no container surface |
 | Padding (compact) | `theme.spacing.xs` H + V |
-| Background | `theme.colors.surface` |
+| Background | none when full; `theme.colors.surface` when compact |
 | Corner radius | `theme.radii.chip` |
-| Border | 1pt `theme.colors.border` |
+| Border | none when full; 1pt `theme.colors.border` when compact |
 | Accessibility | Combined element, "X of Y lives remaining" |
 
 **Rule:** Hearts everywhere, always. Never circles, dots, bars, X-marks, or
@@ -144,12 +148,12 @@ the `TimelineView` timer logic in a game-specific chip.
 |----------|-------|
 | Font (full) | `theme.typography.monoNumber` + `.monospacedDigit()` |
 | Font (compact) | `theme.typography.caption` + `.monospacedDigit()` |
-| Padding (full) | `theme.spacing.m` H, `theme.spacing.s` V |
+| Padding (full) | `theme.spacing.xs` H + V; no container surface |
 | Padding (compact) | `theme.spacing.xs` H + V |
 | Icon | `clock` system glyph |
-| Background | `theme.colors.surface` |
+| Background | none when full; `theme.colors.surface` when compact |
 | Corner radius | `theme.radii.chip` |
-| Border | 1pt `theme.colors.border` |
+| Border | none when full; 1pt `theme.colors.border` when compact |
 
 **Rule:** Always pass `compact: true` when the chip appears inside any
 compact control row (Video Mode large-zone bar). Never use the non-compact
@@ -161,10 +165,10 @@ difficulty) share the same shell:
 
 | Property | Value |
 |----------|-------|
-| Background | `theme.colors.surface` |
+| Background | none when full; `theme.colors.surface` when compact |
 | Corner radius | `theme.radii.chip` |
-| Border | 1pt `theme.colors.border` |
-| Padding (full) | `theme.spacing.s` H, `theme.spacing.s` V |
+| Border | none when full; 1pt `theme.colors.border` when compact |
+| Padding (full) | `theme.spacing.xs` H + V; no container surface |
 | Padding (compact) | `theme.spacing.xs` H + V |
 | Typography | `theme.typography.body` full; `theme.typography.caption` compact |
 

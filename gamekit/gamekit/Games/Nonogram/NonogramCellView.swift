@@ -49,9 +49,10 @@ struct NonogramCellView: View {
             Rectangle()
                 .stroke(theme.colors.textPrimary.opacity(0.18), lineWidth: 0.5)
         )
-        .offset(x: wrongFlash ? 3 : 0)
-        .animation(.spring(response: 0.18, dampingFraction: 0.35), value: wrongFlash)
-        .animation(.easeOut(duration: 0.35), value: completionFlash)
+        .offset(x: wrongFlash ? theme.spacing.xs : 0)
+        .feedbackAnimation(theme.motion.ease, value: state)
+        .feedbackAnimation(.spring(response: 0.18, dampingFraction: 0.35), value: wrongFlash)
+        .feedbackAnimation(.easeOut(duration: 0.35), value: completionFlash)
         .contentShape(Rectangle())
         .onTapGesture {
             guard isInteractive else { return }
@@ -67,6 +68,7 @@ struct NonogramCellView: View {
                 .resizable().scaledToFit()
                 .frame(width: cellSize * 0.55, height: cellSize * 0.55)
                 .foregroundStyle(theme.colors.textPrimary.opacity(0.55))
+                .transition(.scale(scale: 0.6).combined(with: .opacity))
         case .filled, .empty:
             EmptyView()
         }

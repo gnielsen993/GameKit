@@ -185,11 +185,7 @@ struct FiveLetterGameView: View {
                 .foregroundStyle(theme.colors.textPrimary)
                 .contentTransition(.numericText(value: Double(viewModel.guesses.count)))
                 .feedbackAnimation(theme.motion.ease, value: viewModel.guesses.count)
-                .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.s)
-                .padding(.vertical, theme.spacing.xs)
-                .background(theme.colors.surface)
-                .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
-                .chipShadow()
+                .gameInfoReadout(theme: theme, compact: compact)
             if pack == .leading { Spacer() }
         }
         .padding(.horizontal, theme.spacing.m)

@@ -48,7 +48,7 @@ struct SolitaireColumnView: View {
             RoundedRectangle(cornerRadius: slotRadius, style: .continuous)
                 .stroke(theme.colors.accentPrimary.opacity(isDragTarget ? 0.7 : 0), lineWidth: 2)
                 .frame(width: cardWidth, height: cardHeight)
-                .animation(.easeInOut(duration: 0.15), value: isDragTarget),
+                .feedbackAnimation(.easeInOut(duration: 0.15), value: isDragTarget),
             alignment: .top
         )
     }
@@ -72,6 +72,7 @@ struct SolitaireColumnView: View {
             }
         }
         .opacity(isGhost ? 0.15 : 1.0)
+        .feedbackAnimation(.easeInOut(duration: 0.15), value: isSelected)
         .onTapGesture(count: 2) {
             if card.isFaceUp && !isGhost { onDoubleTap?(idx) }
         }

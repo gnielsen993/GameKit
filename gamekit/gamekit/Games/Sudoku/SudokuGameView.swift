@@ -324,13 +324,14 @@ extension SudokuGameView {
                 .foregroundStyle(theme.colors.textPrimary)
                 .frame(width: 36, height: 36)
                 .background(theme.colors.surface)
-                .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
+                .clipShape(Circle())
                 .overlay(
-                    RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
+                    Circle()
                         .stroke(theme.colors.border, lineWidth: 1)
                 )
+                .chipShadow()
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
         .disabled(!isInteractive)
         .opacity(isInteractive ? 1 : 0.4)
         .accessibilityLabel(Text("Erase"))

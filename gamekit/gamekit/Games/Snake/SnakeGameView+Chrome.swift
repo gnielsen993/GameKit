@@ -105,7 +105,8 @@ extension SnakeGameView {
 // MARK: - SnakeDPad
 
 /// Always-visible directional pad, placed in the mode-pill slot below the board
-/// (DESIGN §5.4). Each button has a ≥44pt hit target (DESIGN §3.3 / §9).
+/// (DESIGN §5.4). Round controls keep the pad visually light while each button
+/// retains a ≥44pt hit target (DESIGN §3.3 / §9).
 ///
 /// All four buttons stay enabled at all times — the 180° reversal rejection and
 /// capacity cap live in the VM's direction queue, so the D-pad itself never
@@ -140,12 +141,12 @@ struct SnakeDPad: View {
         } label: {
             Image(systemName: systemImage)
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(theme.colors.textPrimary)
+                .foregroundStyle(theme.colors.accentPrimary)
                 .frame(width: 44, height: 44)
                 .background(theme.colors.surface)
-                .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
+                .clipShape(Circle())
                 .overlay(
-                    RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
+                    Circle()
                         .stroke(theme.colors.border, lineWidth: 1)
                 )
                 .chipShadow()

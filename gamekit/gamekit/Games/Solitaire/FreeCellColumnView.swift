@@ -101,6 +101,8 @@ struct FreeCellColumnView: View {
                 }
             }
             .opacity(ghosted ? 0.22 : (isSelected ? 0.85 : 1.0))
+            .feedbackAnimation(.easeInOut(duration: 0.15), value: isSelected)
+            .feedbackAnimation(.easeInOut(duration: 0.15), value: isHighlighted)
             .contentShape(Rectangle())
             .onTapGesture      { vm.tapColumnCard(colIdx: colIdx, cardIdx: idx) }
             .onLongPressGesture(minimumDuration: 0.4) {

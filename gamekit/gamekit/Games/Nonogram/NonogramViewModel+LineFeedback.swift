@@ -25,9 +25,11 @@ extension NonogramViewModel {
     /// Bumps `lineCompletionCount` for each line that newly transitioned
     /// to fully-crossed-off; un-completing a previously-finished line
     /// drops it from the tracked set without firing a haptic.
-    func updateLineCompletions(touchedRow: Int, touchedCol: Int) {
+    @discardableResult
+    func updateLineCompletions(touchedRow: Int, touchedCol: Int) -> Bool {
         let rowMask = rowsCrossOff
         let colMask = columnsCrossOff
+        var completedNewLine = false
 
         let rowKey = "r\(touchedRow)"
         let rowComplete = touchedRow >= 0 && touchedRow < rowMask.count
@@ -35,6 +37,7 @@ extension NonogramViewModel {
         if rowComplete && !completedLineKeys.contains(rowKey) {
             completedLineKeys.insert(rowKey)
             lineCompletionCount += 1
+            completedNewLine = true
             triggerFlashRow(touchedRow)
         } else if !rowComplete {
             completedLineKeys.remove(rowKey)
@@ -46,10 +49,13 @@ extension NonogramViewModel {
         if colComplete && !completedLineKeys.contains(colKey) {
             completedLineKeys.insert(colKey)
             lineCompletionCount += 1
+            completedNewLine = true
             triggerFlashCol(touchedCol)
         } else if !colComplete {
             completedLineKeys.remove(colKey)
         }
+
+        return completedNewLine
     }
 
     /// Light up `row` for ~700ms, then clear the flag. If a newer

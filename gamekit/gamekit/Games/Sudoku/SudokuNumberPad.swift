@@ -38,6 +38,7 @@ struct SudokuNumberPad: View {
     private func digitButton(_ digit: Int) -> some View {
         let remaining = viewModel.remainingPerDigit[digit] ?? 0
         let isExhausted = remaining == 0
+        let isSelected = viewModel.selectedCell?.value == digit
         return Button {
             viewModel.place(value: digit)
         } label: {
@@ -46,16 +47,20 @@ struct SudokuNumberPad: View {
                     .font(theme.typography.title.weight(.semibold))
                     .foregroundStyle(isExhausted
                         ? theme.colors.textSecondary
-                        : theme.colors.textPrimary)
+                        : isSelected
+                            ? theme.colors.background
+                            : theme.colors.textPrimary)
                 Text(isExhausted ? " " : "\(remaining)")
                     .font(theme.typography.caption)
-                    .foregroundStyle(theme.colors.textSecondary)
+                    .foregroundStyle(isSelected
+                        ? theme.colors.background.opacity(0.8)
+                        : theme.colors.textSecondary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, theme.spacing.s)
             .background(
                 RoundedRectangle(cornerRadius: theme.radii.chip)
-                    .fill(theme.colors.surface)
+                    .fill(isSelected ? theme.colors.accentPrimary : theme.colors.surface)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: theme.radii.chip)
@@ -80,7 +85,11 @@ struct SudokuNumberPad: View {
             }
         }
         .scaleEffect(pulsing.contains(digit) ? 1.12 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: pulsing.contains(digit))
+        .feedbackAnimation(
+            .spring(response: 0.25, dampingFraction: 0.5),
+            value: pulsing.contains(digit)
+        )
+        .feedbackAnimation(theme.motion.ease, value: isSelected)
         .buttonStyle(.pressable)
         .disabled(isExhausted)
         .accessibilityLabel("Place \(digit), \(remaining) remaining")

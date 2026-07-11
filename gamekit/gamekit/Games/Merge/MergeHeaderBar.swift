@@ -2,10 +2,10 @@
 //  MergeHeaderBar.swift
 //  gamekit
 //
-//  Score chip + best-score chip for the Merge game scene. Props-only.
-//  Post-Plan 12-01 (D-12-CHIPS): thin composer that consumes MergeScoreChip
-//  + MergeBestChip. Off-path callers leave `compact` defaulted to false,
-//  producing the v1.1 inline chip shape verbatim (D-12-OFFRESTORE).
+//  Floating score + best-score hierarchy for the Merge game scene. Props-only.
+//  Thin composer that consumes MergeScoreChip + MergeBestChip. Off-path
+//  callers leave `compact` false for floating readouts; constrained Video
+//  Mode layouts request compact bounded variants directly.
 //  Mirrors MinesweeperHeaderBar's post-Plan 11-01 thin-composer shape.
 //
 
@@ -19,7 +19,7 @@ struct MergeHeaderBar: View {
     let mode: MergeMode
 
     var body: some View {
-        HStack(spacing: theme.spacing.s) {
+        HStack(alignment: .bottom, spacing: theme.spacing.s) {
             MergeScoreChip(theme: theme, score: score)
             Spacer()
             MergeBestChip(theme: theme, bestScore: bestScore)

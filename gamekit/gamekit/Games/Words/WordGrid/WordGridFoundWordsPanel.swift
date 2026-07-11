@@ -11,7 +11,28 @@ struct WordGridFoundWordsPanel: View {
     let words: [String]
     let layout: Layout
 
+    @ViewBuilder
     var body: some View {
+        if layout == .rail {
+            panelContent
+                .padding(theme.spacing.s)
+                .background(theme.colors.surface)
+                .clipShape(RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                        .stroke(theme.colors.border, lineWidth: 1)
+                )
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(accessibilityLabel)
+        } else {
+            panelContent
+                .padding(.vertical, theme.spacing.xs)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(accessibilityLabel)
+        }
+    }
+
+    private var panelContent: some View {
         VStack(alignment: .leading, spacing: theme.spacing.s) {
             HStack(spacing: theme.spacing.s) {
                 Text(String(localized: "Found"))
@@ -54,15 +75,6 @@ struct WordGridFoundWordsPanel: View {
                 }
             }
         }
-        .padding(theme.spacing.s)
-        .background(theme.colors.surface)
-        .clipShape(RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                .stroke(theme.colors.border, lineWidth: 1)
-        )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(accessibilityLabel)
     }
 
     private func wordRow(_ word: String) -> some View {
@@ -88,11 +100,9 @@ struct WordGridFoundWordsPanel: View {
                 .foregroundStyle(theme.colors.textSecondary)
         }
         .font(theme.typography.caption)
-        .foregroundStyle(theme.colors.textPrimary)
         .padding(.horizontal, theme.spacing.s)
         .padding(.vertical, theme.spacing.xs)
-        .background(theme.colors.background)
-        .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
+        .foregroundStyle(theme.colors.accentPrimary)
     }
 
     private var accessibilityLabel: Text {

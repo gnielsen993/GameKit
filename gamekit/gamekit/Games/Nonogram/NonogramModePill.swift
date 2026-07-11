@@ -29,6 +29,7 @@ struct NonogramModePill: View {
     /// Namespace for the sliding active-segment thumb (DESIGN.md §10.2 —
     /// hard-cuts to instant when animations are gated off).
     @Namespace private var pillNamespace
+    @Environment(\.settingsStore) private var settingsStore
 
     var body: some View {
         Button {
@@ -59,6 +60,10 @@ struct NonogramModePill: View {
         .accessibilityLabel(Text(String(localized: "Toggle mode")))
         .accessibilityValue(Text(mode == .place ? String(localized: "Place") : String(localized: "Mark")))
         .accessibilityAddTraits(.isButton)
+        .sensoryFeedback(
+            .impact(weight: .light),
+            trigger: settingsStore.hapticsEnabled ? mode : nil
+        )
     }
 
     @ViewBuilder

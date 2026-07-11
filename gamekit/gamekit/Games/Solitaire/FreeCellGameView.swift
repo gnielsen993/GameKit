@@ -8,6 +8,8 @@ struct FreeCellGameView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) var dismiss
     @Environment(\.videoModeStore) var videoModeStore
+    @Environment(\.settingsStore) var settingsStore
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
 
     @State var vm: FreeCellViewModel
     @State var showingDealEntry = false
@@ -24,6 +26,7 @@ struct FreeCellGameView: View {
 
     var theme:     Theme   { themeManager.theme(using: colorScheme) }
     var isClassic: Bool    { themeManager.preset == .classicMuted }
+    var fxEnabled: Bool    { settingsStore.animationsEnabled && !reduceMotion }
 
     var boardColor: Color {
         SolitaireFelt.boardColor(theme: theme, isClassic: isClassic)
@@ -60,9 +63,12 @@ struct FreeCellGameView: View {
         .background(theme.colors.background.ignoresSafeArea())
         .navigationTitle("FreeCell")
         .navigationBarTitleDisplayMode(.inline)
-        .sensoryFeedback(.selection,            trigger: vm.selectTick)
-        .sensoryFeedback(.success,              trigger: vm.dropTick)
-        .sensoryFeedback(.error,                trigger: vm.rejectTick)
+        .sensoryFeedback(.selection,
+                         trigger: settingsStore.hapticsEnabled ? vm.selectTick : 0)
+        .sensoryFeedback(.success,
+                         trigger: settingsStore.hapticsEnabled ? vm.dropTick : 0)
+        .sensoryFeedback(.error,
+                         trigger: settingsStore.hapticsEnabled ? vm.rejectTick : 0)
         .sheet(isPresented: $showingDealEntry)  { dealEntrySheet }
         .alert("Resume game?", isPresented: Binding(
             get: { vm.pendingSaveState != nil },
@@ -91,7 +97,8 @@ struct FreeCellGameView: View {
         .onChange(of: vm.board.canAutoComplete) { _, canAC in
             if canAC { vm.beginAutoCompleteAnimation() }
         }
-        .sensoryFeedback(.success, trigger: vm.winTick)
+        .sensoryFeedback(.success,
+                         trigger: settingsStore.hapticsEnabled ? vm.winTick : 0)
         .onChange(of: vm.hintText) { _, text in
             guard text != nil else { return }
             hintDismissTask?.cancel()
@@ -101,6 +108,7 @@ struct FreeCellGameView: View {
             }
         }
         .onChange(of: vm.winTick) { _, _ in
+            guard fxEnabled else { return }
             withAnimation(.easeIn(duration: 0.05)) { showWinFlash = true }
             Task { @MainActor in
                 try? await Task.sleep(for: .milliseconds(350))
@@ -115,7 +123,7 @@ struct FreeCellGameView: View {
             }
         }
         .overlay(alignment: .top) { hintToast }
-        .animation(.easeInOut(duration: 0.22), value: vm.hintText != nil)
+        .feedbackAnimation(.easeInOut(duration: 0.22), value: vm.hintText != nil)
     }
 
     @ViewBuilder private var hintToast: some View {
@@ -210,7 +218,7 @@ struct FreeCellGameView: View {
             .overlay { dragOverlay(cardW: cardW) }
         }
         .overlay {
-            if vm.gameState == .won {
+            if vm.gameState == .won && fxEnabled {
                 GeometryReader { g in
                     FreeCellCascadeView(theme: theme, isClassic: isClassic, screenSize: g.size)
                 }
@@ -384,7 +392,10 @@ struct FreeCellGameView: View {
         .padding(.horizontal, theme.spacing.l)
         .padding(.bottom, theme.spacing.l)
         .transition(.move(edge: .bottom).combined(with: .opacity))
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: vm.gameState == .won)
+        .feedbackAnimation(
+            .spring(response: 0.4, dampingFraction: 0.8),
+            value: vm.gameState == .won
+        )
     }
 
     // MARK: - Helpers

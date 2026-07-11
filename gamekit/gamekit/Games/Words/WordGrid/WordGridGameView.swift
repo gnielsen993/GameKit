@@ -119,6 +119,7 @@ struct WordGridGameView: View {
             }
         }
         .sensoryFeedback(.impact(weight: .light, intensity: 0.7), trigger: settingsStore.hapticsEnabled ? viewModel.submitCount : 0)
+        .sensoryFeedback(.selection, trigger: settingsStore.hapticsEnabled ? viewModel.selectionCount : 0)
         .sensoryFeedback(.error, trigger: settingsStore.hapticsEnabled ? viewModel.invalidCount : 0)
         .sensoryFeedback(.success, trigger: settingsStore.hapticsEnabled ? viewModel.finishCount : 0)
     }
@@ -205,6 +206,11 @@ struct WordGridGameView: View {
         Text(viewModel.currentWord.isEmpty ? (viewModel.message ?? viewModel.mode.displayName) : viewModel.currentWord)
             .font(theme.typography.headline)
             .foregroundStyle(viewModel.currentWord.isEmpty ? theme.colors.textSecondary : theme.colors.accentPrimary)
+            .contentTransition(.interpolate)
+            .feedbackAnimation(
+                .spring(response: 0.22, dampingFraction: 0.72),
+                value: viewModel.currentWord
+            )
             .frame(height: theme.spacing.xl)
             .frame(maxWidth: .infinity)
     }
@@ -251,11 +257,7 @@ struct WordGridGameView: View {
         }
         .font(compact ? theme.typography.caption : theme.typography.body)
         .foregroundStyle(theme.colors.textPrimary)
-        .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.s)
-        .padding(.vertical, theme.spacing.xs)
-        .background(theme.colors.surface)
-        .clipShape(RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous))
-        .chipShadow()
+        .gameInfoReadout(theme: theme, compact: compact)
     }
 
     /// Off-path toolbar shape with per-side parameters — Video Mode small-top

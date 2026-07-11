@@ -7,6 +7,8 @@ struct FiveLetterKeyboardView: View {
     let onLetter: (Character) -> Void
     let onDelete: () -> Void
     let onSubmit: () -> Void
+    @Environment(\.settingsStore) private var settingsStore
+    @State private var keyPressCount = 0
 
     private let rows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"]
 
@@ -27,11 +29,18 @@ struct FiveLetterKeyboardView: View {
             }
         }
         .padding(.horizontal, theme.spacing.m)
+        .sensoryFeedback(
+            .selection,
+            trigger: settingsStore.hapticsEnabled ? keyPressCount : 0
+        )
     }
 
     @ViewBuilder
     private func letterButton(_ letter: Character) -> some View {
-        Button { onLetter(letter) } label: {
+        Button {
+            onLetter(letter)
+            keyPressCount += 1
+        } label: {
             Text(String(letter))
                 .font(theme.typography.body.weight(.semibold))
                 .foregroundStyle(theme.colors.textPrimary)

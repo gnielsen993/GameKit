@@ -18,6 +18,7 @@ final class WordGridViewModel {
     private var timer: Timer?
 
     var submitCount = 0
+    var selectionCount = 0
     var invalidCount = 0
     var finishCount = 0
 
@@ -59,6 +60,7 @@ final class WordGridViewModel {
         }
         if WordGridEngine.canAppend(position, to: selectedPath) {
             selectedPath.append(position)
+            selectionCount += 1
             message = nil
         }
     }

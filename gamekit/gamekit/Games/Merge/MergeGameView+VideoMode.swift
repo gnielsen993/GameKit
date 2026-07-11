@@ -61,12 +61,12 @@ extension MergeGameView {
                 )
                 .padding(.horizontal, theme.spacing.l)
                 .sensoryFeedback(
-                    .impact(weight: .light),
-                    trigger: settingsStore.hapticsEnabled ? viewModel.mergeCount : 0
+                    .impact(weight: .light, intensity: 0.7),
+                    trigger: settingsStore.hapticsEnabled ? viewModel.slideCount : 0
                 )
                 .sensoryFeedback(
-                    .success,
-                    trigger: settingsStore.hapticsEnabled ? viewModel.terminalCount : 0
+                    .impact(weight: .medium, intensity: 1),
+                    trigger: settingsStore.hapticsEnabled ? viewModel.mergeCount : 0
                 )
 
                 MergeModePill(
@@ -204,12 +204,12 @@ extension MergeGameView {
         )
         .padding(.horizontal, theme.spacing.l)
         .sensoryFeedback(
-            .impact(weight: .light),
-            trigger: settingsStore.hapticsEnabled ? viewModel.mergeCount : 0
+            .impact(weight: .light, intensity: 0.7),
+            trigger: settingsStore.hapticsEnabled ? viewModel.slideCount : 0
         )
         .sensoryFeedback(
-            .success,
-            trigger: settingsStore.hapticsEnabled ? viewModel.terminalCount : 0
+            .impact(weight: .medium, intensity: 1),
+            trigger: settingsStore.hapticsEnabled ? viewModel.mergeCount : 0
         )
     }
 
@@ -393,12 +393,12 @@ extension MergeGameView {
                 )
                 .padding(.horizontal, theme.spacing.l)
                 .sensoryFeedback(
-                    .impact(weight: .light),
-                    trigger: settingsStore.hapticsEnabled ? viewModel.mergeCount : 0
+                    .impact(weight: .light, intensity: 0.7),
+                    trigger: settingsStore.hapticsEnabled ? viewModel.slideCount : 0
                 )
                 .sensoryFeedback(
-                    .success,
-                    trigger: settingsStore.hapticsEnabled ? viewModel.terminalCount : 0
+                    .impact(weight: .medium, intensity: 1),
+                    trigger: settingsStore.hapticsEnabled ? viewModel.mergeCount : 0
                 )
 
                 if videoModeStore.location == .largeTop {

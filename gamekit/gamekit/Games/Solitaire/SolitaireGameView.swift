@@ -9,6 +9,8 @@ struct SolitaireGameView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.videoModeStore) var videoModeStore
+    @Environment(\.settingsStore) var settingsStore
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
 
     @State var vm: SolitaireViewModel
     @State var showingNewGame = false
@@ -33,6 +35,7 @@ struct SolitaireGameView: View {
 
     var theme:     Theme { themeManager.theme(using: colorScheme) }
     var isClassic: Bool  { themeManager.preset == .classicMuted }
+    var fxEnabled: Bool  { settingsStore.animationsEnabled && !reduceMotion }
 
     var boardColor: Color {
         SolitaireFelt.boardColor(theme: theme, isClassic: isClassic)
@@ -84,14 +87,19 @@ struct SolitaireGameView: View {
             }
             Button("Cancel", role: .cancel) { }
         }
-        .sensoryFeedback(.impact(weight: .medium), trigger: pickUpTick)
-        .sensoryFeedback(.success, trigger: dropTick)
-        .sensoryFeedback(.error, trigger: rejectTick)
-        .sensoryFeedback(.success, trigger: vm.winTick)
+        .sensoryFeedback(.impact(weight: .medium),
+                         trigger: settingsStore.hapticsEnabled ? pickUpTick : 0)
+        .sensoryFeedback(.success,
+                         trigger: settingsStore.hapticsEnabled ? dropTick : 0)
+        .sensoryFeedback(.error,
+                         trigger: settingsStore.hapticsEnabled ? rejectTick : 0)
+        .sensoryFeedback(.success,
+                         trigger: settingsStore.hapticsEnabled ? vm.winTick : 0)
         .onChange(of: vm.board.canAutoComplete) { _, canAC in
             if canAC { vm.beginAutoCompleteAnimation() }
         }
         .onChange(of: vm.winTick) { _, _ in
+            guard fxEnabled else { return }
             withAnimation(.easeIn(duration: 0.05)) { showWinFlash = true }
             Task { @MainActor in
                 try? await Task.sleep(for: .milliseconds(350))
@@ -133,10 +141,14 @@ struct SolitaireGameView: View {
                                timerAnchor: vm.timerAnchor,
                                pausedElapsed: vm.pausedElapsed)
             Spacer()
-            Text("Deal #\(vm.dealNumber) · \(vm.difficulty.label)")
-                .font(theme.typography.caption)
-                .foregroundStyle(theme.colors.textSecondary)
-                .lineLimit(1)
+            HStack(spacing: theme.spacing.xs) {
+                Text("Deal #\(vm.dealNumber)")
+                    .foregroundStyle(theme.colors.textPrimary)
+                Text(vm.difficulty.label)
+                    .foregroundStyle(theme.colors.textSecondary)
+            }
+            .font(theme.typography.caption.weight(.semibold))
+            .lineLimit(1)
         }
         .padding(.horizontal, theme.spacing.m)
         .padding(.vertical, theme.spacing.s)

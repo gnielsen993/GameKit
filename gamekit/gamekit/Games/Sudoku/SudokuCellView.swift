@@ -115,9 +115,15 @@ struct SudokuCellView: View {
     @ViewBuilder
     private var wrongFlashOverlay: some View {
         if isWrongFlashing {
-            Rectangle()
-                .fill(theme.colors.danger.opacity(0.30))
-                .transition(.opacity)
+            ZStack {
+                Rectangle()
+                    .fill(theme.colors.danger.opacity(0.24))
+                Rectangle()
+                    .inset(by: 1)
+                    .stroke(theme.colors.danger, lineWidth: 2)
+            }
+            .transition(.opacity)
+            .allowsHitTesting(false)
         }
     }
 
