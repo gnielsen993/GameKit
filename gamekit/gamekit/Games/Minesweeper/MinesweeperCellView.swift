@@ -58,7 +58,7 @@ struct MinesweeperCellView: View {
     let onLongPress: (MinesweeperIndex) -> Void
 
     var body: some View {
-        tileBackground
+        tileSurface
             .frame(width: cellSize, height: cellSize)
             .overlay(
                 glyph
@@ -97,11 +97,6 @@ struct MinesweeperCellView: View {
                         }
                     }
             )
-            // P5 D-07: cell-level haptics. Trigger gating-at-source —
-            // hapticsEnabled=false collapses the trigger to constant 0
-            // so .sensoryFeedback never fires.
-            .sensoryFeedback(.selection, trigger: hapticsEnabled ? revealCount : 0)
-            .sensoryFeedback(.impact(weight: .light), trigger: hapticsEnabled ? flagToggleCount : 0)
             .accessibilityElement(children: .ignore)  // RESEARCH Pitfall 5
             .accessibilityLabel(accessibilityLabelKey)
             .accessibilityAddTraits(.isButton)
@@ -114,6 +109,16 @@ struct MinesweeperCellView: View {
     // mineHit = danger (the "you stepped here" highlight per D-17 step 1)
 
     @ViewBuilder
+    private var tileSurface: some View {
+        if needsHiddenTint {
+            tileBackground
+                .chipShadow()
+        } else {
+            tileBackground
+        }
+    }
+
+    @ViewBuilder
     private var tileBackground: some View {
         ZStack {
             Rectangle().fill(backgroundFill)
@@ -124,7 +129,7 @@ struct MinesweeperCellView: View {
             // pressable caps against the flat revealed floor (DESIGN.md §3
             // depth rules).
             if needsHiddenTint {
-                Rectangle().fill(theme.colors.textPrimary.opacity(0.22))
+                Rectangle().fill(theme.colors.textPrimary.opacity(0.16))
                 Rectangle().fill(SurfaceDepth.raisedSheen)
             }
         }
@@ -161,6 +166,7 @@ struct MinesweeperCellView: View {
                 .resizable().scaledToFit()
                 .frame(width: cellSize * 0.45, height: cellSize * 0.45)
                 .foregroundStyle(theme.colors.textPrimary)
+                .transition(.scale(scale: 0.55).combined(with: .opacity))
 
         // 2. On loss, flip every other still-hidden mine to a visible mine
         //    glyph (D-17 step 2). Gated on `lossMinesRevealed` so the
@@ -197,12 +203,20 @@ struct MinesweeperCellView: View {
                 // belt-and-suspenders — value=0 prevents replay even though
                 // .symbolEffect honors the system flag automatically.
                 .symbolEffect(.bounce, value: reduceMotion ? 0 : flagToggleCount)
+                .transition(.scale(scale: 0.55).combined(with: .opacity))
 
         // 5. Revealed numbered cell — adjacency 1...8 from theme.gameNumber(_:).
         case (.revealed, _, _, _) where cell.adjacentMineCount > 0:
             Text("\(cell.adjacentMineCount)")
                 .font(.system(size: cellSize * 0.55, weight: .bold, design: .rounded))
                 .foregroundStyle(theme.gameNumber(cell.adjacentMineCount))
+                .transition(.scale(scale: 0.55).combined(with: .opacity))
+                .animation(
+                    reduceMotion
+                        ? nil
+                        : .spring(response: 0.25, dampingFraction: 0.78),
+                    value: cell.state
+                )
 
         // 6. Revealed empty cell (zero adjacency) — no glyph.
         case (.revealed, _, _, _):

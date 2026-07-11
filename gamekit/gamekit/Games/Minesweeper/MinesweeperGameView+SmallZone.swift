@@ -56,7 +56,7 @@ extension MinesweeperGameView {
                     gameState: viewModel.gameState,
                     phase: viewModel.phase,
                     hapticsEnabled: settingsStore.hapticsEnabled,
-                    reduceMotion: reduceMotion,
+                    reduceMotion: reduceMotion || !settingsStore.animationsEnabled,
                     revealCount: viewModel.revealCount,
                     flagToggleCount: viewModel.flagToggleCount,
                     lossMinesRevealed: lossMinesRevealed,
@@ -67,7 +67,7 @@ extension MinesweeperGameView {
                 )
                 .keyframeAnimator(
                     initialValue: 0.0,
-                    trigger: reduceMotion ? false : viewModel.phase.isLossShake
+                    trigger: (reduceMotion || !settingsStore.animationsEnabled) ? false : viewModel.phase.isLossShake
                 ) { content, value in
                     content.offset(x: value)
                 } keyframes: { _ in
@@ -121,7 +121,7 @@ extension MinesweeperGameView {
                     gameState: viewModel.gameState,
                     phase: viewModel.phase,
                     hapticsEnabled: settingsStore.hapticsEnabled,
-                    reduceMotion: reduceMotion,
+                    reduceMotion: reduceMotion || !settingsStore.animationsEnabled,
                     revealCount: viewModel.revealCount,
                     flagToggleCount: viewModel.flagToggleCount,
                     lossMinesRevealed: lossMinesRevealed,
@@ -132,7 +132,7 @@ extension MinesweeperGameView {
                 )
                 .keyframeAnimator(
                     initialValue: 0.0,
-                    trigger: reduceMotion ? false : viewModel.phase.isLossShake
+                    trigger: (reduceMotion || !settingsStore.animationsEnabled) ? false : viewModel.phase.isLossShake
                 ) { content, value in
                     content.offset(x: value)
                 } keyframes: { _ in
@@ -252,7 +252,7 @@ extension MinesweeperGameView {
             .ignoresSafeArea()
             .allowsHitTesting(false)
             .phaseAnimator(
-                reduceMotion ? [0.0] : [0.0, 0.25, 0.0],
+                (reduceMotion || !settingsStore.animationsEnabled) ? [0.0] : [0.0, 0.25, 0.0],
                 trigger: viewModel.phase == .winSweep
             ) { content, alpha in
                 content.opacity(alpha)

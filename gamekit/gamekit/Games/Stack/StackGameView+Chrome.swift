@@ -43,15 +43,21 @@ extension StackGameView {
             Text("\(vm.frame.score)")
                 .font(theme.typography.title.monospacedDigit())
                 .foregroundStyle(theme.colors.textPrimary)
+                .contentTransition(.numericText(value: Double(vm.frame.score)))
+                .feedbackAnimation(theme.motion.ease, value: vm.frame.score)
             if vm.frame.streak > 0 {
                 Text(String(localized: "Streak: \(vm.frame.streak)"))
                     .font(theme.typography.caption.monospacedDigit())
                     .foregroundStyle(theme.colors.accentPrimary)
+                    .contentTransition(.numericText(value: Double(vm.frame.streak)))
+                    .feedbackAnimation(theme.motion.ease, value: vm.frame.streak)
             }
         }
         .padding(theme.spacing.m)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
         .allowsHitTesting(false)   // board overlays never intercept taps (DESIGN §7.1)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Score \(vm.frame.score), perfect streak \(vm.frame.streak)"))
     }
 
     /// Idle / tap-to-start screen — shown before the first tap and after restart.
@@ -74,6 +80,10 @@ extension StackGameView {
         .background(
             RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
                 .fill(theme.colors.surfaceElevated.opacity(0.94))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                .stroke(theme.colors.border, lineWidth: 1)
         )
         .padding(theme.spacing.l)
     }

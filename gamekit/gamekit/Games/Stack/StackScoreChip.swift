@@ -30,6 +30,8 @@ struct StackScoreChip: View {
                 .font(compact ? theme.typography.caption : theme.typography.monoNumber)
                 .monospacedDigit()
                 .foregroundStyle(theme.colors.textPrimary)
+                .contentTransition(.numericText(value: Double(score)))
+                .feedbackAnimation(theme.motion.ease, value: score)
         }
         .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.m)
         .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
@@ -39,6 +41,7 @@ struct StackScoreChip: View {
             RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
                 .stroke(theme.colors.border, lineWidth: 1)
         )
+        .chipShadow()
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Score \(score)"))
     }

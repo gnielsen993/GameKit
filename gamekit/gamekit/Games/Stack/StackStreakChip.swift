@@ -27,6 +27,8 @@ struct StackStreakChip: View {
                 .font(compact ? theme.typography.caption : theme.typography.monoNumber)
                 .monospacedDigit()
                 .foregroundStyle(theme.colors.accentPrimary)
+                .contentTransition(.numericText(value: Double(streak)))
+                .feedbackAnimation(theme.motion.ease, value: streak)
         }
         .padding(.horizontal, compact ? theme.spacing.xs : theme.spacing.m)
         .padding(.vertical, compact ? theme.spacing.xs : theme.spacing.s)
@@ -36,6 +38,7 @@ struct StackStreakChip: View {
             RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
                 .stroke(theme.colors.border, lineWidth: 1)
         )
+        .chipShadow()
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Perfect streak \(streak)"))
     }

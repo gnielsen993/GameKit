@@ -215,11 +215,35 @@ struct MinesweeperBoardView: View {
             }
             .padding(.horizontal, theme.spacing.s)
             .padding(.vertical, theme.spacing.s)
+            // The grid sits in a bounded play surface instead of floating in
+            // unused screen space. This gives Minesweeper the same deliberate
+            // visual anchor as Stack's tower while keeping the cells flat or
+            // raised according to their interaction state.
+            .background(
+                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                    .fill(theme.colors.surfaceElevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                    .stroke(theme.colors.border, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous))
+            .chipShadow()
             // 2026-05-02 — center horizontally so iPad Hard (16 cols at
             // height-bound size) doesn't pin to the leading edge with
             // a wide trailing gap. iPhone Easy/Medium also benefit when
             // height is the binding constraint in landscape.
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .center)
         }
+        // One attachment point per event class. Reveal is the primary move;
+        // flagging is the secondary action (DESIGN.md §8.2).
+        .sensoryFeedback(
+            .impact(weight: .light, intensity: 0.7),
+            trigger: hapticsEnabled ? revealCount : 0
+        )
+        .sensoryFeedback(
+            .selection,
+            trigger: hapticsEnabled ? flagToggleCount : 0
+        )
     }
 }
