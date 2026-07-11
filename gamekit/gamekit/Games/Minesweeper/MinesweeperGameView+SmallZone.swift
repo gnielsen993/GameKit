@@ -65,6 +65,8 @@ extension MinesweeperGameView {
                     onTap: { viewModel.handleTap(at: $0) },
                     onLongPress: { viewModel.handleLongPress(at: $0) }
                 )
+                // DESIGN.md §5 — board never bleeds to the screen edges.
+                .padding(.horizontal, theme.spacing.m)
                 .keyframeAnimator(
                     initialValue: 0.0,
                     trigger: (reduceMotion || !settingsStore.animationsEnabled) ? false : viewModel.phase.isLossShake
@@ -130,6 +132,8 @@ extension MinesweeperGameView {
                     onTap: { viewModel.handleTap(at: $0) },
                     onLongPress: { viewModel.handleLongPress(at: $0) }
                 )
+                // DESIGN.md §5 — board never bleeds to the screen edges.
+                .padding(.horizontal, theme.spacing.m)
                 .keyframeAnimator(
                     initialValue: 0.0,
                     trigger: (reduceMotion || !settingsStore.animationsEnabled) ? false : viewModel.phase.isLossShake

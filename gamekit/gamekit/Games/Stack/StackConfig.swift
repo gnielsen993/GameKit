@@ -28,14 +28,16 @@ nonisolated struct StackConfig: Sendable {
     let cycleLength: Int           // chart-color cycle length (matches theme.charts count)
 
     /// Default in-game preset — play-test baseline, not gospel.
-    /// perfectTolerance tightened 0.025 → 0.015 after play-testing: the wider
-    /// band made clearly-off drops snap to center and read as too forgiving.
+    /// perfectTolerance tightened 0.025 → 0.015 → 0.010 after play-testing:
+    /// at 0.015 visibly off-center drops still snapped in as perfects. 0.010
+    /// keeps ~3 frames of grace at startSpeed; going lower risks frame-luck
+    /// at maxSpeed (per-tick travel there is 0.015).
     nonisolated static let `default` = StackConfig(
         fixedDt: 1.0 / 60.0,
         playfieldWidth: 1.0, playfieldCenter: 0.5,
         startingWidth: 0.62, startingDepth: 0.62, minWidth: 0.015,
         startSpeed: 0.35, maxSpeed: 0.90, plateauScore: 80,
-        perfectTolerance: 0.015, streakThreshold: 5, expandAmount: 0.04,
+        perfectTolerance: 0.010, streakThreshold: 5, expandAmount: 0.04,
         cycleLength: 6
     )
 

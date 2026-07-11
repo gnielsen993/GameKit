@@ -171,7 +171,7 @@ struct MinesweeperBoardView: View {
                 height: proxy.size.height,
                 cols: board.cols,
                 rows: board.rows,
-                padding: theme.spacing.s,
+                padding: 0,
                 spacing: 0,
                 floor: Self.minCellSize(videoModeOn: videoModeStore.isEnabled)
             )
@@ -213,22 +213,10 @@ struct MinesweeperBoardView: View {
                     )
                 }
             }
-            .padding(.horizontal, theme.spacing.s)
-            .padding(.vertical, theme.spacing.s)
-            // The grid sits in a bounded play surface instead of floating in
-            // unused screen space. This gives Minesweeper the same deliberate
-            // visual anchor as Stack's tower while keeping the cells flat or
-            // raised according to their interaction state.
-            .background(
-                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                    .fill(theme.colors.surfaceElevated)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                    .stroke(theme.colors.border, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous))
-            .chipShadow()
+            // 2026-07-10 — the elevated play-surface card behind the grid
+            // (surfaceElevated fill + border + shadow) was removed: it read
+            // as a distracting box rather than an anchor. Cells carry their
+            // own surface treatment; the grid floats on the screen bg.
             // 2026-05-02 — center horizontally so iPad Hard (16 cols at
             // height-bound size) doesn't pin to the leading edge with
             // a wide trailing gap. iPhone Easy/Medium also benefit when
