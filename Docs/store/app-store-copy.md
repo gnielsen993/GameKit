@@ -89,7 +89,7 @@ Steer with swipes or the always-visible D-pad. Eat to grow, chase your high scor
 All ten games. Six PiP positions. Every layout reflows. No features lost, no controls buried.
 
 - THEMES -
-Seventeen presets plus custom colors. Switch instantly. Every theme is legible on every game. Classic Chrome Diner is the default; try Voltage or Dracula for something darker.
+34 presets plus custom colors. Switch instantly. Every theme is legible on every game. Classic Chrome Diner is the default; try Voltage or Dracula for something darker.
 
 - ZERO NONSENSE -
 No account. No required permissions. No ads, no coins, no subscription, no energy timers, no paywalled features. Stats live on your device. Works fully offline and always will.
@@ -148,7 +148,7 @@ GameDrawer 1.5 adds two arcade games, bringing the drawer to ten. Both support V
 - 6,000 Sudoku puzzles, four difficulties, in-progress save state
 - Completion glow on rows, columns, and boxes
 - Exhausted number-pad digits strike through automatically
-- 17 color themes + custom color support
+- 34 color themes + custom color support
 - Full offline — no account, no permissions, no network required
 - Stats per game, per difficulty — device-local only
 - No ads. No coins. No subscription.
