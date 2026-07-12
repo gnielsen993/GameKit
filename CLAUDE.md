@@ -409,3 +409,16 @@ components, or animations. Key sections:
 DESIGN.md is the tiebreaker for visual/interaction decisions. When CLAUDE.md
 and DESIGN.md conflict on a non-functional detail, DESIGN.md wins.
 New games must pass the §12.5 checklist before shipping.
+
+---
+
+## 10) Brain (Obsidian knowledge base — Claude only)
+
+Durable knowledge from this project goes in my Obsidian brain under the
+[[GameKit]] MOC, tagged `gamekit` (covers the GameKitWebsite repo too).
+Global conventions — format, when to read/write — are in `~/.claude/CLAUDE.md`.
+
+Worth capturing here: game-engine design decisions and rationale, preset/
+legibility learnings from theme passes, App Store learnings, approaches tried
+and rejected. Ecosystem-wide learnings (DesignKit usage, SwiftUI patterns)
+become atomic notes linked from every relevant MOC, not buried here.
