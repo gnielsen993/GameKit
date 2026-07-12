@@ -218,8 +218,10 @@ xcodebuild -scheme GameKit -destination 'platform=iOS Simulator,name=iPhone 16' 
 ## Monetization
 
 Not now. Future options (in order of preference): one-time unlock for
-the full suite · paid DesignKit theme packs · tip jar. **Never:** ads,
-coins, energy systems, aggressive subscriptions.
+the full suite · paid DesignKit theme packs · tip jar · ads (stance
+shifted 2026-07-12 — no longer permanently excluded, nothing
+implemented). **Never:** coins, energy systems, aggressive
+subscriptions.
 
 ---
 

@@ -105,7 +105,7 @@ everything else fails, this differentiator must not.
 
 ### Out of Scope
 
-- **Banner ads / interstitials / video ads** — kills the differentiator. Permanent exclusion
+- **Banner ads / interstitials / video ads** — out of scope for current milestones, but no longer permanently excluded (stance shifted 2026-07-12; nothing implemented). External copy says "no ads" in the present tense only — never "ever"/"never"/"permanent"
 - **Coins, fake currency, energy systems, daily-reward streaks-as-engagement-bait** — same reason
 - **Aggressive subscriptions / paywalls** — never. Future monetization (if any) is one-time unlock or theme-pack tip jar
 - **Required accounts** — sign-in is *optional only*; never blocks gameplay

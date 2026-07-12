@@ -112,8 +112,12 @@ doc-only commits.
 - Export/Import JSON backup (versioned) for persisted shapes
 
 ### Product
-- **No ads. No coins. No fake currency. No energy systems. No
-  aggressive subscriptions.** This is the differentiator — non-negotiable.
+- **No coins. No fake currency. No energy systems. No aggressive
+  subscriptions.** This is the differentiator — non-negotiable.
+- **Ads: none shipped, and "no ads" (present tense) stays accurate
+  in all copy. The "no ads ever" pledge was retired 2026-07-12 —
+  stance is under review. Never write "no ads ever" / "never ads" /
+  "permanent" ad claims in any internal or external copy.**
 - Cold-start latency is a P0 bug.
 - Settings screen is small: theme · haptics · reset stats · about.
 - Any haptics, confetti, sound, or celebratory animation must respect

@@ -135,7 +135,7 @@ GameDrawer 1.5 adds two arcade games, bringing the drawer to ten. Both support V
 
 **Everything moves better.** This release also ships an app-wide motion and depth pass: Merge tiles slide and pop instead of teleporting, counters roll instead of snapping, mode pills animate between choices, keys and tiles compress under the finger, and pressable surfaces sit on a soft shadow. Every effect cuts to instant with Reduce Motion or animations off.
 
-**Still no ads. Still no coins. Still no accounts.** That's not a marketing line — it's a design constraint. GameDrawer has no ad SDK, no coin economy, no energy system, and no paywalled features. You download it once.
+**Still no ads. Still no coins. Still no accounts.** GameDrawer has no ad SDK, no coin economy, no energy system, and no paywalled features. You download it once.
 
 [Download on the App Store]
 
@@ -151,4 +151,4 @@ GameDrawer 1.5 adds two arcade games, bringing the drawer to ten. Both support V
 - 17 color themes + custom color support
 - Full offline — no account, no permissions, no network required
 - Stats per game, per difficulty — device-local only
-- No ads. No coins. No subscription. Ever.
+- No ads. No coins. No subscription.

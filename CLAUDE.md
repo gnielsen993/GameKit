@@ -114,8 +114,12 @@ tweaks, in-flight work that did not ship in that `MARKETING_VERSION`.
   only network surface; SIWA is the only auth surface.
 
 ### Product
-- **No ads. No coins. No fake currency. No energy systems. No
-  aggressive subscriptions.** Ever. This is the differentiator.
+- **No coins. No fake currency. No energy systems. No aggressive
+  subscriptions.** Ever. This is the differentiator.
+- **Ads: none shipped, and "no ads" (present tense) stays accurate
+  in all copy. The "no ads ever" pledge was retired 2026-07-12 —
+  stance is under review. Never write "no ads ever" / "never ads" /
+  "permanent" ad claims in any internal or external copy.**
 - App must launch instantly. Cold-start latency is a P0 bug.
 - No popups, modals, or push-y UX on first run.
 - Settings stays small — theme · haptics · reset stats · about.
