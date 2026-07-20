@@ -8,11 +8,10 @@
 //  + AuthStore alert wiring so those side effects keep firing exactly once
 //  at the scene root.
 //
-//  P5 (D-23, SHELL-04): drives the 3-step IntroFlowView via
-//  .fullScreenCover gated on settingsStore.hasSeenIntro. The cover presents
-//  ONLY when !hasSeenIntro at first appear; IntroFlowView writes
-//  hasSeenIntro = true on Skip / Done dismissal so subsequent app launches
-//  skip the cover entirely.
+//  P5 (D-23, SHELL-04): routes directly to the 3-step IntroFlowView when
+//  settingsStore.hasSeenIntro is false. IntroFlowView writes the flag on
+//  Skip / Done, then the root crossfades to HomeView. Returning launches
+//  construct HomeView directly, so neither path flashes the other.
 //
 //  P6 (D-03/D-13/D-14): observes scenePhase to call
 //  AuthStore.validateOnSceneActive() on every .active transition (D-14
@@ -33,25 +32,27 @@ struct RootTabView: View {
     @Environment(\.settingsStore) private var settingsStore
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.authStore) private var authStore
-
-    @State private var isIntroPresented: Bool = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
+    private var destinationAnimation: Animation? {
+        settingsStore.animationsEnabled && !reduceMotion
+            ? .easeOut(duration: theme.motion.normal)
+            : nil
+    }
 
     var body: some View {
-        HomeView()
-        .tint(theme.colors.accentPrimary)
-        .fullScreenCover(isPresented: $isIntroPresented) {
-            IntroFlowView()
-        }
-        .onAppear {
-            // Read-once on first appear; IntroFlowView writes hasSeenIntro = true
-            // on dismiss, so subsequent app launches see hasSeenIntro = true and
-            // the cover never re-presents (PATTERNS line 621 + CONTEXT D-23).
-            if !settingsStore.hasSeenIntro {
-                isIntroPresented = true
+        Group {
+            if settingsStore.hasSeenIntro {
+                HomeView()
+                    .transition(.opacity)
+            } else {
+                IntroFlowView()
+                    .transition(.opacity)
             }
         }
+        .tint(theme.colors.accentPrimary)
+        .animation(destinationAnimation, value: settingsStore.hasSeenIntro)
         .onChange(of: scenePhase) { _, newPhase in
             // D-14: validate stored Apple credential on every .active transition.
             // AuthStore.validateOnSceneActive early-returns when not signed in

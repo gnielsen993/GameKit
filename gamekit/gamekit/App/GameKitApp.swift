@@ -4,44 +4,38 @@
 //
 //  The single @main scene for GameKit.
 //  Owns ThemeManager (single source of truth for theming, P1 invariant).
-//  Owns the shared SwiftData ModelContainer (P4: GameRecord + BestTime,
-//  CloudKit-compat schema per D-07/D-08, container ID iCloud.com.lauterstar.gamekit
-//  per D-09). Owns SettingsStore for the cloudSyncEnabled flag (D-28/D-29).
+//  Owns app-wide stores and the startup controller. The controller prepares
+//  the single shared SwiftData ModelContainer after the branded first frame,
+//  then injects it at the destination root.
 //
 //  Phase 4 invariants (per D-07, D-08, D-09, D-29):
-//    - Single shared ModelContainer (D-07) — constructed ONCE in init(),
-//      injected app-wide via .modelContainer(sharedContainer)
+//    - Single shared ModelContainer (D-07) — constructed once per startup
+//      attempt and injected app-wide at RootTabView
 //    - cloudKitDatabase reads SettingsStore.cloudSyncEnabled at startup
 //      (D-08); flag default is false in P4 (relaunch required to flip;
 //      live reconfigure is a P6 concern per ROADMAP)
 //    - CloudKit container ID is iCloud.com.lauterstar.gamekit (D-09 lock,
 //      mirrored in PROJECT.md and Plan 04-01's smoke test)
-//    - ModelContainer construction wraps a do/catch with fatalError
-//      (RESEARCH §Code Examples 1) — schema constraint violations or
-//      container ID drift fail at app launch, which Plan 04-01's smoke
-//      test protects from at PR time
+//    - ModelContainer construction failures surface a retry experience;
+//      existing game data is never deleted automatically
 //    - Existing themeManager @StateObject seam PRESERVED — additive only
 //      per 04-PATTERNS.md line 9 critical correction
 //
-//  Phase 1 invariants (preserved):
-//    - No async work in App.init beyond the container init (cold-start
-//      <1s target — ModelContainer init is sync; benchmark in Plan 06)
-//    - No eager DesignKit work beyond ThemeManager()
+//  Cold-start invariant: App.init performs no persistence or network work.
 //
 
 import SwiftUI
-import SwiftData
 import DesignKit
 
 @main
 struct GameKitApp: App {
-    @StateObject private var themeManager = ThemeManager()
+    @StateObject private var themeManager: ThemeManager
     @State private var settingsStore: SettingsStore
     @State private var videoModeStore: VideoModeStore
     @State private var sfxPlayer: SFXPlayer
     @State private var authStore: AuthStore
     @State private var cloudSyncStatusObserver: CloudSyncStatusObserver
-    let sharedContainer: ModelContainer
+    @State private var startupController: AppStartupController
 
     init() {
         // Register GameDrawer's "Classic" identity (Chrome Diner) into the
@@ -49,10 +43,18 @@ struct GameKitApp: App {
         // stored `.classicMuted` preference resolves through the registered
         // preset's anchors. See Core/GameKitClassic.swift.
         DesignKit.configure(classicPreset: GameKitClassic.chromeDiner)
+        _themeManager = StateObject(wrappedValue: ThemeManager())
 
         // SettingsStore must be constructed BEFORE the container so
         // cloudSyncEnabled is available for ModelConfiguration (D-08).
         let store = SettingsStore()
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--fresh-launch") {
+            store.hasSeenIntro = false
+        } else if ProcessInfo.processInfo.arguments.contains("--returning-launch") {
+            store.hasSeenIntro = true
+        }
+        #endif
         _settingsStore = State(initialValue: store)
 
         // P9 (D-05): VideoModeStore constructed right after SettingsStore so
@@ -87,70 +89,17 @@ struct GameKitApp: App {
         )
         _cloudSyncStatusObserver = State(initialValue: observer)
 
-        // P6 (Pitfall D): one-shot CloudKit schema deploy to Development.
-        // The lldb-driven flow specified in Plan 06-03 (paused-frame `expr
-        // try? GameKitApp._runtimeDeployCloudKitSchema()`) is unreliable in
-        // practice — pausing usually lands in libsystem_kernel where Swift
-        // module resolution fails ("cannot find 'GameKitApp' in scope").
-        // This DEBUG-only block runs the same call automatically on the
-        // first launch per device, gates with UserDefaults so it never
-        // runs twice, and prints the outcome to the console. Remove the
-        // UserDefaults flag locally to force a redeploy; the block is
-        // stripped entirely from Release builds.
-        #if DEBUG
-        let schemaDeployedKey = "gamekit.debug.didDeployCloudKitSchemaOnce.v1"
-        if !UserDefaults.standard.bool(forKey: schemaDeployedKey) {
-            do {
-                try CloudKitSchemaInitializer.deployDevelopmentSchema()
-                UserDefaults.standard.set(true, forKey: schemaDeployedKey)
-                print("✅ CloudKit schema deployed to Development. Refresh CloudKit Dashboard → iCloud.com.lauterstar.gamekit → Development → Schema → Record Types to confirm CD_GameRecord + CD_BestTime + CD_BestScore.")
-            } catch {
-                print("❌ CloudKit schema deploy failed: \(error). Most common cause: iPhone iCloud account ≠ the Apple Developer account that owns container iCloud.com.lauterstar.gamekit. Sign the device into the matching iCloud account and relaunch.")
-            }
-        }
-        #endif
-
-        let schema = Schema([GameRecord.self, BestTime.self, BestScore.self])
-        let config = ModelConfiguration(
-            schema: schema,
-            cloudKitDatabase: store.cloudSyncEnabled
-                ? .private("iCloud.com.lauterstar.gamekit")
-                : .none
-        )
-        do {
-            sharedContainer = try ModelContainer(for: schema, configurations: [config])
-        } catch {
-            // Schema constraint violation OR CloudKit container ID drift.
-            // Plan 04-01's ModelContainerSmokeTests catches this at PR time
-            // before it can ship; reaching this fatalError in production
-            // means a non-schema issue (e.g. disk write barrier).
-            fatalError("Failed to construct shared ModelContainer: \(error)")
-        }
-
-        // DEBUG-only: pre-populate stats with realistic dummy records on
-        // first launch per device so screenshot sessions show populated
-        // cards (best times, recent games, score history) instead of empty
-        // states. Gated by UserDefaults flag (one-shot per install) AND
-        // cloudSyncEnabled (refuses to push fake records to a real iCloud
-        // account). Reset command + reseed instructions live in
-        // App/DummyDataSeeder.swift.
-        #if DEBUG
-        if ScreenshotSeeder.isActive || ScreenshotSeeder.isArcadeActive {
-            // --screenshots: wipe + seed 6 base games (Stack/Snake remain empty — "No runs yet.")
-            // --screenshots-arcade: same + Stack/Snake with 6-7 digit scores (Phase 18 D-04 audit)
-            ScreenshotSeeder.seed(container: sharedContainer, includeArcade: ScreenshotSeeder.isArcadeActive)
-        } else {
-            DummyDataSeeder.seedIfNeeded(
-                container: sharedContainer,
+        _startupController = State(
+            initialValue: AppStartupController(
                 cloudSyncEnabled: store.cloudSyncEnabled
             )
-        }
-        #endif
+        )
+
     }
 
     var body: some Scene {
         WindowGroup {
-            RootTabView()
+            AppEntryRootView(startupController: startupController)
                 .environmentObject(themeManager)
                 .environment(\.settingsStore, settingsStore)
                 .environment(\.videoModeStore, videoModeStore)
@@ -158,7 +107,6 @@ struct GameKitApp: App {
                 .environment(\.authStore, authStore)
                 .environment(\.cloudSyncStatusObserver, cloudSyncStatusObserver)
                 .preferredColorScheme(preferredScheme)
-                .modelContainer(sharedContainer)
         }
     }
 

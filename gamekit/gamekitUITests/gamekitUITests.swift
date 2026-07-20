@@ -23,12 +23,41 @@ final class gamekitUITests: XCTestCase {
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testFreshLaunchRoutesIntoOnboarding() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["--fresh-launch"]
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        XCTAssertTrue(app.staticTexts["Make it yours"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testReturningLaunchRoutesIntoHome() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--returning-launch"]
+        app.launch()
+
+        XCTAssertTrue(app.navigationBars["The Drawer"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testDelayedStartupShowsProgressFeedback() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--returning-launch", "--launch-entry-delay"]
+        app.launch()
+
+        XCTAssertTrue(app.descendants(matching: .any)["startup-progress"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.navigationBars["The Drawer"].waitForExistence(timeout: 7))
+    }
+
+    @MainActor
+    func testStartupFailureOffersRetryRecovery() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--launch-entry-failure"]
+        app.launch()
+
+        XCTAssertTrue(app.descendants(matching: .any)["startup-recovery"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Try opening GameDrawer again"].exists)
     }
 
     @MainActor
