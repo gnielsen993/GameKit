@@ -9,26 +9,52 @@ if [ -n "$dupes" ]; then
   exit 1
 fi
 
-# Reject hardcoded colors / radii / padding integers under Games/ and Screens/ (CLAUDE.md §1, Pitfall 8)
-staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^gamekit/gamekit/(Games|Screens)/.*\.swift$' || true)
+# Reject hardcoded colors / radii / padding integers in app UI (CLAUDE.md §1, Pitfall 8).
+# Scope is every app source folder — Games/, Screens/, Core/, App/ — because §1 states
+# "No hard-coded colors / radii / spacing in UI" with no directory carve-out.
+# Only ADDED lines in the staged diff are inspected, so pre-existing code is never
+# retroactively blocked; the guard applies to what you are writing right now.
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^gamekit/gamekit/(Games|Screens|Core|App)/.*\.swift$' || true)
+
+# Narrow exclusion — Color check ONLY (radii + spacing checks still apply to these files).
+# These three DEFINE the raw colors the rest of the app consumes through tokens; a raw
+# Color literal is the correct and documented thing here, and each file says so in its
+# own header comment:
+#   Core/GameKitClassic.swift      - the DesignKit "Classic" preset anchors (Chrome Diner).
+#                                    This is the token source, not a token consumer.
+#   Core/GameKind+AccentColor.swift - per-game brand-identity constants, intentionally
+#                                    theme-independent (they must not shift with preset).
+#   Core/SurfaceDepth.swift        - white/black lighting primitives for sheen and shadow.
+#                                    Light comes from the top on every preset, so these
+#                                    are deliberately identical across all themes.
+# Do NOT widen this list to silence a violation in an ordinary view. If a new file needs
+# raw colors, justify it in a header comment and add it here explicitly.
+color_exempt='^gamekit/gamekit/Core/(GameKitClassic|GameKind\+AccentColor|SurfaceDepth)\.swift$'
+
 if [ -n "$staged" ]; then
   bad=""
   for f in $staged; do
+    added=$(git diff --cached -- "$f" | grep -E '^\+[^+]' || true)
     # Color literals (Color(red:..) / Color(hex:..) / Color.gray etc.)
-    if git diff --cached "$f" | grep -E '^\+' | grep -E 'Color\(\s*(red:|hex:|white:)|Color\.(red|blue|green|gray|orange|yellow|pink|purple|black|white)' > /dev/null; then
-      bad="${bad}${f}: hardcoded Color literal\n"
+    if ! echo "$f" | grep -Eq "$color_exempt"; then
+      if echo "$added" | grep -E 'Color\(\s*(red:|hex:|white:)|Color\.(red|blue|green|gray|orange|yellow|pink|purple|black|white)' > /dev/null; then
+        bad="${bad}${f}: hardcoded Color literal (use DesignKit semantic tokens)\n"
+      fi
     fi
     # cornerRadius: <int>
-    if git diff --cached "$f" | grep -E '^\+' | grep -E 'cornerRadius:\s*[0-9]+' > /dev/null; then
+    if echo "$added" | grep -E 'cornerRadius:\s*[0-9]+' > /dev/null; then
       bad="${bad}${f}: numeric cornerRadius literal (use theme.radii.{card,button,chip,sheet})\n"
     fi
     # padding(<int>)
-    if git diff --cached "$f" | grep -E '^\+' | grep -E '\.padding\(\s*[0-9]+(\.[0-9]+)?\s*\)' > /dev/null; then
+    if echo "$added" | grep -E '\.padding\(\s*[0-9]+(\.[0-9]+)?\s*\)' > /dev/null; then
       bad="${bad}${f}: numeric padding literal (use theme.spacing.{xs,s,m,l,xl,xxl})\n"
     fi
   done
   if [ -n "$bad" ]; then
-    echo -e "ERROR: token-discipline violations under Games/ or Screens/:\n${bad}"
+    echo -e "ERROR: token-discipline violations under Games/, Screens/, Core/ or App/:\n${bad}"
+    echo "Only newly added lines are checked. Fix the new line, or -- if this file"
+    echo "genuinely defines raw colors -- document why and add it to color_exempt"
+    echo "in .githooks/pre-commit."
     exit 1
   fi
 fi
