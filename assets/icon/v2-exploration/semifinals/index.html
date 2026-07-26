@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>GameDrawer 2.0 — Icon Semifinals</title>
+  <style>
+    :root {
+      --night: #111b28;
+      --night-soft: #172536;
+      --cream: #f4ead7;
+      --cream-dim: #c8bda9;
+      --line: rgba(244, 234, 215, .16);
+      --red: #df513d;
+      --teal: #3d9b90;
+      --gold: #e3ad39;
+      --shadow: 0 22px 70px rgba(0, 0, 0, .34);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--cream);
+      background:
+        radial-gradient(circle at 82% 5%, rgba(61, 155, 144, .15), transparent 32rem),
+        radial-gradient(circle at 8% 28%, rgba(223, 81, 61, .1), transparent 26rem),
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        var(--night);
+      background-size: auto, auto, 100% 28px, auto;
+      font-family: "Avenir Next", Avenir, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; }
+    img { max-width: 100%; }
+
+    .masthead {
+      min-height: 78vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 24px clamp(20px, 4vw, 64px) 0;
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    nav, .hero, .status-inner, main, footer {
+      width: min(1500px, 100%);
+      margin-inline: auto;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      font-size: 12px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .wordmark { display: flex; align-items: center; gap: 12px; font-weight: 750; }
+    .drawer-glyph { width: 31px; height: 25px; border: 2px solid var(--cream); border-radius: 6px; position: relative; }
+    .drawer-glyph::after { content: ""; position: absolute; width: 9px; height: 3px; border-radius: 4px; background: var(--gold); left: 9px; bottom: 5px; }
+    nav a { color: var(--cream-dim); text-decoration: none; border-bottom: 1px solid currentColor; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, .82fr);
+      align-items: center;
+      gap: clamp(40px, 8vw, 130px);
+      padding-block: clamp(70px, 10vw, 150px);
+    }
+
+    .eyebrow, .parent-label, .detail dt, .scale-label, .palette-label {
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, .variant-title {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      font-weight: 600;
+      letter-spacing: -.045em;
+    }
+
+    h1 { font-size: clamp(62px, 9vw, 138px); line-height: .83; margin: 24px 0 30px; }
+    .hero p { color: var(--cream-dim); max-width: 650px; font-size: clamp(17px, 1.5vw, 22px); line-height: 1.55; }
+
+    .hero-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; transform: rotate(2deg); }
+    .hero-stack img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 24%; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.18); }
+    .hero-stack img:nth-child(2) { transform: translateY(32px); }
+    .hero-stack img:nth-child(3) { transform: translateY(-12px); }
+    .hero-stack img:nth-child(4) { transform: translateY(20px); }
+
+    .status-strip { margin-inline: calc(clamp(20px, 4vw, 64px) * -1); border-top: 1px solid var(--line); background: rgba(8, 14, 22, .38); }
+    .status-inner { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .status-item { padding: 18px 22px; border-right: 1px solid var(--line); }
+    .status-item:last-child { border-right: 0; }
+    .status-item span { display: block; color: var(--cream-dim); font-size: 9px; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 5px; }
+    .status-item strong { font-size: 13px; }
+
+    main { padding: 96px clamp(20px, 4vw, 64px) 120px; }
+    .intro { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(32px, 8vw, 130px); align-items: end; margin-bottom: 54px; }
+    h2 { font-size: clamp(44px, 6vw, 80px); line-height: .92; margin: 16px 0 0; }
+    .intro p { margin: 0; color: var(--cream-dim); line-height: 1.7; max-width: 730px; }
+
+    .judge-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 8px;
+      margin-bottom: 32px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(17, 27, 40, .88);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 14px 38px rgba(0,0,0,.22);
+    }
+
+    .filter, .clear-button {
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--cream-dim);
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .filter:hover, .clear-button:hover { color: var(--cream); }
+    .filter.is-active { color: var(--night); background: var(--cream); }
+    .pick-count { padding: 0 10px; color: var(--gold); font-size: 11px; font-weight: 800; }
+
+    .families { display: grid; gap: 76px; }
+    .family-section[hidden] { display: none; }
+    .family-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+    .family-head h3 { margin: 0; font-size: clamp(25px, 3vw, 40px); font-family: "Iowan Old Style", serif; font-weight: 600; }
+    .family-head a { color: var(--cream-dim); font-size: 11px; text-decoration: none; border-bottom: 1px solid currentColor; }
+
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .option {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      overflow: hidden;
+      background: rgba(23, 37, 54, .72);
+      box-shadow: 0 5px 0 rgba(0,0,0,.12);
+      transition: border-color .2s, transform .25s;
+    }
+    .option:hover { transform: translateY(-3px); border-color: rgba(244,234,215,.3); }
+    .option.is-picked { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 24px 70px rgba(0,0,0,.25); }
+
+    .art-zone { padding: clamp(18px, 3vw, 38px); background: var(--panel); border-bottom: 1px solid rgba(17,27,40,.22); }
+    .art-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; color: rgba(17,27,40,.64); }
+    .variant-code { font-family: "Iowan Old Style", serif; font-size: 27px; font-style: italic; }
+    .occupancy { font-size: 9px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .artwork { display: block; width: min(100%, 560px); aspect-ratio: 1; margin-inline: auto; object-fit: cover; border-radius: 23%; box-shadow: 0 28px 58px rgba(17,27,40,.27); }
+
+    .scale-row { display: flex; align-items: end; gap: 13px; margin-top: 22px; }
+    .scale-label { color: rgba(17,27,40,.58); margin-right: auto; }
+    .scale { object-fit: cover; border-radius: 23%; box-shadow: 0 4px 10px rgba(17,27,40,.24); image-rendering: auto; }
+    .scale-64 { width: 64px; height: 64px; }
+    .scale-32 { width: 32px; height: 32px; }
+
+    .story { padding: clamp(26px, 3.5vw, 44px); }
+    .parent-label { color: var(--teal); }
+    .variant-title { font-size: clamp(35px, 4vw, 56px); line-height: 1; margin: 9px 0 14px; }
+    .change { color: var(--cream-dim); line-height: 1.65; margin: 0 0 26px; }
+
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .detail { margin: 0; padding-top: 18px; border-top: 1px solid var(--line); }
+    .detail dt { margin-bottom: 7px; color: var(--cream-dim); }
+    .detail dd { margin: 0; font-size: 13px; line-height: 1.58; }
+    .detail.risk dd { color: #e4baa0; }
+    .games { grid-column: 1 / -1; }
+
+    .palette-wrap { margin-top: 24px; }
+    .palette-label { color: var(--cream-dim); margin-bottom: 9px; }
+    .palette { display: flex; flex-wrap: wrap; gap: 8px; }
+    .swatch { display: flex; align-items: center; gap: 7px; padding: 5px 8px 5px 5px; border: 1px solid var(--line); border-radius: 999px; color: var(--cream-dim); font: 9px/1 SFMono-Regular, Consolas, monospace; }
+    .swatch::before { content: ""; width: 17px; height: 17px; border-radius: 50%; background: var(--color); border: 1px solid rgba(255,255,255,.22); }
+
+    .pick-button {
+      margin-top: 25px;
+      width: 100%;
+      border: 1px solid var(--cream);
+      border-radius: 999px;
+      padding: 12px 16px;
+      background: transparent;
+      color: var(--cream);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .06em;
+    }
+    .pick-button:hover, .pick-button.is-picked { background: var(--cream); color: var(--night); }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+    .shortlist-tray { margin-top: 90px; padding: clamp(30px, 5vw, 64px); border-radius: 28px; background: var(--cream); color: var(--night); display: grid; grid-template-columns: .7fr 1.3fr; gap: 42px; }
+    .shortlist-tray h2 { margin-top: 10px; }
+    .shortlist-tray .eyebrow { color: var(--red); }
+    .tray-empty { color: #645e55; align-self: center; line-height: 1.6; }
+    .tray-picks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-content: center; }
+    .tray-item { margin: 0; }
+    .tray-item img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 23%; box-shadow: 0 12px 25px rgba(17,27,40,.18); }
+    .tray-item figcaption { margin-top: 7px; font-size: 10px; font-weight: 800; text-align: center; }
+
+    footer { display: flex; justify-content: space-between; gap: 24px; padding: 34px clamp(20px, 4vw, 64px); border-top: 1px solid var(--line); color: var(--cream-dim); font-size: 11px; line-height: 1.6; }
+    footer strong { color: var(--cream); }
+
+    @media (max-width: 900px) {
+      .masthead { min-height: auto; }
+      .hero, .intro, .shortlist-tray { grid-template-columns: 1fr; }
+      .hero-stack { max-width: 540px; }
+      .pair { grid-template-columns: 1fr; }
+      .status-inner { grid-template-columns: 1fr 1fr; }
+      .status-item:nth-child(2) { border-right: 0; }
+      .status-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    }
+
+    @media (max-width: 560px) {
+      nav span:last-child { display: none; }
+      .status-inner { grid-template-columns: 1fr; }
+      .status-item { border-right: 0; border-bottom: 1px solid var(--line); }
+      .judge-bar { border-radius: 20px; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .games { grid-column: auto; }
+      .tray-picks { grid-template-columns: repeat(2, 1fr); }
+      footer { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <nav aria-label="Page navigation">
+      <div class="wordmark"><span class="drawer-glyph" aria-hidden="true"></span><span>GameDrawer <span>2.0 icon semifinals</span></span></div>
+      <a href="../index.html">First round ↗</a>
+    </nav>
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Round two · eight refinements</div>
+        <h1>Game,<br>not generic.</h1>
+        <p>Four selected ideas return with tighter canvas use and recognizable mechanics from the games already inside GameDrawer. Each pair tests a genuinely different construction.</p>
+      </div>
+      <div class="hero-stack" aria-label="Four semifinal icon directions">
+        <img src="01a-front-drawer-cartridges.png" alt="Front drawer cartridges direction">
+        <img src="04b-unified-mechanics-board.png" alt="Unified mechanics board direction">
+        <img src="07b-pip-reflow-board.png" alt="Picture-in-picture reflow direction">
+        <img src="09b-bold-object-fan.png" alt="Bold object fan direction">
+      </div>
+    </div>
+    <div class="status-strip">
+      <div class="status-inner">
+        <div class="status-item"><span>Field</span><strong>8 semifinal options</strong></div>
+        <div class="status-item"><span>Target occupancy</span><strong>82–90% usable canvas</strong></div>
+        <div class="status-item"><span>Scale tests</span><strong>64px + 32px</strong></div>
+        <div class="status-item"><span>Shipping icon</span><strong>Untouched</strong></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="options">
+    <section class="intro" aria-labelledby="semifinal-title">
+      <div><div class="eyebrow">The judging board</div><h2 id="semifinal-title">Four parents.<br>Two answers each.</h2></div>
+      <p>Judge the large artwork and the actual-size previews separately. The 32px check should preserve the main metaphor; the 64px check should reveal the named games without depending on decorative detail. Shortlist selections persist in this browser.</p>
+    </section>
+
+    <div class="judge-bar" role="group" aria-label="Filter semifinal concepts">
+      <button class="filter is-active" type="button" data-filter="all">All 8</button>
+      <button class="filter" type="button" data-filter="1">Parent 1</button>
+      <button class="filter" type="button" data-filter="4">Parent 4</button>
+      <button class="filter" type="button" data-filter="7">Parent 7</button>
+      <button class="filter" type="button" data-filter="9">Parent 9</button>
+      <span class="pick-count" aria-live="polite">0 shortlisted</span>
+      <button class="clear-button" type="button">Clear</button>
+    </div>
+
+    <div class="families" id="families"></div>
+
+    <section class="shortlist-tray" aria-labelledby="tray-title">
+      <div><div class="eyebrow">Your cut</div><h2 id="tray-title">Shortlist tray</h2></div>
+      <div class="tray-content" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span><strong>GameDrawer 2.0 icon exploration</strong><br>Semifinal concept artwork only. The shipping AppIcon asset set was not changed.</span>
+    <span>Built-in image generation · 1254 × 1254 PNG<br>Parents preserved in <code>../logos/</code></span>
+  </footer>
+
+  <script>
+    const options = [
+      {
+        id: "1A", parent: 1, parentName: "The Personal Drawer", title: "Cartridge Drawer", image: "01a-front-drawer-cartridges.png", panel: "#dcc6a2", occupancy: "≈ 86% target",
+        changed: "Moves the drawer closer, trims the furniture-like body, and replaces generic picture, star, and puzzle glyphs with three broad game cartridges.",
+        games: "Minesweeper · Sudoku · Snake",
+        strength: "Best literal read of the GameDrawer name. The three cartridges are orderly and each gets enough area to survive reduction.",
+        risk: "The large drawer front still competes with the games; digits and mine details soften first at 32px.",
+        palette: ["#F5E7CC", "#172433", "#D74635", "#2F978C", "#E2A936"]
+      },
+      {
+        id: "1B", parent: 1, parentName: "The Personal Drawer", title: "Board Organizer", image: "01b-top-down-drawer-boards.png", panel: "#d8c39f", occupancy: "≈ 88% target",
+        changed: "Changes the viewpoint to a shallow top-down organizer. The contents are playable surfaces rather than cartridges, making the collection feel curated and tactile.",
+        games: "Minesweeper · Nonogram · Solitaire",
+        strength: "Strongest personal-collection story in the pair; the three compartments feel deliberately chosen rather than stuffed into a box.",
+        risk: "The wide silhouette leaves less vertical energy, and the Nonogram clues become texture at 32px.",
+        palette: ["#F4E7CE", "#192431", "#C9362D", "#2F9184", "#DCA63C"]
+      },
+      {
+        id: "4A", parent: 4, parentName: "Play Quilt", title: "Four-Game Mosaic", image: "04a-game-board-mosaic.png", panel: "#d7c29d", occupancy: "≈ 88% target",
+        changed: "Compresses nine generic modules into four large tiles, each tied to a shipped game. The tighter 2×2 block gives the parent a decisive outer silhouette.",
+        games: "Minesweeper · Sudoku · Snake · Solitaire",
+        strength: "Fastest inventory read: clearly multiple games, clearly one family, and much cleaner than the first-round quilt.",
+        risk: "The 2×2 arrangement can still resemble a generic app folder; Solitaire introduces a slight casino association.",
+        palette: ["#F7E9CE", "#173047", "#EE2E1E", "#27988D", "#EFA30D"]
+      },
+      {
+        id: "4B", parent: 4, parentName: "Play Quilt", title: "One Shared Board", image: "04b-unified-mechanics-board.png", panel: "#cbb997", occupancy: "≈ 86% target",
+        changed: "Eliminates separate modules entirely. Snake, Minesweeper, Nonogram, and Merge now coexist inside one continuous grid and one outer frame.",
+        games: "Snake · Minesweeper · Nonogram · Merge",
+        strength: "Most ownable evolution of Play Quilt. It says one system of games, not a launcher full of unrelated apps.",
+        risk: "The mechanics compete for priority; at 32px the snake dominates and the other games become supporting texture.",
+        palette: ["#F5E6C9", "#13283A", "#DF4934", "#278D82", "#EDA919"]
+      },
+      {
+        id: "7A", parent: 7, parentName: "Watch Window", title: "Game-Framed PiP", image: "07a-watch-mode-frame.png", panel: "#d5bf97", occupancy: "≈ 88% target",
+        changed: "Replaces the loose marketplace ring with a compact four-sided game frame. The video window grows while unused center space disappears.",
+        games: "Minesweeper · Sudoku · Snake · Nonogram",
+        strength: "The clearest instant explanation of Watch Mode: video remains central while recognizable games make the frame.",
+        risk: "The play triangle can pull toward a generic video product, and the detailed frame is the busiest 32px candidate.",
+        palette: ["#F8EAD0", "#132536", "#D94331", "#247F9D", "#E3A82E"]
+      },
+      {
+        id: "7B", parent: 7, parentName: "Watch Window", title: "Board Reflow", image: "07b-pip-reflow-board.png", panel: "#cbb793", occupancy: "≈ 87% target",
+        changed: "Turns Watch Mode into behavior: the offset PiP window visibly notches the playfield while three game zones bend and continue around it.",
+        games: "Minesweeper · Nonogram · Snake",
+        strength: "Most product-specific story in the field. The reflow notch is proprietary and communicates play beside video rather than a simple frame.",
+        risk: "Dense clue numerals and the segmented snake may collapse into texture; simplification would be needed for a production master.",
+        palette: ["#F3E5CB", "#152331", "#D94531", "#286D89", "#E4AA27"]
+      },
+      {
+        id: "9A", parent: 9, parentName: "Quiet Fan", title: "Mini-Board Fan", image: "09a-mini-board-fan.png", panel: "#1a2a3d", occupancy: "≈ 88% target",
+        changed: "Keeps the welcoming fan gesture but replaces dot, line, and arc abstractions with four complete miniature boards.",
+        games: "Minesweeper · Sudoku · Nonogram · Snake",
+        strength: "Richest collection expression and a clear answer to the first round’s generic symbols; the cream slot remains a strong anchor.",
+        risk: "Four boards approach collage density, and the angled board details need careful pruning before final icon production.",
+        palette: ["#F4E7CF", "#132235", "#D74732", "#348E87", "#E1A633"]
+      },
+      {
+        id: "9B", parent: 9, parentName: "Quiet Fan", title: "Bold Three Fan", image: "09b-bold-object-fan.png", panel: "#192a3d", occupancy: "≈ 90% target",
+        changed: "Cuts the fan to three extra-wide game objects and gives each one oversized mechanic. This is the direct small-size counterpoint to 9A.",
+        games: "Minesweeper · Sudoku · Snake",
+        strength: "Strongest 32px fan. The mine, grid, and snake stay distinct, while the drawer slot preserves the brand-name metaphor.",
+        risk: "The center Sudoku board can read as a keypad, and the three tall objects retain a faint card-fan association.",
+        palette: ["#F3E6CD", "#122236", "#DB432D", "#348F89", "#E6AA27"]
+      }
+    ];
+
+    const parents = [
+      { id: 1, name: "The Personal Drawer", note: "literal container" },
+      { id: 4, name: "Play Quilt", note: "modular collection" },
+      { id: 7, name: "Watch Window", note: "product differentiator" },
+      { id: 9, name: "Quiet Fan", note: "collection gesture" }
+    ];
+
+    const picked = new Set(JSON.parse(localStorage.getItem("gamedrawer-icon-semifinal-picks") || "[]"));
+    const familyRoot = document.querySelector("#families");
+
+    function swatches(colors) {
+      return colors.map(color => `<span class="swatch" style="--color:${color}">${color}</span>`).join("");
+    }
+
+    function optionCard(item) {
+      const selected = picked.has(item.id);
+      return `<article class="option ${selected ? "is-picked" : ""}" data-option="${item.id}">
+        <div class="art-zone" style="--panel:${item.panel}">
+          <div class="art-top"><span class="variant-code">${item.id}</span><span class="occupancy">${item.occupancy}</span></div>
+          <a href="${item.image}" aria-label="Open full-size ${item.id} artwork"><img class="artwork" src="${item.image}" alt="${item.id} ${item.title} app icon concept"></a>
+          <div class="scale-row"><span class="scale-label">Actual-size recognition</span><img class="scale scale-64" src="${item.image}" alt="${item.id} at 64 pixels"><img class="scale scale-32" src="${item.image}" alt="${item.id} at 32 pixels"></div>
+        </div>
+        <div class="story">
+          <div class="parent-label">Parent ${item.parent} · ${item.parentName}</div>
+          <h4 class="variant-title">${item.title}</h4>
+          <p class="change">${item.changed}</p>
+          <div class="detail-grid">
+            <dl class="detail games"><dt>Recognizable games</dt><dd>${item.games}</dd></dl>
+            <dl class="detail"><dt>Strength</dt><dd>${item.strength}</dd></dl>
+            <dl class="detail risk"><dt>Remaining risk</dt><dd>${item.risk}</dd></dl>
+          </div>
+          <div class="palette-wrap"><div class="palette-label">Palette</div><div class="palette">${swatches(item.palette)}</div></div>
+          <button class="pick-button ${selected ? "is-picked" : ""}" type="button" data-pick="${item.id}" aria-pressed="${selected}">${selected ? "Shortlisted ✓" : "Add to shortlist +"}</button>
+        </div>
+      </article>`;
+    }
+
+    familyRoot.innerHTML = parents.map(parent => {
+      const pair = options.filter(item => item.parent === parent.id).map(optionCard).join("");
+      return `<section class="family-section" data-parent="${parent.id}">
+        <div class="family-head"><div><div class="eyebrow">Parent ${parent.id} · ${parent.note}</div><h3>${parent.name}</h3></div><a href="../logos/${String(parent.id).padStart(2, "0")}-${parent.id === 1 ? "personal-drawer" : parent.id === 4 ? "play-quilt" : parent.id === 7 ? "watch-window" : "quiet-fan"}.png">View parent ↗</a></div>
+        <div class="pair">${pair}</div>
+      </section>`;
+    }).join("");
+
+    function renderShortlist() {
+      document.querySelector(".pick-count").textContent = `${picked.size} shortlisted`;
+      const tray = document.querySelector(".tray-content");
+      const chosen = options.filter(item => picked.has(item.id));
+      tray.innerHTML = chosen.length
+        ? `<div class="tray-picks">${chosen.map(item => `<figure class="tray-item"><img src="${item.image}" alt="${item.id} ${item.title}"><figcaption>${item.id} · ${item.title}</figcaption></figure>`).join("")}</div>`
+        : `<p class="tray-empty">Nothing selected yet. Use “Add to shortlist” on any option; your choices will collect here for a clean final comparison.</p>`;
+    }
+
+    document.addEventListener("click", event => {
+      const pickButton = event.target.closest("[data-pick]");
+      if (pickButton) {
+        const id = pickButton.dataset.pick;
+        if (picked.has(id)) picked.delete(id); else picked.add(id);
+        localStorage.setItem("gamedrawer-icon-semifinal-picks", JSON.stringify([...picked]));
+        const selected = picked.has(id);
+        pickButton.classList.toggle("is-picked", selected);
+        pickButton.setAttribute("aria-pressed", String(selected));
+        pickButton.textContent = selected ? "Shortlisted ✓" : "Add to shortlist +";
+        document.querySelector(`[data-option="${id}"]`).classList.toggle("is-picked", selected);
+        renderShortlist();
+      }
+
+      const filterButton = event.target.closest("[data-filter]");
+      if (filterButton) {
+        document.querySelectorAll(".filter").forEach(button => button.classList.remove("is-active"));
+        filterButton.classList.add("is-active");
+        const filter = filterButton.dataset.filter;
+        document.querySelectorAll(".family-section").forEach(section => { section.hidden = filter !== "all" && section.dataset.parent !== filter; });
+      }
+
+      if (event.target.closest(".clear-button")) {
+        picked.clear();
+        localStorage.removeItem("gamedrawer-icon-semifinal-picks");
+        document.querySelectorAll(".option, .pick-button").forEach(element => element.classList.remove("is-picked"));
+        document.querySelectorAll(".pick-button").forEach(button => { button.setAttribute("aria-pressed", "false"); button.textContent = "Add to shortlist +"; });
+        renderShortlist();
+      }
+    });
+
+    renderShortlist();
+  </script>
+</body>
+</html>

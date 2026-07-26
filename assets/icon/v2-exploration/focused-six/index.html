@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>GameDrawer Icon — Focused Six</title>
+  <style>
+    :root { --night:#111b28; --panel:#172536; --cream:#f4ead7; --dim:#c8bda9; --gold:#e3ad39; --line:rgba(244,234,215,.15); }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--cream); background:radial-gradient(circle at 86% 0,rgba(61,155,144,.17),transparent 34rem),radial-gradient(circle at 5% 40%,rgba(223,81,61,.09),transparent 28rem),var(--night); font-family:"Avenir Next",Avenir,sans-serif; }
+    header,main,footer { width:min(1500px,calc(100% - 40px)); margin:auto; }
+    header { padding:72px 0 46px; border-bottom:1px solid var(--line); }
+    .eyebrow,.code { color:var(--gold); font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { max-width:1050px; margin:18px 0 22px; font-family:"Iowan Old Style",Palatino,serif; font-size:clamp(58px,9vw,126px); font-weight:600; letter-spacing:-.05em; line-height:.86; }
+    header p { max-width:790px; margin:0; color:var(--dim); font-size:18px; line-height:1.65; }
+    main { padding:68px 0 110px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+    article { overflow:hidden; border:1px solid var(--line); border-radius:26px; background:rgba(23,37,54,.8); }
+    article.is-picked { border-color:var(--gold); box-shadow:0 0 0 1px var(--gold),0 28px 70px rgba(0,0,0,.24); }
+    .art { padding:clamp(14px,2.6vw,34px); background:var(--art,#18293a); }
+    img { display:block; width:100%; aspect-ratio:1; object-fit:cover; border-radius:23%; box-shadow:0 22px 46px rgba(0,0,0,.29); }
+    .copy { padding:clamp(24px,3vw,38px); }
+    h2 { margin:9px 0 10px; font-size:clamp(28px,3.2vw,43px); }
+    .copy p { min-height:52px; margin:0 0 20px; color:var(--dim); line-height:1.6; }
+    button { width:100%; padding:12px 16px; border:1px solid var(--cream); border-radius:999px; color:var(--cream); background:transparent; font:800 11px/1 "Avenir Next",sans-serif; cursor:pointer; }
+    button[aria-pressed="true"] { color:var(--night); background:var(--cream); }
+    footer { padding:30px 0 50px; border-top:1px solid var(--line); color:var(--dim); font-size:12px; }
+    @media(max-width:760px){ .grid{grid-template-columns:1fr} header,main,footer{width:min(100% - 28px,1500px)} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Focused round · six candidates only</div>
+    <h1>The drawer<br>opens wider.</h1>
+    <p>Two new 9A.3 refinements restore the explosion while treating Video Mode as one feature among the games. They sit beside the four surviving references—nothing else is surfaced in this round.</p>
+  </header>
+  <main>
+    <div class="grid">
+      <article><div class="art"><img src="../finalist-variants/09a-2-video-mode.png" alt="9A.2 Video drawer"></div><div class="copy"><span class="code">9A.2</span><h2>Video drawer</h2><p>The original winner and stable benchmark: four clear focus cards grounded by the drawer.</p><button>Shortlist</button></div></article>
+      <article><div class="art"><img src="../winner-refinements/09a-3-current-games-video.png" alt="9A.3R current-games drawer explosion"></div><div class="copy"><span class="code">9A.3R</span><h2>Current-games lineup</h2><p>The first current-catalog pass: broad representation, with Video Mode standing alone in front.</p><button>Shortlist</button></div></article>
+      <article><div class="art"><img src="../winner-refinements/09a-3r-radial-burst.png" alt="9A.3 radial drawer burst"></div><div class="copy"><span class="code">9A.3R-A</span><h2>Radial burst</h2><p>Three overlapping focus cards anchor a wide, balanced explosion of current games.</p><button>Shortlist</button></div></article>
+      <article><div class="art"><img src="../winner-refinements/09a-3r-layered-cascade.png" alt="9A.3 asymmetric layered drawer cascade"></div><div class="copy"><span class="code">9A.3R-B</span><h2>Layered cascade</h2><p>A deeper asymmetric eruption with Video Mode tucked into the game-card foreground.</p><button>Shortlist</button></div></article>
+      <article style="--art:#182f44"><div class="art"><img src="../winner-refinements/07b-2-polished.png" alt="7B.2R polished PIP reflow"></div><div class="copy"><span class="code">7B.2R</span><h2>Polished reflow</h2><p>The distinctive full-bleed games-and-video construction, retained as an alternate direction.</p><button>Shortlist</button></div></article>
+      <article style="--art:#e5d8c1"><div class="art"><img src="../winner-refinements/04a-4-abstract-refined.png" alt="4A.4R-A flowing abstract games"></div><div class="copy"><span class="code">4A.4R-A</span><h2>Flowing abstract</h2><p>The strongest abstract alternative: one ribbon, four mechanics, and an integrated viewing aperture.</p><button>Shortlist</button></div></article>
+    </div>
+  </main>
+  <footer>Exploration assets only. The shipping AppIcon remains unchanged.</footer>
+  <script>
+    const key="gamedrawer-icon-focused-six";
+    const selected=new Set(JSON.parse(localStorage.getItem(key)||"[]"));
+    document.querySelectorAll("article").forEach(article=>{
+      const code=article.querySelector(".code").textContent;
+      const button=article.querySelector("button");
+      const render=()=>{const on=selected.has(code);article.classList.toggle("is-picked",on);button.setAttribute("aria-pressed",on);button.textContent=on?"Shortlisted":"Shortlist"};
+      button.addEventListener("click",()=>{selected.has(code)?selected.delete(code):selected.add(code);localStorage.setItem(key,JSON.stringify([...selected]));render()});
+      render();
+    });
+  </script>
+</body>
+</html>

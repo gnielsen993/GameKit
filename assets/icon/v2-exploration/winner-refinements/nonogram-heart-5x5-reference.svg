@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="650" viewBox="0 0 600 650">
+  <rect width="600" height="650" rx="42" fill="#f2e8d0"/>
+  <g font-family="Avenir Next, Arial, sans-serif" font-size="42" font-weight="700" fill="#173047" text-anchor="middle">
+    <text x="170" y="72">2</text>
+    <text x="250" y="72">4</text>
+    <text x="330" y="72">5</text>
+    <text x="410" y="72">4</text>
+    <text x="490" y="72">2</text>
+    <text x="75" y="158">3</text>
+    <text x="75" y="238">5</text>
+    <text x="75" y="318">5</text>
+    <text x="75" y="398">3</text>
+    <text x="75" y="478">1</text>
+  </g>
+  <g transform="translate(130 105)" stroke="#173047" stroke-width="6">
+    <rect x="0" y="0" width="400" height="400" fill="#f2e8d0"/>
+    <g fill="#c8323c">
+      <rect x="80" y="0" width="80" height="80"/>
+      <rect x="160" y="0" width="80" height="80"/>
+      <rect x="240" y="0" width="80" height="80"/>
+      <rect x="0" y="80" width="80" height="80"/>
+      <rect x="80" y="80" width="80" height="80"/>
+      <rect x="160" y="80" width="80" height="80"/>
+      <rect x="240" y="80" width="80" height="80"/>
+      <rect x="320" y="80" width="80" height="80"/>
+      <rect x="0" y="160" width="80" height="80"/>
+      <rect x="80" y="160" width="80" height="80"/>
+      <rect x="160" y="160" width="80" height="80"/>
+      <rect x="240" y="160" width="80" height="80"/>
+      <rect x="320" y="160" width="80" height="80"/>
+      <rect x="80" y="240" width="80" height="80"/>
+      <rect x="160" y="240" width="80" height="80"/>
+      <rect x="240" y="240" width="80" height="80"/>
+      <rect x="160" y="320" width="80" height="80"/>
+    </g>
+    <path d="M80 0V400M160 0V400M240 0V400M320 0V400M0 80H400M0 160H400M0 240H400M0 320H400" fill="none"/>
+  </g>
+  <g font-family="Menlo, monospace" font-size="24" fill="#173047">
+    <text x="130" y="570">.XXX.</text>
+    <text x="130" y="602">XXXXX  XXXXX  .XXX.  ..X..</text>
+  </g>
+</svg>

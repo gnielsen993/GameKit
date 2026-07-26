@@ -3,9 +3,9 @@
 //  gamekitTests
 //
 //  Pinpoints the cross-off rule under the player-feedback constraint:
-//  a hint is only crossed off when its corresponding player run is
-//  locked into that hint position by the surrounding cells (edges or
-//  X marks). Under-determined runs leave hints uncrossed.
+//  unique clue values may cross when logically complete, while repeated
+//  values require a player-visible chain from an edge. Under-determined
+//  and isolated duplicate runs leave hints uncrossed.
 //
 
 import Testing
@@ -22,6 +22,55 @@ struct NonogramCrossOffTests {
         let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [1, 1])
         #expect(mask == [false, false],
                 "Run at col 3 could be either hint 0 or hint 1 — neither locked.")
+    }
+
+    @Test("A geometrically forced duplicate stays uncrossed without an edge connection")
+    func forcedInteriorDuplicateDoesNotRevealItsIndex() {
+        // In four cells, a fill at col 2 can only be the second [1,1] clue,
+        // but col 3 is untouched, so the player has not anchored it visibly.
+        var filled = Array(repeating: false, count: 4)
+        filled[2] = true
+        let marked = Array(repeating: false, count: 4)
+        let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [1, 1])
+        #expect(mask == [false, false])
+    }
+
+    @Test("A completed unique-length clue crosses without touching an edge")
+    func uniqueInteriorRunCrossesOff() {
+        var filled = Array(repeating: false, count: 12)
+        for index in 4...7 { filled[index] = true }
+        let marked = Array(repeating: false, count: 12)
+        let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [1, 4, 3])
+        #expect(mask == [false, true, false])
+    }
+
+    @Test("Explicit separators carry an anchored chain through repeated clues")
+    func markedSeparatorExtendsLeftAnchor() {
+        var filled = Array(repeating: false, count: 7)
+        filled[0] = true
+        filled[2] = true
+        var marked = Array(repeating: false, count: 7)
+        marked[1] = true
+        let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [1, 1, 1])
+        #expect(mask == [true, true, false])
+    }
+
+    @Test("A repeated clue touching the right edge crosses the matching last value")
+    func repeatedValueAnchoredAtRightEdge() {
+        var filled = Array(repeating: false, count: 6)
+        filled[4] = true
+        filled[5] = true
+        let marked = Array(repeating: false, count: 6)
+        let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [2, 2])
+        #expect(mask == [false, true])
+    }
+
+    @Test("Completing the whole line crosses every repeated clue")
+    func completedLineCrossesAllClues() {
+        let filled = [true, false, true, false]
+        let marked = Array(repeating: false, count: 4)
+        let mask = NonogramHints.crossOffMask(filled: filled, marked: marked, hints: [1, 1])
+        #expect(mask == [true, true])
     }
 
     @Test("[1,1] in 10 cells, fill at col 3 + X marks at 0..2 → first hint crosses off")

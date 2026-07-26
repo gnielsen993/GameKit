@@ -26,7 +26,10 @@ struct NonogramCellView: View {
     /// — drives a brief accent-tint pulse so the player can feel the
     /// completion across the whole line, not just at the touched cell.
     let completionFlash: Bool
-    let onTap: () -> Void
+    /// Touch-down preview for precision targeting on dense boards. The cell
+    /// does not mutate until the board-level gesture ends.
+    let precisionTarget: Bool
+    let onAccessibilityTap: () -> Void
 
     var body: some View {
         ZStack {
@@ -47,16 +50,22 @@ struct NonogramCellView: View {
         .frame(width: cellSize, height: cellSize)
         .overlay(
             Rectangle()
-                .stroke(theme.colors.textPrimary.opacity(0.18), lineWidth: 0.5)
+                .stroke(
+                    precisionTarget
+                    ? theme.colors.accentPrimary
+                    : theme.colors.textPrimary.opacity(0.18),
+                    lineWidth: precisionTarget ? 2 : 0.5
+                )
         )
         .offset(x: wrongFlash ? theme.spacing.xs : 0)
         .feedbackAnimation(theme.motion.ease, value: state)
         .feedbackAnimation(.spring(response: 0.18, dampingFraction: 0.35), value: wrongFlash)
         .feedbackAnimation(.easeOut(duration: 0.35), value: completionFlash)
         .contentShape(Rectangle())
-        .onTapGesture {
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction {
             guard isInteractive else { return }
-            onTap()
+            onAccessibilityTap()
         }
     }
 

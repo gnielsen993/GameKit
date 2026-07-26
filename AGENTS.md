@@ -38,7 +38,7 @@ Mirror of `CLAUDE.md` §0.1 — drift between the two is a bug.
 | Current milestone | `v1.5` shipped — Arcade release (Stack + Snake) | 2026-07-10 |
 | Current MVP game | Minesweeper | — |
 | Next game (post-MVP) | TBD — Flow / Pattern Memory / Chess puzzles remain roadmap candidates | 2026-06-22 |
-| Icon | Stack-of-three-game-boxes (light / dark / tinted) | 2026-04-30 ev. |
+| Icon | 9A.2 Video drawer (unified light / dark / tinted) | 2026-07-18 |
 | Classic preset | Chrome Diner (cream + brushed grey + diner red) | 2026-04-28 |
 
 Naming history (display name only — bundle ID never changes):

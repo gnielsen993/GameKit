@@ -671,6 +671,23 @@ When in doubt, check these before changing chrome for a specific game.
 
 ### 12.3 Nonogram
 - Lives chip: `NonogramLivesChip`, hearts, only when `gameMode == .lives`.
+- Row hints: render as one trailing-aligned proportional-digit sequence with
+  centered-dot clue boundaries (`1·5·11`, never ambiguous whitespace such as
+  `1 5 11`). The separator uses `textTertiary`; each clue independently keeps
+  its normal, targeted, or crossed-off styling. Column hints remain vertically
+  stacked because line breaks already provide explicit boundaries.
+- Hint cross-off: an exact completed run may cross immediately when its clue
+  value occurs only once in that line. Repeated values cross only when a
+  player-visible chain of fills and X separators connects the run to the left
+  or right edge. Do not expose a duplicate clue's identity solely because the
+  internal solver can prove its position; completing the full line crosses all.
+- Board targeting: touch-down previews the candidate cell with an accent
+  outline and accents its row/column hints; touch-up commits. Before the
+  gesture crosses the smear threshold, sliding adjusts the candidate without
+  mutating the board so dense 20×20 cells can be corrected safely.
+- Swipe-to-fill: once movement crosses the cell-aware threshold, the gesture
+  axis-locks and interpolates every crossed cell from the touch-down origin.
+  Fast samples must never be rejected solely for landing near a cell edge.
 - Small Video Mode zones: show lives + timer only — NOT the size chip.
 - Large Video Mode zones: single-slot size↔lives swap in compact row slot 2
   (D-NG-01). In Free mode: size chip. In Lives mode: lives chip. Never stack

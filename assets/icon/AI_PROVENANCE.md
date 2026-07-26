@@ -6,8 +6,9 @@ Revision 1: 2026-04-29 (filled colorful arcade cabinet, "GameKit" CRT)
 Revision 2: 2026-04-30 morning (PixelParlor — Cream Hero arcade cabinet, FT-teal trim)
 Revision 3: 2026-04-30 evening (PlayCore — Stack of Three Games, FT-teal box)
 Revision 3a: 2026-04-30 (rename only — display name PlayCore → CorePlay; full brand "CorePlay Arcade"; icon artwork unchanged)
-Revision 3b: 2026-05-01 (rename only — display name CorePlay → GameDrawer; "Arcade" suffix dropped; icon artwork unchanged) — CURRENT
-Subject lineage: "old school arcade machine" → restomod cream-hero cabinet → stack of three game boxes (away from arcade-genre signal toward calm-classic-suite signal)
+Revision 3b: 2026-05-01 (rename only — display name CorePlay → GameDrawer; "Arcade" suffix dropped; icon artwork unchanged)
+Revision 4: 2026-07-18 (GameDrawer — 9A.2 Video drawer) — CURRENT
+Subject lineage: "old school arcade machine" → restomod cream-hero cabinet → stack of three game boxes → drawer of playable game cards with Video Mode
 
 ## Naming history (display-name only, bundle ID unchanged throughout)
 
@@ -20,7 +21,27 @@ Subject lineage: "old school arcade machine" → restomod cream-hero cabinet →
 `INFOPLIST_KEY_CFBundleDisplayName = GameDrawer` in Debug + Release. Bundle ID
 `com.lauterstar.gamekit` and target name `gamekit` unchanged per CLAUDE §1.
 
-## Approval (2026-04-30 evening — Revision 3 PlayCore)
+## Approval (2026-07-18 — Revision 4 GameDrawer)
+
+User selected finalist **9A.2 Video drawer** as the current shipping app icon.
+The mark uses four fanned game cards emerging from a cream drawer on a dark
+navy background; one card integrates GameDrawer's Video Mode treatment.
+
+The exact 1024×1024 RGB finalist master was promoted without regeneration or
+reconstruction. It is intentionally identical across the light, dark, and
+tinted AppIcon slots so the selected artwork remains stable in every iOS
+appearance. `Contents.json` remains unchanged.
+
+The four ending candidates are preserved as the top-picks set:
+- `assets/icon/top-picks/09a-2-video-drawer.png` — selected current icon
+- `assets/icon/top-picks/09a-3r-b-drawer-explosion.png`
+- `assets/icon/top-picks/04a-4r-a-flowing-abstract.png`
+- `assets/icon/top-picks/07b-2r-polished-reflow.png`
+
+The superseded Revision 3 stack masters are preserved at
+`assets/icon/archive/revision-3-stack/`.
+
+## Prior approval (2026-04-30 evening — Revision 3 PlayCore)
 
 User approved final PlayCore stack candidates after iterating away from
 the PixelParlor arcade-cabinet direction (genre-mismatch with the logic-
@@ -72,14 +93,14 @@ at the icon-size scales the AppIcon slot is rendered at).
 
 ## Final renders
 
-`gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/icon-light.png` — light slot (PlayCore stack on cream/iOS-light bg, 2026-04-30 evening)
-`gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/icon-dark.png` — luminosity-dark slot (PlayCore stack on iOS-dark charcoal bg, 2026-04-30 evening)
-`gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/icon-tinted.png` — tinted slot (PlayCore stack outline-stencil, transparent bg, white filled pattern glyphs, 2026-04-30 evening)
+`gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/icon-light.png` — light slot (9A.2 Video drawer, 2026-07-18)
+`gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/icon-dark.png` — luminosity-dark slot (same 9A.2 Video drawer master, 2026-07-18)
+`gamekit/gamekit/Assets.xcassets/AppIcon.appiconset/icon-tinted.png` — tinted slot (same 9A.2 Video drawer master, 2026-07-18)
 
 `Assets.xcassets/AppIcon.appiconset/Contents.json` UNCHANGED (P1 wiring already
 correct for the 3-slot layout).
 
-## Final prompts (saved for v1.0.x re-export reproducibility)
+## Historical prompts (Revision 3 and earlier)
 
 > **Revision 2026-04-30 evening (PlayCore — Stack of Three Games):**
 > direction shift away from arcade-cabinet imagery (genre-mismatch with

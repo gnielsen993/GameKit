@@ -11,9 +11,8 @@
 //
 //  Long-hint safety: worst-case alternating-fill rows produce ceil(N/2)
 //  hint numbers (10 for a 20-cell row). The hint header gets up to 32%
-//  of the axis width, the per-hint slot scales down to a `minHintFont`
-//  floor for legibility, and the rendering uses spacing of 0 between
-//  numbers when they get tight.
+//  of the axis width, the font scales down to a `minHintFont` floor for
+//  legibility, and centered dots keep adjacent clues distinct when tight.
 //
 
 import SwiftUI
@@ -81,6 +80,11 @@ struct NonogramBoardView: View {
     /// Locked-in axis for the current drag. nil until the player has moved
     /// far enough for SwiftUI to disambiguate horizontal vs vertical.
     @State var dragAxis: SlideAxis? = nil
+    /// Cell currently under the finger before the gesture commits to a
+    /// smear. The matching cell and its row/column hints highlight so dense
+    /// boards provide visible aiming feedback before touch-up commits.
+    @State var precisionRow: Int? = nil
+    @State var precisionCol: Int? = nil
 
     // P12 D-NG-15 (Plan 12-05): gates floor in computeLayout only.
     // D-NG-17 untouched; seam constants in NonogramBoardView+VideoMode.swift.
@@ -94,7 +98,7 @@ struct NonogramBoardView: View {
     /// Target board edge as a fraction of container width. Pinned so
     /// the grid stays the same size across difficulties — only the
     /// cells themselves shrink/grow as N changes.
-    private static let gridEdgeFraction: CGFloat = 0.78
+    private static let gridEdgeFraction: CGFloat = 0.85
     /// Floor on the column-hint header height so vertical-hint stacks
     /// have headroom even at small N.
     private static let minColHintHeight: CGFloat = 80
@@ -176,9 +180,7 @@ struct NonogramBoardView: View {
                         // rather than a blank slot.
                         Text("\(value)")
                             .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
-                            .foregroundStyle(crossed
-                                             ? theme.colors.textTertiary
-                                             : theme.colors.textSecondary)
+                            .foregroundStyle(hintColor(crossed: crossed, targeted: precisionCol == col))
                             .strikethrough(crossed, color: theme.colors.textTertiary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
@@ -196,27 +198,26 @@ struct NonogramBoardView: View {
     private func rowHeader(layout: Layout) -> some View {
         VStack(spacing: 0) {
             ForEach(0..<board.size, id: \.self) { row in
+                let hints = rowHints[safe: row] ?? []
                 let crossMask = rowsCrossOff[safe: row] ?? []
-                // 2pt between adjacent hint numbers — tighter than
-                // theme.spacing.xs so "1 5" reads as two distinct hints
-                // without sprawling, while "15" (a single 2-digit hint)
-                // stays visually intact.
-                HStack(spacing: 2) {
-                    Spacer(minLength: 0)
-                    ForEach(Array((rowHints[safe: row] ?? []).enumerated()), id: \.offset) { idx, value in
-                        let crossed = crossMask[safe: idx] ?? false
-                        Text("\(value)")
-                            .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
-                            .foregroundStyle(crossed
-                                             ? theme.colors.textTertiary
-                                             : theme.colors.textSecondary)
-                            .strikethrough(crossed, color: theme.colors.textTertiary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-                            .fixedSize()
-                    }
-                }
-                .frame(width: layout.rowHintColumnWidth, height: layout.cellSize)
+                // One attributed line keeps the rail's existing fixed size
+                // while giving every clue an explicit boundary. Individual
+                // runs retain completion color + strikethrough treatment.
+                Text(rowHintText(
+                    hints: hints,
+                    crossMask: crossMask,
+                    targeted: precisionRow == row
+                ))
+                .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .allowsTightening(true)
+                .frame(
+                    width: layout.rowHintColumnWidth,
+                    height: layout.cellSize,
+                    alignment: .trailing
+                )
+                .accessibilityLabel(Self.rowHintAccessibilityLabel(hints))
             }
         }
         // Same breathing-room budget as the column hints, applied to
@@ -241,7 +242,8 @@ struct NonogramBoardView: View {
                             isInteractive: isInteractive,
                             wrongFlash: wrongFlashIdx == idx,
                             completionFlash: flashRow == row || flashCol == col,
-                            onTap: { onTap(row, col) }
+                            precisionTarget: precisionRow == row && precisionCol == col,
+                            onAccessibilityTap: { onTap(row, col) }
                         )
                     }
                 }
@@ -251,11 +253,11 @@ struct NonogramBoardView: View {
         // player can count cell positions without losing place. Drawn as
         // an overlay on top of the cell grid; doesn't intercept gestures.
         .overlay(superCellRules(cellSize: cellSize).allowsHitTesting(false))
-        // Slide-to-fill: a drag with at-least-8pt movement starts a smear.
-        // Below threshold, the per-cell tap/long-press gestures fire as
-        // before. simultaneousGesture lets the drag coexist with the cell
-        // gestures without one starving the other.
-        .simultaneousGesture(slideGesture(cellSize: cellSize))
+        // One board-level gesture owns touch targeting and slide-to-fill.
+        // A short touch previews the target and commits on lift; a deliberate
+        // longer movement becomes an axis-locked smear. Keeping both paths in
+        // one recognizer prevents a child tap from racing the board drag.
+        .gesture(slideGesture(cellSize: cellSize))
     }
 
     /// Bold internal grid lines every 5 cells. Drawn at full board span;
@@ -300,7 +302,6 @@ struct NonogramBoardView: View {
     /// but the player's eye lands on the same physical area each time.
     /// Matches the layout pattern from competitor nonogram apps.
     private func computeLayout(in size: CGSize) -> Layout {
-        let maxRowHints = rowHints.map(\.count).max() ?? 1
         let maxColHints = columnHints.map(\.count).max() ?? 1
         let n = CGFloat(board.size)
 
@@ -310,7 +311,7 @@ struct NonogramBoardView: View {
         // cells, denser puzzles get small cells, but the board's
         // overall size doesn't shift around.
         //
-        // gridEdgeFraction (0.78) of the container width is reserved
+        // gridEdgeFraction (0.85) of the container width is reserved
         // for the grid; the remaining horizontal margin holds the row
         // hints regardless of how many hints the puzzle actually has.
         // Hints rely on minimumScaleFactor to shrink digits into the

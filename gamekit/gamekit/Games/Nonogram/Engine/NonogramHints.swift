@@ -61,15 +61,14 @@ enum NonogramHints {
     // MARK: - Per-hint reactive cross-off
 
     /// For each row, return a per-hint mask: `mask[row][hintIdx] = true`
-    /// when the player has placed a run that uniquely satisfies that hint
-    /// number (positionally). Lets the renderer strike through individual
-    /// hint values as the player completes them, instead of waiting for
-    /// the whole line to finish.
+    /// when the player has visibly resolved that hint. Unique clue values
+    /// may resolve by exact logical matching; repeated values additionally
+    /// need an edge-connected chain. Lets the renderer strike through
+    /// individual hints without revealing a duplicate clue's hidden index.
     ///
-    /// Algorithm: for each player-filled run, find every hint index whose
-    /// length matches AND whose valid-position range contains the run's
-    /// start. If exactly one hint matches, that hint is crossed off.
-    /// Ambiguous (multiple matches) and unmatched runs leave hints blank.
+    /// Algorithm: find exact logical matches across every valid placement,
+    /// then filter duplicate values through the visible edge-anchor rule.
+    /// Ambiguous, unmatched, and isolated duplicate runs stay uncrossed.
     static func rowsCrossOff(board: NonogramBoard, hints: [[Int]]) -> [[Bool]] {
         (0..<board.size).map { row in
             let filled = (0..<board.size).map { col in
@@ -97,17 +96,19 @@ enum NonogramHints {
     /// Run with start position. Internal to cross-off math.
     private struct PositionedRun { let start: Int; let length: Int }
 
-    /// Cross-off computation for a single line. A hint number is crossed
-    /// off ONLY when the corresponding player run is locked into that hint
-    /// position by the surrounding cells — i.e. across every valid
-    /// placement of all hints consistent with the current fills + X marks,
-    /// the run maps to the same hint index.
+    /// Cross-off computation for a single line. A completed run first has to
+    /// map to one hint index across every valid placement. A unique clue value
+    /// may then cross immediately; repeated values additionally require a
+    /// visible chain from the left or right edge. This avoids revealing which
+    /// identical clue an isolated interior run satisfies.
     ///
     /// Player intuition (from feedback): if hints are `[1, 1]` in a 10-cell
     /// row and the player places a fill at column 3 with cols 0–2 still
-    /// blank, neither hint may be crossed yet — the fill could be either
-    /// the first OR the second 1 until walls (edges or X marks) lock its
-    /// position. Marking cols 0–2 with X then crosses off the first hint.
+    /// blank, neither hint may be crossed yet — even if board geometry proves
+    /// which `1` it is. Marking cols 0–2 with X visibly connects the run to
+    /// the left edge, so the first hint then crosses. Conversely, an interior
+    /// `4` in `[1, 4, 3]` can cross without an edge chain because its value
+    /// identifies it unambiguously to the player.
     static func crossOffMask(filled: [Bool], marked: [Bool], hints: [Int]) -> [Bool] {
         let n = filled.count
 
@@ -118,6 +119,12 @@ enum NonogramHints {
         if hints == [0] {
             let allEmpty = !filled.contains(true)
             return [allEmpty]
+        }
+
+        // Once the entire visible line matches its clue sequence, every clue
+        // is resolved regardless of whether the player marked each separator.
+        if runs(in: filled) == hints {
+            return Array(repeating: true, count: hints.count)
         }
 
         // Player runs we want to map to hint indices.
@@ -173,10 +180,61 @@ enum NonogramHints {
             }
         }
 
+        let anchored = edgeAnchoredMask(filled: filled, marked: marked, hints: hints)
+        let valueCounts = Dictionary(grouping: hints, by: { $0 }).mapValues(\.count)
         var mask = Array(repeating: false, count: hints.count)
         for (idx, set) in candidates.enumerated() where exactMatches[idx] && set.count == 1 {
-            mask[set.first!] = true
+            let hintIdx = set.first!
+            let valueIsUnique = valueCounts[hints[hintIdx]] == 1
+            mask[hintIdx] = valueIsUnique || anchored[hintIdx]
         }
+        return mask
+    }
+
+    /// Returns clue indices reached by an uninterrupted, player-visible chain
+    /// from either edge. X marks may lead to a run and separate consecutive
+    /// runs; an untouched blank stops the scan. The current exact-length run
+    /// may cross as soon as the chain reaches it, while advancing to another
+    /// clue requires an explicit X separator.
+    private static func edgeAnchoredMask(
+        filled: [Bool],
+        marked: [Bool],
+        hints: [Int]
+    ) -> [Bool] {
+        var mask = Array(repeating: false, count: hints.count)
+
+        func scan(fromLeft: Bool) -> [Int] {
+            var reached: [Int] = []
+            var cell = fromLeft ? 0 : filled.count - 1
+            var hintIdx = fromLeft ? 0 : hints.count - 1
+            let step = fromLeft ? 1 : -1
+
+            func isInBounds(_ index: Int) -> Bool {
+                index >= 0 && index < filled.count
+            }
+
+            while isInBounds(cell), hintIdx >= 0, hintIdx < hints.count {
+                while isInBounds(cell), marked[cell] { cell += step }
+                guard isInBounds(cell), filled[cell] else { break }
+
+                var runLength = 0
+                while isInBounds(cell), filled[cell] {
+                    runLength += 1
+                    cell += step
+                }
+                guard runLength == hints[hintIdx] else { break }
+                reached.append(hintIdx)
+
+                // The current edge-connected run is resolved. Without an X
+                // after it, however, the visible chain cannot reach another.
+                guard isInBounds(cell), marked[cell] else { break }
+                hintIdx += step
+            }
+            return reached
+        }
+
+        for index in scan(fromLeft: true) { mask[index] = true }
+        for index in scan(fromLeft: false) { mask[index] = true }
         return mask
     }
 
