@@ -15,7 +15,10 @@ import sys
 
 SIZE_TO_BUCKET = {5: "tiny", 10: "small", 15: "medium", 20: "large"}
 THUMB_DIR = "/tmp/nonogram-thumbs"
-OUT_DIR = "/Users/gabrielnielsen/Desktop/GameKit/gamekit/gamekit/Resources/nonograms"
+# Repo-relative so this keeps working wherever the checkout lives.
+# (Was hardcoded to ~/Desktop/GameKit, which is now a dead path.)
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+OUT_DIR = os.path.join(REPO_ROOT, "gamekit", "gamekit", "Resources", "nonograms")
 
 
 def main() -> None:

@@ -67,7 +67,12 @@ not answer from prior-session memory alone.
 
 | Repo | Path | Purpose |
 |------|------|---------|
-| GameKitWebsite | `~/Desktop/GameKitWebsite` | Marketing site for GameDrawer — `index.html`, `updates.html`, `press.html`, `about.html`, `privacy.html`, `support.html`, `terms.html`. When the user says "update the website", edit files in this repo. |
+| GameKitWebsite | `~/Developer/GameKitWebsite` | Marketing site for GameDrawer — `index.html`, `updates.html`, `press.html`, `about.html`, `privacy.html`, `support.html`, `terms.html`. When the user says "update the website", edit files in this repo. |
+
+All repos live under `~/Developer/`. Grouped convenience symlinks exist at
+`~/Desktop/Projects/<Group>/<Repo>` (e.g. `~/Desktop/Projects/GameDrawer/GameKitWebsite`).
+Bare `~/Desktop/<Repo>` paths are dead — never write one into a doc, a
+script, or a command.
 
 ---
 
@@ -366,7 +371,7 @@ work that didn't actually ship in this `MARKETING_VERSION`.
 
 ### 8.15 Release wrap-up fires on "wrap up", "shipping", "ship vX.X", "release vX.X"
 Full procedure in [`WRAPUP.md`](WRAPUP.md). Summary: finalize release notes →
-update `~/Desktop/GameKitWebsite` (index, about, updates) and push → update
+update `~/Developer/GameKitWebsite` (index, about, updates) and push → update
 `Docs/store/app-store-copy.md` → deliver What's New copy to user.
 
 ### 8.16 Push cadence — don't let unpushed commits pile up

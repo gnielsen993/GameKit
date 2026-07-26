@@ -32,10 +32,14 @@ run the procedure in order.
 
 ---
 
-## Step 2 — Website (`~/Desktop/GameKitWebsite`)
+## Step 2 — Website (`~/Developer/GameKitWebsite`)
 
-Website files live at `~/Desktop/GameKitWebsite`. Always work from that
+Website files live at `~/Developer/GameKitWebsite`. Always work from that
 directory. Never edit these files in the GameKit repo.
+
+(A convenience symlink also exists at `~/Desktop/Projects/GameDrawer/GameKitWebsite`.
+The bare `~/Desktop/GameKitWebsite` path is dead — all repos moved to
+`~/Developer`. Never use it.)
 
 ### 2a. `index.html`
 - Update the hero copy or feature highlights if a new game or major feature
@@ -54,11 +58,20 @@ directory. Never edit these files in the GameKit repo.
 
 ### 2d. Push
 After all website edits are staged and committed:
+```bash
+cd ~/Developer/GameKitWebsite || { echo "FATAL: GameKitWebsite repo not found at ~/Developer/GameKitWebsite — website deploy did NOT run"; exit 1; }
+git add -A
+git commit -m "chore: update for vX.X release"
+git push
 ```
-cd ~/Desktop/GameKitWebsite && git add -A && git commit -m "chore: update for vX.X release" && git push
-```
+Run these as separate statements, never as one `&&` chain. A chain that
+starts with a failing `cd` short-circuits silently and the whole deploy
+no-ops while looking like it ran — the explicit `||` guard above makes a
+missing directory fail loudly instead.
+
 Push is required on every wrap-up — Plesk deploys from the remote.
-Confirm the push succeeded before moving to Step 3.
+Confirm the push succeeded (`git log origin/main -1 --oneline` matches
+local `HEAD`) before moving to Step 3.
 
 ---
 
