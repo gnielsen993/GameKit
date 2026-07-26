@@ -1,62 +1,101 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Reject Finder-dupe files (CLAUDE.md §8.7 / Pitfall 14)
-dupes=$(git diff --cached --name-only --diff-filter=A | grep -E ' 2\.swift$' || true)
+fail=0
+
+# ---------------------------------------------------------------------------
+# 1. Reject Finder-dupe files (CLAUDE.md §8.7 / Pitfall 14)
+# ---------------------------------------------------------------------------
+# Finder produces "X 2.swift", then "X 3.swift", ... so match any trailing
+# " <n>.swift", not just " 2.swift".
+dupes=$(git diff --cached --name-only --diff-filter=A | grep -E ' [0-9]+\.swift$' || true)
 if [ -n "$dupes" ]; then
   echo "ERROR: Finder-dupe files detected (will break the build via PBXFileSystemSynchronizedRootGroup):"
   echo "$dupes"
-  exit 1
+  fail=1
 fi
 
-# Reject hardcoded colors / radii / padding integers in app UI (CLAUDE.md §1, Pitfall 8).
-# Scope is every app source folder — Games/, Screens/, Core/, App/ — because §1 states
-# "No hard-coded colors / radii / spacing in UI" with no directory carve-out.
-# Only ADDED lines in the staged diff are inspected, so pre-existing code is never
-# retroactively blocked; the guard applies to what you are writing right now.
-staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^gamekit/gamekit/(Games|Screens|Core|App)/.*\.swift$' || true)
-
-# Narrow exclusion — Color check ONLY (radii + spacing checks still apply to these files).
-# These three DEFINE the raw colors the rest of the app consumes through tokens; a raw
-# Color literal is the correct and documented thing here, and each file says so in its
-# own header comment:
-#   Core/GameKitClassic.swift      - the DesignKit "Classic" preset anchors (Chrome Diner).
-#                                    This is the token source, not a token consumer.
-#   Core/GameKind+AccentColor.swift - per-game brand-identity constants, intentionally
-#                                    theme-independent (they must not shift with preset).
-#   Core/SurfaceDepth.swift        - white/black lighting primitives for sheen and shadow.
-#                                    Light comes from the top on every preset, so these
-#                                    are deliberately identical across all themes.
-# Do NOT widen this list to silence a violation in an ordinary view. If a new file needs
-# raw colors, justify it in a header comment and add it here explicitly.
+# ---------------------------------------------------------------------------
+# 2. Token discipline in app UI source (CLAUDE.md §1, Pitfall 8)
+# ---------------------------------------------------------------------------
+# Scope is every app source folder -- Games/, Screens/, Core/, App/ -- because
+# §1 states "No hard-coded colors / radii / spacing in UI" with no directory
+# carve-out. Only ADDED lines in the staged diff are inspected, so pre-existing
+# code is never retroactively blocked; the guard applies to what you write now.
+#
+# Two escape hatches, deliberately different in scope:
+#
+#   a) File-level (color_exempt below) -- for files that DEFINE raw colors.
+#   b) Line-level "// token-exempt: <reason>" -- for one-off legitimate cases
+#      in an ordinary file. Mirrors the hatch in FitnessTracker's hook so both
+#      repos behave the same way. The reason is mandatory: a bare
+#      "// token-exempt" does not suppress anything.
+#
+# File-level exemptions apply to the Color check ONLY (radii + spacing checks
+# still apply). Each of these DEFINES the raw colors the rest of the app
+# consumes through tokens, and each says so in its own header comment:
+#   Core/GameKitClassic.swift       - DesignKit "Classic" preset anchors (Chrome
+#                                     Diner). Token source, not consumer.
+#   Core/GameKind+AccentColor.swift - per-game brand constants, intentionally
+#                                     theme-independent (must not shift w/ preset).
+#   Core/SurfaceDepth.swift         - white/black lighting primitives for sheen
+#                                     and shadow; light comes from the top on
+#                                     every preset, so identical across themes.
+# Do NOT widen this list to silence a violation in an ordinary view.
 color_exempt='^gamekit/gamekit/Core/(GameKitClassic|GameKind\+AccentColor|SurfaceDepth)\.swift$'
 
-if [ -n "$staged" ]; then
-  bad=""
-  for f in $staged; do
-    added=$(git diff --cached -- "$f" | grep -E '^\+[^+]' || true)
-    # Color literals (Color(red:..) / Color(hex:..) / Color.gray etc.)
-    if ! echo "$f" | grep -Eq "$color_exempt"; then
-      if echo "$added" | grep -E 'Color\(\s*(red:|hex:|white:)|Color\.(red|blue|green|gray|orange|yellow|pink|purple|black|white)' > /dev/null; then
-        bad="${bad}${f}: hardcoded Color literal (use DesignKit semantic tokens)\n"
-      fi
+# Dev-only operator tooling, exempt from the print() ban per CLAUDE.md §8.17.
+# These run from debug builds and print for a human watching Xcode's console.
+print_exempt='^gamekit/gamekit/(Core/ScreenshotSeeder|App/DummyDataSeeder|App/AppStartupController)\.swift$'
+
+bad=""
+
+# NUL-delimited and piped STRAIGHT into the loop. Do not route this through a
+# shell variable: bash silently drops NUL bytes in command substitution, which
+# makes `read -d ''` hit EOF immediately and the loop body never execute -- a
+# hook that passes everything while looking like it works.
+while IFS= read -r -d '' f; do
+  case "$f" in
+    gamekit/gamekit/Games/*.swift|gamekit/gamekit/Screens/*.swift|gamekit/gamekit/Core/*.swift|gamekit/gamekit/App/*.swift) ;;
+    *) continue ;;
+  esac
+
+  # Added lines, minus any carrying a justified line-level exemption.
+  added=$(git diff --cached -- "$f" \
+            | grep -E '^\+[^+]' \
+            | grep -vE '// *token-exempt: *\S' || true)
+  [ -n "$added" ] || continue
+
+  if ! echo "$f" | grep -Eq "$color_exempt"; then
+    if echo "$added" | grep -Eq 'Color\(\s*(red:|hex:|white:)|Color\.(red|blue|green|gray|orange|yellow|pink|purple|black|white)'; then
+      bad="${bad}${f}: hardcoded Color literal (use DesignKit semantic tokens)\n"
     fi
-    # cornerRadius: <int>
-    if echo "$added" | grep -E 'cornerRadius:\s*[0-9]+' > /dev/null; then
-      bad="${bad}${f}: numeric cornerRadius literal (use theme.radii.{card,button,chip,sheet})\n"
-    fi
-    # padding(<int>)
-    if echo "$added" | grep -E '\.padding\(\s*[0-9]+(\.[0-9]+)?\s*\)' > /dev/null; then
-      bad="${bad}${f}: numeric padding literal (use theme.spacing.{xs,s,m,l,xl,xxl})\n"
-    fi
-  done
-  if [ -n "$bad" ]; then
-    echo -e "ERROR: token-discipline violations under Games/, Screens/, Core/ or App/:\n${bad}"
-    echo "Only newly added lines are checked. Fix the new line, or -- if this file"
-    echo "genuinely defines raw colors -- document why and add it to color_exempt"
-    echo "in .githooks/pre-commit."
-    exit 1
   fi
+  if echo "$added" | grep -Eq 'cornerRadius:\s*[0-9]+'; then
+    bad="${bad}${f}: numeric cornerRadius literal (use theme.radii.{card,button,chip,sheet})\n"
+  fi
+  if echo "$added" | grep -Eq '\.padding\(\s*[0-9]+(\.[0-9]+)?\s*\)'; then
+    bad="${bad}${f}: numeric padding literal (use theme.spacing.{xs,s,m,l,xl,xxl})\n"
+  fi
+
+  # print() / debugPrint() -- CLAUDE.md §8.17. Strip // comments and string
+  # literals first so a doc comment mentioning `print(...)` is not a false
+  # positive. Dev tooling is exempt.
+  if ! echo "$f" | grep -Eq "$print_exempt"; then
+    code=$(echo "$added" | sed -e 's://.*::' -e 's:"[^"]*":"":g')
+    if echo "$code" | grep -Eq '(^|[^A-Za-z0-9_.])(print|debugPrint)\s*\('; then
+      bad="${bad}${f}: print()/debugPrint() call (use os.Logger via AppLog - §8.17)\n"
+    fi
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+if [ -n "$bad" ]; then
+  echo -e "ERROR: rule violations in staged changes:\n${bad}"
+  echo "Only newly added lines are checked. Fix the new line, or -- if this case is"
+  echo "genuinely legitimate -- append '// token-exempt: <reason>' to that line."
+  echo "If the whole FILE defines raw colors, document why and add it to"
+  echo "color_exempt in .githooks/pre-commit instead."
+  fail=1
 fi
 
-exit 0
+exit $fail
