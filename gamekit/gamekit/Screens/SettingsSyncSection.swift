@@ -17,12 +17,15 @@
 //    2. Sync-status row — reads CloudSyncStatusObserver.status; wrapped
 //       in TimelineView(.periodic(from: .now, by: 60)) so "Synced X ago"
 //       ticks once per minute without observer churn (D-12).
-//    3. Sign-out row (P7.1; signed-in only) — clears local Keychain;
-//       SwiftData stats stay (offline-first §1).
-//    4. Delete-account row (P7.1; signed-in only) — App Store Guideline
-//       5.1.1(v). Confirm alert → AuthStore.deleteAccount wipes the
-//       CloudKit private zone + Keychain. Failure path shows a follow-up
-//       alert directing the user to System Settings to finish revocation.
+//    3. Sign-out row (P7.1) — clears local Keychain; SwiftData stats
+//       stay (offline-first §1).
+//    4. Delete-account row (P7.1) — App Store Guideline 5.1.1(v).
+//       Confirm alert → AuthStore.deleteAccount wipes the CloudKit
+//       private zone + Keychain. Failure path shows a follow-up alert
+//       directing the user to System Settings to finish revocation.
+//
+//    Rows 3+4 are gated on `canManageCloudAccount` (isSignedIn ||
+//    cloudSyncEnabled), not isSignedIn alone — see the property doc.
 //
 //  P7.1 supersedes the original T-06-row-noSignOut lock ("System Settings
 //  is the only sign-out path"): App Store Review rejects SIWA apps that
@@ -61,6 +64,29 @@ struct SettingsSyncSection: View {
     @State private var isDeleteConfirmPresented: Bool = false
     @State private var isDeleteCloudFailedAlertPresented: Bool = false
 
+    /// Gate for the sign-out + delete-account rows. Tracks whether a
+    /// cloud store is actually live, NOT whether the Keychain still
+    /// holds a userID.
+    ///
+    /// `isSignedIn` alone is wrong because the two halves of "signed in"
+    /// live in different stores that can desync: the userID is in the
+    /// Keychain (`AuthStore`) while `cloudSyncEnabled` — the flag that
+    /// actually gates the CloudKit `ModelConfiguration`
+    /// (`AppStartupController.makeContainer`) — is in UserDefaults.
+    /// The 2026-07 team transfer (App ID prefix JCWX4BK8GW ->
+    /// ATRCA5V7ZV, warning ITMS-90076) orphans the Keychain row for
+    /// every updating user while UserDefaults survives, so they land on
+    /// `isSignedIn == false` with CloudKit still syncing. Gating on
+    /// `isSignedIn` there hides in-app sign-out AND delete-account
+    /// (App Store 5.1.1(v)) while cloud rows keep flowing.
+    ///
+    /// Both row actions are safe when the Keychain is already empty:
+    /// `AuthStore.clearLocalSignInState` tolerates `errSecItemNotFound`
+    /// and `deleteAccount` wipes the CloudKit zone regardless of it.
+    private var canManageCloudAccount: Bool {
+        authStore.isSignedIn || settingsStore.cloudSyncEnabled
+    }
+
     var body: some View {
         settingsSectionHeader(theme: theme, String(localized: "SYNC"))
         DKCard(theme: theme) {
@@ -70,7 +96,7 @@ struct SettingsSyncSection: View {
                     .fill(theme.colors.border)
                     .frame(height: 1)
                 syncStatusRow
-                if authStore.isSignedIn {
+                if canManageCloudAccount {
                     Rectangle()
                         .fill(theme.colors.border)
                         .frame(height: 1)
