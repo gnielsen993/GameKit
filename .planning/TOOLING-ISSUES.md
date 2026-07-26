@@ -3,6 +3,9 @@
 Local agent/toolchain issues that affect development sessions but are outside
 the GameDrawer app release scope.
 
+Repo-health work (structure, CI, gitignore, file-size debt) lives in
+`Docs/ENGINEERING-BACKLOG.md`, not here.
+
 ## Open
 
 - [ ] 2026-06-24 — Invalid Claude cowork schedule skill metadata
