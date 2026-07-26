@@ -1,9 +1,19 @@
 # CLAUDE.md
-## GameKit — Claude Code working rules
+## GameKit — agent working rules (Claude Code · Codex · any agent tool)
 
 Claude Code reads this file at the start of every session. Treat it as
-the project constitution. Mirrored in [`AGENTS.md`](AGENTS.md) for
-other AI tools.
+the project constitution.
+
+`AGENTS.md` is a **symlink to this file**, so Codex and any other agent
+tool read byte-identical rules. Edit only this file, never a copy — the
+two were hand-maintained mirrors until 2026-07-26 and had drifted apart
+(AGENTS.md still claimed "MVP scope: Minesweeper only" long after v1.5
+shipped with Stack and Snake). Do not recreate AGENTS.md as a regular
+file.
+
+> Codex note: where a rule below is Claude-specific (Claude Code memory,
+> the Obsidian brain in §10), it is marked as such. Everything else
+> applies to every agent equally.
 
 ---
 
@@ -57,7 +67,7 @@ sources at session start instead.
 | What's the active phase doing? | `.planning/phases/<NN>-<name>/PLAN.md` (latest mtime) |
 | Why was X chosen? | matching ADR/PRD in `.planning/phases/.../` + commit body |
 | Icon / branding history | `assets/icon/AI_PROVENANCE.md` |
-| Persistent decisions across sessions | Claude Code memory (auto-loaded) |
+| Persistent decisions across sessions | Claude Code memory (auto-loaded) — Claude only; Codex should read `.planning/STATE.md` and recent commit bodies instead |
 
 Rule: when the user asks "what's going on" / "status" / "where are
 we", read `STATE.md` + `git log` first, then this §0.1 block — do
@@ -73,6 +83,36 @@ All repos live under `~/Developer/`. Grouped convenience symlinks exist at
 `~/Desktop/Projects/<Group>/<Repo>` (e.g. `~/Desktop/Projects/GameDrawer/GameKitWebsite`).
 Bare `~/Desktop/<Repo>` paths are dead — never write one into a doc, a
 script, or a command.
+
+## 0.5) Commands
+
+The Xcode project is at `gamekit/gamekit.xcodeproj` — there is no
+`.xcodeproj` at the repo root and no `.xcworkspace`. The scheme is
+lowercase `gamekit` (schemes: `gamekit`, `DesignKit`, `SudokuCore`).
+
+```bash
+# Build (run from repo root)
+xcodebuild -project gamekit/gamekit.xcodeproj -scheme gamekit \
+  -destination 'platform=iOS Simulator,name=iPhone 17' -quiet build
+
+# Test
+xcodebuild -project gamekit/gamekit.xcodeproj -scheme gamekit \
+  -destination 'platform=iOS Simulator,name=iPhone 17' -quiet test
+
+# Open
+open gamekit/gamekit.xcodeproj
+```
+
+- **Destination: use `iPhone 17` or `iPhone 17 Pro`.** `iPhone 16` is
+  installed under two runtimes (iOS 18.4 and 18.5) on this machine, so
+  that destination fails to resolve — "Unable to find a device matching
+  the provided destination specifier". Verified 2026-07-26.
+- Bundle ID for `xcrun simctl uninstall` (see §8.9): `com.lauterstar.gamekit`.
+- Prefer `-quiet`; drop it only when diagnosing a failure.
+- Don't claim "verified" without saying which of {build, test,
+  simulator run} you actually ran.
+- Install the git hooks once per clone: `./scripts/install-hooks.sh`
+  (sets `core.hooksPath` to `.githooks`).
 
 ---
 
@@ -172,6 +212,12 @@ Hard rules for new games and screens:
 - **Visual audit on Classic + one Loud preset (Voltage / Dracula).**
   Game-screen changes still need the §8.12 contrast pass.
 
+### Widgets (if requested)
+None ship today. When one is asked for:
+- WidgetKit + App Intents for quick actions where applicable.
+- Shared theme snapshot logic for widget chrome.
+- Widgets are timeline-driven, not real-time.
+
 ---
 
 ## 2) DesignKit: how to consume it
@@ -190,6 +236,15 @@ Hard rules for new games and screens:
 - Game models (`MinesweeperCell`, `MergeBoard`, …)
 - Game-specific haptics patterns *unless* the same pattern is reused
   in 2+ games — only then promote to `DKHaptics`.
+
+Future hooks (allowed, not required now): category / icon colour
+overrides. Do not implement unless asked.
+
+### Missing a token? Add it to DesignKit
+GameKit must not duplicate or re-derive DesignKit styling logic. If the
+token you need doesn't exist, **add it to DesignKit** — don't work
+around it with a local constant. A local workaround is exactly how
+hard-coded colors get back in (§1) and how the two repos drift.
 
 ### Available tokens — verify before using
 Radii: `card | button | chip | sheet` (no `.medium` / `.small`).
@@ -227,8 +282,18 @@ Cross-game shared state lives in `Core/`.
 
 ## 4) Rules for AI-assisted changes (avoid drift)
 
+Working order for any task — **Explore → Plan → Implement → Verify**:
+1. **Explore** — locate the relevant files, note the existing patterns.
+2. **Plan** — a minimal change list plus the files it touches. Keep it
+   in the reply; do not write a plan file unless asked.
+3. **Implement** — small diffs, follow structure + tokens.
+4. **Verify** — build / run tests (§0.5); state what was run, what
+   changed, and which presets were spot-checked for game-screen changes.
+
 - **Reuse existing patterns in the repo.** Do not invent new
   architectures.
+- **View models stay small and testable.** Use `final` on classes where
+  appropriate.
 - **Smallest change that satisfies the requirement.** A bug fix isn't
   a refactor. A one-shot doesn't need a helper.
 - **Promote to DesignKit only when proven** — used in 2+ games. Until
@@ -349,19 +414,22 @@ Moody preset (e.g. Voltage / Dracula) in addition to the default
 Classic preset. If mines / numbers / flags stop being legible under
 any preset, fix the token usage — don't carve out an exception.
 
-### 8.13 Brand / project-status changes update §0.1 + AGENTS.md in the same commit
+### 8.13 Brand / project-status changes update §0.1 in the same commit
 When any user-facing fact in §0.1 changes (display name, full brand,
 bundle ID, target iOS, current milestone label, MVP/next-game pick,
-icon direction, Classic-preset character), update **all three** in
-the same commit:
-1. `CLAUDE.md` §0.1 row + `Last updated` date
-2. `AGENTS.md` §0.1 (mirror)
-3. Relevant memory file under `~/.claude/projects/.../memory/` if
-   the fact is also pinned there (e.g. `project_app_name.md`).
+icon direction, Classic-preset character), update in the same commit:
+1. The `CLAUDE.md` §0.1 row + its `Last updated` date
+2. The canonical artifact (e.g. `AI_PROVENANCE.md` for icon / naming,
+   `pbxproj` for display name)
+3. The relevant memory file under `~/.claude/projects/.../memory/` if
+   the fact is also pinned there (e.g. `project_app_name.md`) —
+   Claude only.
 
-Plus the canonical artifact (e.g. `AI_PROVENANCE.md` for icon /
-naming, `pbxproj` for display name). Never let §0.1 drift past
-truth — a stale §0.1 misleads every future session.
+There is no AGENTS.md mirror step: `AGENTS.md` is a symlink to this
+file, so updating §0.1 here updates it everywhere by construction.
+
+Never let §0.1 drift past truth — a stale §0.1 misleads every future
+session.
 
 ### 8.14 Every significant change appends to `Docs/releases/v{current}.md`
 See §0.3. Pull `MARKETING_VERSION` from `pbxproj`, append a bullet

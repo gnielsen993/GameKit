@@ -41,7 +41,7 @@ same shape.
 - Milestone audits: `.planning/v{X.Y}-MILESTONE-AUDIT.md`
 - Recent commits: `git log --oneline -20`
 - Pinned project facts (display name, brand, milestone label):
-  CLAUDE.md / AGENTS.md §0.1
+  CLAUDE.md §0.1 (AGENTS.md is a symlink to it)
 
 The milestone audit and the per-version release log are complementary:
 the audit asks "did v1.0 satisfy the original intent?", the release log

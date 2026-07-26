@@ -1,8 +1,9 @@
 # WRAPUP.md
 ## GameDrawer — Release Wrap-Up Procedure
 
-This document defines the full wrap-up checklist. CLAUDE.md and AGENTS.md
-reference it by name; read it whenever a wrap-up fires.
+This document defines the full wrap-up checklist. CLAUDE.md (and therefore
+AGENTS.md, which is a symlink to it) references it by name; read it whenever
+a wrap-up fires.
 
 ---
 
@@ -27,8 +28,9 @@ run the procedure in order.
    - No placeholder bullets or unresolved TODOs in the file.
    - If the file is missing, create it from `Docs/releases/TEMPLATE.md` first.
 3. If the milestone status changed (e.g. v1.x shipped → v1.y is next),
-   update `.planning/STATE.md` and §0.1 of CLAUDE.md + AGENTS.md in
-   the same commit per §8.13 of CLAUDE.md.
+   update `.planning/STATE.md` and §0.1 of CLAUDE.md in the same commit
+   per §8.13 of CLAUDE.md. (AGENTS.md needs no separate edit — it is a
+   symlink to CLAUDE.md.)
 
 ---
 

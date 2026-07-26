@@ -8,7 +8,8 @@ gestures, predictable information hierarchy. This document is the binding
 contract for how that consistency is achieved.
 
 **Relation to other docs:**
-- `CLAUDE.md` / `AGENTS.md` govern *what to build* and *how to code it*.
+- `CLAUDE.md` governs *what to build* and *how to code it* (`AGENTS.md` is a
+  symlink to it).
 - `DESIGN.md` (this file) governs *how it looks and behaves* — the visual
   and interaction language. When the two conflict on a non-functional detail,
   DESIGN.md wins.

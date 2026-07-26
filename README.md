@@ -238,6 +238,7 @@ subscriptions.
 
 ## Related docs
 
-- [`CLAUDE.md`](CLAUDE.md) — Claude Code working rules for this repo
-- [`AGENTS.md`](AGENTS.md) — Codex / other-agent rules (mirrors CLAUDE)
+- [`CLAUDE.md`](CLAUDE.md) — agent working rules for this repo (the project
+  constitution). [`AGENTS.md`](AGENTS.md) is a symlink to it, so Codex and
+  other agent tools read the same file. Edit only `CLAUDE.md`.
 - `../DesignKit/README.md` — design system reference
