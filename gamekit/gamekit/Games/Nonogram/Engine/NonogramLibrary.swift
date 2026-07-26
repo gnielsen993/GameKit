@@ -12,12 +12,13 @@
 //      ...
 //    ]
 //
-//  Files that fail to decode log to console and contribute zero puzzles —
-//  the library degrades gracefully so a single typo'd entry doesn't
-//  crash the game shell.
+//  Files that fail to decode log via `AppLog.puzzles` and contribute zero
+//  puzzles — the library degrades gracefully so a single typo'd entry
+//  doesn't crash the game shell.
 //
 
 import Foundation
+import os
 
 enum NonogramLibrary {
     nonisolated(unsafe) private static var cache: [NonogramDifficulty: [NonogramPuzzle]] = [:]
@@ -59,25 +60,25 @@ enum NonogramLibrary {
             withExtension: "json"
         )
         guard let url else {
-            #if DEBUG
-            print("ℹ️ NonogramLibrary: no bundle file for \(difficulty.rawValue)")
-            #endif
+            AppLog.puzzles.notice(
+                "No bundle file for difficulty \(difficulty.rawValue, privacy: .public)"
+            )
             return []
         }
         do {
             let data = try Data(contentsOf: url)
             let decoded = try JSONDecoder().decode([NonogramPuzzle].self, from: data)
             let valid = decoded.filter { $0.isValid(for: difficulty.size) }
-            #if DEBUG
             if valid.count != decoded.count {
-                print("⚠️ NonogramLibrary: dropped \(decoded.count - valid.count) invalid \(difficulty.rawValue) entries")
+                AppLog.puzzles.warning(
+                    "Dropped \(decoded.count - valid.count, privacy: .public) invalid \(difficulty.rawValue, privacy: .public) entries"
+                )
             }
-            #endif
             return valid
         } catch {
-            #if DEBUG
-            print("❌ NonogramLibrary: decode failed for \(difficulty.rawValue): \(error)")
-            #endif
+            AppLog.puzzles.error(
+                "Decode failed for \(difficulty.rawValue, privacy: .public): \(error.localizedDescription, privacy: .public)"
+            )
             return []
         }
     }

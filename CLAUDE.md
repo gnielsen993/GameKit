@@ -457,6 +457,29 @@ is met; this rule is the standing authorization. Branch first if on a
 protected branch per the harness rules; otherwise push the current
 branch to its upstream.
 
+### 8.17 Logging — `os.Logger` via `AppLog`, never `print()`
+Diagnostics go through `Core/AppLog.swift` (`AppLog.puzzles.error(...)`,
+`AppLog.audio.warning(...)`, etc.), never `print()` / `debugPrint()` and
+never a hand-rolled `Logger(subsystem:category:)` at the call site.
+`os.Logger` is levelled, filterable in Console.app / `log stream`,
+privacy-aware, and compiled out of the hot path when not collected — so
+it needs no `#if DEBUG` guard, unlike `print`. Interpolate diagnostic
+values as `privacy: .public`; none of ours carry user PII. Mirrors
+FitnessTracker §9.13 so a session crossing repos sees one convention.
+
+Need a category that doesn't exist? Add it to `AppLog` rather than
+constructing a `Logger` locally.
+
+**Carve-out — dev-only tooling keeps `print()`.** `ScreenshotSeeder`,
+`DummyDataSeeder`, and the CloudKit schema-deploy branch in
+`AppStartupController` are operator consoles run from a debug build;
+their output is meant for a human watching Xcode's console, not for
+`log stream`. They are exempt, and the pre-commit hook does not scan
+them. No other file is.
+
+**No emoji in log strings** (per the account-wide no-emoji rule) —
+severity is carried by the `Logger` level, not by a glyph.
+
 ---
 
 ## 9) Design rules — [`DESIGN.md`](DESIGN.md)

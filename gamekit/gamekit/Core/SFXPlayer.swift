@@ -82,7 +82,7 @@ final class SFXPlayer {
         do {
             try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
         } catch {
-            Logger(subsystem: "com.lauterstar.gamekit", category: "audio")
+            AppLog.audio
                 .error("Failed to set AVAudioSession .ambient: \(error.localizedDescription, privacy: .public)")
         }
 
@@ -101,7 +101,7 @@ final class SFXPlayer {
     /// failure semantics. Logger is constructed locally because this is
     /// a `static` method called from `init` before `self.logger` exists.
     private static func makePlayer(name: String) -> AVAudioPlayer? {
-        let logger = Logger(subsystem: "com.lauterstar.gamekit", category: "audio")
+        let logger = AppLog.audio
         guard let url = Bundle.main.url(forResource: name, withExtension: "caf") else {
             logger.error("CAF not found in bundle: \(name, privacy: .public)")
             return nil
