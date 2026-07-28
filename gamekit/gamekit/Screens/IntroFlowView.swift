@@ -25,6 +25,7 @@ struct IntroFlowView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.settingsStore) private var settingsStore
     @Environment(\.authStore) private var authStore
+    @Environment(\.appStartupController) private var startupController
     @Environment(\.dismiss) private var dismiss
 
     @State private var currentStep: Int = 0
@@ -116,7 +117,7 @@ struct IntroFlowView: View {
     }
 
     /// Plan 06-07 mirror. Success: Keychain → flip cloudSyncEnabled (D-02) →
-    /// flip Restart-prompt flag (D-03) → dismiss. Failure: silent log only.
+    /// reconfigure the container live → dismiss. Failure: silent log only.
     private func handleSIWACompletion(_ result: Result<ASAuthorization, Error>) {
         Task { @MainActor in
             switch result {
@@ -130,7 +131,10 @@ struct IntroFlowView: View {
                 do {
                     try authStore.signIn(userID: credential.user)
                     settingsStore.cloudSyncEnabled = true        // D-02
-                    authStore.shouldShowRestartPrompt = true     // D-03
+                    // Sync is live before the drawer opens — a first-run user
+                    // restoring on a new device sees their stats arrive
+                    // instead of an empty app plus a "quit and reopen" prompt.
+                    await startupController?.reconfigure(cloudSyncEnabled: true)
                     dismissIntro()                                // STATE 05-05 SoT
                 } catch {
                     Self.logger.error("SIWA Keychain write failed: \(error.localizedDescription, privacy: .public)")

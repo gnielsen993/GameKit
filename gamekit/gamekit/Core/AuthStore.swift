@@ -109,11 +109,6 @@ final class AuthStore {
 
     // MARK: - Observed state
 
-    /// D-03 root-level alert trigger. Both SIWA-success sites
-    /// (SettingsView Plan 06-07 + IntroFlowView Plan 06-08) flip this
-    /// to true; RootTabView's `.alert(isPresented:)` reads via Bindable.
-    var shouldShowRestartPrompt: Bool = false
-
     /// P7.1 fix: stored, not computed. The @Observable macro only tracks
     /// stored properties; the previous computed read of `backend.read(...)`
     /// gave the right value but never invalidated SwiftUI views when the

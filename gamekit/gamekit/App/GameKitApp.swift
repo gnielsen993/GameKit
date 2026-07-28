@@ -12,8 +12,10 @@
 //    - Single shared ModelContainer (D-07) — constructed once per startup
 //      attempt and injected app-wide at RootTabView
 //    - cloudKitDatabase reads SettingsStore.cloudSyncEnabled at startup
-//      (D-08); flag default is false in P4 (relaunch required to flip;
-//      live reconfigure is a P6 concern per ROADMAP)
+//      (D-08); flipping the flag now reconfigures the container live via
+//      AppStartupController.reconfigure(cloudSyncEnabled:) — no relaunch.
+//      (The deferred "live reconfigure is a P6 concern" note was resolved
+//      2026-07-27; the quit-and-reopen prompt it required is gone.)
 //    - CloudKit container ID is iCloud.com.lauterstar.gamekit (D-09 lock,
 //      mirrored in PROJECT.md and Plan 04-01's smoke test)
 //    - ModelContainer construction failures surface a retry experience;
@@ -106,6 +108,7 @@ struct GameKitApp: App {
                 .environment(\.sfxPlayer, sfxPlayer)
                 .environment(\.authStore, authStore)
                 .environment(\.cloudSyncStatusObserver, cloudSyncStatusObserver)
+                .environment(\.appStartupController, startupController)
                 .preferredColorScheme(preferredScheme)
         }
     }

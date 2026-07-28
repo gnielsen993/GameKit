@@ -34,6 +34,11 @@ struct AppEntryRootView: View {
                 if let container = startupController.container {
                     RootTabView()
                         .modelContainer(container)
+                        // Identity follows the container. Swapping sync modes
+                        // builds a replacement container against the same
+                        // store; without an identity change SwiftUI would keep
+                        // @Query views bound to the retired ModelContext.
+                        .id(startupController.containerToken)
                         .transition(.opacity)
                 }
 

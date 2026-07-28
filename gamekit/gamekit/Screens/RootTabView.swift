@@ -13,14 +13,17 @@
 //  Skip / Done, then the root crossfades to HomeView. Returning launches
 //  construct HomeView directly, so neither path flashes the other.
 //
-//  P6 (D-03/D-13/D-14): observes scenePhase to call
+//  P6 (D-13/D-14): observes scenePhase to call
 //  AuthStore.validateOnSceneActive() on every .active transition (D-14
-//  silent revocation catch). Hosts the root-level Restart prompt .alert
-//  bound to AuthStore.shouldShowRestartPrompt (D-03 single-source-of-truth
-//  for both SIWA-success sites — Settings Plan 06-07 + IntroFlow Plan
-//  06-08). On authStore.isSignedIn transition from true to false (revocation)
-//  flips settingsStore.cloudSyncEnabled = false; same-store-path lock (D-08)
-//  preserves local data and cloud rows.
+//  silent revocation catch). On authStore.isSignedIn transition from true
+//  to false (revocation) flips settingsStore.cloudSyncEnabled = false and
+//  reconfigures the container to .none in the same session; same-store-path
+//  lock (D-08) preserves local data and cloud rows.
+//
+//  The root-level "quit and reopen" Restart prompt (D-03/D-04/D-05) was
+//  removed 2026-07-27. It existed only because the container's sync mode was
+//  fixed at launch; AppStartupController.reconfigure(cloudSyncEnabled:) now
+//  swaps it live, so there is nothing left for the user to do by hand.
 //
 
 import SwiftUI
@@ -32,6 +35,7 @@ struct RootTabView: View {
     @Environment(\.settingsStore) private var settingsStore
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.authStore) private var authStore
+    @Environment(\.appStartupController) private var startupController
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var theme: Theme { themeManager.theme(using: colorScheme) }
@@ -65,31 +69,14 @@ struct RootTabView: View {
         }
         .onChange(of: authStore.isSignedIn) { wasSignedIn, isNowSignedIn in
             // T-06-08 + D-13: when revocation clears the Keychain (isSignedIn
-            // flips true→false), turn the cloud-sync flag off. Container
-            // reconfigures to .none on next cold-start; same-store-path
-            // (D-08) preserves all local rows. Cloud rows remain on iCloud
-            // server (Pitfall 4).
+            // flips true→false), turn the cloud-sync flag off and drop the
+            // container to .none in the same session. Same-store-path (D-08)
+            // preserves all local rows. Cloud rows remain on iCloud server
+            // (Pitfall 4).
             if wasSignedIn && !isNowSignedIn {
                 settingsStore.cloudSyncEnabled = false
+                Task { await startupController?.reconfigure(cloudSyncEnabled: false) }
             }
-        }
-        .alert(
-            String(localized: "Quit and reopen to finish iCloud setup"),
-            isPresented: Bindable(authStore).shouldShowRestartPrompt
-        ) {
-            // D-04 + D-05 (revised 2026-05-01): button labels updated for
-            // honesty. The previous "Restart to enable iCloud sync" title +
-            // "Quit GameKit" button promised an action that the dismiss-only
-            // body never delivered, which read as "broken" to users. New
-            // copy makes it explicit that the user is the one doing the
-            // quitting. T-06-05 / D-05 LOCK preserved — both buttons remain
-            // dismiss-only; no programmatic termination (App Store Review
-            // red flag). App name interpolated from AppInfo.displayName so
-            // future renames don't re-introduce the brand-drift bug.
-            Button(String(localized: "Later"), role: .cancel) { }
-            Button(String(localized: "OK")) { }
-        } message: {
-            Text(String(localized: "Your stats will sync to all devices signed in to this iCloud account. Swipe up in the app switcher to quit \(AppInfo.displayName), then reopen it to finish setup."))
         }
     }
 }

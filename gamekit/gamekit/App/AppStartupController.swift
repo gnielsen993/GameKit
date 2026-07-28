@@ -1,6 +1,8 @@
 import Foundation
 import Observation
+import os
 import SwiftData
+import SwiftUI
 
 enum AppStartupPresentation: Equatable {
     case preparing
@@ -30,7 +32,15 @@ final class AppStartupController {
     private(set) var container: ModelContainer?
     private(set) var feedback = AppStartupFeedbackState()
 
-    private let cloudSyncEnabled: Bool
+    /// Bumped on every successful container build. `AppEntryRootView` keys the
+    /// destination subtree on it so a reconfigured container rebuilds the tree
+    /// cleanly rather than leaving views bound to the retired `ModelContext`.
+    private(set) var containerToken: Int = 0
+
+    /// Mutable so `reconfigure(cloudSyncEnabled:)` can swap sync modes without
+    /// a relaunch. Was a `let` until 2026-07-27 — that is what forced the
+    /// "quit and reopen" prompt this replaces.
+    private(set) var cloudSyncEnabled: Bool
     private var isAttemptingStartup = false
 
     init(cloudSyncEnabled: Bool) {
@@ -50,6 +60,40 @@ final class AppStartupController {
         await attemptStartup()
     }
 
+    /// Rebuilds the container against a new sync mode **without a relaunch**.
+    ///
+    /// Both modes open the SAME on-disk store (D-08 same-store-path), so no
+    /// local row is created, moved, or deleted — the only difference is
+    /// whether SwiftData mirrors that store to CloudKit. Existing local rows
+    /// are pushed up the first time sync is turned on.
+    ///
+    /// Deliberately does NOT drop to `.preparing`: the caller is standing in
+    /// Settings (or finishing the intro) and a flash back to the branded entry
+    /// screen would be a worse experience than the brief pause. The current
+    /// tree stays on screen until the replacement container is ready, then
+    /// `containerToken` swaps it atomically.
+    func reconfigure(cloudSyncEnabled newValue: Bool) async {
+        guard newValue != cloudSyncEnabled, !isAttemptingStartup else { return }
+        isAttemptingStartup = true
+        cloudSyncEnabled = newValue
+
+        do {
+            container = try await Self.makeContainer(cloudSyncEnabled: newValue)
+            containerToken &+= 1
+            presentation = .ready
+        } catch {
+            // Same contract as a failed cold start: the recovery screen offers
+            // Try Again, which reopens with whatever mode is now current. No
+            // user data is touched on this path.
+            AppLog.storage.error(
+                "Container reconfigure failed (cloudSync=\(newValue, privacy: .public)): \(error.localizedDescription, privacy: .public)"
+            )
+            presentation = .failed
+        }
+
+        isAttemptingStartup = false
+    }
+
     private func attemptStartup() async {
         isAttemptingStartup = true
 
@@ -66,6 +110,7 @@ final class AppStartupController {
                 cloudSyncEnabled: cloudSyncEnabled
             )
             container = loadedContainer
+            containerToken &+= 1
             seedDebugDataIfNeeded(container: loadedContainer)
             feedback.startupFinished()
             presentation = .ready
@@ -131,6 +176,23 @@ final class AppStartupController {
             print("❌ CloudKit schema deploy failed: \(error).")
         }
         #endif
+    }
+}
+
+// MARK: - EnvironmentKey injection (mirrors AuthStore.swift's seam)
+
+/// Optional because there is no sensible default controller — constructing one
+/// here would open a second container against the same store. `GameKitApp`
+/// injects the real instance; every call site treats `nil` as "no reconfigure
+/// available" rather than falling back to a throwaway.
+private struct AppStartupControllerKey: EnvironmentKey {
+    static let defaultValue: AppStartupController? = nil
+}
+
+extension EnvironmentValues {
+    var appStartupController: AppStartupController? {
+        get { self[AppStartupControllerKey.self] }
+        set { self[AppStartupControllerKey.self] = newValue }
     }
 }
 

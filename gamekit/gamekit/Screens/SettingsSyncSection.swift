@@ -57,6 +57,7 @@ struct SettingsSyncSection: View {
     @Environment(\.settingsStore) private var settingsStore
     @Environment(\.authStore) private var authStore
     @Environment(\.cloudSyncStatusObserver) private var cloudSyncStatusObserver
+    @Environment(\.appStartupController) private var startupController
 
     // P7.1 alert state — destructive delete confirm + cloud-wipe-failed
     // follow-up. Both default false; alert(isPresented:) toggles back on
@@ -186,6 +187,10 @@ struct SettingsSyncSection: View {
             // signed-in state. Cloud rows on iCloud server stay intact;
             // re-signing-in restores sync (Pitfall 4).
             settingsStore.cloudSyncEnabled = false
+            // Stop mirroring immediately. Without this the container keeps
+            // pushing to iCloud until the next cold start, so writes made
+            // after "Sign out" would still reach the account just left.
+            Task { await startupController?.reconfigure(cloudSyncEnabled: false) }
         } label: {
             HStack(spacing: theme.spacing.s) {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
@@ -227,8 +232,8 @@ struct SettingsSyncSection: View {
 
     private func performDeleteAccount() async {
         let outcome = await authStore.deleteAccount()
-        // D-08 mirror: clear the flag locally; container reconfigures to
-        // .none on next cold-start (same-store-path preserves the file).
+        // D-08 mirror: clear the flag locally; the container drops to .none
+        // below (same-store-path preserves the file).
         settingsStore.cloudSyncEnabled = false
         // P7.1 user-feedback: "delete account" must also wipe local
         // stats — leaving GameRecord/BestTime/BestScore rows behind
@@ -242,6 +247,10 @@ struct SettingsSyncSection: View {
                 "Local stats wipe failed during deleteAccount: \(error.localizedDescription, privacy: .public)"
             )
         }
+        // Reconfigure AFTER the local wipe: the wipe runs against the current
+        // modelContext, and swapping the container rebuilds the view tree that
+        // owns it. Reversing these drops the wipe on a retired context.
+        await startupController?.reconfigure(cloudSyncEnabled: false)
         if !outcome.cloudWipeSucceeded {
             isDeleteCloudFailedAlertPresented = true
         }
@@ -324,14 +333,12 @@ struct SettingsSyncSection: View {
                 // DO NOT touch credential. one-shot JWT property; never persist.
                 do {
                     try authStore.signIn(userID: credential.user)
-                    // D-02: flip flag BEFORE prompt; the prompt is a UX hint,
-                    // not a consent gate. If user cancels, next cold-start
-                    // picks up cloudSyncEnabled=true and reconfigures container.
                     settingsStore.cloudSyncEnabled = true
-                    // D-03: trigger root-level prompt via AuthStore property.
-                    // RootTabView root-level prompt (Bindable(authStore).shouldShowRestartPrompt)
-                    // surfaces the Restart copy (Plan 06-06).
-                    authStore.shouldShowRestartPrompt = true
+                    // Turn sync on for the session the user is already in.
+                    // Previously this raised a "quit and reopen" prompt,
+                    // which left anyone who tapped Later using a local-only
+                    // container while their iCloud stats sat untouched.
+                    await startupController?.reconfigure(cloudSyncEnabled: true)
                 } catch {
                     // T-06-PERSIST05: silent log; no user-facing prompt (PERSIST-05 "never nag").
                     Self.logger.error(
