@@ -138,9 +138,16 @@ final class CloudSyncStatusObserver {
     /// initializer (PATTERNS §S5).
     ///
     /// State transitions (RESEARCH §Pattern 5 lines 588-611):
-    ///   - endDate == nil           → .syncing
-    ///   - endDate != nil + success → .syncedAt(endDate); lastSyncDate := endDate
-    ///   - endDate != nil + failure → .unavailable(lastSynced: lastSyncDate)
+    ///   - endDate == nil                            → .syncing
+    ///   - endDate != nil + success + import/export  → .syncedAt(endDate); lastSyncDate := endDate
+    ///   - endDate != nil + success + setup          → .syncing (see below)
+    ///   - endDate != nil + failure                  → .unavailable(lastSynced: lastSyncDate)
+    ///
+    /// A successful `.setup` means CloudKit reached the container and nothing
+    /// more — no record has moved in either direction. Reporting "Synced just
+    /// now" off it puts a green status row over an app that may have imported
+    /// nothing, which is exactly how a failed restore reads as a healthy one.
+    /// Only import/export prove data actually moved.
     private func applyEvent(
         type: NSPersistentCloudKitContainer.EventType,
         endDate: Date?,
@@ -152,6 +159,10 @@ final class CloudSyncStatusObserver {
             return
         }
         if succeeded {
+            guard type == .import || type == .export else {
+                status = .syncing
+                return
+            }
             lastSyncDate = endDate
             status = .syncedAt(endDate ?? Date())
         } else {

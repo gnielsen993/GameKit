@@ -104,6 +104,66 @@ struct CloudSyncStatusObserverTests {
         #expect(observer.status == .syncedAt(endDate))
     }
 
+    @Test("A successful .setup stays .syncing — connecting is not syncing")
+    func event_setupSucceeded_staysSyncing() {
+        let observer = CloudSyncStatusObserver(initialStatus: .notSignedIn)
+        let endDate = Date(timeIntervalSince1970: 1_700_000_000)
+
+        // `.setup` only proves CloudKit reached the container. Reporting
+        // "Synced just now" off it is how an import that never ran reads as a
+        // healthy restore — the status row must keep spinning until an
+        // import/export actually moves a record.
+        observer.applyEvent_forTesting(
+            type: .setup,
+            endDate: endDate,
+            succeeded: true,
+            error: nil
+        )
+
+        #expect(observer.status == .syncing)
+    }
+
+    @Test("A successful .import after setup is what flips status to .syncedAt")
+    func event_importSucceeded_flipsToSyncedAt() {
+        let observer = CloudSyncStatusObserver(initialStatus: .notSignedIn)
+        let setupDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let importDate = Date(timeIntervalSince1970: 1_700_000_060)
+
+        observer.applyEvent_forTesting(
+            type: .setup,
+            endDate: setupDate,
+            succeeded: true,
+            error: nil
+        )
+        #expect(observer.status == .syncing)
+
+        observer.applyEvent_forTesting(
+            type: .import,
+            endDate: importDate,
+            succeeded: true,
+            error: nil
+        )
+
+        #expect(observer.status == .syncedAt(importDate))
+    }
+
+    @Test("A failed .setup still surfaces as .unavailable")
+    func event_setupFailed_flipsToUnavailable() {
+        let observer = CloudSyncStatusObserver(initialStatus: .syncing)
+        let endDate = Date(timeIntervalSince1970: 1_700_000_000)
+
+        // The import/export gate above must not swallow setup *failures* —
+        // an unreachable account is exactly what the row needs to report.
+        observer.applyEvent_forTesting(
+            type: .setup,
+            endDate: endDate,
+            succeeded: false,
+            error: NSError(domain: "test", code: 1)
+        )
+
+        #expect(observer.status == .unavailable(lastSynced: nil))
+    }
+
     @Test("Failed event after a prior success flips to .unavailable(lastSynced: priorSuccessDate)")
     func event_failed_flipsToUnavailable_withLastSynced() {
         let observer = CloudSyncStatusObserver(initialStatus: .notSignedIn)
