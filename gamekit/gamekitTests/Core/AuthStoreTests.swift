@@ -67,6 +67,33 @@ final class StubCredentialStateProvider: CredentialStateProvider {
     }
 }
 
+/// Controllable clock for the post-sign-in revocation grace window. `now` is
+/// handed to `AuthStore` as its time source; `advance(by:)` moves it forward
+/// without sleeping.
+///
+/// `nonisolated` because the target builds with
+/// `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`, and `AuthStore` stores this as
+/// a `@Sendable () -> Date` — the closure must be callable off the main actor.
+/// The lock is what makes the `@unchecked` conformance honest.
+nonisolated final class MutableClock: @unchecked Sendable {
+    private let lock = NSLock()
+    private var current = Date(timeIntervalSince1970: 1_700_000_000)
+
+    var now: @Sendable () -> Date {
+        { [self] in
+            lock.lock()
+            defer { lock.unlock() }
+            return current
+        }
+    }
+
+    func advance(by interval: TimeInterval) {
+        lock.lock()
+        defer { lock.unlock() }
+        current = current.addingTimeInterval(interval)
+    }
+}
+
 // MARK: - Suite
 
 @MainActor
@@ -98,9 +125,17 @@ struct AuthStoreTests {
     @Test("credentialRevokedNotification clears Keychain + currentUserID")
     func revocationClearsState() throws {
         let backend = InMemoryKeychainBackend()
-        let store = AuthStore(backend: backend, credentialStateProvider: StubCredentialStateProvider())
+        // Clock starts at t0 and jumps past the post-sign-in grace window, so
+        // this exercises a genuine revocation rather than the spurious one.
+        let clock = MutableClock()
+        let store = AuthStore(
+            backend: backend,
+            credentialStateProvider: StubCredentialStateProvider(),
+            now: clock.now
+        )
         try store.signIn(userID: "fake.user.id.002")
         #expect(store.currentUserID != nil)
+        clock.advance(by: 60)
 
         NotificationCenter.default.post(
             name: ASAuthorizationAppleIDProvider.credentialRevokedNotification,
@@ -110,6 +145,53 @@ struct AuthStoreTests {
         // AuthStore's revocation handler MUST run synchronously on the
         // main actor (no Task hop) per PATTERNS §6 line 376 to allow
         // direct seam read.
+        #expect(store.currentUserID == nil)
+        #expect(store.isSignedIn == false)
+    }
+
+    /// Regression guard: Apple posts `credentialRevokedNotification` on some
+    /// successful sign-ins. A revocation arriving inside the grace window is
+    /// that defect, not user intent, and must not discard the new credential.
+    @Test("Revocation within the post-sign-in grace window is ignored")
+    func revocationWithinGraceWindowIgnored() throws {
+        let backend = InMemoryKeychainBackend()
+        let clock = MutableClock()
+        let store = AuthStore(
+            backend: backend,
+            credentialStateProvider: StubCredentialStateProvider(),
+            now: clock.now
+        )
+        try store.signIn(userID: "fake.user.id.007")
+
+        // Same instant as sign-in — the spurious emission Apple sends.
+        NotificationCenter.default.post(
+            name: ASAuthorizationAppleIDProvider.credentialRevokedNotification,
+            object: nil
+        )
+
+        #expect(store.currentUserID == "fake.user.id.007")
+        #expect(store.isSignedIn == true)
+    }
+
+    /// The window is narrow, not a blanket suppression: once it lapses, a
+    /// revocation is honored unconditionally.
+    @Test("Revocation just past the grace window still clears state")
+    func revocationAfterGraceWindowClears() throws {
+        let backend = InMemoryKeychainBackend()
+        let clock = MutableClock()
+        let store = AuthStore(
+            backend: backend,
+            credentialStateProvider: StubCredentialStateProvider(),
+            now: clock.now
+        )
+        try store.signIn(userID: "fake.user.id.008")
+        clock.advance(by: 5)
+
+        NotificationCenter.default.post(
+            name: ASAuthorizationAppleIDProvider.credentialRevokedNotification,
+            object: nil
+        )
+
         #expect(store.currentUserID == nil)
         #expect(store.isSignedIn == false)
     }

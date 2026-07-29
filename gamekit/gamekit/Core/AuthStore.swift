@@ -107,6 +107,26 @@ final class AuthStore {
     private let credentialStateProvider: CredentialStateProvider
     private let cloudAccountWiper: CloudAccountWiper
 
+    /// Clock seam. Injected so the post-sign-in revocation grace window below
+    /// is testable without sleeping.
+    private let now: @Sendable () -> Date
+
+    /// When the last successful `signIn(userID:)` completed, or nil if the user
+    /// has not signed in during this process lifetime.
+    private var lastSignInAt: Date?
+
+    /// How long after a successful authorization a `credentialRevokedNotification`
+    /// is treated as Apple's spurious post-login emission rather than a real
+    /// revocation.
+    ///
+    /// Apple posts this notification on some successful sign-ins. A user cannot
+    /// plausibly complete a sign-in and revoke access in the same few seconds, so
+    /// a revocation inside this window is far more likely to be the known defect
+    /// than a genuine intent — and acting on it drops the credential the user just
+    /// created. Outside the window the notification is honored unconditionally:
+    /// a real revocation from Settings -> Apple Account must still sign the user out.
+    private static let postSignInRevocationGrace: TimeInterval = 5
+
     // MARK: - Observed state
 
     /// P7.1 fix: stored, not computed. The @Observable macro only tracks
@@ -125,11 +145,13 @@ final class AuthStore {
     init(
         backend: KeychainBackend = SystemKeychainBackend(),
         credentialStateProvider: CredentialStateProvider = SystemCredentialStateProvider(),
-        cloudAccountWiper: CloudAccountWiper = CloudKitAccountWiper()
+        cloudAccountWiper: CloudAccountWiper = CloudKitAccountWiper(),
+        now: @escaping @Sendable () -> Date = Date.init
     ) {
         self.backend = backend
         self.credentialStateProvider = credentialStateProvider
         self.cloudAccountWiper = cloudAccountWiper
+        self.now = now
         // Hydrate observable state from Keychain at construction so a
         // cold-launch with a persisted userID renders the signed-in UI
         // on first paint (matches D-15 reinstall path: nil if absent).
@@ -146,6 +168,8 @@ final class AuthStore {
         try backend.write(userID, account: Self.appleUserIDAccount)
         // P7.1: mirror to observable surface so SwiftUI re-renders.
         currentUserID = userID
+        // Opens the grace window used by handleRevocation(_:).
+        lastSignInAt = now()
         // T-06-02 lock: NEVER interpolate userID into log output.
         Self.logger.info("Signed in (userID hidden)")
     }
@@ -254,6 +278,15 @@ final class AuthStore {
         // is the narrow-and-correct shape here vs. wrapping in
         // Task { @MainActor in ... } which would defer past .post returning.
         MainActor.assumeIsolated {
+            if let lastSignInAt,
+               now().timeIntervalSince(lastSignInAt) < Self.postSignInRevocationGrace {
+                // Apple's known spurious post-authorization revocation. Honoring
+                // it would discard the credential the user just created.
+                Self.logger.info(
+                    "Ignoring credentialRevokedNotification within \(Self.postSignInRevocationGrace, privacy: .public)s of sign-in (spurious post-authorization signal)"
+                )
+                return
+            }
             clearLocalSignInState(reason: "credentialRevokedNotification")
         }
     }
