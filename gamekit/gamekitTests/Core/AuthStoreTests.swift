@@ -19,9 +19,12 @@
 //      actor (no Task hop) — mirrors HapticsTests.swift:69-80 engine-state
 //      seam pattern so tests can assert directly after a sync `post`.
 //    - `validateOnSceneActive()` routes the 4 `CredentialState` cases per
-//      D-14: `.authorized` preserves state, `.revoked`/`.notFound`/
-//      `.transferred` all clear. The `.transferred` case treated as a
-//      defensive default per D-14 (rare developer-account migration).
+//      D-14: `.authorized` and `.notFound` preserve state, `.revoked` and
+//      `.transferred` clear. `.transferred` is what an App Store developer-
+//      account migration produces (team-scoped userID stops validating).
+//      `.notFound` deliberately does NOT clear — Apple emits a spurious
+//      not-found signal right after a successful authorization, and
+//      discarding a just-created credential is the worse error.
 //    - Early-return when no userID stored (D-15 reinstall path):
 //      `validateOnSceneActive()` skips the credential-state probe entirely;
 //      `StubCredentialStateProvider.callCount == 0` proves it.
@@ -143,7 +146,11 @@ struct AuthStoreTests {
         #expect(stub.callCount == 1)
     }
 
-    @Test(".notFound clears Keychain + currentUserID")
+    /// Regression guard: `.notFound` must NOT sign the user out. Apple emits a
+    /// spurious not-found signal right after a successful authorization, so a
+    /// scene-active probe landing in that window used to discard a credential
+    /// the user had just created.
+    @Test(".notFound preserves Keychain + currentUserID — post-authorization race")
     func sceneActiveValidation_notFound() async throws {
         let backend = InMemoryKeychainBackend()
         let stub = StubCredentialStateProvider()
@@ -153,8 +160,8 @@ struct AuthStoreTests {
 
         await store.validateOnSceneActive()
 
-        #expect(store.currentUserID == nil)
-        #expect(store.isSignedIn == false)
+        #expect(store.currentUserID == "fake.user.id.005")
+        #expect(store.isSignedIn == true)
         #expect(stub.callCount == 1)
     }
 

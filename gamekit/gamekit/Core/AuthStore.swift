@@ -195,13 +195,36 @@ final class AuthStore {
         switch state {
         case .authorized:
             return  // happy path
-        case .revoked, .notFound, .transferred:
-            // D-14 + defensive: .transferred treated like .notFound
-            // (rare developer-account migration; Apple docs suggest treat
-            // as no-longer-authorized).
+        case .revoked, .transferred:
+            // Both are positive server statements. `.transferred` is what an
+            // App Store developer-account migration produces — the stored
+            // userID is team-scoped and stops validating afterward.
             clearLocalSignInState(reason: "scene-active state=\(state)")
+        case .notFound:
+            // Deliberately NOT a sign-out. Apple emits a spurious
+            // not-found/revoked signal immediately after a *successful*
+            // authorization, so a scene-active probe that lands in that window
+            // discards a credential the user just created.
+            //
+            // The cost is asymmetric: keeping a stale credential costs nothing
+            // (the user can sign out from Settings, a real `.revoked` resolves
+            // it on the next probe, and CloudKit mirroring here keys off
+            // `SettingsStore.cloudSyncEnabled` rather than this credential
+            // anyway). Discarding a valid one silently flips the UI to
+            // signed-out with no explanation.
+            //
+            // Ported from FitnessTracker, where the same policy caused a
+            // silent sign-out that also disabled mirroring — sync is gated on
+            // sign-in state there, so the blast radius was larger.
+            Self.logger.info(
+                "Scene-active state=notFound — keeping session (post-authorization race)"
+            )
         @unknown default:
-            clearLocalSignInState(reason: "scene-active unknown state")
+            // Same asymmetry: an unrecognized future state is not evidence the
+            // credential is gone.
+            Self.logger.info(
+                "Scene-active unknown credential state — keeping session"
+            )
         }
     }
 
