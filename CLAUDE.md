@@ -42,7 +42,7 @@ Ordered by how often a session needs them.
 | Repo / target name | `gamekit` | locked |
 | Target iOS | 17+ | — |
 | Swift / UI | Swift 6 + SwiftUI | — |
-| Current milestone | `v1.5` shipped — Arcade release (Stack + Snake) | 2026-07-10 |
+| Current milestone | `v1.6` in development — Be Kind (`.planning/v1.6-BRIEF.md`); absorbed the never-released 1.5.1 | 2026-07-31 |
 | Current MVP game | Minesweeper | — |
 | Next game (post-MVP) | TBD — Flow / Pattern Memory / Chess puzzles remain roadmap candidates | 2026-06-22 |
 | Icon | 9A.2 Video drawer (unified light / dark / tinted) | 2026-07-18 |
