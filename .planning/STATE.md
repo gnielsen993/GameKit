@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Endless Arcade Primitive
-status: completed
-stopped_at: Completed 18-03-PLAN.md
-last_updated: "2026-07-07T02:09:49.652Z"
-last_activity: 2026-07-06
+milestone: v1.6
+milestone_name: Be Kind
+status: executing
+stopped_at: v1.6 scope delivered from the brief; no phase plans were authored
+last_updated: "2026-08-02T00:00:00.000Z"
+last_activity: 2026-08-02
 progress:
-  total_phases: 4
-  completed_phases: 3
-  total_plans: 22
-  completed_plans: 67
-  percent: 75
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,14 +21,53 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** Milestone complete
+**Current focus:** v1.6 "Be Kind" — assist talkthroughs plus repair of the
+defects that silently punish players. Scope: `.planning/v1.6-BRIEF.md`.
 
 ## Current Position
 
-Phase: 18
-Plan: Not started
-Status: Milestone complete — shipped as v1.5 (2026-07-10)
-Last activity: 2026-07-10
+Phase: none — v1.6 was executed directly from the brief
+Plan: none authored
+Status: v1.6 in development. Every item scoped in the brief is implemented,
+tested, and pushed. Not shipped.
+Last activity: 2026-08-02
+
+### How to read the zeroed progress block
+
+v1.6 was built straight from `v1.6-BRIEF.md` without running
+`/gsd-new-milestone`, so no phase directories or PLAN.md files exist for it
+and the counters above are honestly zero rather than retrofitted. The work
+is real and is in git; the tracking artifacts are not. Use
+`git log --oneline` for what landed.
+
+If v1.6 is reopened for the remaining work, run `/gsd-new-milestone v1.6`
+first — phases continue append-only from 18, so it opens at **Phase 19**.
+
+### Delivered in v1.6 so far
+
+Dignity fixes: Five Letter's daily word made deterministic (it differed per
+launch and per device); Sudoku and Nonogram free modes now signal a wrong
+entry instead of letting a dead board run for a session; Klondike and
+FreeCell undo survives both a dead end and an app relaunch, and their loss
+is no longer recorded before the player accepts it; Merge shows the real
+stored best rather than the session best; Stack and Snake report the run and
+personal best at game over.
+
+Assists: record semantics settled and enforced (an assisted win counts as a
+win but sets no record); talkthrough pilots shipped for Nonogram and Sudoku,
+with on-board highlighting of the squares each explanation refers to;
+Minesweeper can replay the board you just lost.
+
+### Known-remaining before v1.6 can ship
+
+- Visual pass on Classic + a Loud/Moody preset (CLAUDE §8.12). Seven commits
+  carry color, banner, or highlight work verified only by construction.
+- On-device check that the Nonogram hint does not cost frames on a 20×20 —
+  placement enumeration was already that game's dominant swipe-lag source.
+- Product call: hints exist in 2 of 10 games (Nonogram, Sudoku). WordGrid
+  and FiveLetter are ~1 day each, FreeCell 2-3, Minesweeper 4-6.
+- Release wrap-up per CLAUDE §8.15, and bump `CURRENT_PROJECT_VERSION`
+  (still 2, already consumed by the 1.5.1 TestFlight upload).
 
 ## v1.0 Carry-Over
 
