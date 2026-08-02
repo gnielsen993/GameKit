@@ -301,11 +301,58 @@ final class MinesweeperViewModel {
         saveCurrentState()
     }
 
+    /// True when the current game is a replay of a board the player has
+    /// already lost. Its result is recorded like any other game, but it can
+    /// never set a best time — see `retryCurrentBoard()`.
+    private(set) var isReplayingBoard = false
+
+    /// Replay the board that was just lost, mines in the same places.
+    ///
+    /// The honest alternative to a revive. The loss is already recorded and
+    /// the run is over; this is "let me see how that one should have gone"
+    /// rather than a second chance at the same run.
+    ///
+    /// Two things make it work. The state goes straight to `.playing`, not
+    /// `.idle` — the `.idle` branch in `reveal(at:)` is the only path that
+    /// calls `BoardGenerator.generate`, so entering it would discard the very
+    /// layout we are trying to keep, and would also re-roll first-tap safety
+    /// against a different board. And the result cannot set a record: the
+    /// loss cascade has already shown the player every mine, so a replayed
+    /// win is a walk-through, not a time worth keeping.
+    func retryCurrentBoard() {
+        guard case .lost = gameState else { return }
+        clearSavedState()
+        // Mines and adjacency counts are already correct; only the per-cell
+        // lifecycle state resets.
+        board = MinesweeperBoard(
+            difficulty: board.difficulty,
+            rows: board.rows,
+            cols: board.cols,
+            mineCount: board.mineCount,
+            cells: board.cells.map {
+                MinesweeperCell(isMine: $0.isMine, adjacentMineCount: $0.adjacentMineCount)
+            }
+        )
+        isReplayingBoard = true
+        gameState = .playing
+        flaggedCount = 0
+        lossContext = nil
+        timerAnchor = clock()
+        pausedElapsed = 0
+        phase = .idle
+        revealCount = 0
+        flagToggleCount = 0
+        interactionMode = .reveal
+        modeToggleCount = 0
+        saveCurrentState()
+    }
+
     /// Same difficulty, fresh idle board. Timer / pausedElapsed / lossContext reset.
     func restart() {
         clearSavedState()
         board = Self.idleBoard(for: difficulty)
         gameState = .idle
+        isReplayingBoard = false
         flaggedCount = 0
         timerAnchor = nil
         pausedElapsed = 0

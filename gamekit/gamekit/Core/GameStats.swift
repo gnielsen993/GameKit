@@ -65,7 +65,8 @@ final class GameStats {
         outcome: Outcome,
         durationSeconds: Double,
         puzzleId: String? = nil,
-        assistCount: Int? = nil
+        assistCount: Int? = nil,
+        countsTowardRecords: Bool = true
     ) throws {
         // 1. Insert GameRecord unconditionally (D-12 step 1).
         //    Done BEFORE BestTime evaluation so a flaky predicate cannot
@@ -87,7 +88,12 @@ final class GameStats {
         // An assisted win is still a win — it is inserted above and counts
         // toward games played, win rate, and streaks — but it does not set a
         // record. A best time is a claim about unaided play (v1.6 ruling).
-        if outcome == .win && !record.wasAssisted {
+        //
+        // `countsTowardRecords` is the same rule for a different reason:
+        // replaying a board you already lost is not comparable to a first
+        // solve. Kept separate from `assistCount` deliberately — the player
+        // used no hint, and reporting one would be a lie in the disclosure.
+        if outcome == .win && !record.wasAssisted && countsTowardRecords {
             do {
                 try evaluateBestTime(
                     gameKind: gameKind,

@@ -252,7 +252,8 @@ struct MinesweeperGameView: View {
                 onRestart: { viewModel.restart() },
                 onChangeDifficulty: {
                     showDifficultyPicker = true
-                }
+                },
+                onRetryBoard: { viewModel.retryCurrentBoard() }
             )
         }
         .confirmationDialog(

@@ -33,6 +33,8 @@ struct MinesweeperEndStateCard: View {
     let lossContext: LossContext?           // populated only when outcome == .loss
     let onRestart: () -> Void
     let onChangeDifficulty: () -> Void
+    /// Offered only after a loss: replay the same mine layout. nil hides it.
+    var onRetryBoard: (() -> Void)? = nil
 
     var body: some View {
         DKCard(theme: theme) {
@@ -61,6 +63,17 @@ struct MinesweeperEndStateCard: View {
                         theme: theme,
                         action: onRestart
                     )
+                    // "This board" rather than "Try again" — the distinction
+                    // from Restart is the whole point, and Restart already
+                    // means a fresh layout here.
+                    if let onRetryBoard, outcome == .loss {
+                        DKButton(
+                            String(localized: "Replay this board"),
+                            style: .secondary,
+                            theme: theme,
+                            action: onRetryBoard
+                        )
+                    }
                     DKButton(
                         String(localized: "Change difficulty"),
                         style: .secondary,
