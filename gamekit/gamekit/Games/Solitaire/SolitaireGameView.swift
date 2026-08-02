@@ -81,6 +81,10 @@ struct SolitaireGameView: View {
             if phase == .background { vm.saveCurrentState(); vm.pause() }
             else if phase == .active { vm.resume() }
         }
+        // Leaving the screen with an unresolved dead end accepts it: the
+        // held loss is written here rather than at the moment it was
+        // detected, so undo can revive the deal in between.
+        .onDisappear { vm.flushPendingLoss() }
         .confirmationDialog("New Game", isPresented: $showingNewGame) {
             ForEach(SolitaireDifficulty.allCases, id: \.self) { d in
                 Button("\(d.label) — \(d.detail)") { vm.startNewGame(difficulty: d) }

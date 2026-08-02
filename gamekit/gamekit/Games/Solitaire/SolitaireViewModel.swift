@@ -35,7 +35,20 @@ final class SolitaireViewModel {
     // information can appear — the game is unwinnable.
     private var progressSinceLastRecycle = false
 
-    var canUndo: Bool { !history.isEmpty && gameState == .playing }
+    /// Undo stays available in `.stuck`. It used to require `.playing`, which
+    /// switched off the one tool that could rescue the player at exactly the
+    /// moment they needed it — the dead end is the whole reason to back up.
+    var canUndo: Bool { !history.isEmpty && (gameState == .playing || gameState == .stuck) }
+
+    /// A dead end the player has not yet acknowledged.
+    ///
+    /// The loss used to be written the instant `finishStuck` fired. Now that
+    /// undo can revive a stuck deal, that would let one deal produce both a
+    /// loss and a win. The record is held here and flushed when the player
+    /// actually accepts the outcome — restarting the deal, taking a new one,
+    /// or leaving the screen — and dropped entirely if they undo back into
+    /// play.
+    private var pendingLossElapsed: TimeInterval?
 
     // MARK: - Init
 
@@ -222,14 +235,27 @@ final class SolitaireViewModel {
 
     func undo() {
         guard canUndo, let prev = history.popLast() else { return }
+        let wasStuck = gameState == .stuck
         board = prev
         moveCount = max(0, moveCount - 1)
         selection = nil
+        guard wasStuck else { return }
+        // Backing out of a dead end returns the deal to play, drops the held
+        // loss, and restarts the clock.
+        pendingLossElapsed = nil
+        gameState = .playing
+        timerAnchor = Date.now
+        // The stuck verdict came from a full stock pass with nothing new. The
+        // undone move is new information by definition, so clear the flag or
+        // the next recycle re-declares the deal dead immediately.
+        progressSinceLastRecycle = true
+        saveCurrentState()
     }
 
     // MARK: - New game
 
     func restartCurrentDeal() {
+        flushPendingLoss()   // moving on is accepting the dead end
         clearSavedState()
         board = SolitaireBoard.deal(seed: dealNumber, difficulty: difficulty)
         history = []
@@ -242,6 +268,7 @@ final class SolitaireViewModel {
     }
 
     func startNewGame(difficulty: SolitaireDifficulty) {
+        flushPendingLoss()   // moving on is accepting the dead end
         clearSavedState()
         self.difficulty = difficulty
         let deal = Int.random(in: 1...1_000_000)
@@ -374,10 +401,28 @@ final class SolitaireViewModel {
     }
 
     private func finishStuck() {
-        clearSavedState()
         gameState = .stuck
         let elapsed = pausedElapsed + (timerAnchor.map { Date.now.timeIntervalSince($0) } ?? 0)
+        pausedElapsed = elapsed
         timerAnchor = nil
+        // Held, not written — see `pendingLossElapsed`. The saved state is
+        // also kept: undo can revive this deal, so discarding it here would
+        // destroy a game the player has not finished with.
+        pendingLossElapsed = elapsed
+    }
+
+    #if DEBUG
+    /// Drives the deal into `.stuck` without replaying a full unwinnable
+    /// game. Mirrors the `injectTestBoardForUnitTests` seam in Sudoku.
+    func forceStuckForTests() { finishStuck() }
+    #endif
+
+    /// Writes a held loss, if there is one. Called when the player accepts the
+    /// dead end by moving on, or leaves the screen with it unresolved.
+    func flushPendingLoss() {
+        guard let elapsed = pendingLossElapsed else { return }
+        pendingLossElapsed = nil
+        clearSavedState()
         Task {
             try? gameStats?.record(
                 gameKind: .klondike,

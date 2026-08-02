@@ -127,7 +127,16 @@ final class FreeCellViewModel {
         return FreeCellRules.canMoveToFoundation(card, foundations: board.foundations)
     }
 
-    var canUndo: Bool { !history.isEmpty && gameState == .playing }
+    /// Undo stays available in `.lost`. It used to require `.playing`, which
+    /// switched off the one tool that could rescue the player at exactly the
+    /// moment they needed it. FreeCell deals are near-always winnable, so a
+    /// dead board almost always means a recoverable misplay.
+    var canUndo: Bool { !history.isEmpty && (gameState == .playing || gameState == .lost) }
+
+    /// A dead board the player has not yet acknowledged. Held rather than
+    /// written, because undo can now revive it and one deal must not produce
+    /// both a loss and a win. Mirrors SolitaireViewModel.pendingLossElapsed.
+    private var hasPendingLoss = false
 
     func clearSelection() { selection = nil; rejectStreak = 0 }
     func dismissHint()    { hintText = nil }
@@ -244,12 +253,54 @@ final class FreeCellViewModel {
 
     func undo() {
         guard canUndo, let last = history.popLast() else { return }
+        let wasLost = gameState == .lost
         board     = last.boardBefore
         selection = nil
+        if wasLost {
+            // Backing out of a dead board returns the deal to play, drops the
+            // held loss, and restarts the clock from where it froze.
+            hasPendingLoss = false
+            gameState     = .playing
+            frozenElapsed = 0
+            timerAnchor   = Date.now
+            saveCurrentState()
+            return
+        }
         if history.isEmpty { timerAnchor = nil; pausedElapsed = 0 }
     }
 
+    #if DEBUG
+    /// Drives the deal into `.lost` without constructing a genuinely dead
+    /// board. `withHistory` pushes one reversible move so undo has something
+    /// to pop, which is the case these tests exist to cover.
+    func forceLostForTests(withHistory: Bool) {
+        if withHistory, history.isEmpty {
+            history.append(
+                FreeCellMove(
+                    cards: [],
+                    source: .freeCell(cellIdx: 0),
+                    destination: .foundation,
+                    boardBefore: board
+                )
+            )
+        }
+        freezeTimer()
+        gameState = .lost
+        hasPendingLoss = true
+    }
+    #endif
+
+    /// Writes a held loss, if there is one. Called when the player accepts the
+    /// dead board by moving on, or leaves the screen with it unresolved.
+    func flushPendingLoss() {
+        guard hasPendingLoss else { return }
+        hasPendingLoss = false
+        clearSavedState()
+        recordResult(outcome: "loss")
+    }
+
     func reset() {
+        flushPendingLoss()   // moving on is accepting the dead board
         clearSavedState()
         board         = FreeCellBoard(dealNumber: dealNumber)
         history       = []
@@ -388,10 +439,12 @@ final class FreeCellViewModel {
             winTick += 1
             recordResult(outcome: "win")
         } else if FreeCellRules.isLost(board: board) {
-            clearSavedState()
             freezeTimer()
             gameState = .lost
-            recordResult(outcome: "loss")
+            // Held, not written — see `hasPendingLoss`. The saved state is
+            // kept too: undo can revive this deal, so discarding it would
+            // destroy a game the player has not finished with.
+            hasPendingLoss = true
         }
     }
 
