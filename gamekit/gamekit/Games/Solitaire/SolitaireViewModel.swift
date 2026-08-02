@@ -239,7 +239,10 @@ final class SolitaireViewModel {
         board = prev
         moveCount = max(0, moveCount - 1)
         selection = nil
-        guard wasStuck else { return }
+        guard wasStuck else {
+            saveCurrentState()   // keep the persisted stack in step with undo
+            return
+        }
         // Backing out of a dead end returns the deal to play, drops the held
         // loss, and restarts the clock.
         pendingLossElapsed = nil
@@ -461,7 +464,9 @@ extension SolitaireViewModel {
         dealNumber    = saved.dealNumber
         difficulty    = saved.difficulty
         moveCount     = saved.moveCount
-        history       = []
+        // Undo now survives a relaunch. Older saves carry no history and
+        // decode to nil, which restores the previous behaviour for them.
+        history       = saved.history ?? []
         selection     = nil
         pausedElapsed = saved.elapsedSeconds
         timerAnchor   = Date.now
@@ -482,7 +487,8 @@ extension SolitaireViewModel {
             difficulty: difficulty,
             moveCount: moveCount,
             elapsedSeconds: elapsed,
-            savedAt: Date.now
+            savedAt: Date.now,
+            history: Array(history.suffix(SolitaireSaveState.persistedHistoryDepth))
         )
         let key = SolitaireSaveState.key(difficulty: difficulty)
         if let data = try? JSONEncoder().encode(snapshot) {

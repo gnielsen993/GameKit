@@ -267,6 +267,7 @@ final class FreeCellViewModel {
             return
         }
         if history.isEmpty { timerAnchor = nil; pausedElapsed = 0 }
+        saveCurrentState()   // keep the persisted stack in step with undo
     }
 
     #if DEBUG
@@ -510,7 +511,9 @@ final class FreeCellViewModel {
         board         = saved.board
         dealNumber    = saved.dealNumber
         difficulty    = saved.difficulty.flatMap { FreeCellDifficulty(rawValue: $0) }
-        history       = []
+        // Undo now survives a relaunch. Older saves carry no history and
+        // decode to nil, restoring the previous behaviour for them.
+        history       = saved.history ?? []
         selection     = nil
         pausedElapsed = saved.elapsedSeconds
         frozenElapsed = 0
@@ -531,7 +534,8 @@ final class FreeCellViewModel {
             dealNumber: dealNumber,
             difficulty: difficulty?.rawValue,
             elapsedSeconds: elapsed,
-            savedAt: Date.now
+            savedAt: Date.now,
+            history: Array(history.suffix(FreeCellSaveState.persistedHistoryDepth))
         )
         if let data = try? JSONEncoder().encode(snapshot) {
             UserDefaults.standard.set(data, forKey: FreeCellSaveState.currentKey)

@@ -84,19 +84,23 @@ struct FreeCellBoard: Codable {
 
 // MARK: - Move record (source + dest + snapshot for undo)
 
-enum FreeCellSource: Hashable {
+enum FreeCellSource: Hashable, Codable {
     case column(colIdx: Int, startIdx: Int)
     case freeCell(cellIdx: Int)
     case foundation(suit: CardSuit)
 }
 
-enum FreeCellDest: Hashable {
+enum FreeCellDest: Hashable, Codable {
     case column(Int)
     case freeCell(Int)
     case foundation
 }
 
-struct FreeCellMove {
+/// Codable so the undo stack can survive a relaunch. `cards`, `source`, and
+/// `destination` are unread today — undo restores `boardBefore` wholesale —
+/// but they are persisted rather than dropped so a future move list or replay
+/// does not need a save-format change.
+struct FreeCellMove: Codable {
     let cards:       [PlayingCard]
     let source:      FreeCellSource
     let destination: FreeCellDest
