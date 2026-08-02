@@ -269,13 +269,19 @@ final class FiveLetterViewModel {
         return mode
     }
 
-    private static func selectAnswer(mode: FiveLetterMode, now: Date = .now) -> (answer: String, puzzleId: String) {
+    // Internal rather than private so the date -> answer mapping is directly
+    // testable; the daily word is a cross-device contract, not an internal
+    // detail. See FiveLetterDailyAnswerTests.
+    nonisolated static func selectAnswer(mode: FiveLetterMode, now: Date = .now) -> (answer: String, puzzleId: String) {
         let answers = WordLexicon.fiveLetterAnswers
         guard !answers.isEmpty else { return ("APPLE", "fallback") }
         switch mode {
         case .daily:
             let id = dailyPuzzleId(now: now)
-            let index = abs(id.hashValue) % answers.count
+            // StableHash, not `id.hashValue`: Swift's hasher is seeded per
+            // process, so hashValue gave every launch — and every player — a
+            // different word for the same date.
+            let index = StableHash.index(for: id, upperBound: answers.count)
             return (answers[index], id)
         case .unlimited:
             let seed = UInt64(Date().timeIntervalSinceReferenceDate.rounded()) ^ UInt64.random(in: 0...UInt64.max)
@@ -284,7 +290,7 @@ final class FiveLetterViewModel {
         }
     }
 
-    private static func dailyPuzzleId(now: Date) -> String {
+    nonisolated static func dailyPuzzleId(now: Date) -> String {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")
