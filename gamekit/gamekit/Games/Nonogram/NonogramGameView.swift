@@ -105,6 +105,14 @@ struct NonogramGameView: View {
                 puzzleGeneratingOverlay
             }
         }
+        .overlay(alignment: .top) {
+            talkthroughBanner
+                .transition(.move(edge: .top).combined(with: .opacity))
+        }
+        .animation(
+            settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
+            value: viewModel.activeTalkthrough
+        )
         .onChange(of: viewModel.state) { _, newState in
             switch newState {
             case .won:

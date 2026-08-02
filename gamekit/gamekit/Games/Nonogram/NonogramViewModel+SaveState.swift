@@ -31,6 +31,7 @@ extension NonogramViewModel {
         board = restoredBoard
         livesRemaining = saved.livesRemaining
         lockedCells = Set(saved.lockedCellIndices)
+        assistsUsed = saved.assistsUsed ?? 0
         pausedElapsed = saved.elapsedSeconds
         state = .playing
         timerAnchor = clock()
@@ -63,7 +64,8 @@ extension NonogramViewModel {
             livesRemaining: livesRemaining,
             lockedCellIndices: Array(lockedCells),
             elapsedSeconds: elapsedSeconds,
-            savedAt: Date.now
+            savedAt: Date.now,
+            assistsUsed: assistsUsed
         )
         let key = NonogramSaveState.key(difficulty: difficulty, gameMode: gameMode)
         if let data = try? JSONEncoder().encode(snapshot) {

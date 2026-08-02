@@ -205,6 +205,17 @@ struct SettingsView: View {
                     label: String(localized: "Animations"),
                     isOn: Bindable(settingsStore).animationsEnabled
                 )
+                Rectangle()
+                    .fill(theme.colors.border)
+                    .frame(height: 1)
+                // The purist switch. Off removes the assist entry points
+                // entirely rather than leaving them to be ignored.
+                SettingsToggleRow(
+                    theme: theme,
+                    glyph: "lightbulb",
+                    label: String(localized: "Hints"),
+                    isOn: Bindable(settingsStore).assistsEnabled
+                )
             }
         }
     }

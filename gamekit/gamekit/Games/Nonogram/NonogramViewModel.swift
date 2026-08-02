@@ -122,6 +122,29 @@ final class NonogramViewModel {
     /// Per-column, per-hint cross-off mask. Cached — see `rowsCrossOff`.
     private(set) var columnsCrossOff: [[Bool]] = []
 
+    /// Assists the player has asked for on this puzzle. Persisted with the
+    /// save so closing the app cannot launder an assisted solve into a clean
+    /// one, and passed to GameStats at win time.
+    // Plain `var` (not private(set)) — written by
+    // NonogramViewModel+SaveState.swift on restore, matching the pattern used
+    // by `livesRemaining` and `lockedCells` above. Read-only to view callers.
+    var assistsUsed: Int = 0
+
+    /// The deduction currently being explained, if the player has asked.
+    /// Cleared by the next board mutation — the explanation describes a board
+    /// state, so it must not outlive it.
+    private(set) var activeTalkthrough: NonogramTalkthrough.Deduction?
+
+    /// Why the last talkthrough request produced nothing, when it did.
+    private(set) var talkthroughUnavailable: TalkthroughUnavailable?
+
+    enum TalkthroughUnavailable: Equatable {
+        /// A line contradicts its clues, so no honest next step exists.
+        case boardHasAMistake
+        /// The solver cannot take this puzzle further by line logic alone.
+        case noLineDeduction
+    }
+
     /// Rows whose contents can no longer satisfy their clues — a proof the
     /// player has gone wrong somewhere in that row.
     ///
@@ -139,6 +162,40 @@ final class NonogramViewModel {
     /// Columns whose contents can no longer satisfy their clues.
     private(set) var unsatisfiableColumns: Set<Int> = []
 
+    /// Ask for the next deduction and an explanation of it.
+    ///
+    /// On-demand only: the solver enumerates placements per line, and running
+    /// that on the mutation path was already the dominant cause of 20x20
+    /// swipe lag. Nothing here touches `refreshCrossOff`.
+    func requestTalkthrough() {
+        // .idle is allowed: "where do I even start" is a fair question, and
+        // the first overlap deduction is the honest answer to it.
+        guard state == .idle || state == .playing else { return }
+        talkthroughUnavailable = nil
+
+        if let deduction = NonogramTalkthrough.nextDeduction(
+            board: board, rowHints: rowHints, columnHints: columnHints
+        ) {
+            activeTalkthrough = deduction
+            assistsUsed += 1
+            saveCurrentState()
+            return
+        }
+
+        // No deduction has two very different causes and the player deserves
+        // to know which: their own mistake, or a puzzle this solver cannot
+        // advance. Neither counts as an assist — nothing was given.
+        activeTalkthrough = nil
+        talkthroughUnavailable = (unsatisfiableRows.isEmpty && unsatisfiableColumns.isEmpty)
+            ? .noLineDeduction
+            : .boardHasAMistake
+    }
+
+    func dismissTalkthrough() {
+        activeTalkthrough = nil
+        talkthroughUnavailable = nil
+    }
+
     /// Recompute cross-off masks. Called after any board mutation.
     func refreshCrossOff() {
         guard currentPuzzle != nil else {
@@ -148,6 +205,9 @@ final class NonogramViewModel {
             unsatisfiableColumns = []
             return
         }
+        // The explanation describes the board as it was; once it changes the
+        // advice is stale, so it goes with it.
+        activeTalkthrough = nil
         rowsCrossOff = NonogramHints.rowsCrossOff(board: board, hints: rowHints)
         columnsCrossOff = NonogramHints.columnsCrossOff(board: board, hints: columnHints)
         if gameMode == .free {
@@ -554,7 +614,8 @@ final class NonogramViewModel {
             difficulty: difficulty.rawValue,
             outcome: .loss,
             durationSeconds: frozenElapsed,
-            puzzleId: currentPuzzle?.id
+            puzzleId: currentPuzzle?.id,
+            assistCount: assistsUsed
         )
     }
 

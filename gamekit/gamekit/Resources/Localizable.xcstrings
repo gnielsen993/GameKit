@@ -1,6 +1,39 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Show me a step" : {
+
+    },
+    "Hints" : {
+
+    },
+    "Row %d" : {
+
+    },
+    "Column %d" : {
+
+    },
+    "Double tap to dismiss" : {
+
+    },
+    "%@ has a run of %d in %d squares. Wherever that run sits, these %d always fall inside it." : {
+
+    },
+    "%@ already has every square its clues call for. The rest of it must be empty." : {
+
+    },
+    "%@ has a clue of zero. Nothing goes in it at all." : {
+
+    },
+    "In %@, these squares are the same in every arrangement that fits the clues." : {
+
+    },
+    "Something already placed does not match its clues. Check the rows and columns marked in red." : {
+
+    },
+    "No next square can be worked out from a single row or column here." : {
+
+    },
     "" : {
 
     },

@@ -150,7 +150,10 @@ extension NonogramGameView {
                 currentDifficulty: viewModel.difficulty,
                 currentGameMode: viewModel.gameMode,
                 onSelectDifficulty: { viewModel.setDifficulty($0) },
-                onSelectGameMode: { viewModel.setGameMode($0) }
+                onSelectGameMode: { viewModel.setGameMode($0) },
+                onTalkthrough: settingsStore.assistsEnabled
+                    ? { viewModel.requestTalkthrough() }
+                    : nil
             )
         }
     }
@@ -168,7 +171,10 @@ extension NonogramGameView {
                 currentDifficulty: viewModel.difficulty,
                 currentGameMode: viewModel.gameMode,
                 onSelectDifficulty: { viewModel.setDifficulty($0) },
-                onSelectGameMode: { viewModel.setGameMode($0) }
+                onSelectGameMode: { viewModel.setGameMode($0) },
+                onTalkthrough: settingsStore.assistsEnabled
+                    ? { viewModel.requestTalkthrough() }
+                    : nil
             )
         }
     }

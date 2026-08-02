@@ -16,9 +16,25 @@ struct NonogramToolbarMenu: View {
     let currentGameMode: NonogramGameMode
     let onSelectDifficulty: (NonogramDifficulty) -> Void
     let onSelectGameMode: (NonogramGameMode) -> Void
+    /// nil hides the assist entry point entirely — the purist setting, and
+    /// the Video Mode small-zone case where there is no room for a control.
+    var onTalkthrough: (() -> Void)? = nil
 
     var body: some View {
         Menu {
+            if let onTalkthrough {
+                // Rides the existing menu rather than claiming a chip: the
+                // large-zone compact row is already full and small zones cap
+                // at two chips (DESIGN.md §7).
+                Section {
+                    Button {
+                        onTalkthrough()
+                    } label: {
+                        Label(String(localized: "Show me a step"), systemImage: "lightbulb")
+                    }
+                }
+            }
+
             Section(String(localized: "Mode")) {
                 ForEach(NonogramGameMode.allCases, id: \.self) { mode in
                     Button {
