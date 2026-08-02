@@ -75,6 +75,7 @@ final class MergeViewModel {
         self.board = .empty
         self.board = BoardSpawner.initial(rng: &self.rng)
         self.state = .playing
+        refreshBestScore()
     }
 
     // MARK: - GameStats injection (lazy, one-shot)
@@ -83,6 +84,22 @@ final class MergeViewModel {
         guard self.gameStats == nil else { return }
         self.gameStats = stats
         checkAndLoadOrRestoreState()
+        refreshBestScore()
+    }
+
+    /// Seeds `bestScore` from persisted stats for the current mode.
+    ///
+    /// `bestScore` drives the header chip, the Video Mode chips, and the
+    /// "Best: N" line on the end-state card. It used to be raised only by
+    /// `handleSwipe`, so a fresh launch showed Best 0 and then reported the
+    /// current run as the all-time best the moment it scored anything —
+    /// the number was the best *this session*, presented as the best ever.
+    ///
+    /// Takes the max with the live `score` so a run in progress never
+    /// appears to lose ground to a lower stored value.
+    private func refreshBestScore() {
+        guard let gameStats else { return }
+        bestScore = max(gameStats.bestScore(gameKind: .merge, mode: mode.rawValue), score)
     }
 
     // MARK: - Public API
@@ -150,7 +167,8 @@ final class MergeViewModel {
     }
 
     /// Same mode, fresh board. Score / state / continuation flag reset.
-    /// Best-score is session-local on the VM; persistence is via GameStats.
+    /// `bestScore` deliberately survives a restart — it mirrors the stored
+    /// BestScore for this mode (see `refreshBestScore`), not the session.
     /// Re-spawns the initial 2-tile board (matches VM init) so the player
     /// can act immediately without an extra swipe.
     func restart() {
@@ -173,6 +191,8 @@ final class MergeViewModel {
         mode = newMode
         userDefaults.set(newMode.rawValue, forKey: Self.lastModeKey)
         restart()
+        // Best is stored per mode, so switching modes must re-read it.
+        refreshBestScore()
     }
 
     // MARK: - Mode-change confirmation flow (mirrors Minesweeper's
@@ -226,6 +246,9 @@ final class MergeViewModel {
             outcome: outcome,
             score: score
         )
+        // GameStats has just evaluated BestScore for this run, so re-read it
+        // before the end-state card renders its "Best: N" line.
+        refreshBestScore()
     }
 
     // MARK: - Constants
@@ -251,6 +274,8 @@ final class MergeViewModel {
         hasContinuedPastWin = saved.hasContinuedPastWin
         state = .playing
         pendingSaveState = nil
+        // A restored save can carry a different mode than the VM started in.
+        refreshBestScore()
     }
 
     func discardSaveAndLoadNew() {
