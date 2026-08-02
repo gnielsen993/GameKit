@@ -25,6 +25,9 @@ struct SudokuSaveState: Codable {
     let lockedCellIndices: [Int]    // flat indices of lives-mode locked cells
     let gameMode: String            // SudokuGameMode.rawValue
     let savedAt: Date
+    /// Assists used. Optional with a nil default so saves written before
+    /// assists existed still decode; nil reads as zero.
+    var assistsUsed: Int? = nil
 
     /// UserDefaults key for the given difficulty + game mode pair.
     static func key(difficulty: SudokuDifficulty, gameMode: SudokuGameMode) -> String {

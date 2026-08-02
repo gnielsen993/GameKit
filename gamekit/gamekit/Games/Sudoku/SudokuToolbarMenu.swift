@@ -16,12 +16,26 @@ struct SudokuToolbarMenu: View {
     let currentGameMode: SudokuGameMode
     let onSelectDifficulty: (SudokuDifficulty) -> Void
     let onSelectGameMode: (SudokuGameMode) -> Void
+    /// nil hides the assist entry point entirely — the purist setting.
+    var onHint: (() -> Void)? = nil
     /// Compact variant for Video Mode large-zone control row — smaller frame +
     /// surface background to match VideoCompactControlRow button style.
     var compact: Bool = false
 
     var body: some View {
         Menu {
+            if let onHint {
+                // Rides the menu rather than claiming a chip: the large-zone
+                // control row is already five items wide (DESIGN.md §7).
+                Section {
+                    Button {
+                        onHint()
+                    } label: {
+                        Label(String(localized: "Show me a step"), systemImage: "lightbulb")
+                    }
+                }
+            }
+
             Section(String(localized: "Mode")) {
                 ForEach(SudokuGameMode.allCases, id: \.self) { mode in
                     Button {

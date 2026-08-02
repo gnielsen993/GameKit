@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import SudokuCore
 import Observation
 
 @Observable @MainActor
@@ -350,6 +351,96 @@ final class SudokuViewModel {
         return result
     }
 
+    // MARK: - Talkthrough (assist)
+
+    /// Assists asked for on this puzzle. Persisted with the save so closing
+    /// the app cannot launder an assisted solve into a clean one.
+    var assistsUsed: Int = 0
+
+    /// How far the player has asked the current hint to go.
+    ///
+    /// Graduated on purpose: naming the technique and region is usually
+    /// enough to unstick someone, and stopping there leaves them the
+    /// satisfaction of placing the digit. Only a second ask reveals it.
+    enum HintStage: Equatable { case explanation, reveal }
+
+    struct ActiveHint: Equatable {
+        let step: SudokuHintEngine.Step
+        var stage: HintStage
+    }
+
+    private(set) var activeHint: ActiveHint?
+
+    /// Set when a request could not produce a step. Singles are the only
+    /// techniques this engine proves, so Hard and Extreme puzzles will reach
+    /// this — the copy has to own that rather than pretend.
+    private(set) var hintUnavailable: HintUnavailable?
+
+    enum HintUnavailable: Equatable {
+        /// Something already placed contradicts the solution (free mode only).
+        case boardHasAMistake
+        /// Beyond naked and hidden singles.
+        case beyondSingles
+    }
+
+    /// Ask for the next step, or push the current one further.
+    ///
+    /// Charges exactly one assist per puzzle-step, not per tap: escalating
+    /// from explanation to reveal is the same hint, so it does not cost twice.
+    func requestHint() {
+        guard state == .idle || state == .playing else { return }
+        hintUnavailable = nil
+
+        // Second ask on the same step escalates rather than re-charging.
+        if var hint = activeHint {
+            hint.stage = .reveal
+            activeHint = hint
+            return
+        }
+
+        // A wrong digit already on the board makes any further advice
+        // meaningless — the engine would reason from a false premise.
+        if !incorrectCellIndices.isEmpty {
+            hintUnavailable = .boardHasAMistake
+            return
+        }
+
+        guard let board else { return }
+        let engine = SudokuHintEngine()
+        guard let step = engine.nextStep(board: Self.flatValues(of: board)) else {
+            hintUnavailable = .beyondSingles
+            return
+        }
+
+        activeHint = ActiveHint(step: step, stage: .explanation)
+        assistsUsed += 1
+        saveCurrentState()
+    }
+
+    func dismissHint() {
+        activeHint = nil
+        hintUnavailable = nil
+    }
+
+    /// Places the digit the current hint names, if the player asks for it.
+    func applyHint() {
+        guard let hint = activeHint else { return }
+        select(row: hint.step.row, col: hint.step.column)
+        place(value: hint.step.value)
+        activeHint = nil
+    }
+
+    /// The board as SudokuCore sees it: row-major, 0 for empty.
+    static func flatValues(of board: SudokuBoard) -> [Int] {
+        (0..<81).map { index in
+            switch board.cell(row: index / 9, col: index % 9) {
+            case .given(let v): return v
+            case .user(let v):  return v
+            case .empty:        return 0
+            }
+        }
+    }
+
     private func commitValue(_ value: Int, atRow row: Int, col: Int) {
         guard var board else { return }
         let idx = row * 9 + col
@@ -386,6 +477,8 @@ final class SudokuViewModel {
         board = board.clearingPeerNotes(of: value, fromRow: row, col: col)
         self.board = board
         placeCount += 1
+        // The explanation describes the board as it was.
+        activeHint = nil
         if state == .idle { startTimer() }
         fireCompletionEffects(row: row, col: col, value: value, board: board)
         saveCurrentState()
@@ -453,7 +546,8 @@ final class SudokuViewModel {
             difficulty: difficulty.rawValue,
             outcome: .loss,
             durationSeconds: frozenElapsed,
-            puzzleId: currentPuzzle?.id
+            puzzleId: currentPuzzle?.id,
+            assistCount: assistsUsed
         )
     }
 

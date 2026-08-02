@@ -1,6 +1,39 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Show the answer" : {
+
+    },
+    "Fill it in" : {
+
+    },
+    "Dismiss" : {
+
+    },
+    "row %d" : {
+
+    },
+    "column %d" : {
+
+    },
+    "this box" : {
+
+    },
+    "The square at row %d, column %d has only one digit left — its row, column, and box rule out all the others." : {
+
+    },
+    "In %@, one digit fits in only one square. Look for the digit that has nowhere else to go." : {
+
+    },
+    "Row %d, column %d is %d." : {
+
+    },
+    "A digit already placed does not match the solution. Fix the red squares first — anything worked out from here would rest on it." : {
+
+    },
+    "This one needs a harder technique than a single square or a single digit. No step here can be spelled out." : {
+
+    },
     "Show me a step" : {
 
     },

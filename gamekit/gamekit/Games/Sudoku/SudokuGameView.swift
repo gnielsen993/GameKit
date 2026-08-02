@@ -57,6 +57,14 @@ struct SudokuGameView: View {
                 videoModeLayout
             }
         }
+        .overlay(alignment: .top) {
+            hintBanner
+                .transition(.move(edge: .top).combined(with: .opacity))
+        }
+        .animation(
+            settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
+            value: viewModel.activeHint
+        )
         .alert("Resume puzzle?", isPresented: Binding(
             get: { viewModel.pendingSaveState != nil },
             set: { _ in }
@@ -276,7 +284,8 @@ extension SudokuGameView {
                 currentDifficulty: viewModel.difficulty,
                 currentGameMode: viewModel.gameMode,
                 onSelectDifficulty: { viewModel.setDifficulty($0) },
-                onSelectGameMode: { viewModel.setGameMode($0) }
+                onSelectGameMode: { viewModel.setGameMode($0) },
+                onHint: settingsStore.assistsEnabled ? { viewModel.requestHint() } : nil
             )
         }
     }

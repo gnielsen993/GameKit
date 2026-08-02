@@ -38,6 +38,7 @@ extension SudokuViewModel {
         self.board = restored
         mistakes = saved.mistakes
         lockedCells = Set(saved.lockedCellIndices)
+        assistsUsed = saved.assistsUsed ?? 0
         pausedElapsed = saved.elapsedSeconds
         state = .playing
         timerAnchor = clock()
@@ -75,7 +76,8 @@ extension SudokuViewModel {
             mistakes: mistakes,
             lockedCellIndices: Array(lockedCells),
             gameMode: gameMode.rawValue,
-            savedAt: Date.now
+            savedAt: Date.now,
+            assistsUsed: assistsUsed
         )
         let key = SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode)
         if let data = try? JSONEncoder().encode(snapshot) {
