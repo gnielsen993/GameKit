@@ -13,8 +13,11 @@ extension NonogramBoardView {
     /// widening the existing hint rail: `1·5` cannot be mistaken for `15`.
     static var rowHintSeparator: String { "·" }
 
-    func hintColor(crossed: Bool, targeted: Bool) -> Color {
+    /// Precedence: targeted beats everything (it is momentary and tracks the
+    /// finger), then unsatisfiable, then crossed-off.
+    func hintColor(crossed: Bool, targeted: Bool, unsatisfiable: Bool = false) -> Color {
         if targeted { return theme.colors.accentPrimary }
+        if unsatisfiable { return theme.colors.danger }
         return crossed ? theme.colors.textTertiary : theme.colors.textSecondary
     }
 
@@ -22,14 +25,19 @@ extension NonogramBoardView {
     func rowHintText(
         hints: [Int],
         crossMask: [Bool],
-        targeted: Bool
+        targeted: Bool,
+        unsatisfiable: Bool = false
     ) -> AttributedString {
         var result = AttributedString()
 
         for (index, value) in hints.enumerated() {
             let crossed = crossMask.indices.contains(index) ? crossMask[index] : false
             var clue = AttributedString(String(value))
-            clue.foregroundColor = hintColor(crossed: crossed, targeted: targeted)
+            clue.foregroundColor = hintColor(
+                crossed: crossed,
+                targeted: targeted,
+                unsatisfiable: unsatisfiable
+            )
             if crossed {
                 clue.strikethroughStyle = Text.LineStyle(
                     pattern: .solid,
@@ -52,7 +60,10 @@ extension NonogramBoardView {
         hints.map(String.init).joined(separator: rowHintSeparator)
     }
 
-    static func rowHintAccessibilityLabel(_ hints: [Int]) -> String {
-        hints.map(String.init).joined(separator: ", ")
+    static func rowHintAccessibilityLabel(_ hints: [Int], unsatisfiable: Bool = false) -> String {
+        let clues = hints.map(String.init).joined(separator: ", ")
+        // Colour alone must not carry the signal.
+        guard unsatisfiable else { return clues }
+        return String(format: String(localized: "%@, line no longer matches its clues"), clues)
     }
 }

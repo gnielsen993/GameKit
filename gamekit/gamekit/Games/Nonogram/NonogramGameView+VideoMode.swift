@@ -201,6 +201,8 @@ extension NonogramGameView {
             columnHints: viewModel.columnHints,
             rowsCrossOff: viewModel.rowsCrossOff,
             columnsCrossOff: viewModel.columnsCrossOff,
+            unsatisfiableRows: viewModel.unsatisfiableRows,
+            unsatisfiableColumns: viewModel.unsatisfiableColumns,
             theme: theme,
             isInteractive: isInteractive,
             interactionMode: viewModel.interactionMode,

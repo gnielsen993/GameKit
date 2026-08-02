@@ -93,6 +93,32 @@ enum NonogramHints {
         }
     }
 
+    /// Row indices whose current contents can no longer satisfy their clues.
+    static func unsatisfiableRows(board: NonogramBoard, hints: [[Int]]) -> Set<Int> {
+        var result: Set<Int> = []
+        for row in 0..<board.size {
+            let filled = (0..<board.size).map { board.cell(row: row, col: $0) == .filled }
+            let marked = (0..<board.size).map { board.cell(row: row, col: $0) == .marked }
+            if !lineIsSatisfiable(filled: filled, marked: marked, hints: hints[safe: row] ?? [0]) {
+                result.insert(row)
+            }
+        }
+        return result
+    }
+
+    /// Column indices whose current contents can no longer satisfy their clues.
+    static func unsatisfiableColumns(board: NonogramBoard, hints: [[Int]]) -> Set<Int> {
+        var result: Set<Int> = []
+        for col in 0..<board.size {
+            let filled = (0..<board.size).map { board.cell(row: $0, col: col) == .filled }
+            let marked = (0..<board.size).map { board.cell(row: $0, col: col) == .marked }
+            if !lineIsSatisfiable(filled: filled, marked: marked, hints: hints[safe: col] ?? [0]) {
+                result.insert(col)
+            }
+        }
+        return result
+    }
+
     /// Run with start position. Internal to cross-off math.
     private struct PositionedRun { let start: Int; let length: Int }
 
@@ -109,6 +135,33 @@ enum NonogramHints {
     /// the left edge, so the first hint then crosses. Conversely, an interior
     /// `4` in `[1, 4, 3]` can cross without an edge chain because its value
     /// identifies it unambiguously to the player.
+    /// True when the line's current fills and marks can still be completed
+    /// into its clue sequence.
+    ///
+    /// False is a *proof* the player has made a mistake somewhere in this
+    /// line — not a guess and never a false positive, since it means no
+    /// arrangement of the clues fits what is already on the board.
+    ///
+    /// `crossOffMask` computes the same fact internally and throws it away:
+    /// its no-placement branch returns an all-false mask, which is
+    /// indistinguishable from the ordinary "nothing determinable yet" mask,
+    /// so it cannot be used to detect this. Hence a separate entry point.
+    ///
+    /// Stops at the first valid placement (`cap: 1`) rather than enumerating
+    /// up to 4000, so the common consistent case exits almost immediately.
+    static func lineIsSatisfiable(filled: [Bool], marked: [Bool], hints: [Int]) -> Bool {
+        let n = filled.count
+        if hints == [0] { return !filled.contains(true) }
+
+        var placements: [[Int]] = []
+        enumeratePlacements(
+            n: n, hints: hints, hintIdx: 0, startPos: 0,
+            filled: filled, marked: marked, current: [],
+            out: &placements, cap: 1
+        )
+        return !placements.isEmpty
+    }
+
     static func crossOffMask(filled: [Bool], marked: [Bool], hints: [Int]) -> [Bool] {
         let n = filled.count
 

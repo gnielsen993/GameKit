@@ -27,6 +27,12 @@ struct NonogramBoardView: View {
     /// player run. The renderer strikes through that single number.
     let rowsCrossOff: [[Bool]]
     let columnsCrossOff: [[Bool]]
+    /// Rows/columns whose contents can no longer satisfy their clues. Their
+    /// clue rail renders in the danger color: a proof the player went wrong
+    /// somewhere in that line, without naming the cell (which in a two-state
+    /// puzzle would be the same as solving it). Empty outside free mode.
+    var unsatisfiableRows: Set<Int> = []
+    var unsatisfiableColumns: Set<Int> = []
     let theme: Theme
     let isInteractive: Bool
     /// Current interaction mode (Place / Mark). Drag intent is computed
@@ -180,7 +186,11 @@ struct NonogramBoardView: View {
                         // rather than a blank slot.
                         Text("\(value)")
                             .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
-                            .foregroundStyle(hintColor(crossed: crossed, targeted: precisionCol == col))
+                            .foregroundStyle(hintColor(
+                                crossed: crossed,
+                                targeted: precisionCol == col,
+                                unsatisfiable: unsatisfiableColumns.contains(col)
+                            ))
                             .strikethrough(crossed, color: theme.colors.textTertiary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
@@ -206,7 +216,8 @@ struct NonogramBoardView: View {
                 Text(rowHintText(
                     hints: hints,
                     crossMask: crossMask,
-                    targeted: precisionRow == row
+                    targeted: precisionRow == row,
+                    unsatisfiable: unsatisfiableRows.contains(row)
                 ))
                 .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
                 .lineLimit(1)
@@ -217,7 +228,10 @@ struct NonogramBoardView: View {
                     height: layout.cellSize,
                     alignment: .trailing
                 )
-                .accessibilityLabel(Self.rowHintAccessibilityLabel(hints))
+                .accessibilityLabel(Self.rowHintAccessibilityLabel(
+                    hints,
+                    unsatisfiable: unsatisfiableRows.contains(row)
+                ))
             }
         }
         // Same breathing-room budget as the column hints, applied to

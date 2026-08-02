@@ -122,15 +122,41 @@ final class NonogramViewModel {
     /// Per-column, per-hint cross-off mask. Cached — see `rowsCrossOff`.
     private(set) var columnsCrossOff: [[Bool]] = []
 
+    /// Rows whose contents can no longer satisfy their clues — a proof the
+    /// player has gone wrong somewhere in that row.
+    ///
+    /// Free mode only. Lives mode auto-marks and locks a wrong fill the
+    /// moment it happens, so it cannot accumulate a contradiction; free mode
+    /// had no error signal at all, which is what made a mistake on move eight
+    /// survivable for an entire session.
+    ///
+    /// Deliberately line-level, not cell-level. Naming the offending cell in
+    /// a two-state puzzle is the same as solving it: fill everything, read
+    /// the red. Naming the line tells the player only what they could have
+    /// worked out by re-reading the clue themselves.
+    private(set) var unsatisfiableRows: Set<Int> = []
+
+    /// Columns whose contents can no longer satisfy their clues.
+    private(set) var unsatisfiableColumns: Set<Int> = []
+
     /// Recompute cross-off masks. Called after any board mutation.
     func refreshCrossOff() {
         guard currentPuzzle != nil else {
             rowsCrossOff = []
             columnsCrossOff = []
+            unsatisfiableRows = []
+            unsatisfiableColumns = []
             return
         }
         rowsCrossOff = NonogramHints.rowsCrossOff(board: board, hints: rowHints)
         columnsCrossOff = NonogramHints.columnsCrossOff(board: board, hints: columnHints)
+        if gameMode == .free {
+            unsatisfiableRows = NonogramHints.unsatisfiableRows(board: board, hints: rowHints)
+            unsatisfiableColumns = NonogramHints.unsatisfiableColumns(board: board, hints: columnHints)
+        } else {
+            unsatisfiableRows = []
+            unsatisfiableColumns = []
+        }
     }
 
     /// Live elapsed seconds. While playing this advances with wall clock;
