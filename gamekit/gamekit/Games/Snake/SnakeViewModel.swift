@@ -59,8 +59,18 @@ final class SnakeViewModel {
     private let maxQueueDepth = 2         // capacity-2 per RESEARCH Pattern 3
     private var didAttachStats = false    // one-shot guard for attachGameStats
     /// Persisted best score at the start of this run — used to detect the
-    /// once-per-run high-score crossing for the D-09 haptic.
-    private var bestScoreAtStart: Int = 0
+    /// once-per-run high-score crossing for the D-09 haptic, and to tell the
+    /// player at game-over what they were chasing (or that they beat it).
+    /// Deliberately the *pre-run* value: the game-over record write updates
+    /// the stored best, so reading GameStats after the fact would always
+    /// report a tie.
+    private(set) var bestScoreAtStart: Int = 0
+
+    /// True once this run has passed the best score it started against.
+    /// Requires a stored best to beat — with no history there is no record to
+    /// break, and the first run simply sets the baseline. Matches
+    /// StackViewModel so the two arcade banners cannot diverge.
+    var isNewBest: Bool { bestScoreAtStart > 0 && frame.score > bestScoreAtStart }
     /// Prevents highScoreCount from firing more than once per run.
     private var didCrossHighScore = false
 

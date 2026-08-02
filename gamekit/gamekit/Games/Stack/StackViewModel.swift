@@ -45,6 +45,20 @@ final class StackViewModel {
     /// SwiftData firewall: opaque GameStats reference (VM never imports SwiftData).
     private(set) var gameStats: GameStats?
 
+    /// Persisted best score at the start of this run, so game-over can tell
+    /// the player what they were chasing. Mirrors SnakeViewModel. Must be the
+    /// *pre-run* value: `recordStackRun` updates the stored best before the
+    /// banner renders, so re-reading GameStats there would always report a tie.
+    private(set) var bestScoreAtStart: Int = 0
+
+    /// True once this run has passed the best score it started against.
+    ///
+    /// Requires a stored best to beat. With no history there is no record to
+    /// break, and Stack's score floor is 1 (the base block is already placed),
+    /// so a bare `score > best` would greet every first-time player with
+    /// "New best - 1" the instant they missed.
+    var isNewBest: Bool { bestScoreAtStart > 0 && frame.score > bestScoreAtStart }
+
     // MARK: - Tap input (writable from view; main-actor, no Sendable concern)
 
     /// Set to true by the view's .onTapGesture. Latched once per engine step,
@@ -174,6 +188,7 @@ final class StackViewModel {
         guard !didAttachStats else { return }
         didAttachStats = true
         gameStats = stats
+        bestScoreAtStart = stats.bestScore(gameKind: .stack, mode: GameStats.stackEndlessMode)
     }
 
     // MARK: - Restart
@@ -192,6 +207,8 @@ final class StackViewModel {
         prevCenterZ = engine.cfg.playfieldCenter
         lastDropCenterX = engine.cfg.playfieldCenter
         lastDropCenterZ = engine.cfg.playfieldCenter
+        // Re-read: the run just ended may have set a new stored best.
+        bestScoreAtStart = gameStats?.bestScore(gameKind: .stack, mode: GameStats.stackEndlessMode) ?? 0
         frame = Self.initialFrame(cfg: engine.cfg)
         state = .idle   // tap-to-start affordance re-shows after restart
     }

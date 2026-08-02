@@ -630,6 +630,12 @@
     "Game over" : {
 
     },
+    "Game over. New best, score %d. Restart" : {
+
+    },
+    "Game over. Score %d. Best %d. Restart" : {
+
+    },
     "Game over. Score %d. Restart" : {
 
     },
@@ -888,6 +894,9 @@
 
     },
     "New %@ Game" : {
+
+    },
+    "New best - %d" : {
 
     },
     "New Deal" : {
@@ -1160,6 +1169,9 @@
 
     },
     "Score" : {
+
+    },
+    "Score %d - Best %d" : {
 
     },
     "Score %lld" : {

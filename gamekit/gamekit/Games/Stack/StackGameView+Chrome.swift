@@ -15,16 +15,50 @@ extension StackGameView {
 
     // MARK: - Game-over banner content
 
+    /// Run summary line. A run that beat the stored best says so; otherwise
+    /// it names the score to beat. A first run that scored nothing gets no
+    /// subtitle rather than a dispiriting "Best 0".
+    var runSummarySubtitle: String? {
+        if vm.isNewBest {
+            return String(format: String(localized: "New best - %d"), vm.frame.score)
+        }
+        guard vm.bestScoreAtStart > 0 else { return nil }
+        return String(
+            format: String(localized: "Score %d - Best %d"),
+            vm.frame.score,
+            vm.bestScoreAtStart
+        )
+    }
+
+    /// VoiceOver gets the same information the sighted banner carries, not a
+    /// reduced version of it.
+    var runSummaryAccessibilityLabel: String {
+        if vm.isNewBest {
+            return String(
+                format: String(localized: "Game over. New best, score %d. Restart"),
+                vm.frame.score
+            )
+        }
+        if vm.bestScoreAtStart > 0 {
+            return String(
+                format: String(localized: "Game over. Score %d. Best %d. Restart"),
+                vm.frame.score,
+                vm.bestScoreAtStart
+            )
+        }
+        return String(
+            format: String(localized: "Game over. Score %d. Restart"),
+            vm.frame.score
+        )
+    }
+
     var gameOverContent: VideoModeBannerContent {
         VideoModeBannerContent(
             outcome: .loss,
             title: String(localized: "Game over"),
-            subtitle: nil,
+            subtitle: runSummarySubtitle,
             primaryButtonLabel: String(localized: "Restart"),
-            accessibilityLabel: String(
-                format: String(localized: "Game over. Score %d. Restart"),
-                vm.frame.score
-            ),
+            accessibilityLabel: runSummaryAccessibilityLabel,
             onPrimary: {
                 vm.restart()
                 showBanner = false
