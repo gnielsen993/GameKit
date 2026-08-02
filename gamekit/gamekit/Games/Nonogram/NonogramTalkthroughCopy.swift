@@ -25,30 +25,52 @@ enum NonogramTalkthroughCopy {
         }
     }
 
+    /// Plain-language position, so the sentence can point at something the
+    /// player can actually find: "the 3rd to 8th squares of row 4".
+    private static func span(_ indices: [Int]) -> String {
+        guard let first = indices.first, let last = indices.last else { return "" }
+        if indices.count == 1 {
+            return String(format: String(localized: "square %d"), first + 1)
+        }
+        // Contiguous is the common case and reads far better than a list.
+        if last - first + 1 == indices.count {
+            return String(format: String(localized: "squares %d to %d"), first + 1, last + 1)
+        }
+        return String(
+            format: String(localized: "%d squares"), indices.count
+        )
+    }
+
     static func explanation(for deduction: NonogramTalkthrough.Deduction) -> String {
         let line = lineName(deduction.line)
         switch deduction.technique {
         case .overlap(let clue, let lineLength):
-            // The classic teachable case, and the reason this feature is a
-            // talkthrough rather than a reveal: the argument transfers.
+            // Names the squares rather than saying "these", because there was
+            // nothing on screen telling the player which ones "these" were.
             return String(
-                format: String(localized: "%@ has a run of %d in %d squares. Wherever that run sits, these %d always fall inside it."),
-                line, clue, lineLength, deduction.newFilled.count
+                format: String(localized: "%@ is one block of %d in %d squares. Slide that block to either end and %@ are covered both times, so they must be filled."),
+                line, clue, lineLength, span(deduction.newFilled)
             )
         case .lineComplete:
             return String(
-                format: String(localized: "%@ already has every square its clues call for. The rest of it must be empty."),
+                format: String(localized: "%@ already has all the filled squares its clues ask for, so everything still blank in it must be empty."),
                 line
             )
         case .allEmpty:
             return String(
-                format: String(localized: "%@ has a clue of zero. Nothing goes in it at all."),
+                format: String(localized: "%@ has a clue of 0, so nothing goes in it. Mark the whole line empty."),
                 line
             )
         case .forced:
+            if !deduction.newFilled.isEmpty {
+                return String(
+                    format: String(localized: "In %@, %@ are filled in every arrangement that fits the clues."),
+                    line, span(deduction.newFilled)
+                )
+            }
             return String(
-                format: String(localized: "In %@, these squares are the same in every arrangement that fits the clues."),
-                line
+                format: String(localized: "In %@, %@ are empty in every arrangement that fits the clues."),
+                line, span(deduction.newEmpty)
             )
         }
     }

@@ -33,6 +33,14 @@ struct NonogramBoardView: View {
     /// puzzle would be the same as solving it). Empty outside free mode.
     var unsatisfiableRows: Set<Int> = []
     var unsatisfiableColumns: Set<Int> = []
+    /// Flat indices the active hint is pointing at. Outlined so the sentence
+    /// has something on screen to refer to — without this the copy said
+    /// "these squares" while nothing showed which.
+    var talkthroughHighlight: Set<Int> = []
+    /// The row or column the hint is about, so its clue rail can be accented
+    /// even before the player finds the squares.
+    var talkthroughRow: Int? = nil
+    var talkthroughColumn: Int? = nil
     let theme: Theme
     let isInteractive: Bool
     /// Current interaction mode (Place / Mark). Drag intent is computed
@@ -188,7 +196,7 @@ struct NonogramBoardView: View {
                             .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
                             .foregroundStyle(hintColor(
                                 crossed: crossed,
-                                targeted: precisionCol == col,
+                                targeted: precisionCol == col || talkthroughColumn == col,
                                 unsatisfiable: unsatisfiableColumns.contains(col)
                             ))
                             .strikethrough(crossed, color: theme.colors.textTertiary)
@@ -216,7 +224,7 @@ struct NonogramBoardView: View {
                 Text(rowHintText(
                     hints: hints,
                     crossMask: crossMask,
-                    targeted: precisionRow == row,
+                    targeted: precisionRow == row || talkthroughRow == row,
                     unsatisfiable: unsatisfiableRows.contains(row)
                 ))
                 .font(.system(size: layout.hintFont, weight: .semibold, design: .rounded))
@@ -257,6 +265,7 @@ struct NonogramBoardView: View {
                             wrongFlash: wrongFlashIdx == idx,
                             completionFlash: flashRow == row || flashCol == col,
                             precisionTarget: precisionRow == row && precisionCol == col,
+                            hintTarget: talkthroughHighlight.contains(idx),
                             onAccessibilityTap: { onTap(row, col) }
                         )
                     }

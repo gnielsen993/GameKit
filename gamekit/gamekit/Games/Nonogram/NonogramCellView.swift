@@ -29,6 +29,9 @@ struct NonogramCellView: View {
     /// Touch-down preview for precision targeting on dense boards. The cell
     /// does not mutate until the board-level gesture ends.
     let precisionTarget: Bool
+    /// This square is one the active hint is pointing at. Outlined so the
+    /// explanation has a visible referent.
+    var hintTarget: Bool = false
     let onAccessibilityTap: () -> Void
 
     var body: some View {
@@ -51,11 +54,18 @@ struct NonogramCellView: View {
         .overlay(
             Rectangle()
                 .stroke(
-                    precisionTarget
+                    precisionTarget || hintTarget
                     ? theme.colors.accentPrimary
                     : theme.colors.textPrimary.opacity(0.18),
-                    lineWidth: precisionTarget ? 2 : 0.5
+                    lineWidth: precisionTarget || hintTarget ? 2 : 0.5
                 )
+        )
+        // A soft accent wash under the outline, so a run of hinted squares
+        // reads as one group at a glance rather than as separate borders.
+        .overlay(
+            Rectangle()
+                .fill(theme.colors.accentPrimary.opacity(hintTarget ? 0.20 : 0))
+                .allowsHitTesting(false)
         )
         .offset(x: wrongFlash ? theme.spacing.xs : 0)
         .feedbackAnimation(theme.motion.ease, value: state)

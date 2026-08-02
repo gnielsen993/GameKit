@@ -35,13 +35,16 @@ enum SudokuHintCopy {
     static func explanation(for step: SudokuHintEngine.Step) -> String {
         switch step.technique {
         case .nakedSingle:
+            // The ring and the shaded row/column are on screen, so the
+            // sentence can point at them instead of describing coordinates
+            // the player then has to go and find.
             return String(
-                format: String(localized: "The square at row %d, column %d has only one digit left — its row, column, and box rule out all the others."),
+                format: String(localized: "Only one digit is still possible in the ringed square (row %d, column %d). Everything else is already used in its row, column, or box — the shaded squares show where."),
                 step.row + 1, step.column + 1
             )
         case .hiddenSingle(let unit):
             return String(
-                format: String(localized: "In %@, one digit fits in only one square. Look for the digit that has nowhere else to go."),
+                format: String(localized: "Look at the shaded %@. One digit has nowhere to go in it except the ringed square."),
                 unitName(unit)
             )
         }

@@ -73,9 +73,9 @@ extension MinesweeperGameView {
                 outcome: .win,
                 title: String(localized: "You won!"),
                 subtitle: nil,
-                primaryButtonLabel: String(localized: "Restart"),
+                primaryButtonLabel: String(localized: "New board"),
                 accessibilityLabel: String(
-                    format: String(localized: "You won! Time: %@. Restart"),
+                    format: String(localized: "You won! Time: %@. New board"),
                     formatElapsedShort(viewModel.frozenElapsed)
                 ),
                 onPrimary: { viewModel.restart() },
@@ -89,13 +89,13 @@ extension MinesweeperGameView {
                 outcome: .loss,
                 title: String(localized: "Bad luck"),
                 subtitle: nil,
-                primaryButtonLabel: String(localized: "Restart"),
-                accessibilityLabel: String(localized: "Bad luck. Restart"),
-                onPrimary: { viewModel.restart() },
+                primaryButtonLabel: String(localized: "Try this board again"),
+                accessibilityLabel: String(localized: "Bad luck. Try this board again"),
+                onPrimary: { viewModel.retryCurrentBoard() },
                 secondaryButtonLabel: viewBoardLabel,
                 secondaryAction: dismissBanner,
-                tertiaryButtonLabel: changeDifficultyLabel,
-                tertiaryAction: changeDifficulty
+                tertiaryButtonLabel: String(localized: "New board"),
+                tertiaryAction: { viewModel.restart() }
             )
         }
     }

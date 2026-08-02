@@ -191,6 +191,31 @@ final class NonogramViewModel {
             : .boardHasAMistake
     }
 
+    /// Flat indices the current explanation is pointing at, for the board to
+    /// outline. Empty when no explanation is showing.
+    var talkthroughHighlight: Set<Int> {
+        guard let d = activeTalkthrough else { return [] }
+        let size = board.size
+        return Set((d.newFilled + d.newEmpty).map { offset in
+            switch d.line {
+            case .row(let r):    return r * size + offset
+            case .column(let c): return offset * size + c
+            }
+        })
+    }
+
+    /// The row the explanation refers to, if it is about a row.
+    var talkthroughRow: Int? {
+        if case .row(let r)? = activeTalkthrough?.line { return r }
+        return nil
+    }
+
+    /// The column the explanation refers to, if it is about a column.
+    var talkthroughColumn: Int? {
+        if case .column(let c)? = activeTalkthrough?.line { return c }
+        return nil
+    }
+
     func dismissTalkthrough() {
         activeTalkthrough = nil
         talkthroughUnavailable = nil

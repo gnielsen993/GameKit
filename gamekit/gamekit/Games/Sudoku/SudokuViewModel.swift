@@ -417,6 +417,26 @@ final class SudokuViewModel {
         saveCurrentState()
     }
 
+    /// The square the hint names, so the board can ring it.
+    var hintTargetIndex: Int? { activeHint?.step.index }
+
+    /// The squares carrying the argument — the containing row, column, or box
+    /// for a hidden single, the peers that do the eliminating for a naked one.
+    /// Shaded so the explanation has something to point at.
+    var hintSupportingIndices: Set<Int> {
+        guard let hint = activeHint else { return [] }
+        switch hint.step.technique {
+        case .hiddenSingle:
+            return Set(hint.step.supportingIndices)
+        case .nakedSingle:
+            // All 20 peers at once is noise. The row and column through the
+            // square carry the argument legibly; the box is implied by the
+            // ring on the square itself.
+            let row = hint.step.row, col = hint.step.column
+            return Set((0..<9).map { row * 9 + $0 } + (0..<9).map { $0 * 9 + col })
+        }
+    }
+
     func dismissHint() {
         activeHint = nil
         hintUnavailable = nil

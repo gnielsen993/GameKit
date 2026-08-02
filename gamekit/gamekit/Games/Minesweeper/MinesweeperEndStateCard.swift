@@ -57,21 +57,30 @@ struct MinesweeperEndStateCard: View {
                 }
 
                 VStack(spacing: theme.spacing.s) {
-                    DKButton(
-                        String(localized: "Restart"),
-                        style: .primary,
-                        theme: theme,
-                        action: onRestart
-                    )
-                    // "This board" rather than "Try again" — the distinction
-                    // from Restart is the whole point, and Restart already
-                    // means a fresh layout here.
+                    // After a loss the obvious action is another go at the
+                    // board you just lost, so it takes the primary slot and
+                    // the words say which board you get. "Restart" used to
+                    // sit here and silently dealt a new layout — the button
+                    // and the outcome disagreed.
                     if let onRetryBoard, outcome == .loss {
                         DKButton(
-                            String(localized: "Replay this board"),
-                            style: .secondary,
+                            String(localized: "Try this board again"),
+                            style: .primary,
                             theme: theme,
                             action: onRetryBoard
+                        )
+                        DKButton(
+                            String(localized: "New board"),
+                            style: .secondary,
+                            theme: theme,
+                            action: onRestart
+                        )
+                    } else {
+                        DKButton(
+                            String(localized: "New board"),
+                            style: .primary,
+                            theme: theme,
+                            action: onRestart
                         )
                     }
                     DKButton(

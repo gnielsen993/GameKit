@@ -26,6 +26,10 @@ struct SudokuCellView: View {
     /// True when this cell holds a user digit that disagrees with the
     /// solution. Free mode only — Lives mode never commits a wrong value.
     var isIncorrect: Bool = false
+    /// The square the active hint names — ringed in accent.
+    var isHintTarget: Bool = false
+    /// A square carrying the hint's argument — softly shaded.
+    var isHintSupporting: Bool = false
 
     enum HighlightTier: Equatable {
         case none                  // no overlay
@@ -41,6 +45,7 @@ struct SudokuCellView: View {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .overlay(hintOverlay)
         .overlay(wrongFlashOverlay)
         .feedbackAnimation(.spring(response: 0.25, dampingFraction: 0.7), value: cell)
         .contentShape(Rectangle())
@@ -58,6 +63,20 @@ struct SudokuCellView: View {
             }
         }()
         return Rectangle().fill(theme.colors.accentPrimary.opacity(opacity))
+    }
+
+    /// Ring on the named square, wash on the squares that prove it.
+    @ViewBuilder
+    private var hintOverlay: some View {
+        if isHintTarget {
+            Rectangle()
+                .stroke(theme.colors.accentPrimary, lineWidth: 2)
+                .allowsHitTesting(false)
+        } else if isHintSupporting {
+            Rectangle()
+                .fill(theme.colors.accentPrimary.opacity(0.12))
+                .allowsHitTesting(false)
+        }
     }
 
     // Completion glow: flashes in fast, fades out over ~650ms.
