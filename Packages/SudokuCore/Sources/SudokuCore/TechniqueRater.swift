@@ -56,13 +56,17 @@ public struct TechniqueRater: DifficultyRating {
         return .extreme
     }
 
+    /// Guess-and-recurse on top of the shared single-technique engine.
+    ///
+    /// The naked/hidden-single implementations used to live here as private
+    /// sweeps. They now come from `SudokuHintEngine`, so the rater and the
+    /// player-facing hint cannot drift apart — a technique the rater counts is
+    /// by construction one the hint can explain.
     private func solveWithTechniques(board: inout [Int], stats: inout SolverStats) -> Bool {
-        while true {
-            var progress = false
-            if applyNakedSingles(board: &board, stats: &stats) { progress = true }
-            if applyHiddenSingles(board: &board, stats: &stats) { progress = true }
-            if !progress { break }
-        }
+        let engine = SudokuHintEngine(gridSize: gridSize, boxSize: boxSize)
+        let applied = engine.applyAllSingles(board: &board)
+        stats.nakedSingles += applied.naked
+        stats.hiddenSingles += applied.hidden
 
         guard let (index, candidates) = sudokuBestCell(board: board, gridSize: gridSize, boxSize: boxSize) else { return true }
         if candidates.isEmpty { return false }
@@ -80,52 +84,5 @@ public struct TechniqueRater: DifficultyRating {
             }
         }
         return false
-    }
-
-    private func applyNakedSingles(board: inout [Int], stats: inout SolverStats) -> Bool {
-        var progress = false
-        for index in board.indices where board[index] == 0 {
-            let candidates = sudokuCandidates(at: index, board: board, gridSize: gridSize, boxSize: boxSize)
-            if candidates.count == 1, let value = candidates.first {
-                board[index] = value
-                stats.nakedSingles += 1
-                progress = true
-            }
-        }
-        return progress
-    }
-
-    private func applyHiddenSingles(board: inout [Int], stats: inout SolverStats) -> Bool {
-        var progress = false
-        for row in 0..<gridSize {
-            if placeHiddenSingle(in: sudokuUnitRow(row, gridSize: gridSize), board: &board, stats: &stats) { progress = true }
-        }
-        for col in 0..<gridSize {
-            if placeHiddenSingle(in: sudokuUnitCol(col, gridSize: gridSize), board: &board, stats: &stats) { progress = true }
-        }
-        for boxRow in 0..<(gridSize / boxSize) {
-            for boxCol in 0..<(gridSize / boxSize) {
-                if placeHiddenSingle(in: sudokuUnitBox(boxRow: boxRow, boxCol: boxCol, gridSize: gridSize, boxSize: boxSize), board: &board, stats: &stats) { progress = true }
-            }
-        }
-        return progress
-    }
-
-    private func placeHiddenSingle(in unit: [Int], board: inout [Int], stats: inout SolverStats) -> Bool {
-        var placed = false
-        for value in 1...gridSize {
-            var spots: [Int] = []
-            for index in unit where board[index] == 0 {
-                if sudokuIsValid(value: value, at: index, board: board, gridSize: gridSize, boxSize: boxSize) {
-                    spots.append(index)
-                }
-            }
-            if spots.count == 1, let index = spots.first {
-                board[index] = value
-                stats.hiddenSingles += 1
-                placed = true
-            }
-        }
-        return placed
     }
 }
