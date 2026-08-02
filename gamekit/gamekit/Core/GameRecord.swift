@@ -56,6 +56,24 @@ final class GameRecord {
     /// "Solved puzzles" gallery in StatsView.
     var puzzleIdRaw: String? = nil
 
+    /// Number of assists used in this game; nil for games played before
+    /// assists existed, 0 for an unaided game in a game that offers them.
+    ///
+    /// Optional is mandatory, not stylistic: CloudKit rejects a required
+    /// property added to an existing schema, and the same optionality is what
+    /// makes SwiftData's lightweight migration safe. See `score` above for the
+    /// established precedent.
+    ///
+    /// Product rule (v1.6): an assisted win is a win — it counts toward games
+    /// played, win rate, and streaks — but never writes a BestTime or
+    /// BestScore. A record is a claim about unaided play; the rest of the win
+    /// is not diminished.
+    var assistCount: Int? = nil
+
+    /// True when this game was completed with help. Reads nil as unaided so
+    /// pre-v1.6 records answer correctly.
+    var wasAssisted: Bool { (assistCount ?? 0) > 0 }
+
     /// Safe-fallback accessor (D-02) — unknown raw → `.minesweeper`.
     var gameKind: GameKind { GameKind(rawValue: gameKindRaw) ?? .minesweeper }
 
@@ -70,7 +88,8 @@ final class GameRecord {
         durationSeconds: Double,
         playedAt: Date = .now,
         score: Int? = nil,
-        puzzleId: String? = nil
+        puzzleId: String? = nil,
+        assistCount: Int? = nil
     ) {
         self.gameKindRaw = gameKind.rawValue
         self.difficultyRaw = difficulty
@@ -79,6 +98,7 @@ final class GameRecord {
         self.playedAt = playedAt
         self.score = score
         self.puzzleIdRaw = puzzleId
+        self.assistCount = assistCount
         // id, schemaVersion default-initialized
     }
 }

@@ -70,6 +70,17 @@ final class SettingsStore {
         }
     }
 
+    /// Whether assist affordances (the Nonogram talkthrough and its
+    /// successors) appear at all. Default `true` — help is offered, never
+    /// imposed, and it is always the player who asks for it. A purist can
+    /// switch the entry points off entirely rather than having to ignore
+    /// them, which is the v2.0-VISION principle-5 requirement.
+    var assistsEnabled: Bool {
+        didSet {
+            userDefaults.set(assistsEnabled, forKey: Self.assistsEnabledKey)
+        }
+    }
+
     /// Whether end-of-game choreography fires — Minesweeper loss cascade
     /// (mine-wave reveal + wrong-flag pop, then end card) and win confetti.
     /// Default `true`. Gated at the view layer: when false, end cards
@@ -107,6 +118,7 @@ final class SettingsStore {
 
     /// UserDefaults key for the haptics-enabled flag (P5 D-10).
     /// Renaming = preference loss; locked.
+    static let assistsEnabledKey = "gamekit.assistsEnabled"
     static let hapticsEnabledKey = "gamekit.hapticsEnabled"
 
     /// UserDefaults key for the SFX-enabled flag (P5 D-10).
@@ -129,6 +141,9 @@ final class SettingsStore {
         // D-10 default-true caveat: bool(forKey:) returns false for unset
         // keys (see lines 25-26), so we use the conventional optional-cast
         // fallback to honor the default-true contract on fresh installs.
+        // object(forKey:) not bool(forKey:) — bool() returns false for a
+        // missing key, which would silently invert the default.
+        self.assistsEnabled = (userDefaults.object(forKey: Self.assistsEnabledKey) as? Bool) ?? true
         self.hapticsEnabled = (userDefaults.object(forKey: Self.hapticsEnabledKey) as? Bool) ?? true
         // D-10 default-false: bool(forKey:) returns false for unset keys,
         // which is exactly what we want — no fallback needed.

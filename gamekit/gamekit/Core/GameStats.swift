@@ -64,7 +64,8 @@ final class GameStats {
         difficulty: String,
         outcome: Outcome,
         durationSeconds: Double,
-        puzzleId: String? = nil
+        puzzleId: String? = nil,
+        assistCount: Int? = nil
     ) throws {
         // 1. Insert GameRecord unconditionally (D-12 step 1).
         //    Done BEFORE BestTime evaluation so a flaky predicate cannot
@@ -75,14 +76,18 @@ final class GameStats {
             outcome: outcome,
             durationSeconds: durationSeconds,
             playedAt: .now,
-            puzzleId: puzzleId
+            puzzleId: puzzleId,
+            assistCount: assistCount
         )
         modelContext.insert(record)
 
         // 2. Win path: evaluate BestTime (insert-or-mutate, faster-only).
         //    Wrap in do/catch — best-effort. The outer save() still flushes
         //    the GameRecord even if this throws.
-        if outcome == .win {
+        // An assisted win is still a win — it is inserted above and counts
+        // toward games played, win rate, and streaks — but it does not set a
+        // record. A best time is a claim about unaided play (v1.6 ruling).
+        if outcome == .win && !record.wasAssisted {
             do {
                 try evaluateBestTime(
                     gameKind: gameKind,
