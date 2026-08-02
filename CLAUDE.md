@@ -25,7 +25,10 @@ file.
 accounts. No ads. Powered by the shared **DesignKit** Swift Package.
 
 Sister projects in the same ecosystem (same DesignKit, same rules):
-DesignKit · HabitTracker · FitnessTracker · PantryPlanner.
+DesignKit · HabitTracker · FitnessTracker (ships as **Stack**). PantryPlanner
+is named in the older ecosystem docs but is **dormant** — an untouched early
+prototype in `../DietTracker`, not a shipping app; do not treat it as a second
+consumer when weighing a DesignKit change.
 
 ---
 
