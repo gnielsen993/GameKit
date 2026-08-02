@@ -23,6 +23,9 @@ struct SudokuCellView: View {
     var noteHighlightDigit: Int? = nil
     /// True while this cell belongs to a just-completed row, column, or box.
     var isGlowing: Bool = false
+    /// True when this cell holds a user digit that disagrees with the
+    /// solution. Free mode only — Lives mode never commits a wrong value.
+    var isIncorrect: Bool = false
 
     enum HighlightTier: Equatable {
         case none                  // no overlay
@@ -80,7 +83,9 @@ struct SudokuCellView: View {
         case .user(let v):
             Text("\(v)")
                 .font(theme.typography.title.weight(.regular))
-                .foregroundStyle(theme.colors.accentPrimary)
+                // danger = errors per DESIGN.md §2; accent = the player's own
+                // correct choices.
+                .foregroundStyle(isIncorrect ? theme.colors.danger : theme.colors.accentPrimary)
                 // Placed digits scale in (gated via feedbackAnimation on the
                 // cell container below); erased/replaced digits cut instantly.
                 .transition(.scale(scale: 0.55).combined(with: .opacity))
@@ -130,7 +135,8 @@ struct SudokuCellView: View {
     private var accessibilityText: Text {
         switch cell {
         case .given(let v): return Text("Given \(v)")
-        case .user(let v):  return Text("\(v)")
+        // Colour alone must not carry the information (DESIGN.md a11y).
+        case .user(let v):  return isIncorrect ? Text("\(v), incorrect") : Text("\(v)")
         case .empty(let notes):
             if notes.isEmpty { return Text("Empty") }
             return Text("Notes: \(notes.sorted().map(String.init).joined(separator: ", "))")

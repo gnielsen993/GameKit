@@ -55,6 +55,8 @@ struct SudokuBoardView: View {
     private func cellGrid(cellSide: CGFloat) -> some View {
         let noteDigit = highlightedDigit
         let glowSet = viewModel.completionGlowIndices
+        // Computed once per grid render, not once per cell.
+        let wrongSet = viewModel.incorrectCellIndices
         VStack(spacing: 0) {
             ForEach(0..<Self.size, id: \.self) { r in
                 HStack(spacing: 0) {
@@ -70,7 +72,8 @@ struct SudokuBoardView: View {
                             isWrongFlashing: isFlash,
                             theme: theme,
                             noteHighlightDigit: noteDigit,
-                            isGlowing: isGlowing
+                            isGlowing: isGlowing,
+                            isIncorrect: wrongSet.contains(r * 9 + c)
                         )
                         .frame(width: cellSide, height: cellSide)
                         .onTapGesture {

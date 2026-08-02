@@ -323,6 +323,33 @@ final class SudokuViewModel {
         interactionMode = .value
     }
 
+    /// Indices of user-placed digits that disagree with the solution.
+    ///
+    /// Free mode only, and that is the whole point: `.lives` never commits a
+    /// wrong value, so only `.free` can hold one. Free mode's contract has
+    /// always said wrong placements show red — it simply was not built, so a
+    /// player could enter a wrong digit, get no signal of any kind, and grind
+    /// for the rest of the session on a board that could never be solved.
+    ///
+    /// The tradeoff is real and accepted: a player can now brute-force by
+    /// trying digits until nothing is red. Free mode already has no lives, no
+    /// failure state, and unlimited erase — someone who chose it over Lives
+    /// mode opted out of stakes, and silently letting them waste an hour is
+    /// the worse failure.
+    var incorrectCellIndices: Set<Int> {
+        guard gameMode == .free, let board else { return [] }
+        var result: Set<Int> = []
+        for row in 0..<9 {
+            for col in 0..<9 {
+                if case .user(let value) = board.cell(row: row, col: col),
+                   board.solutionDigit(atRow: row, col: col) != value {
+                    result.insert(row * 9 + col)
+                }
+            }
+        }
+        return result
+    }
+
     private func commitValue(_ value: Int, atRow row: Int, col: Int) {
         guard var board else { return }
         let idx = row * 9 + col
@@ -351,9 +378,9 @@ final class SudokuViewModel {
             return
         }
 
-        // .free mode — commit unconditionally. Wrong placements show red
-        // via the CellView's solution-mismatch overlay, but no failure
-        // state.
+        // .free mode — commit unconditionally. Wrong placements render in the
+        // danger color via `incorrectCellIndices` (fed to SudokuCellView by
+        // SudokuBoardView), but there is no failure state and nothing locks.
         captureUndo(at: row, col: col, previousCell: prevCell)
         board = board.setting(.user(value), atRow: row, col: col)
         board = board.clearingPeerNotes(of: value, fromRow: row, col: col)
