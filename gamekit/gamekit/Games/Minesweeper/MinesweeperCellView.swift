@@ -56,10 +56,31 @@ struct MinesweeperCellView: View {
 
     let onTap: (MinesweeperIndex) -> Void
     let onLongPress: (MinesweeperIndex) -> Void
+    /// This square is the one the hint recommends opening.
+    var isHintSafe: Bool = false
+    /// This revealed number is part of the hint's argument.
+    var isHintEvidence: Bool = false
+
+    /// Solid ring on the recommended square, softer ring on the numbers that
+    /// prove it — so the sentence has something to point at and the argument
+    /// is checkable rather than a claim to trust.
+    @ViewBuilder
+    private var hintOverlay: some View {
+        if isHintSafe {
+            RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
+                .stroke(theme.colors.accentPrimary, lineWidth: 3)
+                .allowsHitTesting(false)
+        } else if isHintEvidence {
+            RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
+                .stroke(theme.colors.accentPrimary.opacity(0.65), lineWidth: 2)
+                .allowsHitTesting(false)
+        }
+    }
 
     var body: some View {
         tileSurface
             .frame(width: cellSize, height: cellSize)
+            .overlay(hintOverlay)
             .overlay(
                 glyph
                     // Loss cascade: per-cell delay based on chebyshev distance

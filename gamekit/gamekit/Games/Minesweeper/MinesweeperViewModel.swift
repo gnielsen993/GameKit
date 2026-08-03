@@ -221,6 +221,9 @@ final class MinesweeperViewModel {
             pausedElapsed = 0
         }
         guard case .playing = gameState else { return }
+        // The explanation describes the board as it was.
+        activeHint = nil
+        hintFoundNothing = false
 
         let result = RevealEngine.reveal(at: index, on: board)
         board = result.board
@@ -301,6 +304,58 @@ final class MinesweeperViewModel {
         saveCurrentState()
     }
 
+    // MARK: - Hint (assist)
+
+    /// Assists asked for on this board.
+    private(set) var assistsUsed: Int = 0
+
+    private(set) var activeHint: MinesweeperHint.Step?
+    /// Set when the two rules could not prove anything.
+    private(set) var hintFoundNothing = false
+
+    /// Squares to outline: the one being recommended.
+    var hintSafeIndex: MinesweeperIndex? { activeHint?.safe }
+    /// Squares to highlight: the numbers carrying the argument.
+    var hintEvidence: Set<MinesweeperIndex> { Set(activeHint?.evidence ?? []) }
+
+    /// Ask for a square that can be proved safe.
+    func requestHint() {
+        guard case .playing = gameState else { return }
+        hintFoundNothing = false
+        guard let step = MinesweeperHint.nextStep(board: board) else {
+            activeHint = nil
+            hintFoundNothing = true
+            return
+        }
+        activeHint = step
+        assistsUsed += 1
+    }
+
+    func dismissHint() {
+        activeHint = nil
+        hintFoundNothing = false
+    }
+
+    /// Open a genuinely safe square when the player is out of deductions.
+    ///
+    /// Safety here does not come from the solver — it comes from the board
+    /// itself, which knows where the mines are. That distinction matters: the
+    /// two rules are incomplete, so a solver-chosen square could not be
+    /// guaranteed, whereas this one always can. It is the app spending the
+    /// guess the position forced on the player, and it counts as an assist.
+    func openASafeSquare() {
+        guard case .playing = gameState else { return }
+        let candidates = board.allIndices().filter {
+            let cell = board.cell(at: $0)
+            return cell.state == .hidden && !cell.isMine
+        }
+        guard let choice = candidates.min(by: { ($0.row, $0.col) < ($1.row, $1.col) }) else { return }
+        assistsUsed += 1
+        activeHint = nil
+        hintFoundNothing = false
+        reveal(at: choice)
+    }
+
     /// True when the current game is a replay of a board the player has
     /// already lost. Its result is recorded like any other game, but it can
     /// never set a best time — see `retryCurrentBoard()`.
@@ -353,6 +408,9 @@ final class MinesweeperViewModel {
         board = Self.idleBoard(for: difficulty)
         gameState = .idle
         isReplayingBoard = false
+        assistsUsed = 0
+        activeHint = nil
+        hintFoundNothing = false
         flaggedCount = 0
         timerAnchor = nil
         pausedElapsed = 0

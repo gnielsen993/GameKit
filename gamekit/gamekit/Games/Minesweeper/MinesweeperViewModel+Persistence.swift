@@ -63,6 +63,7 @@ extension MinesweeperViewModel {
             difficulty: difficulty.rawValue,
             outcome: outcome == .win ? .win : .loss,
             durationSeconds: frozenElapsed,
+            assistCount: assistsUsed,
             // A replayed board has already shown the player every mine.
             countsTowardRecords: !isReplayingBoard
         )

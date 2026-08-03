@@ -60,6 +60,8 @@ extension MinesweeperGameView {
                     theme: theme,
                     board: viewModel.board,
                     gameState: viewModel.gameState,
+                    hintSafeIndex: viewModel.hintSafeIndex,
+                    hintEvidence: viewModel.hintEvidence,
                     phase: viewModel.phase,
                     hapticsEnabled: settingsStore.hapticsEnabled,
                     reduceMotion: reduceMotion || !settingsStore.animationsEnabled,
@@ -196,7 +198,10 @@ extension MinesweeperGameView {
             MinesweeperToolbarMenu(
                 theme: theme,
                 currentDifficulty: viewModel.difficulty,
-                onSelect: { viewModel.requestDifficultyChange($0) }
+                onSelect: { viewModel.requestDifficultyChange($0) },
+                onHint: settingsStore.assistsEnabled ? { viewModel.requestHint() } : nil,
+                onOpenSafeSquare: settingsStore.assistsEnabled && viewModel.hintFoundNothing
+                    ? { viewModel.openASafeSquare() } : nil
             )
         }
     }
@@ -223,7 +228,10 @@ extension MinesweeperGameView {
                 theme: theme,
                 currentDifficulty: viewModel.difficulty,
                 onSelect: { viewModel.requestDifficultyChange($0) },
-                compact: true        // Plan 12.1-06 round 3 — icon-only menu
+                compact: true,       // Plan 12.1-06 round 3 — icon-only menu
+                onHint: settingsStore.assistsEnabled ? { viewModel.requestHint() } : nil,
+                onOpenSafeSquare: settingsStore.assistsEnabled && viewModel.hintFoundNothing
+                    ? { viewModel.openASafeSquare() } : nil
             )
         }
     }
@@ -280,6 +288,8 @@ extension MinesweeperGameView {
                     theme: theme,
                     board: viewModel.board,
                     gameState: viewModel.gameState,
+                    hintSafeIndex: viewModel.hintSafeIndex,
+                    hintEvidence: viewModel.hintEvidence,
                     phase: viewModel.phase,
                     hapticsEnabled: settingsStore.hapticsEnabled,
                     reduceMotion: reduceMotion || !settingsStore.animationsEnabled,

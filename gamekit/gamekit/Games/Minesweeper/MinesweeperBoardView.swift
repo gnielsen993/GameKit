@@ -36,6 +36,11 @@ struct MinesweeperBoardView: View {
     let theme: Theme
     let board: MinesweeperBoard
     let gameState: MinesweeperGameState
+    /// The square the hint recommends opening — outlined.
+    var hintSafeIndex: MinesweeperIndex? = nil
+    /// The revealed numbers carrying the hint's argument — highlighted, so
+    /// the player can check the reasoning instead of trusting it.
+    var hintEvidence: Set<MinesweeperIndex> = []
 
     // P5 (D-01/D-04/D-07) — animation orchestration props (props-only,
     // CLAUDE.md §8.2). MinesweeperGameView hoists these from the VM /
@@ -204,7 +209,9 @@ struct MinesweeperBoardView: View {
                         lossWrongFlagsPopped: lossWrongFlagsPopped,
                         lossTripIdx: lossTripIdx,
                         onTap: onTap,
-                        onLongPress: onLongPress
+                        onLongPress: onLongPress,
+                        isHintSafe: hintSafeIndex == index,
+                        isHintEvidence: hintEvidence.contains(index)
                     )
                     .transition(
                         reduceMotion

@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Open a safe square for me" : {
+
+    },
+    "The highlighted %d already touches all %d of its mines, so every other square around it is safe. The outlined one is safe to open." : {
+
+    },
+    "Compare the highlighted %d and %d. Every square the %d touches, the %d touches too — so the %d's mines are all inside that shared group, and the squares only the %d touches are safe. The outlined one is safe to open." : {
+
+    },
+    "No square here can be proved safe by counting one number or comparing two. It may need whole-board counting, or it may genuinely be a guess." : {
+
+    },
     "Show me a move" : {
 
     },

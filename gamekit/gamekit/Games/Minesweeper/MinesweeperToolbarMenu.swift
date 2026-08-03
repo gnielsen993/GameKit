@@ -28,9 +28,30 @@ struct MinesweeperToolbarMenu: View {
     /// the inline difficulty text and renders icon-only. Small Video-Mode
     /// zones use `compact: true` so the toolbar fits next to PiP overlays.
     var compact: Bool = false
+    /// nil hides the assist entry point — the purist setting.
+    var onHint: (() -> Void)? = nil
+    /// Offered only when the two rules found nothing: spend the guess.
+    var onOpenSafeSquare: (() -> Void)? = nil
+
 
     var body: some View {
         Menu {
+            if let onHint {
+                Section {
+                    Button {
+                        onHint()
+                    } label: {
+                        Label(String(localized: "Show me a step"), systemImage: "lightbulb")
+                    }
+                    if let onOpenSafeSquare {
+                        Button {
+                            onOpenSafeSquare()
+                        } label: {
+                            Label(MinesweeperHintCopy.spendTheGuess, systemImage: "hand.tap")
+                        }
+                    }
+                }
+            }
             ForEach(MinesweeperDifficulty.allCases, id: \.self) { difficulty in
                 Button {
                     onSelect(difficulty)

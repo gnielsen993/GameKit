@@ -189,6 +189,14 @@ struct MinesweeperGameView: View {
         //   via .sensoryFeedback(.impact(.light)) on CellView)
         // Side-effect contract: this handler MUST NOT mutate VM state —
         // a phase change inside the handler would loop (T-05-19 mitigation).
+        .overlay(alignment: .top) {
+            hintBanner
+                .transition(.move(edge: .top).combined(with: .opacity))
+        }
+        .animation(
+            settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
+            value: viewModel.activeHint
+        )
         .onChange(of: viewModel.phase) { _, newPhase in
             switch newPhase {
             case .winSweep:
