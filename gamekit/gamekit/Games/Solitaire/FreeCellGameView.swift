@@ -276,6 +276,15 @@ struct FreeCellGameView: View {
 
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
+                if settingsStore.assistsEnabled {
+                    Section {
+                        Button {
+                            vm.requestHint()
+                        } label: {
+                            Label(String(localized: "Show me a move"), systemImage: "lightbulb")
+                        }
+                    }
+                }
                 Button("New Random Game") {
                     let mode = FreeCellMode.random(vm.difficulty ?? .easy)
                     vm.startNewGame(mode: mode)

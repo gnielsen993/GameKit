@@ -1,6 +1,42 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Show me a move" : {
+
+    },
+    "No move left to suggest on this board." : {
+
+    },
+    "%@ of %@" : {
+
+    },
+    "spades" : {
+
+    },
+    "hearts" : {
+
+    },
+    "diamonds" : {
+
+    },
+    "clubs" : {
+
+    },
+    "Send the %@ up to its foundation — nothing still needs it." : {
+
+    },
+    "The %@ can come out of its free cell and back onto the tableau." : {
+
+    },
+    "Move the %@ across — it empties that column." : {
+
+    },
+    "The %@ has somewhere to go on the tableau." : {
+
+    },
+    "Nothing builds right now. Parking the %@ in a free cell opens things up, but spend the cell carefully." : {
+
+    },
     "Find me a word" : {
 
     },

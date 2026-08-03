@@ -141,6 +141,24 @@ final class FreeCellViewModel {
     func clearSelection() { selection = nil; rejectStreak = 0 }
     func dismissHint()    { hintText = nil }
 
+    /// Assists asked for on this deal.
+    private(set) var assistsUsed: Int = 0
+
+    /// Suggest a move worth making.
+    ///
+    /// Reuses the toast that already existed for the frustration counter, so
+    /// the deliberate ask and the automatic nudge speak in the same voice and
+    /// from the same place on screen.
+    func requestHint() {
+        guard gameState == .playing || gameState == .idle else { return }
+        guard let suggestion = FreeCellHint.nextMove(board: board) else {
+            hintText = String(localized: "No move left to suggest on this board.")
+            return
+        }
+        hintText = FreeCellHintCopy.text(for: suggestion)
+        assistsUsed += 1
+    }
+
     @discardableResult
     func applyDragDrop(from sel: FreeCellSelection, to dest: FreeCellDest) -> Bool {
         attemptMove(from: sel, to: dest)
@@ -302,6 +320,8 @@ final class FreeCellViewModel {
 
     func reset() {
         flushPendingLoss()   // moving on is accepting the dead board
+        assistsUsed = 0
+        hintText = nil
         clearSavedState()
         board         = FreeCellBoard(dealNumber: dealNumber)
         history       = []
@@ -456,7 +476,8 @@ final class FreeCellViewModel {
             difficulty: diff,
             outcome: outcome == "win" ? .win : .loss,
             durationSeconds: frozenElapsed,
-            puzzleId: "deal-\(dealNumber)"
+            puzzleId: "deal-\(dealNumber)",
+            assistCount: assistsUsed
         )
     }
 
