@@ -30,6 +30,7 @@ struct FiveLetterGameView: View {
                     .toolbar { gameToolbar() }
             }
         }
+        .overlay(alignment: .top) { candidateBanner }
         .navigationTitle(String(localized: "Five Letter"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -230,6 +231,15 @@ struct FiveLetterGameView: View {
         }
         ToolbarItem(placement: menuAtTrailing ? .topBarTrailing : .topBarLeading) {
             Menu {
+                if settingsStore.assistsEnabled {
+                    Section {
+                        Button {
+                            viewModel.requestCandidateCount()
+                        } label: {
+                            Label(String(localized: "How many words fit?"), systemImage: "lightbulb")
+                        }
+                    }
+                }
                 ForEach(FiveLetterMode.allCases, id: \.self) { mode in
                     Button(mode.displayName) { viewModel.setMode(mode) }
                 }
@@ -241,6 +251,45 @@ struct FiveLetterGameView: View {
                 Image(systemName: "ellipsis.circle")
             }
             .accessibilityLabel(Text("Mode"))
+        }
+    }
+
+    /// The count, phrased so it reads as reassurance rather than a verdict.
+    /// It gives away nothing that is not already on the board in green,
+    /// yellow, and grey — it only answers "am I actually close?".
+    @ViewBuilder
+    private var candidateBanner: some View {
+        if let count = viewModel.candidateCount {
+            Text(candidateText(count))
+                .font(theme.typography.caption)
+                .foregroundStyle(theme.colors.textPrimary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, theme.spacing.m)
+                .padding(.vertical, theme.spacing.s)
+                .background(
+                    RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                        .fill(theme.colors.surface)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                                .stroke(theme.colors.accentPrimary, lineWidth: 1)
+                        )
+                )
+                .padding(.horizontal, theme.spacing.m)
+                .contentShape(Rectangle())
+                .onTapGesture { viewModel.dismissCandidateCount() }
+        }
+    }
+
+    private func candidateText(_ count: Int) -> String {
+        switch count {
+        case 0:
+            // Only reachable if a guess was mis-scored or the answer pool and
+            // the guess list disagree. Say something true rather than "0 fit".
+            return String(localized: "No answer in the list fits every clue so far.")
+        case 1:
+            return String(localized: "Only one answer still fits.")
+        default:
+            return String(format: String(localized: "%d answers still fit your clues."), count)
         }
     }
 

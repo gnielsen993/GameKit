@@ -80,6 +80,9 @@ final class FiveLetterViewModel {
         guesses.append(guess)
         currentGuess = ""
         submitCount += 1
+        // The count described the board before this guess; drop it rather
+        // than leave a number that is now wrong.
+        candidateCount = nil
 
         if normalized == answer {
             state = .won
@@ -116,6 +119,8 @@ final class FiveLetterViewModel {
         currentGuess = ""
         state = .playing
         message = nil
+        assistsUsed = 0
+        candidateCount = nil
         pausedElapsed = 0
         timerAnchor = .now
         clearSave()
@@ -131,6 +136,8 @@ final class FiveLetterViewModel {
         currentGuess = ""
         state = .playing
         message = nil
+        assistsUsed = 0
+        candidateCount = nil
         pausedElapsed = 0
         timerAnchor = .now
         pendingSaveState = nil
@@ -156,6 +163,31 @@ final class FiveLetterViewModel {
         timerAnchor = .now
     }
 
+    // MARK: - Candidate count (assist)
+
+    /// Shown only when the player asks. Counting is cheap (about a thousand
+    /// candidates against at most six guesses) but it is still a nudge, so it
+    /// is opt-in rather than always on the screen.
+    private(set) var candidateCount: Int?
+
+    /// Number of assists used. A count is the only assist here and it can be
+    /// asked for repeatedly on the same board, so it is charged once per
+    /// puzzle rather than once per look — the information does not compound.
+    private(set) var assistsUsed: Int = 0
+
+    func requestCandidateCount() {
+        guard state == .playing else { return }
+        candidateCount = FiveLetterCandidates.count(
+            after: guesses,
+            answers: WordLexicon.fiveLetterAnswers
+        )
+        if assistsUsed == 0 { assistsUsed = 1 }
+    }
+
+    func dismissCandidateCount() {
+        candidateCount = nil
+    }
+
     func restoreState(_ saved: FiveLetterSaveState) {
         guard let restoredMode = FiveLetterMode(rawValue: saved.mode) else {
             discardSaveAndLoadNew()
@@ -167,6 +199,7 @@ final class FiveLetterViewModel {
         guesses = saved.guesses
         currentGuess = ""
         state = .playing
+        assistsUsed = saved.assistsUsed ?? 0
         pausedElapsed = saved.elapsedSeconds
         timerAnchor = .now
         pendingSaveState = nil
@@ -187,7 +220,8 @@ final class FiveLetterViewModel {
             mode: mode.rawValue,
             puzzleId: puzzleId,
             elapsedSeconds: elapsed,
-            savedAt: .now
+            savedAt: .now,
+            assistsUsed: assistsUsed
         )
         if let data = try? JSONEncoder().encode(snapshot) {
             userDefaults.set(data, forKey: FiveLetterSaveState.key(mode: mode))
@@ -256,7 +290,8 @@ final class FiveLetterViewModel {
             outcome: outcome,
             durationSeconds: seconds,
             puzzleId: puzzleId,
-            score: guesses.count
+            score: guesses.count,
+            assistCount: assistsUsed
         )
     }
 

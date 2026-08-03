@@ -5,6 +5,9 @@ struct WordGridBoardView: View {
     let theme: Theme
     let board: [[Character]]
     let selectedPath: [WordGridPosition]
+    /// Path of a revealed word, outlined so the player can see where it runs.
+    /// Distinct from selection: this is the app showing, not the player doing.
+    var hintPath: [WordGridPosition] = []
     let onSelect: (WordGridPosition) -> Void
 
     var body: some View {
@@ -51,6 +54,7 @@ struct WordGridBoardView: View {
 
     private func tile(_ position: WordGridPosition) -> some View {
         let selected = isSelected(position)
+        let hinted = hintPath.contains(position)
         return Text(letter(row: position.row, column: position.column))
             .font(theme.typography.title.weight(.bold))
             .foregroundStyle(selected ? theme.colors.background : theme.colors.textPrimary)
@@ -59,7 +63,10 @@ struct WordGridBoardView: View {
             .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
-                    .stroke(theme.colors.border, lineWidth: 1)
+                    .stroke(
+                        hinted && !selected ? theme.colors.accentPrimary : theme.colors.border,
+                        lineWidth: hinted && !selected ? 2 : 1
+                    )
             )
             // Tiles lift as the trace picks them up and settle on release —
             // makes the drag feel physical (DESIGN.md §10.2). The accent

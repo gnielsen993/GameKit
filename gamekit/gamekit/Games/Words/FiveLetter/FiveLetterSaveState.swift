@@ -12,6 +12,9 @@ struct FiveLetterSaveState: Codable {
     let puzzleId: String
     let elapsedSeconds: Double
     let savedAt: Date
+    /// Assists used. Optional with a nil default so saves written before
+    /// assists existed still decode; nil reads as zero.
+    var assistsUsed: Int? = nil
 
     static func key(mode: FiveLetterMode) -> String {
         "fiveLetter.saveState.\(mode.rawValue)"

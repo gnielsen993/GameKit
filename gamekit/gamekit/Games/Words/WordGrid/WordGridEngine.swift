@@ -46,6 +46,16 @@ nonisolated enum WordGridEngine {
         return dr <= 1 && dc <= 1 && (dr + dc) > 0
     }
 
+    /// Adjacency and letter lookup, exposed for WordGridHint so the hint
+    /// search cannot drift from the rules the board itself enforces.
+    static func canAppendForHint(_ position: WordGridPosition, to path: [WordGridPosition]) -> Bool {
+        canAppend(position, to: path)
+    }
+
+    static func wordForHint(at position: WordGridPosition, board: [[Character]]) -> String {
+        word(for: [position], board: board)
+    }
+
     static func playableWords(on board: [[Character]]) -> Set<String> {
         var words = Set<String>()
         for row in 0..<size {

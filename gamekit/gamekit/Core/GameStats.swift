@@ -228,8 +228,11 @@ final class GameStats {
         outcome: Outcome,
         durationSeconds: Double,
         puzzleId: String?,
-        score: Int
+        score: Int,
+        assistCount: Int? = nil
     ) throws {
+        // This overload writes no BestTime or BestScore, so there is nothing
+        // to suppress — the assist count is carried for disclosure only.
         let record = GameRecord(
             gameKind: gameKind,
             difficulty: difficulty,
@@ -237,7 +240,8 @@ final class GameStats {
             durationSeconds: durationSeconds,
             playedAt: .now,
             score: score,
-            puzzleId: puzzleId
+            puzzleId: puzzleId,
+            assistCount: assistCount
         )
         modelContext.insert(record)
         try modelContext.save()

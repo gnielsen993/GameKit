@@ -8,6 +8,39 @@ struct WordGridGameView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @Environment(\.settingsStore) var settingsStore
+
+    /// Names the revealed word and says plainly that it scored nothing —
+    /// the disclosure and the pricing in one line.
+    @ViewBuilder
+    private var hintBanner: some View {
+        if let word = viewModel.hintWord {
+            bannerText(
+                String(format: String(localized: "%@ is on the board, outlined. Revealed words score 0."), word)
+            )
+        } else if viewModel.hintExhausted {
+            bannerText(String(localized: "No more words found on this board."))
+        }
+    }
+
+    private func bannerText(_ text: String) -> some View {
+        Text(text)
+            .font(theme.typography.caption)
+            .foregroundStyle(theme.colors.textPrimary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, theme.spacing.m)
+            .padding(.vertical, theme.spacing.s)
+            .background(
+                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                    .fill(theme.colors.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
+                            .stroke(theme.colors.accentPrimary, lineWidth: 1)
+                    )
+            )
+            .padding(.horizontal, theme.spacing.m)
+            .contentShape(Rectangle())
+            .onTapGesture { viewModel.dismissHint() }
+    }
     @Environment(\.videoModeStore) var videoModeStore
     @Environment(\.dismiss) var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -198,8 +231,10 @@ struct WordGridGameView: View {
             theme: theme,
             board: viewModel.board,
             selectedPath: viewModel.selectedPath,
+            hintPath: viewModel.hintPath,
             onSelect: { viewModel.select($0) }
         )
+        .overlay(alignment: .top) { hintBanner }
     }
 
     private var currentWordRow: some View {
@@ -274,6 +309,15 @@ struct WordGridGameView: View {
         }
         ToolbarItem(placement: menuAtTrailing ? .topBarTrailing : .topBarLeading) {
             Menu {
+                if settingsStore.assistsEnabled {
+                    Section {
+                        Button {
+                            viewModel.requestHint()
+                        } label: {
+                            Label(String(localized: "Find me a word"), systemImage: "lightbulb")
+                        }
+                    }
+                }
                 ForEach(WordGridMode.allCases, id: \.self) { mode in
                     Button(mode.displayName) { viewModel.setMode(mode) }
                 }

@@ -1,6 +1,27 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Find me a word" : {
+
+    },
+    "How many words fit?" : {
+
+    },
+    "%@ is on the board, outlined. Revealed words score 0." : {
+
+    },
+    "No more words found on this board." : {
+
+    },
+    "No answer in the list fits every clue so far." : {
+
+    },
+    "Only one answer still fits." : {
+
+    },
+    "%d answers still fit your clues." : {
+
+    },
     "Only one digit is still possible in the ringed square (row %d, column %d). Everything else is already used in its row, column, or box — the shaded squares show where." : {
 
     },

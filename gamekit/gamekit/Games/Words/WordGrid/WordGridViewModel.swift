@@ -69,6 +69,54 @@ final class WordGridViewModel {
         selectedPath.removeAll()
     }
 
+    // MARK: - Hint
+
+    /// Words revealed by a hint. Kept separate from `foundWords` so they can
+    /// be scored at zero and disclosed honestly.
+    private(set) var revealedWords: Set<String> = []
+
+    /// The path currently being shown, for the board to outline.
+    private(set) var hintPath: [WordGridPosition] = []
+
+    /// The word being shown, for the banner.
+    private(set) var hintWord: String?
+
+    /// True when the board has no findable word left to reveal.
+    private(set) var hintExhausted = false
+
+    var assistsUsed: Int { revealedWords.count }
+
+    /// Reveal one word still on the board.
+    ///
+    /// It scores zero, which is what makes this assist self-pricing: the
+    /// player gets unstuck and sees a legal path, but the score stays a
+    /// record of what they found themselves. No separate stat, no asterisk —
+    /// the number simply does not move.
+    func requestHint() {
+        guard state == .playing else { return }
+        hintExhausted = false
+        guard let hit = WordGridHint.nextWord(
+            board: board,
+            foundWords: foundWords + Array(revealedWords)
+        ) else {
+            hintPath = []
+            hintWord = nil
+            hintExhausted = true
+            return
+        }
+        revealedWords.insert(hit.word)
+        foundWords.append(hit.word)   // it counts as found, it just scores 0
+        hintPath = hit.path
+        hintWord = hit.word
+        saveCurrentState()
+    }
+
+    func dismissHint() {
+        hintPath = []
+        hintWord = nil
+        hintExhausted = false
+    }
+
     func submitSelection() {
         let word = WordLexicon.normalize(currentWord)
         guard state == .playing, !word.isEmpty else { return }
@@ -89,6 +137,8 @@ final class WordGridViewModel {
 
         foundWords.append(word)
         score += WordGridEngine.score(word)
+        hintPath = []
+        hintWord = nil
         submitCount += 1
         message = String(localized: "+\(WordGridEngine.score(word))")
         saveCurrentState()
