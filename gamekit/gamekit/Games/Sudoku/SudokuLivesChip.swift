@@ -32,17 +32,29 @@ struct SudokuLivesChip: View {
     }
 
     var body: some View {
-        HStack(spacing: theme.spacing.xs / 2) {
-            ForEach(0..<SudokuGameMode.livesPerPuzzle, id: \.self) { i in
-                Image(systemName: i < livesRemaining ? "heart.fill" : "heart")
-                    .foregroundStyle(i < livesRemaining
-                                     ? theme.colors.danger
-                                     : theme.colors.textTertiary)
-                    .font(.system(size: compact ? 11 : 14, weight: .semibold))
+        Group {
+            if livesRemaining == 0 {
+                Label(String(localized: "Practice"), systemImage: "heart.slash")
+                    .font(compact ? theme.typography.caption : theme.typography.body)
+                    .foregroundStyle(theme.colors.textSecondary)
+            } else {
+                HStack(spacing: theme.spacing.xs / 2) {
+                    ForEach(0..<SudokuGameMode.livesPerPuzzle, id: \.self) { i in
+                        Image(systemName: i < livesRemaining ? "heart.fill" : "heart")
+                            .foregroundStyle(i < livesRemaining
+                                             ? theme.colors.danger
+                                             : theme.colors.textTertiary)
+                            .font(.system(size: compact ? 11 : 14, weight: .semibold))
+                    }
+                }
             }
         }
         .gameInfoReadout(theme: theme, compact: compact)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("\(livesRemaining) of \(SudokuGameMode.livesPerPuzzle) lives remaining"))
+        .accessibilityLabel(
+            livesRemaining == 0
+                ? Text("Practice mode")
+                : Text("\(livesRemaining) of \(SudokuGameMode.livesPerPuzzle) lives remaining")
+        )
     }
 }

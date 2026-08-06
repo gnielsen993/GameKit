@@ -14,32 +14,21 @@ struct WordGridGameView: View {
     @ViewBuilder
     private var hintBanner: some View {
         if let word = viewModel.hintWord {
-            bannerText(
-                String(format: String(localized: "%@ is on the board, outlined. Revealed words score 0."), word)
+            GameAssistCard(
+                theme: theme,
+                title: String(format: String(localized: "Found %@"), word),
+                message: String(localized: "Follow the highlighted letters. Revealed words score 0."),
+                onDismiss: { viewModel.dismissHint() }
             )
         } else if viewModel.hintExhausted {
-            bannerText(String(localized: "No more words found on this board."))
-        }
-    }
-
-    private func bannerText(_ text: String) -> some View {
-        Text(text)
-            .font(theme.typography.caption)
-            .foregroundStyle(theme.colors.textPrimary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, theme.spacing.m)
-            .padding(.vertical, theme.spacing.s)
-            .background(
-                RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                    .fill(theme.colors.surface)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                            .stroke(theme.colors.accentPrimary, lineWidth: 1)
-                    )
+            GameAssistCard(
+                theme: theme,
+                title: String(localized: "No word left to reveal"),
+                message: String(localized: "No more words were found on this board."),
+                tone: .neutral,
+                onDismiss: { viewModel.dismissHint() }
             )
-            .padding(.horizontal, theme.spacing.m)
-            .contentShape(Rectangle())
-            .onTapGesture { viewModel.dismissHint() }
+        }
     }
     @Environment(\.videoModeStore) var videoModeStore
     @Environment(\.dismiss) var dismiss
@@ -65,6 +54,9 @@ struct WordGridGameView: View {
             }
         }
         .navigationTitle(String(localized: "Word Grid"))
+        .onChange(of: viewModel.hintWord != nil || viewModel.hintExhausted) { _, showing in
+            if showing { viewModel.pauseForAssist() }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .alert("Resume game?", isPresented: Binding(
@@ -307,14 +299,23 @@ struct WordGridGameView: View {
             Button { viewModel.restart() } label: { Image(systemName: "arrow.counterclockwise") }
                 .accessibilityLabel(Text("New grid"))
         }
+        if settingsStore.assistsEnabled && !videoModeStore.isEnabled && viewModel.state == .playing {
+            ToolbarItem(placement: .topBarTrailing) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Reveal a word"),
+                    action: { viewModel.requestHint() }
+                )
+            }
+        }
         ToolbarItem(placement: menuAtTrailing ? .topBarTrailing : .topBarLeading) {
             Menu {
-                if settingsStore.assistsEnabled {
+                if settingsStore.assistsEnabled && viewModel.state == .playing {
                     Section {
                         Button {
                             viewModel.requestHint()
                         } label: {
-                            Label(String(localized: "Find me a word"), systemImage: "lightbulb")
+                            Label(String(localized: "Reveal a word"), systemImage: "lightbulb")
                         }
                     }
                 }
@@ -334,7 +335,7 @@ struct WordGridGameView: View {
             content: VideoModeBannerContent(
                 outcome: .win,
                 title: String(localized: "Grid complete"),
-                subtitle: String(localized: "Score \(viewModel.score) · \(viewModel.foundWords.count) words"),
+                subtitle: wordGridResultSubtitle,
                 primaryButtonLabel: String(localized: "New grid"),
                 accessibilityLabel: "Grid complete. Score \(viewModel.score)",
                 onPrimary: {
@@ -354,6 +355,15 @@ struct WordGridGameView: View {
             reduceMotion: reduceMotion,
             animationsEnabled: settingsStore.animationsEnabled
         )
+    }
+
+    private var wordGridResultSubtitle: String {
+        let base = String(localized: "Score \(viewModel.score) · \(viewModel.foundWords.count) words")
+        guard viewModel.assistsUsed > 0 else { return base }
+        let disclosure = viewModel.assistsUsed == 1
+            ? String(localized: "Solved with 1 hint")
+            : String(format: String(localized: "Solved with %d hints"), viewModel.assistsUsed)
+        return "\(base) · \(disclosure)"
     }
 
     private func formatTime(_ seconds: Double) -> String {

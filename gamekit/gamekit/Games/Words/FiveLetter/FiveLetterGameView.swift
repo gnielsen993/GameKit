@@ -31,6 +31,9 @@ struct FiveLetterGameView: View {
             }
         }
         .overlay(alignment: .top) { candidateBanner }
+        .onChange(of: viewModel.candidateCount != nil) { _, showing in
+            if showing { viewModel.pause() } else { viewModel.resume() }
+        }
         .navigationTitle(String(localized: "Five Letter"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -229,14 +232,23 @@ struct FiveLetterGameView: View {
                 .disabled(!viewModel.canRestart)
                 .accessibilityLabel(Text("Restart puzzle"))
         }
+        if settingsStore.assistsEnabled && !videoModeStore.isEnabled && !viewModel.isTerminal {
+            ToolbarItem(placement: .topBarTrailing) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Suggest a useful guess"),
+                    action: { viewModel.requestCandidateCount() }
+                )
+            }
+        }
         ToolbarItem(placement: menuAtTrailing ? .topBarTrailing : .topBarLeading) {
             Menu {
-                if settingsStore.assistsEnabled {
+                if settingsStore.assistsEnabled && !viewModel.isTerminal {
                     Section {
                         Button {
                             viewModel.requestCandidateCount()
                         } label: {
-                            Label(String(localized: "How many words fit?"), systemImage: "lightbulb")
+                            Label(String(localized: "Suggest a useful guess"), systemImage: "lightbulb")
                         }
                     }
                 }
@@ -260,24 +272,35 @@ struct FiveLetterGameView: View {
     @ViewBuilder
     private var candidateBanner: some View {
         if let count = viewModel.candidateCount {
-            Text(candidateText(count))
-                .font(theme.typography.caption)
-                .foregroundStyle(theme.colors.textPrimary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, theme.spacing.m)
-                .padding(.vertical, theme.spacing.s)
-                .background(
-                    RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                        .fill(theme.colors.surface)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: theme.radii.card, style: .continuous)
-                                .stroke(theme.colors.accentPrimary, lineWidth: 1)
-                        )
-                )
-                .padding(.horizontal, theme.spacing.m)
-                .contentShape(Rectangle())
-                .onTapGesture { viewModel.dismissCandidateCount() }
+            GameAssistCard(
+                theme: theme,
+                title: viewModel.suggestedGuess.map {
+                    String(format: String(localized: "Try %@"), $0)
+                } ?? String(localized: "Use what you know"),
+                message: assistMessage(count: count),
+                progress: candidateText(count),
+                primaryAction: viewModel.suggestedGuess == nil
+                    ? nil
+                    : .init(
+                        title: String(localized: "Use this guess"),
+                        perform: { viewModel.useSuggestedGuess() }
+                    ),
+                onDismiss: { viewModel.dismissCandidateCount() }
+            )
         }
+    }
+
+    private func assistMessage(count: Int) -> String {
+        if let guess = viewModel.suggestedGuess {
+            return String(
+                format: String(localized: "%@ cannot be the answer, but its letters split the remaining possibilities well."),
+                guess
+            )
+        }
+        return viewModel.assistFallback
+            ?? (count == 1
+                ? String(localized: "Only one answer fits, so the hint will not reveal it.")
+                : String(localized: "No safe probe word fits every clue."))
     }
 
     private func candidateText(_ count: Int) -> String {
@@ -299,7 +322,9 @@ struct FiveLetterGameView: View {
             content: VideoModeBannerContent(
                 outcome: viewModel.state == .won ? .win : .loss,
                 title: viewModel.state == .won ? String(localized: "Solved") : String(localized: "Answer: \(viewModel.answer)"),
-                subtitle: viewModel.state == .won ? String(localized: "\(viewModel.guesses.count) guesses") : nil,
+                subtitle: viewModel.state == .won
+                    ? fiveLetterWinSubtitle
+                    : nil,
                 primaryButtonLabel: viewModel.mode == .daily ? String(localized: "Play unlimited") : String(localized: "Next puzzle"),
                 accessibilityLabel: viewModel.state == .won ? "Solved" : "Answer \(viewModel.answer)",
                 onPrimary: {
@@ -323,5 +348,14 @@ struct FiveLetterGameView: View {
             reduceMotion: reduceMotion,
             animationsEnabled: settingsStore.animationsEnabled
         )
+    }
+
+    private var fiveLetterWinSubtitle: String {
+        let base = String(localized: "\(viewModel.guesses.count) guesses")
+        guard viewModel.assistsUsed > 0 else { return base }
+        let disclosure = viewModel.assistsUsed == 1
+            ? String(localized: "Solved with 1 hint")
+            : String(format: String(localized: "Solved with %d hints"), viewModel.assistsUsed)
+        return "\(base) · \(disclosure)"
     }
 }

@@ -41,6 +41,7 @@ struct MinesweeperBoardView: View {
     /// The revealed numbers carrying the hint's argument — highlighted, so
     /// the player can check the reasoning instead of trusting it.
     var hintEvidence: Set<MinesweeperIndex> = []
+    var hintInferredMines: Set<MinesweeperIndex> = []
 
     // P5 (D-01/D-04/D-07) — animation orchestration props (props-only,
     // CLAUDE.md §8.2). MinesweeperGameView hoists these from the VM /
@@ -211,7 +212,8 @@ struct MinesweeperBoardView: View {
                         onTap: onTap,
                         onLongPress: onLongPress,
                         isHintSafe: hintSafeIndex == index,
-                        isHintEvidence: hintEvidence.contains(index)
+                        isHintEvidence: hintEvidence.contains(index),
+                        isHintInferredMine: hintInferredMines.contains(index)
                     )
                     .transition(
                         reduceMotion

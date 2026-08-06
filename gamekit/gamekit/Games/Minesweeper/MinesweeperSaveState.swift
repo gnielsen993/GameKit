@@ -6,6 +6,7 @@ struct MinesweeperSaveState: Codable {
     let flaggedCount: Int
     let elapsedSeconds: TimeInterval
     let savedAt: Date
+    var assistsUsed: Int? = nil
 
     static func key(difficulty: MinesweeperDifficulty) -> String {
         "mines.saveState.\(difficulty.rawValue)"

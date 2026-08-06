@@ -18,4 +18,8 @@ enum NonogramGameState: Equatable, Hashable, Sendable {
     /// Lives-mode terminal state — player exhausted their 3 lives. Timer
     /// frozen; end-state card offers Try Again.
     case gameOver
+    /// Ranked run ended; board remains playable with correctness feedback.
+    case practiceAfterLoss
+    /// Board completed after the ranked loss. No second result is recorded.
+    case practiceComplete
 }

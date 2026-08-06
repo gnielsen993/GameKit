@@ -22,8 +22,10 @@ import Foundation
 enum FreeCellHint {
 
     enum Move: Equatable {
-        case toFoundation(card: PlayingCard, fromColumn: Int?)
+        case columnToFoundation(card: PlayingCard, from: Int)
+        case freeCellToFoundation(card: PlayingCard, cell: Int)
         case columnToColumn(card: PlayingCard, from: Int, to: Int)
+        case sequenceToColumn(cards: [PlayingCard], from: Int, to: Int)
         case freeCellToColumn(card: PlayingCard, cell: Int, to: Int)
         case columnToFreeCell(card: PlayingCard, from: Int, cell: Int)
     }
@@ -46,10 +48,11 @@ enum FreeCellHint {
     }
 
     /// The best available move, or nil when the board offers none.
-    static func nextMove(board: FreeCellBoard) -> Suggestion? {
+    static func nextMove(board: FreeCellBoard, previousMove: FreeCellMove? = nil) -> Suggestion? {
         var best: (rank: Int, suggestion: Suggestion)?
 
         func consider(_ suggestion: Suggestion, rank: Int) {
+            guard !isImmediateReverse(suggestion.move, of: previousMove) else { return }
             if best == nil || rank < best!.rank {
                 best = (rank, suggestion)
             }
@@ -61,7 +64,7 @@ enum FreeCellHint {
             if FreeCellRules.canMoveToFoundation(card, foundations: board.foundations),
                isSafeToBank(card, foundations: board.foundations) {
                 consider(
-                    Suggestion(move: .toFoundation(card: card, fromColumn: index), reason: .safeToFoundation),
+                    Suggestion(move: .columnToFoundation(card: card, from: index), reason: .safeToFoundation),
                     rank: 0
                 )
             }
@@ -70,9 +73,8 @@ enum FreeCellHint {
             guard let card = cell else { continue }
             if FreeCellRules.canMoveToFoundation(card, foundations: board.foundations),
                isSafeToBank(card, foundations: board.foundations) {
-                _ = cellIndex
                 consider(
-                    Suggestion(move: .toFoundation(card: card, fromColumn: nil), reason: .safeToFoundation),
+                    Suggestion(move: .freeCellToFoundation(card: card, cell: cellIndex), reason: .safeToFoundation),
                     rank: 0
                 )
             }
@@ -93,7 +95,28 @@ enum FreeCellHint {
             }
         }
 
-        // 3. Column to column. Ranked by whether it actually achieves
+        // 3. Movable tableau sequences. A hint that ignores supermoves can
+        //    claim there is no productive move while one is in plain sight.
+        for (srcIndex, src) in board.columns.enumerated() where src.count >= 2 {
+            for start in 0..<(src.count - 1) {
+                let cards = Array(src[start...])
+                guard cards.count >= 2, FreeCellRules.isValidSequence(cards) else { continue }
+                for (dstIndex, dst) in board.columns.enumerated() where dstIndex != srcIndex {
+                    guard let first = cards.first, FreeCellRules.canPlace(first, onto: dst) else { continue }
+                    let limit = FreeCellRules.maxMoveable(board: board, toEmptyColumn: dst.isEmpty)
+                    guard cards.count <= limit else { continue }
+                    consider(
+                        Suggestion(
+                            move: .sequenceToColumn(cards: cards, from: srcIndex, to: dstIndex),
+                            reason: start == 0 ? .unburies : .buildsSequence
+                        ),
+                        rank: start == 0 ? 2 : 3
+                    )
+                }
+            }
+        }
+
+        // 4. Column to column. Ranked by whether it actually achieves
         //    something: emptying a column outright beats uncovering a card,
         //    which beats a plain sequence build.
         for (srcIndex, src) in board.columns.enumerated() {
@@ -121,7 +144,7 @@ enum FreeCellHint {
             }
         }
 
-        // 4. Parking in a free cell. Genuinely a last resort: it spends the
+        // 5. Parking in a free cell. Genuinely a last resort: it spends the
         //    resource the whole game is rationing, so it is only suggested
         //    when nothing above it exists.
         if best == nil, board.emptyFreeCellCount > 0,
@@ -140,6 +163,22 @@ enum FreeCellHint {
         }
 
         return best?.suggestion
+    }
+
+    private static func isImmediateReverse(_ move: Move, of previous: FreeCellMove?) -> Bool {
+        guard let previous, previous.cards.count == 1 else { return false }
+        switch (previous.source, previous.destination, move) {
+        case (.column(let from, _), .column(let to), .columnToColumn(_, let candidateFrom, let candidateTo)):
+            return candidateFrom == to && candidateTo == from
+        case (.column(let from, _), .column(let to), .sequenceToColumn(_, let candidateFrom, let candidateTo)):
+            return candidateFrom == to && candidateTo == from
+        case (.column(let from, _), .freeCell(let cell), .freeCellToColumn(_, let candidateCell, let to)):
+            return candidateCell == cell && to == from
+        case (.freeCell(let cell), .column(let to), .columnToFreeCell(_, let candidateFrom, let candidateCell)):
+            return candidateFrom == to && candidateCell == cell
+        default:
+            return false
+        }
     }
 
     /// A card is safe to bank when no card that might still need it as a

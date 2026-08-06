@@ -115,6 +115,12 @@ final class WordGridViewModel {
         hintPath = []
         hintWord = nil
         hintExhausted = false
+        startTimerIfNeeded()
+    }
+
+    func pauseForAssist() {
+        timer?.invalidate()
+        timer = nil
     }
 
     func submitSelection() {
@@ -154,7 +160,8 @@ final class WordGridViewModel {
             gameKind: .wordGrid,
             mode: mode.rawValue,
             outcome: .win,
-            score: score
+            score: score,
+            assistCount: assistsUsed
         )
         clearSave()
     }
@@ -164,6 +171,8 @@ final class WordGridViewModel {
         selectedPath = []
         foundWords = []
         score = 0
+        revealedWords = []
+        dismissHint()
         state = .playing
         message = nil
         remainingSeconds = mode == .timed ? WordGridEngine.timedDuration : 0
@@ -191,6 +200,7 @@ final class WordGridViewModel {
         mode = restoredMode
         board = rows
         foundWords = saved.foundWords
+        revealedWords = Set(saved.revealedWords ?? [])
         score = saved.score
         remainingSeconds = saved.remainingSeconds
         selectedPath = []
@@ -213,7 +223,8 @@ final class WordGridViewModel {
             mode: mode.rawValue,
             score: score,
             remainingSeconds: remainingSeconds,
-            savedAt: .now
+            savedAt: .now,
+            revealedWords: Array(revealedWords).sorted()
         )
         if let data = try? JSONEncoder().encode(snapshot) {
             userDefaults.set(data, forKey: WordGridSaveState.key(mode: mode))

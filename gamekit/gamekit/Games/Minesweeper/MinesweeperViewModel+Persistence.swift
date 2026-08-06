@@ -43,7 +43,8 @@ extension MinesweeperViewModel {
             difficulty: difficulty,
             flaggedCount: flaggedCount,
             elapsedSeconds: frozenElapsed,
-            savedAt: Date.now
+            savedAt: Date.now,
+            assistsUsed: assistsUsed
         )
         let key = MinesweeperSaveState.key(difficulty: difficulty)
         if let data = try? JSONEncoder().encode(snapshot) {

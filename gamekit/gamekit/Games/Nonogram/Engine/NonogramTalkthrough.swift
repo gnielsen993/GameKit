@@ -111,7 +111,8 @@ enum NonogramTalkthrough {
         }
     }
 
-    /// Better technique first, then more new cells, then first-encountered —
+    /// Better technique first, then the smallest useful action set, then
+    /// first-encountered — a short task is easier to follow and finish.
     /// so the result is stable rather than dependent on iteration order.
     private static func preferred(_ lhs: Deduction?, _ rhs: Deduction) -> Deduction {
         guard let lhs else { return rhs }
@@ -119,7 +120,7 @@ enum NonogramTalkthrough {
         let rhsRank = teachingRank(rhs.technique)
         if lhsRank != rhsRank { return lhsRank < rhsRank ? lhs : rhs }
         if lhs.newCellCount != rhs.newCellCount {
-            return lhs.newCellCount > rhs.newCellCount ? lhs : rhs
+            return lhs.newCellCount < rhs.newCellCount ? lhs : rhs
         }
         return lhs
     }

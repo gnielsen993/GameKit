@@ -111,10 +111,11 @@ struct MinesweeperHintTests {
     @Test("both techniques have copy that names the numbers")
     func copyCoversBothTechniques() {
         let steps: [MinesweeperHint.Step] = [
-            .init(safe: MinesweeperIndex(row: 1, col: 1), evidence: [MinesweeperIndex(row: 0, col: 0)],
+            .init(safe: MinesweeperIndex(row: 1, col: 1), evidence: [MinesweeperIndex(row: 0, col: 0)], inferredMines: [],
                   technique: .countingOneNumber(number: 1)),
             .init(safe: MinesweeperIndex(row: 1, col: 1),
                   evidence: [MinesweeperIndex(row: 0, col: 0), MinesweeperIndex(row: 0, col: 1)],
+                  inferredMines: [],
                   technique: .comparingTwoNumbers(smaller: 1, larger: 2))
         ]
         for step in steps {

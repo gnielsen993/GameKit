@@ -104,7 +104,7 @@ struct FreeCellGameView: View {
         .sensoryFeedback(.success,
                          trigger: settingsStore.hapticsEnabled ? vm.winTick : 0)
         .onChange(of: vm.hintText) { _, text in
-            guard text != nil else { return }
+            guard text != nil, vm.activeHint == nil else { return }
             hintDismissTask?.cancel()
             hintDismissTask = Task { @MainActor in
                 try? await Task.sleep(for: .seconds(2.5))
@@ -128,18 +128,33 @@ struct FreeCellGameView: View {
         }
         .overlay(alignment: .top) { hintToast }
         .feedbackAnimation(.easeInOut(duration: 0.22), value: vm.hintText != nil)
+        .onChange(of: vm.activeHint != nil) { _, showing in
+            if showing { vm.pause() } else { vm.resume() }
+        }
     }
 
     @ViewBuilder private var hintToast: some View {
-        if let hint = vm.hintText {
+        if let hint = vm.hintText, vm.activeHint != nil {
+            GameAssistCard(
+                theme: theme,
+                title: String(localized: "A useful move"),
+                message: hint,
+                primaryAction: .init(
+                    title: String(localized: "Move it for me"),
+                    perform: { vm.applyHint() }
+                ),
+                onDismiss: { vm.dismissHint() }
+            )
+            .padding(.top, theme.spacing.s)
+            .transition(.opacity.combined(with: .move(edge: .top)))
+        } else if let hint = vm.hintText {
             Text(hint)
                 .font(theme.typography.caption.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(theme.colors.surface)
                 .padding(.horizontal, theme.spacing.m)
                 .padding(.vertical, theme.spacing.s)
                 .background(Capsule().fill(theme.colors.textPrimary.opacity(0.72)))
                 .padding(.top, theme.spacing.s)
-                .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
 
@@ -274,9 +289,21 @@ struct FreeCellGameView: View {
             .disabled(!vm.canUndo)
         }
 
+        if settingsStore.assistsEnabled && !videoModeStore.isEnabled
+            && (vm.gameState == .idle || vm.gameState == .playing) {
+            ToolbarItem(placement: .topBarTrailing) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a FreeCell move"),
+                    action: { vm.requestHint() }
+                )
+            }
+        }
+
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
-                if settingsStore.assistsEnabled {
+                if settingsStore.assistsEnabled
+                    && (vm.gameState == .idle || vm.gameState == .playing) {
                     Section {
                         Button {
                             vm.requestHint()
@@ -363,7 +390,7 @@ struct FreeCellGameView: View {
         case .won:
             bannerCard(
                 title:   "Solved!",
-                detail:  "Deal #\(vm.dealNumber) · \(formattedTime(vm.frozenElapsed))",
+                detail:  freeCellWinDetail,
                 color:   theme.colors.success
             )
         case .lost:
@@ -375,6 +402,15 @@ struct FreeCellGameView: View {
         default:
             EmptyView()
         }
+    }
+
+    private var freeCellWinDetail: String {
+        let base = "Deal #\(vm.dealNumber) · \(formattedTime(vm.frozenElapsed))"
+        guard vm.assistsUsed > 0 else { return base }
+        let disclosure = vm.assistsUsed == 1
+            ? String(localized: "Solved with 1 hint")
+            : String(format: String(localized: "Solved with %d hints"), vm.assistsUsed)
+        return "\(base) · \(disclosure)"
     }
 
     private func bannerCard(title: String, detail: String, color: Color) -> some View {

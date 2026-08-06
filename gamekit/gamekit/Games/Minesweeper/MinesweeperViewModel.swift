@@ -317,6 +317,7 @@ final class MinesweeperViewModel {
     var hintSafeIndex: MinesweeperIndex? { activeHint?.safe }
     /// Squares to highlight: the numbers carrying the argument.
     var hintEvidence: Set<MinesweeperIndex> { Set(activeHint?.evidence ?? []) }
+    var hintInferredMines: Set<MinesweeperIndex> { Set(activeHint?.inferredMines ?? []) }
 
     /// Ask for a square that can be proved safe.
     func requestHint() {
@@ -329,6 +330,7 @@ final class MinesweeperViewModel {
         }
         activeHint = step
         assistsUsed += 1
+        saveCurrentState()
     }
 
     func dismissHint() {
@@ -487,6 +489,7 @@ final class MinesweeperViewModel {
         lossContext = nil
         pendingSaveState = nil
         pausedElapsed = snapshot.elapsedSeconds
+        assistsUsed = snapshot.assistsUsed ?? 0
         timerAnchor = nil
     }
 

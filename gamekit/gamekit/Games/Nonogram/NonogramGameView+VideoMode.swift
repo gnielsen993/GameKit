@@ -144,6 +144,15 @@ extension NonogramGameView {
     var existingToolbarContent: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) { backButton }
         ToolbarItem(placement: .topBarLeading) { restartButton }
+        if settingsStore.assistsEnabled && !videoModeStore.isEnabled && isInteractive {
+            ToolbarItem(placement: .topBarTrailing) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a Nonogram hint"),
+                    action: { viewModel.requestTalkthrough() }
+                )
+            }
+        }
         ToolbarItem(placement: .topBarTrailing) {
             NonogramToolbarMenu(
                 theme: theme,
@@ -151,7 +160,7 @@ extension NonogramGameView {
                 currentGameMode: viewModel.gameMode,
                 onSelectDifficulty: { viewModel.setDifficulty($0) },
                 onSelectGameMode: { viewModel.setGameMode($0) },
-                onTalkthrough: settingsStore.assistsEnabled
+                onTalkthrough: settingsStore.assistsEnabled && isInteractive
                     ? { viewModel.requestTalkthrough() }
                     : nil
             )
@@ -172,7 +181,7 @@ extension NonogramGameView {
                 currentGameMode: viewModel.gameMode,
                 onSelectDifficulty: { viewModel.setDifficulty($0) },
                 onSelectGameMode: { viewModel.setGameMode($0) },
-                onTalkthrough: settingsStore.assistsEnabled
+                onTalkthrough: settingsStore.assistsEnabled && isInteractive
                     ? { viewModel.requestTalkthrough() }
                     : nil
             )
@@ -209,7 +218,8 @@ extension NonogramGameView {
             columnsCrossOff: viewModel.columnsCrossOff,
             unsatisfiableRows: viewModel.unsatisfiableRows,
             unsatisfiableColumns: viewModel.unsatisfiableColumns,
-            talkthroughHighlight: viewModel.talkthroughHighlight,
+            talkthroughFillHighlight: viewModel.talkthroughFillHighlight,
+            talkthroughCrossHighlight: viewModel.talkthroughCrossHighlight,
             talkthroughRow: viewModel.talkthroughRow,
             talkthroughColumn: viewModel.talkthroughColumn,
             theme: theme,

@@ -359,6 +359,19 @@ The ZStack centers the pill regardless of the action button's width.
 - Compact (Video Mode small zone) toolbar: difficulty menu collapses to icon-only
   (`compact: true` on toolbar menus) so it fits beside the PiP corner.
 
+### 6.1 Assist entry points
+- During normal play, every game with an assist exposes a dedicated 44 × 44pt
+  `lightbulb` toolbar button. Do not hide the primary help path inside Settings
+  or make the player infer that the overflow menu contains it.
+- Present help in the shared in-game coach card: one plain-language instruction,
+  optional progress, one direct action, and a dismiss action. The card persists
+  until dismissed or until every highlighted action is complete.
+- The instruction names the action the board expects. For example, Nonogram
+  says **Fill** and **mark X**; it never describes a result only by color.
+- A direct cell reveal is a fallback after an honest deduction is unavailable,
+  not the first response. Using it counts as an assist under the same record
+  rules as a talkthrough.
+
 ---
 
 ## 7. Video Mode Rules
@@ -434,6 +447,13 @@ User directive; overrides §7.1's original unconditional consolidation and the
 - Exception: small-zone layouts that were explicitly user-tuned in the
   2026-05-14 feedback rounds (Minesweeper / Merge / Nonogram compact
   small-zone chrome) predate this principle and stay as shipped.
+
+### 7.8 Assists in Video Mode
+- Do not add an assist chip or another compact-row slot. The dedicated
+  lightbulb is an off-path control; while Video Mode is enabled, the same
+  action remains available from the existing toolbar/overflow menu.
+- The coach card may appear after the player asks, but it must not become
+  persistent Video Mode chrome or reduce a board below its §7.5 floor.
 
 ---
 
@@ -659,6 +679,9 @@ When in doubt, check these before changing chrome for a specific game.
   be touched when making Video Mode or layout changes (D-17 contract).
 - First-tap safety: mine placement deferred until after first tap; tapped cell
   + 8 neighbors excluded. A first-tap loss is a P0 bug.
+- A hint first explains a provably safe square and marks any mines inferred by
+  that proof. Only when no deduction exists may it offer a safe square reveal;
+  never present a guess as logic.
 
 ### 12.2 Merge
 - Mode pill (Win / Infinite): shown in full off-path layout.
@@ -672,6 +695,13 @@ When in doubt, check these before changing chrome for a specific game.
 
 ### 12.3 Nonogram
 - Lives chip: `NonogramLivesChip`, hearts, only when `gameMode == .lives`.
+- A talkthrough carries separate Fill and X target sets. Each target gets an
+  action marker on its cell, and completed targets disappear individually;
+  the coach card stays until the full step is resolved or dismissed.
+- At zero lives, record the loss once and freeze the timer. **Keep Solving**
+  preserves the board and turns the lives chip into a Practice indicator;
+  further mistakes are corrected without another life loss. Completing the
+  board in Practice creates no second result.
 - Row hints: render as one trailing-aligned proportional-digit sequence with
   centered-dot clue boundaries (`1·5·11`, never ambiguous whitespace such as
   `1 5 11`). The separator uses `textTertiary`; each clue independently keeps
@@ -699,6 +729,9 @@ When in doubt, check these before changing chrome for a specific game.
 ### 12.4 Sudoku
 - Lives chip: `SudokuLivesChip`, hearts (`heart.fill`/`heart`), only when
   `gameMode == .lives`. Identical visual treatment to `NonogramLivesChip`.
+- At zero lives, use the same Keep Solving contract as Nonogram: preserve the
+  board, freeze the recorded run, label the lives slot Practice, reject wrong
+  values with feedback, and never record a second result.
 - Large Video Mode zones: lives chip overlays board **top-leading** corner;
   timer chip overlays board **top-trailing** corner. Both `compact: true`,
   both `allowsHitTesting(false)`, padded inside the board's horizontal margin.

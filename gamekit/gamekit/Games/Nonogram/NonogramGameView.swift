@@ -64,11 +64,11 @@ struct NonogramGameView: View {
     var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var isInteractive: Bool {
-        viewModel.state != .won && viewModel.state != .gameOver
+        viewModel.state == .idle || viewModel.state == .playing || viewModel.state == .practiceAfterLoss
     }
 
     var isTerminal: Bool {
-        viewModel.state == .won || viewModel.state == .gameOver
+        viewModel.state == .won || viewModel.state == .gameOver || viewModel.state == .practiceComplete
     }
 
     var body: some View {
@@ -113,16 +113,19 @@ struct NonogramGameView: View {
             settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
             value: viewModel.activeTalkthrough
         )
+        .onChange(of: viewModel.activeTalkthrough != nil || viewModel.talkthroughUnavailable != nil) { _, showing in
+            if showing { viewModel.pause() } else { viewModel.resume() }
+        }
         .onChange(of: viewModel.state) { _, newState in
             switch newState {
-            case .won:
+            case .won, .practiceComplete:
                 let animate = settingsStore.animationsEnabled && !reduceMotion
                 if animate {
                     Task { @MainActor in
                         // Hold ~2s on the completed picture so the player
                         // can take it in before the overlay covers it.
                         try? await Task.sleep(for: .milliseconds(2000))
-                        guard viewModel.state == .won else { return }
+                        guard viewModel.state == newState else { return }
                         withAnimation(.easeOut(duration: 0.3)) {
                             endCardVisible = true
                         }
@@ -146,7 +149,7 @@ struct NonogramGameView: View {
                 } else {
                     endCardVisible = true
                 }
-            case .idle, .playing:
+            case .idle, .playing, .practiceAfterLoss:
                 endCardVisible = false
                 bannerDismissed = false
             }
@@ -238,7 +241,7 @@ struct NonogramGameView: View {
 
             NonogramEndStateCard(
                 theme: theme,
-                outcome: viewModel.state == .won ? .won : .gameOver,
+                outcome: viewModel.state == .won || viewModel.state == .practiceComplete ? .won : .gameOver,
                 title: viewModel.currentPuzzle?.title ?? "",
                 elapsed: viewModel.frozenElapsed,
                 onPrimary: {

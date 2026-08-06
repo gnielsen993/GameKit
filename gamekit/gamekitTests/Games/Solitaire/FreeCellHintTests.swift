@@ -28,11 +28,15 @@ struct FreeCellHintTests {
             let b = board(deal: deal)
             guard let suggestion = FreeCellHint.nextMove(board: b) else { continue }
             switch suggestion.move {
-            case .toFoundation(let card, _):
+            case .columnToFoundation(let card, _), .freeCellToFoundation(let card, _):
                 #expect(FreeCellRules.canMoveToFoundation(card, foundations: b.foundations))
             case .columnToColumn(let card, let from, let to):
                 #expect(b.columns[from].last == card)
                 #expect(FreeCellRules.canPlace(card, onto: b.columns[to]))
+            case .sequenceToColumn(let cards, let from, let to):
+                #expect(Array(b.columns[from].suffix(cards.count)) == cards)
+                #expect(FreeCellRules.isValidSequence(cards))
+                #expect(cards.first.map { FreeCellRules.canPlace($0, onto: b.columns[to]) } == true)
             case .freeCellToColumn(let card, let cell, let to):
                 #expect(b.freeCells[cell] == card)
                 #expect(FreeCellRules.canPlace(card, onto: b.columns[to]))
@@ -50,7 +54,7 @@ struct FreeCellHintTests {
         for deal in 1...40 {
             let b = board(deal: deal)
             guard let suggestion = FreeCellHint.nextMove(board: b),
-                  case .toFoundation(let card, _) = suggestion.move else { continue }
+                  case .columnToFoundation(let card, _) = suggestion.move else { continue }
             // Aces and twos are always safe; anything higher needs both
             // opposite-colour foundations up to rank - 1.
             if card.rank == .ace || card.rank == .two { continue }
@@ -85,10 +89,11 @@ struct FreeCellHintTests {
     func copyCoversEveryReason() {
         let card = PlayingCard(rank: .nine, suit: .hearts, faceUp: true)
         let moves: [FreeCellHint.Suggestion] = [
-            .init(move: .toFoundation(card: card, fromColumn: 0), reason: .safeToFoundation),
+            .init(move: .columnToFoundation(card: card, from: 0), reason: .safeToFoundation),
             .init(move: .freeCellToColumn(card: card, cell: 0, to: 1), reason: .unburies),
             .init(move: .columnToColumn(card: card, from: 0, to: 1), reason: .unburies),
             .init(move: .columnToColumn(card: card, from: 0, to: 1), reason: .buildsSequence),
+            .init(move: .sequenceToColumn(cards: [card], from: 0, to: 1), reason: .buildsSequence),
             .init(move: .columnToFreeCell(card: card, from: 0, cell: 0), reason: .parksToFreeCell)
         ]
         for suggestion in moves {

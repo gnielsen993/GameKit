@@ -40,11 +40,11 @@ struct SudokuGameView: View {
     var theme: Theme { themeManager.theme(using: colorScheme) }
 
     var isInteractive: Bool {
-        viewModel.state != .won && viewModel.state != .gameOver
+        viewModel.state == .idle || viewModel.state == .playing || viewModel.state == .practiceAfterLoss
     }
 
     var isTerminal: Bool {
-        viewModel.state == .won || viewModel.state == .gameOver
+        viewModel.state == .won || viewModel.state == .gameOver || viewModel.state == .practiceComplete
     }
 
     var body: some View {
@@ -65,6 +65,9 @@ struct SudokuGameView: View {
             settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
             value: viewModel.activeHint
         )
+        .onChange(of: viewModel.activeHint != nil || viewModel.hintUnavailable != nil) { _, showing in
+            if showing { viewModel.pause() } else { viewModel.resume() }
+        }
         .alert("Resume puzzle?", isPresented: Binding(
             get: { viewModel.pendingSaveState != nil },
             set: { _ in }
@@ -82,12 +85,12 @@ struct SudokuGameView: View {
         }
         .onChange(of: viewModel.state) { _, newState in
             switch newState {
-            case .won:
+            case .won, .practiceComplete:
                 let animate = settingsStore.animationsEnabled && !reduceMotion
                 if animate {
                     Task { @MainActor in
                         try? await Task.sleep(for: .milliseconds(1500))
-                        guard viewModel.state == .won else { return }
+                        guard viewModel.state == newState else { return }
                         withAnimation(.easeOut(duration: 0.3)) {
                             endCardVisible = true
                         }
@@ -108,7 +111,7 @@ struct SudokuGameView: View {
                 } else {
                     endCardVisible = true
                 }
-            case .idle, .playing:
+            case .idle, .playing, .practiceAfterLoss:
                 endCardVisible = false
                 bannerDismissed = false
             }
@@ -151,18 +154,24 @@ struct SudokuGameView: View {
 
             SudokuEndStateCard(
                 theme: theme,
-                outcome: viewModel.state == .won ? .won : .gameOver,
+                outcome: viewModel.state == .won
+                    ? .won
+                    : (viewModel.state == .practiceComplete ? .practiceComplete : .gameOver),
                 difficulty: viewModel.difficulty,
                 elapsed: viewModel.frozenElapsed,
+                assistCount: viewModel.assistsUsed,
                 onPrimary: {
                     bannerDismissed = false
                     endCardVisible = false
                     if viewModel.state == .won {
                         viewModel.newPuzzle()
-                    } else {
+                    } else if viewModel.state == .practiceComplete {
                         viewModel.restart()
+                    } else {
+                        viewModel.keepSolving()
                     }
                 },
+                onRetry: viewModel.state == .gameOver ? { viewModel.restart() } : nil,
                 onDismiss: {
                     bannerDismissed = true
                 }
@@ -278,6 +287,15 @@ extension SudokuGameView {
     var existingToolbarContent: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) { backButton }
         ToolbarItem(placement: .topBarLeading) { restartButton }
+        if settingsStore.assistsEnabled && !videoModeStore.isEnabled && isInteractive {
+            ToolbarItem(placement: .topBarTrailing) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a Sudoku hint"),
+                    action: { viewModel.requestHint() }
+                )
+            }
+        }
         ToolbarItem(placement: .topBarTrailing) {
             SudokuToolbarMenu(
                 theme: theme,
@@ -285,7 +303,7 @@ extension SudokuGameView {
                 currentGameMode: viewModel.gameMode,
                 onSelectDifficulty: { viewModel.setDifficulty($0) },
                 onSelectGameMode: { viewModel.setGameMode($0) },
-                onHint: settingsStore.assistsEnabled ? { viewModel.requestHint() } : nil
+                onHint: settingsStore.assistsEnabled && isInteractive ? { viewModel.requestHint() } : nil
             )
         }
     }

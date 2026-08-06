@@ -51,7 +51,7 @@ final class SudokuViewModel {
     // Timer (mirrors NonogramViewModel's pattern)
     var timerAnchor: Date?
     var pausedElapsed: TimeInterval = 0
-    private(set) var frozenElapsed: TimeInterval = 0
+    var frozenElapsed: TimeInterval = 0
 
     // Lives-mode state
     var mistakes: Int = 0
@@ -102,7 +102,9 @@ final class SudokuViewModel {
 
     /// Live elapsed seconds (matches NonogramViewModel pattern).
     var elapsedSeconds: TimeInterval {
-        if state == .won || state == .gameOver { return frozenElapsed }
+        if state == .won || state == .gameOver || state == .practiceAfterLoss || state == .practiceComplete {
+            return frozenElapsed
+        }
         guard let anchor = timerAnchor else { return pausedElapsed }
         return pausedElapsed + clock().timeIntervalSince(anchor)
     }
@@ -180,6 +182,7 @@ final class SudokuViewModel {
     /// interactionMode: in .value commits the digit, in .note toggles it
     /// in the notes set.
     func place(value: Int) {
+        guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
         guard (1...9).contains(value),
               let s = selected,
               let board else { return }
@@ -203,6 +206,7 @@ final class SudokuViewModel {
     /// Erase the selected cell's value/notes. No-op on givens and on
     /// locked correct cells in .lives.
     func erase() {
+        guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
         guard let s = selected, let board else { return }
         let idx = s.row * 9 + s.col
         let cell = board.cell(row: s.row, col: s.col)
@@ -261,6 +265,12 @@ final class SudokuViewModel {
             for i in 0..<81 where b.cells[i].isGiven { locked.insert(i) }
         }
         lockedCells = locked
+    }
+
+    func keepSolving() {
+        guard state == .gameOver else { return }
+        state = .practiceAfterLoss
+        saveCurrentState()
     }
 
     /// Load a new (unplayed) puzzle for the current difficulty.
@@ -322,6 +332,9 @@ final class SudokuViewModel {
         selected = nil
         lockedCells = []
         interactionMode = .value
+        assistsUsed = 0
+        activeHint = nil
+        hintUnavailable = nil
     }
 
     /// Indices of user-placed digits that disagree with the solution.
@@ -388,7 +401,7 @@ final class SudokuViewModel {
     /// Charges exactly one assist per puzzle-step, not per tap: escalating
     /// from explanation to reveal is the same hint, so it does not cost twice.
     func requestHint() {
-        guard state == .idle || state == .playing else { return }
+        guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
         hintUnavailable = nil
 
         // Second ask on the same step escalates rather than re-charging.
@@ -450,6 +463,20 @@ final class SudokuViewModel {
         activeHint = nil
     }
 
+    /// Honest fallback when the singles engine cannot narrate a short step.
+    /// Reveals exactly one empty cell and charges one assist.
+    func applyFallbackHint() {
+        guard hintUnavailable == .beyondSingles, let board else { return }
+        guard let index = (0..<81).first(where: {
+            if case .empty = board.cells[$0] { return true }
+            return false
+        }) else { return }
+        assistsUsed += 1
+        select(row: index / 9, col: index % 9)
+        place(value: board.solutionDigit(atRow: index / 9, col: index % 9))
+        hintUnavailable = nil
+    }
+
     /// The board as SudokuCore sees it: row-major, 0 for empty.
     static func flatValues(of board: SudokuBoard) -> [Int] {
         (0..<81).map { index in
@@ -485,7 +512,7 @@ final class SudokuViewModel {
             if state == .idle { startTimer() }
             fireCompletionEffects(row: row, col: col, value: value, board: board)
             saveCurrentState()
-            if board.isSolved { recordWin(); return }
+            if board.isSolved { completeBoard(); return }
             return
         }
 
@@ -502,7 +529,7 @@ final class SudokuViewModel {
         if state == .idle { startTimer() }
         fireCompletionEffects(row: row, col: col, value: value, board: board)
         saveCurrentState()
-        if board.isSolved { recordWin() }
+        if board.isSolved { completeBoard() }
     }
 
     private func toggleNote(_ value: Int, atRow row: Int, col: Int) {
@@ -540,11 +567,18 @@ final class SudokuViewModel {
     private func recordWrongAttempt(at idx: Int) {
         wrongAttemptCount += 1
         lastWrongAttemptIdx = idx
+        if state == .practiceAfterLoss {
+            scheduleWrongFlashClear(for: idx)
+            return
+        }
         mistakes += 1
         if mistakes >= SudokuGameMode.livesPerPuzzle {
             recordGameOver()
         }
-        // Auto-clear flash after 600ms (mirrors Nonogram).
+        scheduleWrongFlashClear(for: idx)
+    }
+
+    private func scheduleWrongFlashClear(for idx: Int) {
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(600))
             if self.lastWrongAttemptIdx == idx {
@@ -554,7 +588,6 @@ final class SudokuViewModel {
     }
 
     private func recordGameOver() {
-        clearSavedState()
         if let anchor = timerAnchor {
             pausedElapsed += clock().timeIntervalSince(anchor)
             timerAnchor = nil
@@ -569,6 +602,16 @@ final class SudokuViewModel {
             puzzleId: currentPuzzle?.id,
             assistCount: assistsUsed
         )
+        saveCurrentState()
+    }
+
+    private func completeBoard() {
+        if state == .practiceAfterLoss {
+            clearSavedState()
+            state = .practiceComplete
+        } else {
+            recordWin()
+        }
     }
 
     private func recordWin() {
@@ -585,7 +628,8 @@ final class SudokuViewModel {
             difficulty: difficulty.rawValue,
             outcome: .win,
             durationSeconds: frozenElapsed,
-            puzzleId: currentPuzzle?.id
+            puzzleId: currentPuzzle?.id,
+            assistCount: assistsUsed
         )
     }
 

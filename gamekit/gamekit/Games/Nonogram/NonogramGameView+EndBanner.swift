@@ -61,12 +61,28 @@ extension NonogramGameView {
         let changeSize = { showDifficultyPicker = true }
         let changeSizeLabel = String(localized: "Change size")
         let isWon = viewModel.state == .won
+        let isPracticeComplete = viewModel.state == .practiceComplete
+        if isPracticeComplete {
+            return VideoModeBannerContent(
+                outcome: .win,
+                title: String(localized: "Finished in practice"),
+                subtitle: String(localized: "Your ranked run ended when the hearts ran out."),
+                primaryButtonLabel: String(localized: "Retry this puzzle"),
+                accessibilityLabel: String(localized: "Finished in practice. Retry this puzzle"),
+                onPrimary: { viewModel.restart() },
+                secondaryButtonLabel: viewBoardLabel,
+                secondaryAction: dismissBanner,
+                tertiaryButtonLabel: changeSizeLabel,
+                tertiaryAction: changeSize
+            )
+        }
         if isWon {
             let puzzleTitle = viewModel.currentPuzzle?.title ?? ""
+            let assistDisclosure = hintDisclosure(viewModel.assistsUsed)
             return VideoModeBannerContent(
                 outcome: .win,
                 title: String(localized: "Solved"),
-                subtitle: puzzleTitle.isEmpty ? nil : puzzleTitle,
+                subtitle: [puzzleTitle, assistDisclosure].filter { !$0.isEmpty }.joined(separator: " · "),
                 primaryButtonLabel: String(localized: "New puzzle"),
                 accessibilityLabel: puzzleTitle.isEmpty
                     ? String(localized: "Solved. New puzzle")
@@ -82,15 +98,22 @@ extension NonogramGameView {
                 outcome: .loss,
                 title: String(localized: "Out of lives"),
                 subtitle: nil,
-                primaryButtonLabel: String(localized: "Try again"),
-                accessibilityLabel: String(localized: "Out of lives. Try again"),
-                onPrimary: { viewModel.restart() },
-                secondaryButtonLabel: viewBoardLabel,
-                secondaryAction: dismissBanner,
-                tertiaryButtonLabel: changeSizeLabel,
-                tertiaryAction: changeSize
+                primaryButtonLabel: String(localized: "Keep solving"),
+                accessibilityLabel: String(localized: "Out of lives. Keep solving in practice"),
+                onPrimary: { viewModel.keepSolving() },
+                secondaryButtonLabel: String(localized: "Retry this puzzle"),
+                secondaryAction: { viewModel.restart() },
+                tertiaryButtonLabel: viewBoardLabel,
+                tertiaryAction: dismissBanner
             )
         }
+    }
+
+    private func hintDisclosure(_ count: Int) -> String {
+        guard count > 0 else { return "" }
+        return count == 1
+            ? String(localized: "Solved with 1 hint")
+            : String(format: String(localized: "Solved with %d hints"), count)
     }
 
     // MARK: - Anchor → SwiftUI Alignment mapping

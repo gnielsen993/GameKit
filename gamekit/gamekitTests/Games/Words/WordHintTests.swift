@@ -171,3 +171,34 @@ struct WordHintTests {
         #expect(vm.candidateCount == nil)
     }
 }
+
+@Suite("Five Letter useful guess")
+struct FiveLetterAssistTests {
+    @Test("suggested probe is accepted, deterministic, and never an answer")
+    func probeDoesNotRevealAnswer() throws {
+        let answers = ["CRANE", "TRACE", "GRACE", "BRAVE"]
+        let accepted: Set<String> = ["ADIEU", "SLING", "CRANE", "TRACE", "GRACE", "BRAVE"]
+        let first = FiveLetterAssist.suggestion(after: [], answers: answers, acceptedGuesses: accepted)
+        let second = FiveLetterAssist.suggestion(after: [], answers: answers, acceptedGuesses: accepted)
+        let probe = try #require(first.suggestedGuess)
+        #expect(first == second)
+        #expect(accepted.contains(probe))
+        #expect(answers.contains(probe) == false)
+    }
+
+    @Test("one remaining answer is acknowledged without being named")
+    func oneAnswerFallsBack() {
+        let guess = FiveLetterGuess(
+            word: "CRANE",
+            marks: FiveLetterFeedback.evaluate(guess: "CRANE", answer: "TRACE")
+        )
+        let result = FiveLetterAssist.suggestion(
+            after: [guess],
+            answers: ["TRACE"],
+            acceptedGuesses: ["ADIEU", "TRACE"]
+        )
+        #expect(result.remainingCount == 1)
+        #expect(result.suggestedGuess == nil)
+        #expect(result.fallback?.contains("TRACE") != true)
+    }
+}

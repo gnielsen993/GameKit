@@ -31,7 +31,7 @@ enum SudokuHintCopy {
         }
     }
 
-    /// The explanation, without the answer in it.
+    /// Actionable explanation: the player sees both what to place and why.
     static func explanation(for step: SudokuHintEngine.Step) -> String {
         switch step.technique {
         case .nakedSingle:
@@ -39,13 +39,13 @@ enum SudokuHintCopy {
             // sentence can point at them instead of describing coordinates
             // the player then has to go and find.
             return String(
-                format: String(localized: "Only one digit is still possible in the ringed square (row %d, column %d). Everything else is already used in its row, column, or box — the shaded squares show where."),
-                step.row + 1, step.column + 1
+                format: String(localized: "Row %d, column %d can only be %d. Every other digit is already used in its row, column, or box."),
+                step.row + 1, step.column + 1, step.value
             )
         case .hiddenSingle(let unit):
             return String(
-                format: String(localized: "Look at the shaded %@. One digit has nowhere to go in it except the ringed square."),
-                unitName(unit)
+                format: String(localized: "In %@, %d can only go in the ringed square at row %d, column %d."),
+                unitName(unit), step.value, step.row + 1, step.column + 1
             )
         }
     }

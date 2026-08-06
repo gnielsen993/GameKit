@@ -83,6 +83,8 @@ final class FiveLetterViewModel {
         // The count described the board before this guess; drop it rather
         // than leave a number that is now wrong.
         candidateCount = nil
+        suggestedGuess = nil
+        assistFallback = nil
 
         if normalized == answer {
             state = .won
@@ -121,6 +123,8 @@ final class FiveLetterViewModel {
         message = nil
         assistsUsed = 0
         candidateCount = nil
+        suggestedGuess = nil
+        assistFallback = nil
         pausedElapsed = 0
         timerAnchor = .now
         clearSave()
@@ -138,6 +142,8 @@ final class FiveLetterViewModel {
         message = nil
         assistsUsed = 0
         candidateCount = nil
+        suggestedGuess = nil
+        assistFallback = nil
         pausedElapsed = 0
         timerAnchor = .now
         pendingSaveState = nil
@@ -169,6 +175,8 @@ final class FiveLetterViewModel {
     /// candidates against at most six guesses) but it is still a nudge, so it
     /// is opt-in rather than always on the screen.
     private(set) var candidateCount: Int?
+    private(set) var suggestedGuess: String?
+    private(set) var assistFallback: String?
 
     /// Number of assists used. A count is the only assist here and it can be
     /// asked for repeatedly on the same board, so it is charged once per
@@ -177,15 +185,29 @@ final class FiveLetterViewModel {
 
     func requestCandidateCount() {
         guard state == .playing else { return }
-        candidateCount = FiveLetterCandidates.count(
+        guard candidateCount == nil else { return }
+        let result = FiveLetterAssist.suggestion(
             after: guesses,
-            answers: WordLexicon.fiveLetterAnswers
+            answers: WordLexicon.fiveLetterAnswers,
+            acceptedGuesses: WordLexicon.fiveLetterGuesses
         )
+        candidateCount = result.remainingCount
+        suggestedGuess = result.suggestedGuess
+        assistFallback = result.fallback
         if assistsUsed == 0 { assistsUsed = 1 }
+        saveCurrentState()
     }
 
     func dismissCandidateCount() {
         candidateCount = nil
+        suggestedGuess = nil
+        assistFallback = nil
+    }
+
+    func useSuggestedGuess() {
+        guard state == .playing, let suggestedGuess else { return }
+        currentGuess = suggestedGuess
+        dismissCandidateCount()
     }
 
     func restoreState(_ saved: FiveLetterSaveState) {
@@ -212,7 +234,7 @@ final class FiveLetterViewModel {
     }
 
     func saveCurrentState() {
-        guard state == .playing, !guesses.isEmpty else { return }
+        guard state == .playing, !guesses.isEmpty || assistsUsed > 0 else { return }
         let elapsed = elapsedSeconds
         let snapshot = FiveLetterSaveState(
             answer: answer,
@@ -250,7 +272,7 @@ final class FiveLetterViewModel {
     }
 
     private func saveDailyResultIfNeeded() {
-        guard mode == .daily, isTerminal else { return }
+        guard mode == .daily, isTerminal, assistsUsed == 0 else { return }
         let snapshot = FiveLetterDailyResult(
             answer: answer,
             guesses: guesses,

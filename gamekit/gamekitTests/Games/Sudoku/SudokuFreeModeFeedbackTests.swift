@@ -142,4 +142,19 @@ struct SudokuFreeModeFeedbackTests {
         #expect(givenCount > 0)
         #expect(vm.incorrectCellIndices.isEmpty)
     }
+
+    @Test("Keep Solving preserves the board and stops consuming hearts")
+    func keepSolvingAfterLoss() throws {
+        let vm = Self.makeViewModel(mode: .lives)
+        let target = try #require(Self.wrongDigit(for: vm))
+        vm.select(row: target.row, col: target.col)
+        for _ in 0..<3 { vm.place(value: target.value) }
+        #expect(vm.state == .gameOver)
+        #expect(vm.mistakes == 3)
+
+        vm.keepSolving()
+        vm.place(value: target.value)
+        #expect(vm.state == .practiceAfterLoss)
+        #expect(vm.mistakes == 3)
+    }
 }

@@ -33,8 +33,13 @@ extension NonogramViewModel {
         lockedCells = Set(saved.lockedCellIndices)
         assistsUsed = saved.assistsUsed ?? 0
         pausedElapsed = saved.elapsedSeconds
-        state = .playing
-        timerAnchor = clock()
+        switch saved.continuationState {
+        case "gameOver": state = .gameOver
+        case "practice": state = .practiceAfterLoss
+        default: state = .playing
+        }
+        frozenElapsed = saved.elapsedSeconds
+        timerAnchor = state == .playing ? clock() : nil
         pendingSaveState = nil
         refreshCrossOff()
         // Defensive: an in-progress puzzle is by definition seen. Saves
@@ -52,7 +57,8 @@ extension NonogramViewModel {
     }
 
     func saveCurrentState() {
-        guard state == .playing, let puzzle = currentPuzzle else { return }
+        guard state == .playing || state == .gameOver || state == .practiceAfterLoss,
+              let puzzle = currentPuzzle else { return }
         let snapshot = NonogramSaveState(
             puzzleId: puzzle.id,
             puzzleGrid: puzzle.grid,
@@ -65,7 +71,10 @@ extension NonogramViewModel {
             lockedCellIndices: Array(lockedCells),
             elapsedSeconds: elapsedSeconds,
             savedAt: Date.now,
-            assistsUsed: assistsUsed
+            assistsUsed: assistsUsed,
+            continuationState: state == .gameOver
+                ? "gameOver"
+                : (state == .practiceAfterLoss ? "practice" : "playing")
         )
         let key = NonogramSaveState.key(difficulty: difficulty, gameMode: gameMode)
         if let data = try? JSONEncoder().encode(snapshot) {
@@ -85,7 +94,7 @@ extension NonogramViewModel {
               NonogramGameMode(rawValue: saved.gameMode) != nil,
               saved.size == d.size,
               saved.cells.count == saved.size * saved.size,
-              saved.livesRemaining > 0,
+              (saved.livesRemaining > 0 || saved.continuationState == "gameOver" || saved.continuationState == "practice"),
               saved.lockedCellIndices.allSatisfy({ $0 >= 0 && $0 < saved.cells.count }) else {
             return false
         }

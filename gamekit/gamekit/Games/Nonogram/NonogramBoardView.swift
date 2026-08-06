@@ -36,7 +36,8 @@ struct NonogramBoardView: View {
     /// Flat indices the active hint is pointing at. Outlined so the sentence
     /// has something on screen to refer to — without this the copy said
     /// "these squares" while nothing showed which.
-    var talkthroughHighlight: Set<Int> = []
+    var talkthroughFillHighlight: Set<Int> = []
+    var talkthroughCrossHighlight: Set<Int> = []
     /// The row or column the hint is about, so its clue rail can be accented
     /// even before the player finds the squares.
     var talkthroughRow: Int? = nil
@@ -265,7 +266,8 @@ struct NonogramBoardView: View {
                             wrongFlash: wrongFlashIdx == idx,
                             completionFlash: flashRow == row || flashCol == col,
                             precisionTarget: precisionRow == row && precisionCol == col,
-                            hintTarget: talkthroughHighlight.contains(idx),
+                            hintFillTarget: talkthroughFillHighlight.contains(idx),
+                            hintCrossTarget: talkthroughCrossHighlight.contains(idx),
                             onAccessibilityTap: { onTap(row, col) }
                         )
                     }

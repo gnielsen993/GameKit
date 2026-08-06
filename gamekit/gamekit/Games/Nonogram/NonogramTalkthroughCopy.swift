@@ -25,54 +25,41 @@ enum NonogramTalkthroughCopy {
         }
     }
 
-    /// Plain-language position, so the sentence can point at something the
-    /// player can actually find: "the 3rd to 8th squares of row 4".
-    private static func span(_ indices: [Int]) -> String {
-        guard let first = indices.first, let last = indices.last else { return "" }
-        if indices.count == 1 {
-            return String(format: String(localized: "square %d"), first + 1)
-        }
-        // Contiguous is the common case and reads far better than a list.
-        if last - first + 1 == indices.count {
-            return String(format: String(localized: "squares %d to %d"), first + 1, last + 1)
-        }
-        return String(
-            format: String(localized: "%d squares"), indices.count
-        )
-    }
-
     static func explanation(for deduction: NonogramTalkthrough.Deduction) -> String {
         let line = lineName(deduction.line)
+        let action = actionText(fills: deduction.newFilled.count, crosses: deduction.newEmpty.count)
         switch deduction.technique {
         case .overlap(let clue, let lineLength):
-            // Names the squares rather than saying "these", because there was
-            // nothing on screen telling the player which ones "these" were.
             return String(
-                format: String(localized: "%@ is one block of %d in %d squares. Slide that block to either end and %@ are covered both times, so they must be filled."),
-                line, clue, lineLength, span(deduction.newFilled)
+                format: String(localized: "%@ has a block of %d in %d spaces. The highlighted squares are covered wherever that block starts. %@"),
+                line, clue, lineLength, action
             )
         case .lineComplete:
             return String(
-                format: String(localized: "%@ already has all the filled squares its clues ask for, so everything still blank in it must be empty."),
-                line
+                format: String(localized: "%@ already has every filled square its clues need. %@"),
+                line, action
             )
         case .allEmpty:
             return String(
-                format: String(localized: "%@ has a clue of 0, so nothing goes in it. Mark the whole line empty."),
-                line
+                format: String(localized: "%@ has a 0 clue, so none of its squares are filled. %@"),
+                line, action
             )
         case .forced:
-            if !deduction.newFilled.isEmpty {
-                return String(
-                    format: String(localized: "In %@, %@ are filled in every arrangement that fits the clues."),
-                    line, span(deduction.newFilled)
-                )
-            }
             return String(
-                format: String(localized: "In %@, %@ are empty in every arrangement that fits the clues."),
-                line, span(deduction.newEmpty)
+                format: String(localized: "Compare the clues with the squares already decided in %@. Only the highlighted choices still fit. %@"),
+                line, action
             )
         }
+    }
+
+    private static func actionText(fills: Int, crosses: Int) -> String {
+        if fills > 0 && crosses > 0 {
+            return String(format: String(localized: "Fill %d and mark %d with X."), fills, crosses)
+        }
+        if fills > 0 {
+            return String(format: String(localized: "Fill the %d highlighted squares."), fills)
+        }
+        return String(format: String(localized: "Mark the %d highlighted squares with X."), crosses)
     }
 
     static func unavailableMessage(_ reason: NonogramViewModel.TalkthroughUnavailable) -> String {

@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
 status: executing
-stopped_at: v1.6 scope delivered from the brief; no phase plans were authored
-last_updated: "2026-08-02T00:00:00.000Z"
-last_activity: 2026-08-02
+stopped_at: v1.6 assist experience implemented across six piece-by-piece games
+last_updated: "2026-08-05T22:00:00.000-05:00"
+last_activity: 2026-08-05
 progress:
   total_phases: 0
   completed_phases: 0
@@ -28,9 +28,9 @@ defects that silently punish players. Scope: `.planning/v1.6-BRIEF.md`.
 
 Phase: none — v1.6 was executed directly from the brief
 Plan: none authored
-Status: v1.6 in development. Every item scoped in the brief is implemented,
-tested, and pushed. Not shipped.
-Last activity: 2026-08-02
+Status: v1.6 in development. The assist experience has been expanded and
+reworked after playtesting; final simulator QA and release wrap-up remain.
+Last activity: 2026-08-05
 
 ### How to read the zeroed progress block
 
@@ -54,8 +54,10 @@ stored best rather than the session best; Stack and Snake report the run and
 personal best at game over.
 
 Assists: record semantics settled and enforced (an assisted win counts as a
-win but sets no record); talkthrough pilots shipped for Nonogram and Sudoku,
-with on-board highlighting of the squares each explanation refers to;
+win but sets no record); visible, shared coach surfaces now cover Minesweeper,
+Nonogram, Sudoku, Word Grid, Five Letter, and FreeCell. Nonogram identifies
+Fill and X actions and retains them until complete. Nonogram and Sudoku offer
+Keep Solving practice after the final life without double-recording the run.
 Minesweeper can replay the board you just lost.
 
 ### Known-remaining before v1.6 can ship
@@ -64,8 +66,8 @@ Minesweeper can replay the board you just lost.
   carry color, banner, or highlight work verified only by construction.
 - On-device check that the Nonogram hint does not cost frames on a 20×20 —
   placement enumeration was already that game's dominant swipe-lag source.
-- Product call: hints exist in 2 of 10 games (Nonogram, Sudoku). WordGrid
-  and FiveLetter are ~1 day each, FreeCell 2-3, Minesweeper 4-6.
+- On-device interaction pass for the shared coach card and visible lightbulb
+  across the six assisted games, including Dynamic Type and VoiceOver labels.
 - Release wrap-up per CLAUDE §8.15, and bump `CURRENT_PROJECT_VERSION`
   (still 2, already consumed by the 1.5.1 TestFlight upload).
 

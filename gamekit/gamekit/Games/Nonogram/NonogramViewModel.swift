@@ -42,7 +42,7 @@ final class NonogramViewModel {
     // Timer
     var timerAnchor: Date?                       // nil = paused/idle/terminal
     var pausedElapsed: TimeInterval = 0
-    private(set) var frozenElapsed: TimeInterval = 0   // captured at win
+    var frozenElapsed: TimeInterval = 0   // captured at win
 
     // Trigger counters for sensoryFeedback
     private(set) var placeCount: Int = 0
@@ -130,9 +130,8 @@ final class NonogramViewModel {
     // by `livesRemaining` and `lockedCells` above. Read-only to view callers.
     var assistsUsed: Int = 0
 
-    /// The deduction currently being explained, if the player has asked.
-    /// Cleared by the next board mutation — the explanation describes a board
-    /// state, so it must not outlive it.
+    /// The deduction currently being coached, if the player has asked. It
+    /// stays active while the player works through every requested Fill/X.
     private(set) var activeTalkthrough: NonogramTalkthrough.Deduction?
 
     /// Why the last talkthrough request produced nothing, when it did.
@@ -170,7 +169,7 @@ final class NonogramViewModel {
     func requestTalkthrough() {
         // .idle is allowed: "where do I even start" is a fair question, and
         // the first overlap deduction is the honest answer to it.
-        guard state == .idle || state == .playing else { return }
+        guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
         talkthroughUnavailable = nil
 
         if let deduction = NonogramTalkthrough.nextDeduction(
@@ -191,17 +190,39 @@ final class NonogramViewModel {
             : .boardHasAMistake
     }
 
-    /// Flat indices the current explanation is pointing at, for the board to
-    /// outline. Empty when no explanation is showing.
-    var talkthroughHighlight: Set<Int> {
+    /// Still-unresolved cells the current explanation says to fill.
+    var talkthroughFillHighlight: Set<Int> {
         guard let d = activeTalkthrough else { return [] }
         let size = board.size
-        return Set((d.newFilled + d.newEmpty).map { offset in
-            switch d.line {
-            case .row(let r):    return r * size + offset
-            case .column(let c): return offset * size + c
-            }
+        return Set(d.newFilled.compactMap { offset in
+            let index = flatIndex(offset: offset, line: d.line, size: size)
+            return board.cells[index] == .filled ? nil : index
         })
+    }
+
+    /// Still-unresolved cells the current explanation says to mark with X.
+    var talkthroughCrossHighlight: Set<Int> {
+        guard let d = activeTalkthrough else { return [] }
+        let size = board.size
+        return Set(d.newEmpty.compactMap { offset in
+            let index = flatIndex(offset: offset, line: d.line, size: size)
+            return board.cells[index] == .marked ? nil : index
+        })
+    }
+
+    /// Combined compatibility/readout set; presentation uses the typed sets.
+    var talkthroughHighlight: Set<Int> {
+        talkthroughFillHighlight.union(talkthroughCrossHighlight)
+    }
+
+    var talkthroughProgress: String? {
+        guard activeTalkthrough != nil else { return nil }
+        let fills = talkthroughFillHighlight.count
+        let crosses = talkthroughCrossHighlight.count
+        if fills > 0 && crosses > 0 { return "\(fills) to fill · \(crosses) to mark X" }
+        if fills > 0 { return "\(fills) to fill" }
+        if crosses > 0 { return "\(crosses) to mark X" }
+        return nil
     }
 
     /// The row the explanation refers to, if it is about a row.
@@ -230,9 +251,6 @@ final class NonogramViewModel {
             unsatisfiableColumns = []
             return
         }
-        // The explanation describes the board as it was; once it changes the
-        // advice is stale, so it goes with it.
-        activeTalkthrough = nil
         rowsCrossOff = NonogramHints.rowsCrossOff(board: board, hints: rowHints)
         columnsCrossOff = NonogramHints.columnsCrossOff(board: board, hints: columnHints)
         if gameMode == .free {
@@ -242,12 +260,26 @@ final class NonogramViewModel {
             unsatisfiableRows = []
             unsatisfiableColumns = []
         }
+        if activeTalkthrough != nil,
+           talkthroughFillHighlight.isEmpty,
+           talkthroughCrossHighlight.isEmpty {
+            activeTalkthrough = nil
+        }
+    }
+
+    private func flatIndex(offset: Int, line: NonogramTalkthrough.Line, size: Int) -> Int {
+        switch line {
+        case .row(let row): return row * size + offset
+        case .column(let column): return offset * size + column
+        }
     }
 
     /// Live elapsed seconds. While playing this advances with wall clock;
     /// at terminal states (win or game-over) it freezes to `frozenElapsed`.
     var elapsedSeconds: TimeInterval {
-        if state == .won || state == .gameOver { return frozenElapsed }
+        if state == .won || state == .gameOver || state == .practiceAfterLoss || state == .practiceComplete {
+            return frozenElapsed
+        }
         guard let anchor = timerAnchor else { return pausedElapsed }
         return pausedElapsed + clock().timeIntervalSince(anchor)
     }
@@ -330,7 +362,7 @@ final class NonogramViewModel {
     // MARK: - Public API
 
     func handleTap(at row: Int, col: Int) {
-        guard state == .idle || state == .playing else { return }
+        guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
         // Note: .won and .gameOver short-circuit above.
         let cell = board.cell(row: row, col: col)
         let next: NonogramCellState
@@ -352,14 +384,14 @@ final class NonogramViewModel {
     /// can't burn all 3 lives.
     @discardableResult
     func setCell(at row: Int, col: Int, to next: NonogramCellState) -> Bool {
-        guard state == .idle || state == .playing else { return false }
+        guard state == .idle || state == .playing || state == .practiceAfterLoss else { return false }
         let wrongBefore = wrongAttemptCount
         applyMutation(at: row, col: col, next: next)
         return wrongAttemptCount == wrongBefore
     }
 
     func handleLongPress(at row: Int, col: Int) {
-        guard state == .idle || state == .playing else { return }
+        guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
         // Note: .won and .gameOver short-circuit above.
         let cell = board.cell(row: row, col: col)
         // Long-press always invokes the OPPOSITE mode's behavior.
@@ -417,6 +449,9 @@ final class NonogramViewModel {
         interactionMode = .place
         livesRemaining = NonogramGameMode.livesPerPuzzle
         lockedCells = []
+        assistsUsed = 0
+        activeTalkthrough = nil
+        talkthroughUnavailable = nil
         pendingSaveState = nil
     }
 
@@ -445,6 +480,14 @@ final class NonogramViewModel {
     func resume() {
         guard state == .playing, timerAnchor == nil else { return }
         timerAnchor = clock()
+    }
+
+    /// Preserve the failed board and remove further life pressure. The loss
+    /// has already been recorded; finishing from here is practice only.
+    func keepSolving() {
+        guard state == .gameOver else { return }
+        state = .practiceAfterLoss
+        saveCurrentState()
     }
 
     // MARK: - Puzzle loading
@@ -565,7 +608,7 @@ final class NonogramViewModel {
                     if state != .gameOver,
                        let puzzle = currentPuzzle,
                        NonogramWinDetector.isWon(board: board, puzzle: puzzle) {
-                        recordWin()
+                        completeBoard()
                     }
                     return
                 }
@@ -599,7 +642,7 @@ final class NonogramViewModel {
         }
 
         if let puzzle = currentPuzzle, NonogramWinDetector.isWon(board: board, puzzle: puzzle) {
-            recordWin()
+            completeBoard()
         } else {
             saveCurrentState()
         }
@@ -611,13 +654,18 @@ final class NonogramViewModel {
     private func recordWrongAttempt(at idx: Int) {
         wrongAttemptCount += 1
         lastWrongAttemptIdx = idx
+        guard state != .practiceAfterLoss else {
+            scheduleWrongFlashClear(for: idx)
+            return
+        }
         livesRemaining -= 1
         if livesRemaining <= 0 {
             recordGameOver()
         }
-        // Auto-clear the flash so the cell returns to its committed look.
-        // If a newer wrong tap landed in the meantime, it'll have updated
-        // lastWrongAttemptIdx, so guard before clearing.
+        scheduleWrongFlashClear(for: idx)
+    }
+
+    private func scheduleWrongFlashClear(for idx: Int) {
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(600))
             if self.lastWrongAttemptIdx == idx {
@@ -627,7 +675,6 @@ final class NonogramViewModel {
     }
 
     private func recordGameOver() {
-        clearSavedState()
         if let anchor = timerAnchor {
             pausedElapsed += clock().timeIntervalSince(anchor)
             timerAnchor = nil
@@ -642,6 +689,16 @@ final class NonogramViewModel {
             puzzleId: currentPuzzle?.id,
             assistCount: assistsUsed
         )
+        saveCurrentState()
+    }
+
+    private func completeBoard() {
+        if state == .practiceAfterLoss {
+            clearSavedState()
+            state = .practiceComplete
+        } else {
+            recordWin()
+        }
     }
 
     private func recordWin() {
@@ -658,7 +715,8 @@ final class NonogramViewModel {
             difficulty: difficulty.rawValue,
             outcome: .win,
             durationSeconds: frozenElapsed,
-            puzzleId: currentPuzzle?.id
+            puzzleId: currentPuzzle?.id,
+            assistCount: assistsUsed
         )
     }
 

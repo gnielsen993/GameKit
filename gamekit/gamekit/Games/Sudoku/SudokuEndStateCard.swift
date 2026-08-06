@@ -18,6 +18,7 @@ import DesignKit
 enum SudokuEndStateOutcome {
     case won
     case gameOver
+    case practiceComplete
 }
 
 struct SudokuEndStateCard: View {
@@ -25,7 +26,9 @@ struct SudokuEndStateCard: View {
     let outcome: SudokuEndStateOutcome
     let difficulty: SudokuDifficulty
     let elapsed: TimeInterval
+    var assistCount: Int = 0
     let onPrimary: () -> Void
+    var onRetry: (() -> Void)? = nil
     let onDismiss: () -> Void
 
     var body: some View {
@@ -57,6 +60,14 @@ struct SudokuEndStateCard: View {
                         theme: theme,
                         action: onPrimary
                     )
+                    if let onRetry {
+                        DKButton(
+                            String(localized: "Retry this puzzle"),
+                            style: .secondary,
+                            theme: theme,
+                            action: onRetry
+                        )
+                    }
                     DKButton(
                         String(localized: "View board"),
                         style: .secondary,
@@ -72,24 +83,33 @@ struct SudokuEndStateCard: View {
 
     private var headline: String {
         switch outcome {
-        case .won:      return String(localized: "You solved it!")
+        case .won: return String(localized: "You solved it!")
         case .gameOver: return String(localized: "Out of mistakes")
+        case .practiceComplete: return String(localized: "Finished in practice")
         }
     }
 
     private var subtitle: String {
         switch outcome {
         case .won:
-            return "\(difficulty.displayName) · \(formatElapsed(elapsed))"
+            let base = "\(difficulty.displayName) · \(formatElapsed(elapsed))"
+            guard assistCount > 0 else { return base }
+            let disclosure = assistCount == 1
+                ? String(localized: "Solved with 1 hint")
+                : String(format: String(localized: "Solved with %d hints"), assistCount)
+            return "\(base) · \(disclosure)"
         case .gameOver:
             return String(localized: "You used all 3 lives.")
+        case .practiceComplete:
+            return String(localized: "Your ranked run ended when the hearts ran out.")
         }
     }
 
     private var primaryButtonLabel: String {
         switch outcome {
-        case .won:      return String(localized: "New puzzle")
-        case .gameOver: return String(localized: "Try again")
+        case .won: return String(localized: "New puzzle")
+        case .gameOver: return String(localized: "Keep solving")
+        case .practiceComplete: return String(localized: "Retry this puzzle")
         }
     }
 

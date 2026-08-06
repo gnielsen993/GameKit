@@ -60,6 +60,9 @@ struct MinesweeperCellView: View {
     var isHintSafe: Bool = false
     /// This revealed number is part of the hint's argument.
     var isHintEvidence: Bool = false
+    /// A solver-inferred mine, rendered as a temporary marker rather than a
+    /// player flag.
+    var isHintInferredMine: Bool = false
 
     /// Solid ring on the recommended square, softer ring on the numbers that
     /// prove it — so the sentence has something to point at and the argument
@@ -74,6 +77,15 @@ struct MinesweeperCellView: View {
             RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
                 .stroke(theme.colors.accentPrimary.opacity(0.65), lineWidth: 2)
                 .allowsHitTesting(false)
+        } else if isHintInferredMine {
+            ZStack {
+                RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
+                    .stroke(theme.colors.danger, lineWidth: 2)
+                Image(systemName: "burst.fill")
+                    .font(.system(size: max(10, cellSize * 0.36), weight: .semibold))
+                    .foregroundStyle(theme.colors.danger)
+            }
+            .allowsHitTesting(false)
         }
     }
 

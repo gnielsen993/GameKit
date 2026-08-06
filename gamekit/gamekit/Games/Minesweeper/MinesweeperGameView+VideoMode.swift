@@ -62,6 +62,7 @@ extension MinesweeperGameView {
                     gameState: viewModel.gameState,
                     hintSafeIndex: viewModel.hintSafeIndex,
                     hintEvidence: viewModel.hintEvidence,
+                    hintInferredMines: viewModel.hintInferredMines,
                     phase: viewModel.phase,
                     hapticsEnabled: settingsStore.hapticsEnabled,
                     reduceMotion: reduceMotion || !settingsStore.animationsEnabled,
@@ -194,12 +195,24 @@ extension MinesweeperGameView {
         ToolbarItem(placement: .topBarLeading) {
             restartButton
         }
+        if settingsStore.assistsEnabled && !videoModeStore.isEnabled
+            && (viewModel.gameState == .idle || viewModel.gameState == .playing) {
+            ToolbarItem(placement: .topBarTrailing) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a Minesweeper hint"),
+                    action: { viewModel.requestHint() }
+                )
+            }
+        }
         ToolbarItem(placement: .topBarTrailing) {
             MinesweeperToolbarMenu(
                 theme: theme,
                 currentDifficulty: viewModel.difficulty,
                 onSelect: { viewModel.requestDifficultyChange($0) },
-                onHint: settingsStore.assistsEnabled ? { viewModel.requestHint() } : nil,
+                onHint: settingsStore.assistsEnabled
+                    && (viewModel.gameState == .idle || viewModel.gameState == .playing)
+                    ? { viewModel.requestHint() } : nil,
                 onOpenSafeSquare: settingsStore.assistsEnabled && viewModel.hintFoundNothing
                     ? { viewModel.openASafeSquare() } : nil
             )
@@ -229,7 +242,9 @@ extension MinesweeperGameView {
                 currentDifficulty: viewModel.difficulty,
                 onSelect: { viewModel.requestDifficultyChange($0) },
                 compact: true,       // Plan 12.1-06 round 3 — icon-only menu
-                onHint: settingsStore.assistsEnabled ? { viewModel.requestHint() } : nil,
+                onHint: settingsStore.assistsEnabled
+                    && (viewModel.gameState == .idle || viewModel.gameState == .playing)
+                    ? { viewModel.requestHint() } : nil,
                 onOpenSafeSquare: settingsStore.assistsEnabled && viewModel.hintFoundNothing
                     ? { viewModel.openASafeSquare() } : nil
             )
@@ -290,6 +305,7 @@ extension MinesweeperGameView {
                     gameState: viewModel.gameState,
                     hintSafeIndex: viewModel.hintSafeIndex,
                     hintEvidence: viewModel.hintEvidence,
+                    hintInferredMines: viewModel.hintInferredMines,
                     phase: viewModel.phase,
                     hapticsEnabled: settingsStore.hapticsEnabled,
                     reduceMotion: reduceMotion || !settingsStore.animationsEnabled,

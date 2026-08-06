@@ -28,6 +28,7 @@ struct SudokuSaveState: Codable {
     /// Assists used. Optional with a nil default so saves written before
     /// assists existed still decode; nil reads as zero.
     var assistsUsed: Int? = nil
+    var continuationState: String? = nil
 
     /// UserDefaults key for the given difficulty + game mode pair.
     static func key(difficulty: SudokuDifficulty, gameMode: SudokuGameMode) -> String {

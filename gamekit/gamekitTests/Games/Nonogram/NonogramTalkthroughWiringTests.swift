@@ -104,15 +104,47 @@ struct NonogramTalkthroughWiringTests {
         #expect(vm.assistsUsed == countBefore)
     }
 
-    @Test("the explanation does not outlive the board it describes")
-    func explanationClearsOnMutation() throws {
+    @Test("the action map stays until every requested action is complete")
+    func explanationPersistsThroughPartialCompletion() throws {
         let vm = makeViewModel()
         try #require(vm.currentPuzzle != nil)
         vm.requestTalkthrough()
-        #expect(vm.activeTalkthrough != nil)
+        let deduction = try #require(vm.activeTalkthrough)
+        let before = vm.talkthroughHighlight.count
+        #expect(before > 0)
 
-        vm.handleTap(at: 0, col: 0)
-        #expect(vm.activeTalkthrough == nil)
+        let offset = try #require((deduction.newFilled + deduction.newEmpty).first)
+        let target: (Int, Int)
+        switch deduction.line {
+        case .row(let row): target = (row, offset)
+        case .column(let column): target = (offset, column)
+        }
+        let expected: NonogramCellState = deduction.newFilled.contains(offset) ? .filled : .marked
+        vm.setCell(at: target.0, col: target.1, to: expected)
+
+        #expect(vm.talkthroughHighlight.count == before - 1)
+        #expect(vm.activeTalkthrough != nil || before == 1)
+    }
+
+    @Test("Keep Solving preserves the failed board without spending more hearts")
+    func keepSolvingAfterLoss() throws {
+        let suite = UserDefaults(suiteName: "NonogramKeepSolving.\(UUID().uuidString)")!
+        let vm = NonogramViewModel(difficulty: .tiny, mode: .lives, userDefaults: suite)
+        let puzzle = try #require(vm.currentPuzzle)
+        for index in 0..<3 {
+            let wrong: NonogramCellState = puzzle.solution[index] ? .marked : .filled
+            _ = vm.setCell(at: index / vm.board.size, col: index % vm.board.size, to: wrong)
+        }
+        #expect(vm.state == .gameOver)
+        #expect(vm.livesRemaining == 0)
+
+        vm.keepSolving()
+        #expect(vm.state == .practiceAfterLoss)
+        let next = 3
+        let wrong: NonogramCellState = puzzle.solution[next] ? .marked : .filled
+        _ = vm.setCell(at: next / vm.board.size, col: next % vm.board.size, to: wrong)
+        #expect(vm.state == .practiceAfterLoss)
+        #expect(vm.livesRemaining == 0)
     }
 
     @Test("assist count survives a save and restore")

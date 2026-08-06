@@ -197,6 +197,9 @@ struct MinesweeperGameView: View {
             settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
             value: viewModel.activeHint
         )
+        .onChange(of: viewModel.activeHint != nil || viewModel.hintFoundNothing) { _, showing in
+            if showing { viewModel.pause() } else { viewModel.resume() }
+        }
         .onChange(of: viewModel.phase) { _, newPhase in
             switch newPhase {
             case .winSweep:

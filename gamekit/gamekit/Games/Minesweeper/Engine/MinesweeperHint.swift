@@ -44,6 +44,9 @@ nonisolated enum MinesweeperHint {
         /// The revealed number(s) the argument rests on — highlighted so the
         /// player can check the reasoning rather than take it on trust.
         let evidence: [MinesweeperIndex]
+        /// Mines inferred while reaching this step. Shown as temporary hint
+        /// markers so the visible board matches the proof.
+        let inferredMines: [MinesweeperIndex]
         let technique: Technique
     }
 
@@ -136,6 +139,7 @@ nonisolated enum MinesweeperHint {
                 return Step(
                     safe: safe,
                     evidence: [constraint.origin],
+                    inferredMines: knownMines.sorted(by: reading),
                     technique: .countingOneNumber(number: constraint.number)
                 )
             }
@@ -162,6 +166,7 @@ nonisolated enum MinesweeperHint {
                     return Step(
                         safe: safe,
                         evidence: [a.origin, b.origin],
+                        inferredMines: knownMines.sorted(by: reading),
                         technique: .comparingTwoNumbers(smaller: a.number, larger: b.number)
                     )
                 }

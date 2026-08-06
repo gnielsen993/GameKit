@@ -31,7 +31,8 @@ struct NonogramCellView: View {
     let precisionTarget: Bool
     /// This square is one the active hint is pointing at. Outlined so the
     /// explanation has a visible referent.
-    var hintTarget: Bool = false
+    var hintFillTarget: Bool = false
+    var hintCrossTarget: Bool = false
     let onAccessibilityTap: () -> Void
 
     var body: some View {
@@ -54,25 +55,43 @@ struct NonogramCellView: View {
         .overlay(
             Rectangle()
                 .stroke(
-                    precisionTarget || hintTarget
+                    precisionTarget || hintFillTarget || hintCrossTarget
                     ? theme.colors.accentPrimary
                     : theme.colors.textPrimary.opacity(0.18),
-                    lineWidth: precisionTarget || hintTarget ? 2 : 0.5
+                    lineWidth: precisionTarget || hintFillTarget || hintCrossTarget ? 2 : 0.5
                 )
         )
         // A soft accent wash under the outline, so a run of hinted squares
         // reads as one group at a glance rather than as separate borders.
         .overlay(
             Rectangle()
-                .fill(theme.colors.accentPrimary.opacity(hintTarget ? 0.20 : 0))
+                .fill(theme.colors.accentPrimary.opacity(hintFillTarget || hintCrossTarget ? 0.20 : 0))
                 .allowsHitTesting(false)
         )
+        .overlay {
+            if hintCrossTarget && state != .marked {
+                Image(systemName: "xmark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: cellSize * 0.45, height: cellSize * 0.45)
+                    .foregroundStyle(theme.colors.accentPrimary)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            } else if hintFillTarget && state != .filled {
+                Circle()
+                    .fill(theme.colors.accentPrimary)
+                    .frame(width: cellSize * 0.28, height: cellSize * 0.28)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+        }
         .offset(x: wrongFlash ? theme.spacing.xs : 0)
         .feedbackAnimation(theme.motion.ease, value: state)
         .feedbackAnimation(.spring(response: 0.18, dampingFraction: 0.35), value: wrongFlash)
         .feedbackAnimation(.easeOut(duration: 0.35), value: completionFlash)
         .contentShape(Rectangle())
         .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(Text(accessibilityLabel))
         .accessibilityAction {
             guard isInteractive else { return }
             onAccessibilityTap()
@@ -97,6 +116,16 @@ struct NonogramCellView: View {
         switch state {
         case .filled: return theme.colors.accentPrimary
         case .marked, .empty: return theme.colors.surface
+        }
+    }
+
+    private var accessibilityLabel: String {
+        if hintFillTarget { return String(localized: "Hint: fill this square") }
+        if hintCrossTarget { return String(localized: "Hint: mark this square with X") }
+        switch state {
+        case .filled: return String(localized: "Filled square")
+        case .marked: return String(localized: "Square marked with X")
+        case .empty: return String(localized: "Empty square")
         }
     }
 

@@ -10,6 +10,7 @@ struct FreeCellSaveState: Codable {
     /// Capped for the same reason as Klondike's — see
     /// `SolitaireSaveState.persistedHistoryDepth`.
     var history: [FreeCellMove]? = nil
+    var assistsUsed: Int? = nil
 
     static let persistedHistoryDepth = 20
 

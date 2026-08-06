@@ -102,6 +102,31 @@ struct AssistRecordSemanticsTests {
         #expect(try Self.bestTimes(ctx).isEmpty)
     }
 
+    @Test("an assisted score cannot set a best score")
+    func assistedScoreSetsNoBestScore() throws {
+        let (stats, ctx) = try Self.makeStats()
+        try stats.record(
+            gameKind: .wordGrid, mode: "timed", outcome: .win,
+            score: 500, assistCount: 1
+        )
+        #expect(try ctx.fetch(FetchDescriptor<BestScore>()).isEmpty)
+        #expect(try Self.records(ctx).first?.wasAssisted == true)
+    }
+
+    @Test("an assisted puzzle is not consumed")
+    func assistedPuzzleIDIsExcluded() throws {
+        let (stats, _) = try Self.makeStats()
+        try stats.record(
+            gameKind: .nonogram, difficulty: "tiny", outcome: .win,
+            durationSeconds: 30, puzzleId: "helped", assistCount: 1
+        )
+        try stats.record(
+            gameKind: .nonogram, difficulty: "tiny", outcome: .win,
+            durationSeconds: 40, puzzleId: "clean"
+        )
+        #expect(stats.wonPuzzleIDs(gameKind: .nonogram, difficulty: "tiny") == ["clean"])
+    }
+
     @Test("assists default to on so help is offered, not hidden")
     func assistsDefaultOn() {
         let suite = UserDefaults(suiteName: "AssistRecordSemanticsTests.\(UUID().uuidString)")!

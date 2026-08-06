@@ -125,7 +125,8 @@ final class GameStats {
         gameKind: GameKind,
         mode: String,
         outcome: Outcome,
-        score: Int
+        score: Int,
+        assistCount: Int? = nil
     ) throws {
         let record = GameRecord(
             gameKind: gameKind,
@@ -133,11 +134,12 @@ final class GameStats {
             outcome: outcome,
             durationSeconds: 0,
             playedAt: .now,
-            score: score
+            score: score,
+            assistCount: assistCount
         )
         modelContext.insert(record)
 
-        if score > 0 {
+        if score > 0 && !record.wasAssisted {
             do {
                 try evaluateBestScore(
                     gameKind: gameKind,
@@ -175,7 +177,7 @@ final class GameStats {
             }
         )
         let records = (try? modelContext.fetch(descriptor)) ?? []
-        return Set(records.compactMap { $0.puzzleIdRaw })
+        return Set(records.filter { !$0.wasAssisted }.compactMap { $0.puzzleIdRaw })
     }
 
     /// Returns the persisted best score for a (gameKind, mode) pair.

@@ -12,4 +12,6 @@ enum SudokuGameState: Equatable, Hashable, Sendable {
     case playing    // active session; timer running
     case won        // board solved; timer frozen
     case gameOver   // .lives mode: mistakes == 3; timer frozen
+    case practiceAfterLoss
+    case practiceComplete
 }

@@ -32,7 +32,12 @@ struct FreeCellColumnView: View {
         return cardHeight + CGFloat(cards.count - 1) * fanOffset
     }
 
-    private var isTapTarget: Bool { vm.validColumnTargets.contains(colIdx) }
+    private var isTapTarget: Bool {
+        if let destination = vm.activeHintDestination {
+            return destination == .column(colIdx)
+        }
+        return vm.validColumnTargets.contains(colIdx)
+    }
 
     private var isDragTarget: Bool {
         if case .column(let col) = dragTarget { return col == colIdx }

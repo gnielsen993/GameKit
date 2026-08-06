@@ -1,6 +1,6 @@
 import Foundation
 
-enum FiveLetterMark: String, Codable, Sendable, Equatable {
+enum FiveLetterMark: String, Codable, Sendable, Equatable, Hashable {
     case correct
     case present
     case absent

@@ -72,7 +72,11 @@ extension MinesweeperGameView {
             return VideoModeBannerContent(
                 outcome: .win,
                 title: String(localized: "You won!"),
-                subtitle: nil,
+                subtitle: viewModel.assistsUsed == 0
+                    ? nil
+                    : (viewModel.assistsUsed == 1
+                        ? String(localized: "Solved with 1 hint")
+                        : String(format: String(localized: "Solved with %d hints"), viewModel.assistsUsed)),
                 primaryButtonLabel: String(localized: "New board"),
                 accessibilityLabel: String(
                     format: String(localized: "You won! Time: %@. New board"),

@@ -30,6 +30,7 @@ final class FreeCellViewModel {
 
     private(set) var isAutoCompleting = false
     private(set) var hintText: String? = nil
+    private(set) var activeHint: FreeCellHint.Suggestion? = nil
 
     // Stats write-side firewall
     var gameStats: GameStats?
@@ -139,7 +140,11 @@ final class FreeCellViewModel {
     private var hasPendingLoss = false
 
     func clearSelection() { selection = nil; rejectStreak = 0 }
-    func dismissHint()    { hintText = nil }
+    func dismissHint() {
+        hintText = nil
+        activeHint = nil
+        selection = nil
+    }
 
     /// Assists asked for on this deal.
     private(set) var assistsUsed: Int = 0
@@ -151,12 +156,52 @@ final class FreeCellViewModel {
     /// from the same place on screen.
     func requestHint() {
         guard gameState == .playing || gameState == .idle else { return }
-        guard let suggestion = FreeCellHint.nextMove(board: board) else {
+        guard let suggestion = FreeCellHint.nextMove(board: board, previousMove: history.last) else {
+            activeHint = nil
             hintText = String(localized: "No move left to suggest on this board.")
             return
         }
+        activeHint = suggestion
         hintText = FreeCellHintCopy.text(for: suggestion)
+        selection = hintSelection(for: suggestion.move)
         assistsUsed += 1
+        saveCurrentState()
+    }
+
+    func applyHint() {
+        guard let suggestion = activeHint,
+              let source = hintSelection(for: suggestion.move) else { return }
+        let destination = hintDestination(for: suggestion.move)
+        _ = attemptMove(from: source, to: destination)
+    }
+
+    private func hintSelection(for move: FreeCellHint.Move) -> FreeCellSelection? {
+        switch move {
+        case .columnToFoundation(_, let from),
+             .columnToColumn(_, let from, _),
+             .columnToFreeCell(_, let from, _):
+            guard let index = board.columns[from].indices.last else { return nil }
+            return .column(colIdx: from, startCardIdx: index)
+        case .sequenceToColumn(let cards, let from, _):
+            let start = board.columns[from].count - cards.count
+            guard start >= 0 else { return nil }
+            return .column(colIdx: from, startCardIdx: start)
+        case .freeCellToFoundation(_, let cell), .freeCellToColumn(_, let cell, _):
+            return .freeCell(cellIdx: cell)
+        }
+    }
+
+    private func hintDestination(for move: FreeCellHint.Move) -> FreeCellDest {
+        switch move {
+        case .columnToFoundation, .freeCellToFoundation: return .foundation
+        case .columnToColumn(_, _, let to), .freeCellToColumn(_, _, let to): return .column(to)
+        case .sequenceToColumn(_, _, let to): return .column(to)
+        case .columnToFreeCell(_, _, let cell): return .freeCell(cell)
+        }
+    }
+
+    var activeHintDestination: FreeCellDest? {
+        activeHint.map { hintDestination(for: $0.move) }
     }
 
     @discardableResult
@@ -322,6 +367,7 @@ final class FreeCellViewModel {
         flushPendingLoss()   // moving on is accepting the dead board
         assistsUsed = 0
         hintText = nil
+        activeHint = nil
         clearSavedState()
         board         = FreeCellBoard(dealNumber: dealNumber)
         history       = []
@@ -447,6 +493,7 @@ final class FreeCellViewModel {
         selection    = nil
         rejectStreak = 0
         hintText     = nil
+        activeHint   = nil
         dropTick    += 1
         checkTerminalState()
         if gameState == .playing { saveCurrentState() }
@@ -535,6 +582,7 @@ final class FreeCellViewModel {
         // Undo now survives a relaunch. Older saves carry no history and
         // decode to nil, restoring the previous behaviour for them.
         history       = saved.history ?? []
+        assistsUsed   = saved.assistsUsed ?? 0
         selection     = nil
         pausedElapsed = saved.elapsedSeconds
         frozenElapsed = 0
@@ -556,7 +604,8 @@ final class FreeCellViewModel {
             difficulty: difficulty?.rawValue,
             elapsedSeconds: elapsed,
             savedAt: Date.now,
-            history: Array(history.suffix(FreeCellSaveState.persistedHistoryDepth))
+            history: Array(history.suffix(FreeCellSaveState.persistedHistoryDepth)),
+            assistsUsed: assistsUsed
         )
         if let data = try? JSONEncoder().encode(snapshot) {
             UserDefaults.standard.set(data, forKey: FreeCellSaveState.currentKey)

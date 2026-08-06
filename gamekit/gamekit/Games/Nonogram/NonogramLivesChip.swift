@@ -23,17 +23,29 @@ struct NonogramLivesChip: View {
     var compact: Bool = false
 
     var body: some View {
-        HStack(spacing: theme.spacing.xs / 2) {
-            ForEach(0..<NonogramGameMode.livesPerPuzzle, id: \.self) { i in
-                Image(systemName: i < remaining ? "heart.fill" : "heart")
-                    .foregroundStyle(i < remaining
-                                     ? theme.colors.danger
-                                     : theme.colors.textTertiary)
-                    .font(.system(size: compact ? 11 : 14, weight: .semibold))
+        Group {
+            if remaining <= 0 {
+                Label(String(localized: "Practice"), systemImage: "heart.slash")
+                    .font(compact ? theme.typography.caption : theme.typography.body)
+                    .foregroundStyle(theme.colors.textSecondary)
+            } else {
+                HStack(spacing: theme.spacing.xs / 2) {
+                    ForEach(0..<NonogramGameMode.livesPerPuzzle, id: \.self) { i in
+                        Image(systemName: i < remaining ? "heart.fill" : "heart")
+                            .foregroundStyle(i < remaining
+                                             ? theme.colors.danger
+                                             : theme.colors.textTertiary)
+                            .font(.system(size: compact ? 11 : 14, weight: .semibold))
+                    }
+                }
             }
         }
         .gameInfoReadout(theme: theme, compact: compact)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("\(remaining) of \(NonogramGameMode.livesPerPuzzle) lives remaining"))
+        .accessibilityLabel(
+            remaining <= 0
+                ? Text("Practice mode")
+                : Text("\(remaining) of \(NonogramGameMode.livesPerPuzzle) lives remaining")
+        )
     }
 }

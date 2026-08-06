@@ -7,6 +7,7 @@ struct WordGridSaveState: Codable {
     let score: Int
     let remainingSeconds: Double
     let savedAt: Date
+    var revealedWords: [String]? = nil
 
     static func key(mode: WordGridMode) -> String {
         "wordGrid.saveState.\(mode.rawValue)"

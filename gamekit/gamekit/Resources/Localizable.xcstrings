@@ -1,81 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Open a safe square for me" : {
-
-    },
-    "The highlighted %d already touches all %d of its mines, so every other square around it is safe. The outlined one is safe to open." : {
-
-    },
-    "Compare the highlighted %d and %d. Every square the %d touches, the %d touches too — so the %d's mines are all inside that shared group, and the squares only the %d touches are safe. The outlined one is safe to open." : {
-
-    },
-    "No square here can be proved safe by counting one number or comparing two. It may need whole-board counting, or it may genuinely be a guess." : {
-
-    },
-    "Show me a move" : {
-
-    },
-    "No move left to suggest on this board." : {
-
-    },
-    "%@ of %@" : {
-
-    },
-    "spades" : {
-
-    },
-    "hearts" : {
-
-    },
-    "diamonds" : {
-
-    },
-    "clubs" : {
-
-    },
-    "Send the %@ up to its foundation — nothing still needs it." : {
-
-    },
-    "The %@ can come out of its free cell and back onto the tableau." : {
-
-    },
-    "Move the %@ across — it empties that column." : {
-
-    },
-    "The %@ has somewhere to go on the tableau." : {
-
-    },
-    "Nothing builds right now. Parking the %@ in a free cell opens things up, but spend the cell carefully." : {
-
-    },
-    "Find me a word" : {
-
-    },
-    "How many words fit?" : {
-
-    },
-    "%@ is on the board, outlined. Revealed words score 0." : {
-
-    },
-    "No more words found on this board." : {
-
-    },
-    "No answer in the list fits every clue so far." : {
-
-    },
-    "Only one answer still fits." : {
-
-    },
-    "%d answers still fit your clues." : {
-
-    },
-    "Only one digit is still possible in the ringed square (row %d, column %d). Everything else is already used in its row, column, or box — the shaded squares show where." : {
-
-    },
-    "Look at the shaded %@. One digit has nowhere to go in it except the ringed square." : {
-
-    },
     "" : {
 
     },
@@ -116,6 +41,9 @@
     "%@ has a clue of 0, so nothing goes in it. Mark the whole line empty." : {
 
     },
+    "%@ is on the board, outlined. Revealed words score 0." : {
+
+    },
     "%@ is one block of %d in %d squares. Slide that block to either end and %@ are covered both times, so they must be filled." : {
       "localizations" : {
         "en" : {
@@ -125,6 +53,9 @@
           }
         }
       }
+    },
+    "%@ of %@" : {
+
     },
     "%@, line no longer matches its clues" : {
 
@@ -188,6 +119,9 @@
           }
         }
       }
+    },
+    "%d answers still fit your clues." : {
+
     },
     "%d squares" : {
 
@@ -527,6 +461,9 @@
     "Clear" : {
 
     },
+    "clubs" : {
+
+    },
     "column %d" : {
 
     },
@@ -543,6 +480,9 @@
           }
         }
       }
+    },
+    "Compare the highlighted %d and %d. Every square the %d touches, the %d touches too — so the %d's mines are all inside that shared group, and the squares only the %d touches are safe. The outlined one is safe to open." : {
+
     },
     "Contact support" : {
 
@@ -621,6 +561,9 @@
     "DesignKit · own work" : {
 
     },
+    "diamonds" : {
+
+    },
     "Difficulty" : {
       "comment" : "Toolbar Menu a11y label",
       "extractionState" : "automatic",
@@ -691,6 +634,9 @@
 
     },
     "Fill it in" : {
+
+    },
+    "Find me a word" : {
 
     },
     "Finish" : {
@@ -834,6 +780,9 @@
         }
       }
     },
+    "hearts" : {
+
+    },
     "HIGH SCORE" : {
 
     },
@@ -863,6 +812,9 @@
         }
       }
     },
+    "How many words fit?" : {
+
+    },
     "iCloud unavailable" : {
 
     },
@@ -888,9 +840,6 @@
           }
         }
       }
-    },
-    "In %@, one digit fits in only one square. Look for the digit that has nowhere else to go." : {
-
     },
     "In development" : {
 
@@ -943,6 +892,9 @@
 
     },
     "Loading puzzle…" : {
+
+    },
+    "Look at the shaded %@. One digit has nowhere to go in it except the ringed square." : {
 
     },
     "Make it yours" : {
@@ -1036,6 +988,9 @@
     "Move right" : {
 
     },
+    "Move the %@ across — it empties that column." : {
+
+    },
     "Move up" : {
 
     },
@@ -1075,6 +1030,9 @@
     "No Ads, No Coins" : {
 
     },
+    "No answer in the list fits every clue so far." : {
+
+    },
     "No Five Letter games played yet." : {
 
     },
@@ -1085,6 +1043,12 @@
 
     },
     "No Merge games played yet." : {
+
+    },
+    "No more words found on this board." : {
+
+    },
+    "No move left to suggest on this board." : {
 
     },
     "No moves left" : {
@@ -1106,6 +1070,9 @@
 
     },
     "No solved puzzles yet." : {
+
+    },
+    "No square here can be proved safe by counting one number or comparing two. It may need whole-board counting, or it may genuinely be a guess." : {
 
     },
     "No Sudoku games played yet." : {
@@ -1146,10 +1113,22 @@
     "Notes: %@" : {
 
     },
+    "Nothing builds right now. Parking the %@ in a free cell opens things up, but spend the cell carefully." : {
+
+    },
     "Off" : {
 
     },
     "OK" : {
+
+    },
+    "Only one answer still fits." : {
+
+    },
+    "Only one digit is still possible in the ringed square (row %d, column %d). Everything else is already used in its row, column, or box — the shaded squares show where." : {
+
+    },
+    "Open a safe square for me" : {
 
     },
     "Opening GameDrawer" : {
@@ -1367,6 +1346,9 @@
     "Selected" : {
 
     },
+    "Send the %@ up to its foundation — nothing still needs it." : {
+
+    },
     "Settings" : {
       "comment" : "Settings tab + nav title",
       "extractionState" : "manual",
@@ -1380,6 +1362,9 @@
       }
     },
     "SF Symbols · Apple Inc." : {
+
+    },
+    "Show me a move" : {
 
     },
     "Show me a step" : {
@@ -1467,6 +1452,9 @@
 
     },
     "Something already placed does not match its clues. Check the rows and columns marked in red." : {
+
+    },
+    "spades" : {
 
     },
     "square %d" : {
@@ -1584,13 +1572,19 @@
     "Terms of Service" : {
 
     },
+    "The %@ can come out of its free cell and back onto the tableau." : {
+
+    },
+    "The %@ has somewhere to go on the tableau." : {
+
+    },
     "The Drawer" : {
 
     },
     "The file couldn't be read. Check that it's a GameKit stats export and try again." : {
 
     },
-    "The square at row %d, column %d has only one digit left — its row, column, and box rule out all the others." : {
+    "The highlighted %d already touches all %d of its mines, so every other square around it is safe. The outlined one is safe to open." : {
 
     },
     "Theme controls coming in a future update." : {

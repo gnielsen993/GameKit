@@ -40,8 +40,13 @@ extension SudokuViewModel {
         lockedCells = Set(saved.lockedCellIndices)
         assistsUsed = saved.assistsUsed ?? 0
         pausedElapsed = saved.elapsedSeconds
-        state = .playing
-        timerAnchor = clock()
+        switch saved.continuationState {
+        case "gameOver": state = .gameOver
+        case "practice": state = .practiceAfterLoss
+        default: state = .playing
+        }
+        frozenElapsed = saved.elapsedSeconds
+        timerAnchor = state == .playing ? clock() : nil
         pendingSaveState = nil
     }
 
@@ -65,7 +70,8 @@ extension SudokuViewModel {
     }
 
     func saveCurrentState() {
-        guard state == .playing, let board, let puzzle = currentPuzzle else { return }
+        guard state == .playing || state == .gameOver || state == .practiceAfterLoss,
+              let board, let puzzle = currentPuzzle else { return }
         let snapshot = SudokuSaveState(
             puzzleId: puzzle.id,
             givens: puzzle.givens,
@@ -77,7 +83,10 @@ extension SudokuViewModel {
             lockedCellIndices: Array(lockedCells),
             gameMode: gameMode.rawValue,
             savedAt: Date.now,
-            assistsUsed: assistsUsed
+            assistsUsed: assistsUsed,
+            continuationState: state == .gameOver
+                ? "gameOver"
+                : (state == .practiceAfterLoss ? "practice" : "playing")
         )
         let key = SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode)
         if let data = try? JSONEncoder().encode(snapshot) {

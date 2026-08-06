@@ -29,7 +29,7 @@ enum FreeCellHintCopy {
 
     static func text(for suggestion: FreeCellHint.Suggestion) -> String {
         switch suggestion.move {
-        case .toFoundation(let card, _):
+        case .columnToFoundation(let card, _), .freeCellToFoundation(let card, _):
             return String(
                 format: String(localized: "Send the %@ up to its foundation — nothing still needs it."),
                 name(card)
@@ -52,6 +52,12 @@ enum FreeCellHintCopy {
                     name(card)
                 )
             }
+        case .sequenceToColumn(let cards, _, _):
+            guard let first = cards.first else { return String(localized: "Move the highlighted sequence.") }
+            return String(
+                format: String(localized: "Move the %d-card sequence starting with the %@ onto the highlighted column."),
+                cards.count, name(first)
+            )
         case .columnToFreeCell(let card, _, _):
             // Said with the cost attached, because parking is the move that
             // most often turns a winnable deal into a lost one.
