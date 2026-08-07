@@ -63,6 +63,8 @@ even when its normal settings menu is removed, and coach cards reserve space
 opposite the PiP instead of covering their highlighted board targets. Stock
 gameplay alerts and action sheets have been replaced by a shared themed choice
 card, while completed-game New puzzle / New board actions stay immediate.
+Settings support, reset, import, and account-deletion choices use the same
+visual language as inline cards; no stock alert or action-sheet surfaces remain.
 
 ### Known-remaining before v1.6 can ship
 

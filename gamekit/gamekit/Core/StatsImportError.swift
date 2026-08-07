@@ -3,16 +3,16 @@
 //  gamekit
 //
 //  User-surfaceable failure cases for `StatsExporter.importing(_:modelContext:)`.
-//  Per D-21, `schemaVersionMismatch` produces a calm, actionable alert; other
-//  failures produce a generic alert. The `errorDescription` strings land in
+//  Per D-21, `schemaVersionMismatch` produces a calm, actionable inline card;
+//  other failures produce a generic card. The `errorDescription` strings land in
 //  `Localizable.xcstrings` via `String(localized:)` — auto-extracted at build
-//  time (FOUND-05 / SWIFT_EMIT_LOC_STRINGS=YES). Plan 05's SettingsView alert
+//  time (FOUND-05 / SWIFT_EMIT_LOC_STRINGS=YES). SettingsView's error card
 //  body re-references the same strings — single source of truth via xcstrings.
 //
 //  Phase 4 invariants:
 //    - `Equatable` synthesized so tests can `#expect(throws: .schemaVersionMismatch(found: 99, expected: 1))`
 //      against an exact case (default synthesis works for enums with associated values in Swift 6).
-//    - `LocalizedError` so SwiftUI `.alert(...)` flows surface `errorDescription`
+//    - `LocalizedError` so the settings feedback flow surfaces `errorDescription`
 //      without manual string mapping at call sites.
 //    - Foundation-only — no SwiftUI and no persistence-framework imports
 //      at the error layer.

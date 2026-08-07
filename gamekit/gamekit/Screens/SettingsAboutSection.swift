@@ -11,8 +11,7 @@
 //    - Version (mono digits)
 //    - Terms of Service (external Link)
 //    - Privacy Policy (external Link)
-//    - Support (multi-option confirmationDialog → in-app Mail / default mail
-//      app / copy email)
+//    - Support (inline choice card → in-app Mail / default mail app / copy email)
 //    - Acknowledgments (NavigationLink to AcknowledgmentsView)
 //
 //  Self-contained: state + modifiers + helpers + MailComposerView all live
@@ -90,21 +89,47 @@ struct SettingsAboutSection: View {
                     .buttonStyle(.plain)
                 }
             }
+            if showingSupportOptions {
+                GameDrawerDialog(
+                    theme: theme,
+                    title: String(localized: "Contact support"),
+                    message: AppInfo.supportEmail,
+                    systemImage: "envelope",
+                    actions: [
+                        GameDrawerDialogAction(title: String(localized: "Apple Mail"), style: .primary) {
+                            showingSupportOptions = false
+                            openInAppMail()
+                        },
+                        GameDrawerDialogAction(title: String(localized: "Default mail app")) {
+                            showingSupportOptions = false
+                            openDefaultMail()
+                        },
+                        GameDrawerDialogAction(title: String(localized: "Copy email address")) {
+                            showingSupportOptions = false
+                            copyEmail()
+                        },
+                        GameDrawerDialogAction(title: String(localized: "Cancel"), style: .quiet) {
+                            showingSupportOptions = false
+                        }
+                    ]
+                )
+            }
+            if let mailUnavailableMessage {
+                GameDrawerDialog(
+                    theme: theme,
+                    title: String(localized: "Apple Mail isn't set up"),
+                    message: mailUnavailableMessage,
+                    systemImage: "exclamationmark.envelope",
+                    actions: [
+                        GameDrawerDialogAction(title: String(localized: "OK"), style: .primary) {
+                            self.mailUnavailableMessage = nil
+                        }
+                    ]
+                )
+            }
         }
         .fullScreenCover(isPresented: $showingIntro) {
             IntroFlowView()
-        }
-        .confirmationDialog(
-            String(localized: "Contact support"),
-            isPresented: $showingSupportOptions,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "Apple Mail")) { openInAppMail() }
-            Button(String(localized: "Default mail app")) { openDefaultMail() }
-            Button(String(localized: "Copy email address")) { copyEmail() }
-            Button(String(localized: "Cancel"), role: .cancel) {}
-        } message: {
-            Text(AppInfo.supportEmail)
         }
         .sheet(isPresented: $showingMailComposer) {
             MailComposerView(
@@ -113,17 +138,6 @@ struct SettingsAboutSection: View {
                 body: defaultMailBody()
             )
             .ignoresSafeArea()
-        }
-        .alert(
-            String(localized: "Apple Mail isn't set up"),
-            isPresented: Binding(
-                get: { mailUnavailableMessage != nil },
-                set: { if !$0 { mailUnavailableMessage = nil } }
-            )
-        ) {
-            Button(String(localized: "OK"), role: .cancel) {}
-        } message: {
-            Text(mailUnavailableMessage ?? "")
         }
     }
 

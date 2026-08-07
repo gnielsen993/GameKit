@@ -37,8 +37,8 @@
 //      for real-device imports; works in simulator without bookends but
 //      fails silently in release on physical iPhone)
 //    - schemaVersionMismatch and decodeFailed both surface "Couldn't import
-//      stats" alert with case-specific body (UI-SPEC §Copywriting D-21)
-//    - Reset alert per D-22/D-23 — single confirmation, no "Export first?"
+//      stats" card with case-specific body (UI-SPEC §Copywriting D-21)
+//    - Reset card per D-22/D-23 — single confirmation, no "Export first?"
 //      nudge (user can Export from same Settings card one row above)
 //    - Token discipline: zero Color(...) literals; SF Symbols only;
 //      tappable rows .frame(minHeight: 44) HIG carve-out per UI-SPEC §Spacing
@@ -100,30 +100,6 @@ struct SettingsView: View {
                 allowedContentTypes: [.json]
             ) { result in
                 handleImport(result: result)
-            }
-            .alert(
-                String(localized: "Reset all stats?"),
-                isPresented: $isResetAlertPresented
-            ) {
-                Button(String(localized: "Cancel"), role: .cancel) {}
-                Button(String(localized: "Reset all stats"), role: .destructive) {
-                    do {
-                        let stats = GameStats(modelContext: modelContext)
-                        try stats.resetAll()
-                    } catch {
-                        Self.logger.error("Reset failed: \(error.localizedDescription, privacy: .public)")
-                    }
-                }
-            } message: {
-                Text(String(localized: "This deletes all your Minesweeper games and best times. This can't be undone."))
-            }
-            .alert(
-                String(localized: "Couldn't import stats"),
-                isPresented: $isImportErrorAlertPresented
-            ) {
-                Button(String(localized: "OK"), role: .cancel) {}
-            } message: {
-                Text(importErrorMessage)
             }
         }
     }
@@ -256,6 +232,41 @@ struct SettingsView: View {
                     isResetAlertPresented = true
                 }
             }
+        }
+        if isResetAlertPresented {
+            GameDrawerDialog(
+                theme: theme,
+                title: String(localized: "Reset all stats?"),
+                message: String(localized: "This deletes all your Minesweeper games and best times. This can't be undone."),
+                systemImage: "trash",
+                actions: [
+                    GameDrawerDialogAction(title: String(localized: "Cancel"), style: .primary) {
+                        isResetAlertPresented = false
+                    },
+                    GameDrawerDialogAction(title: String(localized: "Reset all stats"), style: .destructive) {
+                        isResetAlertPresented = false
+                        do {
+                            let stats = GameStats(modelContext: modelContext)
+                            try stats.resetAll()
+                        } catch {
+                            Self.logger.error("Reset failed: \(error.localizedDescription, privacy: .public)")
+                        }
+                    }
+                ]
+            )
+        }
+        if isImportErrorAlertPresented {
+            GameDrawerDialog(
+                theme: theme,
+                title: String(localized: "Couldn't import stats"),
+                message: importErrorMessage,
+                systemImage: "exclamationmark.triangle",
+                actions: [
+                    GameDrawerDialogAction(title: String(localized: "OK"), style: .primary) {
+                        isImportErrorAlertPresented = false
+                    }
+                ]
+            )
         }
     }
 

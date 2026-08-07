@@ -20,8 +20,8 @@
 //    3. Sign-out row (P7.1) — clears local Keychain; SwiftData stats
 //       stay (offline-first §1).
 //    4. Delete-account row (P7.1) — App Store Guideline 5.1.1(v).
-//       Confirm alert → AuthStore.deleteAccount wipes the CloudKit
-//       private zone + Keychain. Failure path shows a follow-up alert
+//       Inline confirmation → AuthStore.deleteAccount wipes the CloudKit
+//       private zone + Keychain. Failure path shows a follow-up status card
 //       directing the user to System Settings to finish revocation.
 //
 //    Rows 3+4 are gated on `canManageCloudAccount` (isSignedIn ||
@@ -59,9 +59,8 @@ struct SettingsSyncSection: View {
     @Environment(\.cloudSyncStatusObserver) private var cloudSyncStatusObserver
     @Environment(\.appStartupController) private var startupController
 
-    // P7.1 alert state — destructive delete confirm + cloud-wipe-failed
-    // follow-up. Both default false; alert(isPresented:) toggles back on
-    // dismiss so the rows stay tappable.
+    // P7.1 inline-card state — destructive delete confirm + cloud-wipe-failed
+    // follow-up. Both default false and clear through explicit card actions.
     @State private var isDeleteConfirmPresented: Bool = false
     @State private var isDeleteCloudFailedAlertPresented: Bool = false
 
@@ -109,24 +108,35 @@ struct SettingsSyncSection: View {
                 }
             }
         }
-        .alert(
-            String(localized: "Delete account?"),
-            isPresented: $isDeleteConfirmPresented
-        ) {
-            Button(String(localized: "Cancel"), role: .cancel) {}
-            Button(String(localized: "Delete account"), role: .destructive) {
-                Task { await performDeleteAccount() }
-            }
-        } message: {
-            Text(String(localized: "This wipes your iCloud-synced stats AND your local stats on this device, and signs you out of \(AppInfo.displayName). To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → \(AppInfo.displayName)."))
+        if isDeleteConfirmPresented {
+            GameDrawerDialog(
+                theme: theme,
+                title: String(localized: "Delete account?"),
+                message: String(localized: "This wipes your iCloud-synced stats AND your local stats on this device, and signs you out of \(AppInfo.displayName). To finish revoking Sign in with Apple, open Settings → Apple ID → Sign in with Apple → \(AppInfo.displayName)."),
+                systemImage: "trash",
+                actions: [
+                    GameDrawerDialogAction(title: String(localized: "Cancel"), style: .primary) {
+                        isDeleteConfirmPresented = false
+                    },
+                    GameDrawerDialogAction(title: String(localized: "Delete account"), style: .destructive) {
+                        isDeleteConfirmPresented = false
+                        Task { await performDeleteAccount() }
+                    }
+                ]
+            )
         }
-        .alert(
-            String(localized: "Couldn't reach iCloud"),
-            isPresented: $isDeleteCloudFailedAlertPresented
-        ) {
-            Button(String(localized: "OK"), role: .cancel) {}
-        } message: {
-            Text(String(localized: "You're signed out on this device, but we couldn't wipe the iCloud copy of your stats right now. Reconnect to the internet and sign in again to retry, or open Settings → Apple ID → Sign in with Apple → \(AppInfo.displayName) to revoke access."))
+        if isDeleteCloudFailedAlertPresented {
+            GameDrawerDialog(
+                theme: theme,
+                title: String(localized: "Couldn't reach iCloud"),
+                message: String(localized: "You're signed out on this device, but we couldn't wipe the iCloud copy of your stats right now. Reconnect to the internet and sign in again to retry, or open Settings → Apple ID → Sign in with Apple → \(AppInfo.displayName) to revoke access."),
+                systemImage: "exclamationmark.icloud",
+                actions: [
+                    GameDrawerDialogAction(title: String(localized: "OK"), style: .primary) {
+                        isDeleteCloudFailedAlertPresented = false
+                    }
+                ]
+            )
         }
     }
 

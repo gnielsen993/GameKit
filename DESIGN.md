@@ -255,9 +255,10 @@ Shared component: `VideoModeBanner` in `Core/`.
 
 ### 3.7 Game Choice Card
 
-Routine gameplay choices use the shared `GameDrawerDialog` card, never a
+Choices and safety messages use the shared `GameDrawerDialog` card, never a
 system alert or confirmation dialog. This includes resuming a saved game,
-confirming an in-progress reset, and choosing a new board size or difficulty.
+confirming an in-progress reset, choosing a new board size or difficulty, and
+Settings actions such as support, stats reset/import errors, or account deletion.
 
 - Keep the game visible behind a token-colored scrim so the choice retains
   context and feels part of GameDrawer.
@@ -271,6 +272,8 @@ confirming an in-progress reset, and choosing a new board size or difficulty.
   game; use a choice card only when the player explicitly asks to change size,
   difficulty, or another setup option.
 - Respect the Animations setting and Reduce Motion for card transitions.
+- In scrolling Settings screens, present the card inline beneath the section
+  that caused it. Keep the triggering control and consequence in one context.
 
 ---
 

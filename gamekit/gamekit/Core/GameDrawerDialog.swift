@@ -17,7 +17,7 @@ struct GameDrawerDialogAction {
     let perform: () -> Void
 }
 
-private struct GameDrawerDialog: View {
+struct GameDrawerDialog: View {
     let theme: Theme
     let title: String
     let message: String?
