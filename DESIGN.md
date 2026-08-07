@@ -366,6 +366,9 @@ The ZStack centers the pill regardless of the action button's width.
 - Present help in the shared in-game coach card: one plain-language instruction,
   optional progress, one direct action, and a dismiss action. The card persists
   until dismissed or until every highlighted action is complete.
+- The coach card is layout content, never a board overlay. It reserves space
+  through the shared assist inset so the highlighted cell/card and its
+  destination stay visible while the explanation is open.
 - The instruction names the action the board expects. For example, Nonogram
   says **Fill** and **mark X**; it never describes a result only by color.
 - A direct cell reveal is a fallback after an honest deduction is unavailable,
@@ -449,11 +452,14 @@ User directive; overrides §7.1's original unconditional consolidation and the
   small-zone chrome) predate this principle and stay as shipped.
 
 ### 7.8 Assists in Video Mode
-- Do not add an assist chip or another compact-row slot. The dedicated
-  lightbulb is an off-path control; while Video Mode is enabled, the same
-  action remains available from the existing toolbar/overflow menu.
-- The coach card may appear after the player asks, but it must not become
-  persistent Video Mode chrome or reduce a board below its §7.5 floor.
+- Every assisted game keeps a visible lightbulb action in Video Mode. Large
+  zones use a compact icon action in the control row; small zones place the
+  standard toolbar action at the same router anchor as the menu, opposite the
+  PiP. Do not rely on an overflow menu that a Video layout may remove.
+- The coach card reserves layout space at the vertical edge opposite the PiP:
+  bottom for top zones, top for bottom zones. It never overlays the board or
+  the highlighted target. The card is temporary coaching, not a persistent
+  info chip, and must still respect the §7.5 board floor.
 
 ---
 

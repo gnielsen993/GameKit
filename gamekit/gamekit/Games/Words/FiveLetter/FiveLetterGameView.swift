@@ -30,7 +30,7 @@ struct FiveLetterGameView: View {
                     .toolbar { gameToolbar() }
             }
         }
-        .overlay(alignment: .top) { candidateBanner }
+        .gameAssistInset(theme: theme) { candidateBanner }
         .onChange(of: viewModel.candidateCount != nil) { _, showing in
             if showing { viewModel.pause() } else { viewModel.resume() }
         }
@@ -210,12 +210,22 @@ struct FiveLetterGameView: View {
         } picker: {
             EmptyView()
         } secondaryInfo: {
-            Button { viewModel.restart() } label: {
-                Image(systemName: "arrow.counterclockwise")
-                    .foregroundStyle(theme.colors.textPrimary)
+            HStack(spacing: theme.spacing.s) {
+                if settingsStore.assistsEnabled && !viewModel.isTerminal {
+                    GameAssistToolbarButton(
+                        theme: theme,
+                        label: String(localized: "Suggest a useful guess"),
+                        compact: true,
+                        action: { viewModel.requestCandidateCount() }
+                    )
+                }
+                Button { viewModel.restart() } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .foregroundStyle(theme.colors.textPrimary)
+                }
+                .disabled(!viewModel.canRestart)
+                .accessibilityLabel(Text("Restart puzzle"))
             }
-            .disabled(!viewModel.canRestart)
-            .accessibilityLabel(Text("Restart puzzle"))
         }
     }
 
@@ -232,8 +242,8 @@ struct FiveLetterGameView: View {
                 .disabled(!viewModel.canRestart)
                 .accessibilityLabel(Text("Restart puzzle"))
         }
-        if settingsStore.assistsEnabled && !videoModeStore.isEnabled && !viewModel.isTerminal {
-            ToolbarItem(placement: .topBarTrailing) {
+        if settingsStore.assistsEnabled && !viewModel.isTerminal {
+            ToolbarItem(placement: menuAtTrailing ? .topBarTrailing : .topBarLeading) {
                 GameAssistToolbarButton(
                     theme: theme,
                     label: String(localized: "Suggest a useful guess"),

@@ -260,6 +260,16 @@ extension FreeCellGameView {
             .disabled(!vm.canUndo)
             .accessibilityLabel(Text("Undo"))
 
+            if settingsStore.assistsEnabled
+                && (vm.gameState == .idle || vm.gameState == .playing) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a FreeCell move"),
+                    compact: true,
+                    action: { vm.requestHint() }
+                )
+            }
+
             Spacer(minLength: 0)
 
             Menu {
@@ -326,6 +336,16 @@ extension FreeCellGameView {
             }
             .foregroundStyle(vm.canUndo ? theme.colors.accentPrimary : theme.colors.textSecondary)
             .disabled(!vm.canUndo)
+        }
+        if settingsStore.assistsEnabled
+            && (vm.gameState == .idle || vm.gameState == .playing) {
+            ToolbarItem(placement: Self.fcToolbarPlacement(for: anchors.settings)) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a FreeCell move"),
+                    action: { vm.requestHint() }
+                )
+            }
         }
         // Settings menu — no undo here; it has its own button above
         ToolbarItem(placement: Self.fcToolbarPlacement(for: anchors.settings)) {

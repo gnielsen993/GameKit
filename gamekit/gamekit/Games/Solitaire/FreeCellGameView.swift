@@ -126,7 +126,7 @@ struct FreeCellGameView: View {
                     .allowsHitTesting(false)
             }
         }
-        .overlay(alignment: .top) { hintToast }
+        .gameAssistInset(theme: theme) { hintToast }
         .feedbackAnimation(.easeInOut(duration: 0.22), value: vm.hintText != nil)
         .onChange(of: vm.activeHint != nil) { _, showing in
             if showing { vm.pause() } else { vm.resume() }
@@ -146,7 +146,7 @@ struct FreeCellGameView: View {
                 onDismiss: { vm.dismissHint() }
             )
             .padding(.top, theme.spacing.s)
-            .transition(.opacity.combined(with: .move(edge: .top)))
+            .transition(.opacity.combined(with: .scale(scale: 0.98)))
         } else if let hint = vm.hintText {
             Text(hint)
                 .font(theme.typography.caption.weight(.semibold))
@@ -289,7 +289,7 @@ struct FreeCellGameView: View {
             .disabled(!vm.canUndo)
         }
 
-        if settingsStore.assistsEnabled && !videoModeStore.isEnabled
+        if settingsStore.assistsEnabled
             && (vm.gameState == .idle || vm.gameState == .playing) {
             ToolbarItem(placement: .topBarTrailing) {
                 GameAssistToolbarButton(

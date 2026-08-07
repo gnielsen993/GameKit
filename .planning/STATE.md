@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
 status: executing
-stopped_at: v1.6 assist experience implemented across six piece-by-piece games
-last_updated: "2026-08-05T22:00:00.000-05:00"
-last_activity: 2026-08-05
+stopped_at: v1.6 Video Mode assist access and non-covering coach layout repaired
+last_updated: "2026-08-06T00:00:00.000-05:00"
+last_activity: 2026-08-06
 progress:
   total_phases: 0
   completed_phases: 0
@@ -30,7 +30,7 @@ Phase: none — v1.6 was executed directly from the brief
 Plan: none authored
 Status: v1.6 in development. The assist experience has been expanded and
 reworked after playtesting; final simulator QA and release wrap-up remain.
-Last activity: 2026-08-05
+Last activity: 2026-08-06
 
 ### How to read the zeroed progress block
 
@@ -58,7 +58,9 @@ win but sets no record); visible, shared coach surfaces now cover Minesweeper,
 Nonogram, Sudoku, Word Grid, Five Letter, and FreeCell. Nonogram identifies
 Fill and X actions and retains them until complete. Nonogram and Sudoku offer
 Keep Solving practice after the final life without double-recording the run.
-Minesweeper can replay the board you just lost.
+Minesweeper can replay the board you just lost. Video Mode keeps help visible
+even when its normal settings menu is removed, and coach cards reserve space
+opposite the PiP instead of covering their highlighted board targets.
 
 ### Known-remaining before v1.6 can ship
 

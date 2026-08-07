@@ -54,6 +54,7 @@ struct WordGridGameView: View {
             }
         }
         .navigationTitle(String(localized: "Word Grid"))
+        .gameAssistInset(theme: theme) { hintBanner }
         .onChange(of: viewModel.hintWord != nil || viewModel.hintExhausted) { _, showing in
             if showing { viewModel.pauseForAssist() }
         }
@@ -226,7 +227,6 @@ struct WordGridGameView: View {
             hintPath: viewModel.hintPath,
             onSelect: { viewModel.select($0) }
         )
-        .overlay(alignment: .top) { hintBanner }
     }
 
     private var currentWordRow: some View {
@@ -267,11 +267,21 @@ struct WordGridGameView: View {
         } picker: {
             EmptyView()
         } secondaryInfo: {
-            Button { viewModel.restart() } label: {
-                Image(systemName: "arrow.counterclockwise")
-                    .foregroundStyle(theme.colors.textPrimary)
+            HStack(spacing: theme.spacing.s) {
+                if settingsStore.assistsEnabled && viewModel.state == .playing {
+                    GameAssistToolbarButton(
+                        theme: theme,
+                        label: String(localized: "Reveal a word"),
+                        compact: true,
+                        action: { viewModel.requestHint() }
+                    )
+                }
+                Button { viewModel.restart() } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .foregroundStyle(theme.colors.textPrimary)
+                }
+                .accessibilityLabel(Text("New grid"))
             }
-            .accessibilityLabel(Text("New grid"))
         }
     }
 
@@ -299,8 +309,8 @@ struct WordGridGameView: View {
             Button { viewModel.restart() } label: { Image(systemName: "arrow.counterclockwise") }
                 .accessibilityLabel(Text("New grid"))
         }
-        if settingsStore.assistsEnabled && !videoModeStore.isEnabled && viewModel.state == .playing {
-            ToolbarItem(placement: .topBarTrailing) {
+        if settingsStore.assistsEnabled && viewModel.state == .playing {
+            ToolbarItem(placement: menuAtTrailing ? .topBarTrailing : .topBarLeading) {
                 GameAssistToolbarButton(
                     theme: theme,
                     label: String(localized: "Reveal a word"),

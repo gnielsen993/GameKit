@@ -189,9 +189,9 @@ struct MinesweeperGameView: View {
         //   via .sensoryFeedback(.impact(.light)) on CellView)
         // Side-effect contract: this handler MUST NOT mutate VM state —
         // a phase change inside the handler would loop (T-05-19 mitigation).
-        .overlay(alignment: .top) {
+        .gameAssistInset(theme: theme) {
             hintBanner
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(.opacity.combined(with: .scale(scale: 0.98)))
         }
         .animation(
             settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,

@@ -57,9 +57,9 @@ struct SudokuGameView: View {
                 videoModeLayout
             }
         }
-        .overlay(alignment: .top) {
+        .gameAssistInset(theme: theme) {
             hintBanner
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(.opacity.combined(with: .scale(scale: 0.98)))
         }
         .animation(
             settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
@@ -287,7 +287,7 @@ extension SudokuGameView {
     var existingToolbarContent: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) { backButton }
         ToolbarItem(placement: .topBarLeading) { restartButton }
-        if settingsStore.assistsEnabled && !videoModeStore.isEnabled && isInteractive {
+        if settingsStore.assistsEnabled && isInteractive {
             ToolbarItem(placement: .topBarTrailing) {
                 GameAssistToolbarButton(
                     theme: theme,

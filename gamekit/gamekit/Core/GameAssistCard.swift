@@ -95,6 +95,7 @@ struct GameAssistCard: View {
 struct GameAssistToolbarButton: View {
     let theme: Theme
     let label: String
+    var compact = false
     let action: () -> Void
 
     var body: some View {
@@ -102,10 +103,59 @@ struct GameAssistToolbarButton: View {
             Image(systemName: "lightbulb")
                 .font(theme.typography.body.weight(.semibold))
                 .foregroundStyle(theme.colors.accentPrimary)
-                .frame(width: 44, height: 44)
+                .frame(
+                    width: compact ? theme.spacing.xl : 44,
+                    height: compact ? theme.spacing.xl : 44
+                )
+                .background(compact ? theme.colors.surface : Color.clear)
+                .clipShape(
+                    RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous)
+                )
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(label))
+    }
+}
+
+/// Keeps coaching clear of both the game board and the Video Mode window.
+/// Off-path help reserves space at the top. In Video Mode it moves to the
+/// vertical edge opposite the selected PiP zone.
+enum GameAssistPlacement {
+    static func edge(videoModeEnabled: Bool, location: VideoModeLocation) -> VerticalEdge {
+        guard videoModeEnabled else { return .top }
+        switch location {
+        case .largeTop, .smallTopLeft, .smallTopRight:
+            return .bottom
+        case .largeBottom, .smallBottomLeft, .smallBottomRight:
+            return .top
+        }
+    }
+}
+
+private struct GameAssistInsetModifier<Assist: View>: ViewModifier {
+    let theme: Theme
+    let assist: Assist
+    @Environment(\.videoModeStore) private var videoModeStore
+
+    func body(content: Content) -> some View {
+        content.safeAreaInset(
+            edge: GameAssistPlacement.edge(
+                videoModeEnabled: videoModeStore.isEnabled,
+                location: videoModeStore.location
+            ),
+            spacing: theme.spacing.s
+        ) {
+            assist
+        }
+    }
+}
+
+extension View {
+    func gameAssistInset<Assist: View>(
+        theme: Theme,
+        @ViewBuilder assist: () -> Assist
+    ) -> some View {
+        modifier(GameAssistInsetModifier(theme: theme, assist: assist()))
     }
 }

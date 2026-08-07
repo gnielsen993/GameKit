@@ -172,6 +172,15 @@ extension SudokuGameView {
             .opacity(isInteractive ? 1 : 0.4)
             .accessibilityLabel(Text("Erase"))
 
+            if settingsStore.assistsEnabled && isInteractive {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a Sudoku hint"),
+                    compact: true,
+                    action: { viewModel.requestHint() }
+                )
+            }
+
             Spacer(minLength: 0).frame(maxWidth: theme.spacing.xs)
 
             // Restart / Next Puzzle — adapts when puzzle is won
@@ -339,6 +348,15 @@ extension SudokuGameView {
         let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
         ToolbarItem(placement: Self.toolbarPlacement(for: anchors.back)) { backButton }
         ToolbarItem(placement: Self.toolbarPlacement(for: anchors.back)) { restartButton }
+        if settingsStore.assistsEnabled && isInteractive {
+            ToolbarItem(placement: Self.toolbarPlacement(for: anchors.settings)) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a Sudoku hint"),
+                    action: { viewModel.requestHint() }
+                )
+            }
+        }
         ToolbarItem(placement: Self.toolbarPlacement(for: anchors.settings)) {
             SudokuToolbarMenu(
                 theme: theme,

@@ -12,18 +12,9 @@
 //      Also rendered (with toolbar hidden) on the Large-zone STUB path that
 //      Plan 11-04 will fill in with the actual VideoCompactControlRow
 //      composition.
-//    - `existingToolbarContent` — the v1.0 nav-bar items (Back · Restart ·
-//      MinesweeperToolbarMenu). Applied on the off-path. Hidden on the
-//      Large-zone path per D-09. Re-anchored on the Small-zone path via
-//      `smallZoneToolbarContent`.
-//    - `smallZoneToolbarContent` — same items, but with placements driven by
-//      VideoModeSlotRouter.anchors(for: location). The router returns a
-//      SlotAnchor enum value (`.topLeading` / `.topTrailing` /
-//      `.bottomLeading` / `.bottomTrailing` / `.inCompactRow` / `.hidden`);
-//      we map those to ToolbarItemPlacement. Bottom anchors fall back to
-//      `.bottomBar` so the existing items survive a future Small-zone
-//      override; `.inCompactRow` / `.hidden` are not reachable on Small zones
-//      per VideoModeSlotRouter's switch (P10 D-02) but we map them defensively.
+//    - Toolbar composition and slot routing live in the sibling
+//      MinesweeperGameView+Toolbar.swift to keep this layout file below the
+//      project file-size cap.
 //
 //  D-17 untouched contract: this file does NOT import the inside of
 //  MinesweeperBoardView and does NOT change its constructor call site.
@@ -181,92 +172,6 @@ extension MinesweeperGameView {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text("Restart game"))
-    }
-
-    // MARK: - Toolbar contents (off-path + Small-zone)
-
-    /// v1.0 toolbar shape: Back + Restart at top-leading, MinesweeperToolbarMenu
-    /// at top-trailing. Applied on the off-path.
-    @ToolbarContentBuilder
-    var existingToolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
-            backButton
-        }
-        ToolbarItem(placement: .topBarLeading) {
-            restartButton
-        }
-        if settingsStore.assistsEnabled && !videoModeStore.isEnabled
-            && (viewModel.gameState == .idle || viewModel.gameState == .playing) {
-            ToolbarItem(placement: .topBarTrailing) {
-                GameAssistToolbarButton(
-                    theme: theme,
-                    label: String(localized: "Show a Minesweeper hint"),
-                    action: { viewModel.requestHint() }
-                )
-            }
-        }
-        ToolbarItem(placement: .topBarTrailing) {
-            MinesweeperToolbarMenu(
-                theme: theme,
-                currentDifficulty: viewModel.difficulty,
-                onSelect: { viewModel.requestDifficultyChange($0) },
-                onHint: settingsStore.assistsEnabled
-                    && (viewModel.gameState == .idle || viewModel.gameState == .playing)
-                    ? { viewModel.requestHint() } : nil,
-                onOpenSafeSquare: settingsStore.assistsEnabled && viewModel.hintFoundNothing
-                    ? { viewModel.openASafeSquare() } : nil
-            )
-        }
-    }
-
-    /// D-02 Small-zone toolbar: same items, but placements derived from
-    /// VideoModeSlotRouter.anchors(for: videoModeStore.location). Back and
-    /// Restart follow `anchors.back`; the difficulty menu follows
-    /// `anchors.settings`. The router constrains Small-zone anchors to
-    /// `.topLeading` / `.topTrailing` (per P10 D-02) — `.bottomLeading` /
-    /// `.bottomTrailing` map defensively to `.bottomBar` for future
-    /// Small-zone refinements; `.inCompactRow` / `.hidden` are unreachable
-    /// on Small zones but mapped defensively to `.topBarLeading`.
-    @ToolbarContentBuilder
-    var smallZoneToolbarContent: some ToolbarContent {
-        let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
-        ToolbarItem(placement: Self.toolbarPlacement(for: anchors.back)) {
-            backButton
-        }
-        ToolbarItem(placement: Self.toolbarPlacement(for: anchors.back)) {
-            restartButton
-        }
-        ToolbarItem(placement: Self.toolbarPlacement(for: anchors.settings)) {
-            MinesweeperToolbarMenu(
-                theme: theme,
-                currentDifficulty: viewModel.difficulty,
-                onSelect: { viewModel.requestDifficultyChange($0) },
-                compact: true,       // Plan 12.1-06 round 3 — icon-only menu
-                onHint: settingsStore.assistsEnabled
-                    && (viewModel.gameState == .idle || viewModel.gameState == .playing)
-                    ? { viewModel.requestHint() } : nil,
-                onOpenSafeSquare: settingsStore.assistsEnabled && viewModel.hintFoundNothing
-                    ? { viewModel.openASafeSquare() } : nil
-            )
-        }
-    }
-
-    // MARK: - Anchor → ToolbarItemPlacement mapping
-
-    /// Maps a `VideoModeSlotRouter` SlotAnchor to a SwiftUI
-    /// ToolbarItemPlacement. Only `.topLeading` / `.topTrailing` anchors
-    /// reach Small-zone toolbar call sites today (per P10 D-02); the
-    /// remaining cases are mapped defensively so a future router
-    /// refinement does not silently route items into the wrong slot.
-    static func toolbarPlacement(for anchor: SlotAnchor) -> ToolbarItemPlacement {
-        switch anchor {
-        case .topLeading:        return .topBarLeading
-        case .topTrailing:       return .topBarTrailing
-        case .bottomLeading,
-             .bottomTrailing:    return .bottomBar
-        case .inCompactRow,
-             .hidden:            return .topBarLeading      // defensive — unreachable on Small zones
-        }
     }
 
     // MARK: - Plan 11-04 — Large-zone layout (D-01/D-05/D-06/D-08/D-18)
@@ -436,6 +341,15 @@ extension MinesweeperGameView {
             // Restart button per the prior polish pass.
             // User feedback 2026-05-13 (round 2) — see memory: feedback-video-mode-compact-row.
             HStack(spacing: theme.spacing.s) {
+                if settingsStore.assistsEnabled
+                    && (viewModel.gameState == .idle || viewModel.gameState == .playing) {
+                    GameAssistToolbarButton(
+                        theme: theme,
+                        label: String(localized: "Show a Minesweeper hint"),
+                        compact: true,
+                        action: { viewModel.requestHint() }
+                    )
+                }
                 if videoModeCompactness != .reducedTime {
                     VideoModeTimerChip(
                         theme: theme,

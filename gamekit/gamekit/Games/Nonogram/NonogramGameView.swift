@@ -105,9 +105,9 @@ struct NonogramGameView: View {
                 puzzleGeneratingOverlay
             }
         }
-        .overlay(alignment: .top) {
+        .gameAssistInset(theme: theme) {
             talkthroughBanner
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(.opacity.combined(with: .scale(scale: 0.98)))
         }
         .animation(
             settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,

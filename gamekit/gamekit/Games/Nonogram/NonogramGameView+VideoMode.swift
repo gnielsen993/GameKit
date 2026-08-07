@@ -144,7 +144,7 @@ extension NonogramGameView {
     var existingToolbarContent: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) { backButton }
         ToolbarItem(placement: .topBarLeading) { restartButton }
-        if settingsStore.assistsEnabled && !videoModeStore.isEnabled && isInteractive {
+        if settingsStore.assistsEnabled && isInteractive {
             ToolbarItem(placement: .topBarTrailing) {
                 GameAssistToolbarButton(
                     theme: theme,
@@ -174,6 +174,15 @@ extension NonogramGameView {
         let anchors = VideoModeSlotRouter.anchors(for: videoModeStore.location)
         ToolbarItem(placement: Self.toolbarPlacement(for: anchors.back)) { backButton }
         ToolbarItem(placement: Self.toolbarPlacement(for: anchors.back)) { restartButton }
+        if settingsStore.assistsEnabled && isInteractive {
+            ToolbarItem(placement: Self.toolbarPlacement(for: anchors.settings)) {
+                GameAssistToolbarButton(
+                    theme: theme,
+                    label: String(localized: "Show a Nonogram hint"),
+                    action: { viewModel.requestTalkthrough() }
+                )
+            }
+        }
         ToolbarItem(placement: Self.toolbarPlacement(for: anchors.settings)) {
             NonogramToolbarMenu(
                 theme: theme,
@@ -356,6 +365,14 @@ extension NonogramGameView {
             // TimerChip half gated on videoModeCompactness != .reducedTime
             // (mirror P11-04 D-18 reaction).
             HStack(spacing: theme.spacing.s) {
+                if settingsStore.assistsEnabled && isInteractive {
+                    GameAssistToolbarButton(
+                        theme: theme,
+                        label: String(localized: "Show a Nonogram hint"),
+                        compact: true,
+                        action: { viewModel.requestTalkthrough() }
+                    )
+                }
                 if videoModeCompactness != .reducedTime {
                     VideoModeTimerChip(
                         theme: theme,
