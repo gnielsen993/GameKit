@@ -58,19 +58,26 @@ struct SolitaireGameView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("Solitaire")
         .navigationBarBackButtonHidden(true)
-        .alert("Resume game?", isPresented: Binding(
-            get: { vm.pendingSaveState != nil },
-            set: { _ in }
-        )) {
-            Button("Continue") {
-                if let saved = vm.pendingSaveState { vm.restoreState(saved) }
-            }
-            Button("New Game", role: .destructive) { vm.discardSaveAndLoadNew() }
-        } message: {
-            if let s = vm.pendingSaveState {
-                Text("You have an in-progress \(s.difficulty.label) Solitaire game.")
-            }
-        }
+        .gameDrawerDialog(
+            isPresented: vm.pendingSaveState != nil,
+            theme: theme,
+            title: String(localized: "Resume game?"),
+            message: vm.pendingSaveState.map {
+                String(
+                    format: String(localized: "You have an in-progress %@ Solitaire game."),
+                    $0.difficulty.label
+                )
+            },
+            systemImage: "arrow.counterclockwise",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Continue"), style: .primary) {
+                    if let saved = vm.pendingSaveState { vm.restoreState(saved) }
+                },
+                GameDrawerDialogAction(title: String(localized: "New Game"), style: .destructive) {
+                    vm.discardSaveAndLoadNew()
+                }
+            ]
+        )
         .task {
             guard !didInjectStats else { return }
             didInjectStats = true
@@ -85,12 +92,25 @@ struct SolitaireGameView: View {
         // held loss is written here rather than at the moment it was
         // detected, so undo can revive the deal in between.
         .onDisappear { vm.flushPendingLoss() }
-        .confirmationDialog("New Game", isPresented: $showingNewGame) {
-            ForEach(SolitaireDifficulty.allCases, id: \.self) { d in
-                Button("\(d.label) — \(d.detail)") { vm.startNewGame(difficulty: d) }
-            }
-            Button("Cancel", role: .cancel) { }
-        }
+        .gameDrawerDialog(
+            isPresented: showingNewGame,
+            theme: theme,
+            title: String(localized: "New Game"),
+            systemImage: "suit.spade.fill",
+            actions: SolitaireDifficulty.allCases.map { difficulty in
+                GameDrawerDialogAction(
+                    title: "\(difficulty.label) — \(difficulty.detail)",
+                    style: difficulty == vm.difficulty ? .primary : .secondary
+                ) {
+                    showingNewGame = false
+                    vm.startNewGame(difficulty: difficulty)
+                }
+            } + [
+                GameDrawerDialogAction(title: String(localized: "Cancel"), style: .quiet) {
+                    showingNewGame = false
+                }
+            ]
+        )
         .sensoryFeedback(.impact(weight: .medium),
                          trigger: settingsStore.hapticsEnabled ? pickUpTick : 0)
         .sensoryFeedback(.success,

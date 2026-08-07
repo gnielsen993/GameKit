@@ -157,31 +157,44 @@ struct NonogramGameView: View {
         .navigationTitle(String(localized: "Nonogram"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .confirmationDialog(
-            String(localized: "Choose size"),
-            isPresented: $showDifficultyPicker,
-            titleVisibility: .visible
-        ) {
-            ForEach(NonogramDifficulty.allCases, id: \.self) { d in
-                Button(difficultyDisplayName(d)) {
-                    viewModel.setDifficulty(d)
+        .gameDrawerDialog(
+            isPresented: showDifficultyPicker,
+            theme: theme,
+            title: String(localized: "Choose size"),
+            systemImage: "square.grid.3x3",
+            actions: NonogramDifficulty.allCases.map { difficulty in
+                GameDrawerDialogAction(
+                    title: difficultyDisplayName(difficulty),
+                    style: difficulty == viewModel.difficulty ? .primary : .secondary
+                ) {
+                    showDifficultyPicker = false
+                    if difficulty == viewModel.difficulty {
+                        viewModel.newPuzzle()
+                    } else {
+                        viewModel.setDifficulty(difficulty)
+                    }
                 }
-            }
-            Button(String(localized: "Cancel"), role: .cancel) { }
-        }
-        .alert("Resume puzzle?", isPresented: Binding(
-            get: { viewModel.pendingSaveState != nil },
-            set: { _ in }
-        )) {
-            Button("Continue") {
-                if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
-            }
-            Button("New Puzzle", role: .destructive) { viewModel.discardSaveAndLoadNew() }
-        } message: {
-            if let s = viewModel.pendingSaveState {
-                Text("You have an unfinished \(s.difficulty) puzzle in \(s.gameMode == "lives" ? "Lives" : "Free") mode.")
-            }
-        }
+            } + [
+                GameDrawerDialogAction(title: String(localized: "Cancel"), style: .quiet) {
+                    showDifficultyPicker = false
+                }
+            ]
+        )
+        .gameDrawerDialog(
+            isPresented: viewModel.pendingSaveState != nil,
+            theme: theme,
+            title: String(localized: "Resume puzzle?"),
+            message: nonogramResumeMessage,
+            systemImage: "arrow.counterclockwise",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Continue"), style: .primary) {
+                    if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
+                },
+                GameDrawerDialogAction(title: String(localized: "New Puzzle"), style: .destructive) {
+                    viewModel.discardSaveAndLoadNew()
+                }
+            ]
+        )
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .background:
@@ -267,5 +280,17 @@ struct NonogramGameView: View {
         case .medium: return String(localized: "Medium  -  15 × 15")
         case .large:  return String(localized: "Large  -  20 × 20")
         }
+    }
+
+    private var nonogramResumeMessage: String {
+        guard let saved = viewModel.pendingSaveState else { return "" }
+        let mode = saved.gameMode == "lives"
+            ? String(localized: "Lives")
+            : String(localized: "Free")
+        return String(
+            format: String(localized: "You have an unfinished %@ puzzle in %@ mode."),
+            saved.difficulty,
+            mode
+        )
     }
 }

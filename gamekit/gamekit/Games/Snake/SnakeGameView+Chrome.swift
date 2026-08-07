@@ -114,7 +114,7 @@ extension SnakeGameView {
     /// Wall-mode toggle menu (D-11). The label shows the current state so the
     /// player can see at a glance which mode is active. Tapping always calls
     /// requestWallModeToggle() — if a run is in progress the VM surfaces the
-    /// abandon alert; if idle it applies the toggle immediately. Placement is
+    /// abandon choice; if idle it applies the toggle immediately. Placement is
     /// parameterized in `standardLayout(menuPlacement:)` (see backButton).
     var wallModeMenu: some View {
         Menu {

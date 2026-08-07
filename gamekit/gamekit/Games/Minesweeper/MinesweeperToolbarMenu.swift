@@ -4,13 +4,13 @@
 //
 //  Trailing toolbar Menu with Easy / Medium / Hard buttons. Props-only:
 //  routes selection through `onSelect` closure — the parent VM (consumed
-//  in Plan 04) decides whether to alert mid-game (D-10) before applying.
+//  in Plan 04) decides whether to confirm mid-game (D-10) before applying.
 //
 //  Phase 3 invariants (per D-09, D-11, P2 D-03):
 //    - View layer owns localized display strings ("Easy"/"Medium"/"Hard");
 //      engine layer (P2) carries only mechanical raw values.
 //    - Selection writes through `onSelect` — NOT directly to vm.setDifficulty;
-//      parent routes via vm.requestDifficultyChange(_:) so the abandon-alert
+//      parent routes via vm.requestDifficultyChange(_:) so the abandon-choice
 //      path runs from .playing state (D-10 + RESEARCH Pitfall 4).
 //    - Menu trigger glyph = `slider.horizontal.3` (UI-SPEC §Component Inventory).
 //    - Trigger label uses theme.typography.headline (17pt semibold) — chosen

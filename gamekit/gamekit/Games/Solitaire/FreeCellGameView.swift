@@ -70,19 +70,6 @@ struct FreeCellGameView: View {
         .sensoryFeedback(.error,
                          trigger: settingsStore.hapticsEnabled ? vm.rejectTick : 0)
         .sheet(isPresented: $showingDealEntry)  { dealEntrySheet }
-        .alert("Resume game?", isPresented: Binding(
-            get: { vm.pendingSaveState != nil },
-            set: { _ in }
-        )) {
-            Button("Continue") {
-                if let saved = vm.pendingSaveState { vm.restoreState(saved) }
-            }
-            Button("New Deal", role: .destructive) { vm.discardSaveAndLoadNew() }
-        } message: {
-            if let s = vm.pendingSaveState {
-                Text("You have an in-progress FreeCell deal #\(s.dealNumber).")
-            }
-        }
         .task {
             guard !didInjectStats else { return }
             didInjectStats = true
@@ -131,6 +118,26 @@ struct FreeCellGameView: View {
         .onChange(of: vm.activeHint != nil) { _, showing in
             if showing { vm.pause() } else { vm.resume() }
         }
+        .gameDrawerDialog(
+            isPresented: vm.pendingSaveState != nil,
+            theme: theme,
+            title: String(localized: "Resume game?"),
+            message: vm.pendingSaveState.map {
+                String(
+                    format: String(localized: "You have an in-progress FreeCell deal #%lld."),
+                    Int64($0.dealNumber)
+                )
+            },
+            systemImage: "arrow.counterclockwise",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Continue"), style: .primary) {
+                    if let saved = vm.pendingSaveState { vm.restoreState(saved) }
+                },
+                GameDrawerDialogAction(title: String(localized: "New Deal"), style: .destructive) {
+                    vm.discardSaveAndLoadNew()
+                }
+            ]
+        )
     }
 
     @ViewBuilder private var hintToast: some View {

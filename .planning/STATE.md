@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
 status: executing
-stopped_at: v1.6 Video Mode assist access and non-covering coach layout repaired
+stopped_at: v1.6 gameplay choice pop-ups replaced with branded in-game cards
 last_updated: "2026-08-06T00:00:00.000-05:00"
 last_activity: 2026-08-06
 progress:
@@ -60,7 +60,9 @@ Fill and X actions and retains them until complete. Nonogram and Sudoku offer
 Keep Solving practice after the final life without double-recording the run.
 Minesweeper can replay the board you just lost. Video Mode keeps help visible
 even when its normal settings menu is removed, and coach cards reserve space
-opposite the PiP instead of covering their highlighted board targets.
+opposite the PiP instead of covering their highlighted board targets. Stock
+gameplay alerts and action sheets have been replaced by a shared themed choice
+card, while completed-game New puzzle / New board actions stay immediate.
 
 ### Known-remaining before v1.6 can ship
 

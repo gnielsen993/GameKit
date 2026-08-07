@@ -134,8 +134,7 @@ final class MinesweeperViewModel {
 
     // MARK: - Difficulty-switch confirmation flow (D-10, RESEARCH Pitfall 4)
 
-    /// Bound to `.alert(isPresented:)` in MinesweeperGameView.
-    /// Mutable (not `private(set)`) so the alert binding can dismiss on user choice.
+    /// Drives the branded abandon choice card in MinesweeperGameView.
     var showingAbandonAlert: Bool = false
     private(set) var pendingDifficultyChange: MinesweeperDifficulty?
 
@@ -431,14 +430,14 @@ final class MinesweeperViewModel {
     }
 
     /// Direct setter — internal callers (confirmDifficultyChange, init paths) use this.
-    /// Plan 03 view callers should use `requestDifficultyChange(_:)` so the alert flow runs.
+    /// View callers use `requestDifficultyChange(_:)` so the choice flow runs.
     func setDifficulty(_ d: MinesweeperDifficulty) {
         difficulty = d
         userDefaults.set(d.rawValue, forKey: Self.lastDifficultyKey)
         restart()
     }
 
-    /// View callers go through here so the mid-game alert (D-10) can interpose
+    /// View callers go through here so the mid-game choice card (D-10) can interpose
     /// on `.playing` state. From idle / won / lost the change applies immediately.
     func requestDifficultyChange(_ d: MinesweeperDifficulty) {
         guard d != difficulty else { return }
@@ -451,7 +450,7 @@ final class MinesweeperViewModel {
         }
     }
 
-    /// User confirmed Abandon in the alert — apply the pending change.
+    /// User confirmed the destructive choice — apply the pending change.
     func confirmDifficultyChange() {
         guard let d = pendingDifficultyChange else {
             showingAbandonAlert = false
@@ -462,7 +461,7 @@ final class MinesweeperViewModel {
         setDifficulty(d)
     }
 
-    /// User tapped Cancel in the alert — keep the in-progress game.
+    /// User chose to keep playing — preserve the in-progress game.
     func cancelDifficultyChange() {
         pendingDifficultyChange = nil
         showingAbandonAlert = false

@@ -253,6 +253,25 @@ Shared component: `VideoModeBanner` in `Core/`.
   to `.identity` on Reduce Motion.
 - Haptics on win: `.success` (if `hapticsEnabled`).
 
+### 3.7 Game Choice Card
+
+Routine gameplay choices use the shared `GameDrawerDialog` card, never a
+system alert or confirmation dialog. This includes resuming a saved game,
+confirming an in-progress reset, and choosing a new board size or difficulty.
+
+- Keep the game visible behind a token-colored scrim so the choice retains
+  context and feels part of GameDrawer.
+- Use one clear title, one short explanation, and full-width `DKButton`-style
+  actions. The safest continuation is primary; irreversible reset actions use
+  `theme.colors.danger`; cancellation is quiet text.
+- The card blocks board interaction and cannot be dismissed by tapping the
+  backdrop. Every path must make an explicit, accessible choice.
+- Ordinary end-state primary actions such as **New puzzle** or **New board**
+  happen immediately. Do not insert a second confirmation after a completed
+  game; use a choice card only when the player explicitly asks to change size,
+  difficulty, or another setup option.
+- Respect the Animations setting and Reduce Motion for card transitions.
+
 ---
 
 ## 4. Typography Rules

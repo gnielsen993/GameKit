@@ -103,32 +103,41 @@ struct MergeGameView: View {
         // the end-state card). Same treatment applied to MinesweeperGameView
         // for consistency across game screens.
         .navigationBarBackButtonHidden(true)
-        .alert("Resume game?", isPresented: Binding(
-            get: { viewModel.pendingSaveState != nil },
-            set: { _ in }
-        )) {
-            Button("Continue") {
-                if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
-            }
-            Button("New Game", role: .destructive) { viewModel.discardSaveAndLoadNew() }
-        } message: {
-            if let s = viewModel.pendingSaveState {
-                Text("You have an in-progress Merge game with a score of \(s.score).")
-            }
-        }
-        .alert(
-            String(localized: "Abandon current game?"),
-            isPresented: $viewModel.showingAbandonAlert
-        ) {
-            Button(String(localized: "Cancel"), role: .cancel) {
-                viewModel.cancelModeChange()
-            }
-            Button(String(localized: "Abandon"), role: .destructive) {
-                viewModel.confirmModeChange()
-            }
-        } message: {
-            Text(String(localized: "Switching modes resets the board. Your current score will be lost."))
-        }
+        .gameDrawerDialog(
+            isPresented: viewModel.pendingSaveState != nil,
+            theme: theme,
+            title: String(localized: "Resume game?"),
+            message: viewModel.pendingSaveState.map {
+                String(
+                    format: String(localized: "You have an in-progress Merge game with a score of %lld."),
+                    Int64($0.score)
+                )
+            },
+            systemImage: "arrow.counterclockwise",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Continue"), style: .primary) {
+                    if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
+                },
+                GameDrawerDialogAction(title: String(localized: "New Game"), style: .destructive) {
+                    viewModel.discardSaveAndLoadNew()
+                }
+            ]
+        )
+        .gameDrawerDialog(
+            isPresented: viewModel.showingAbandonAlert,
+            theme: theme,
+            title: String(localized: "Abandon current game?"),
+            message: String(localized: "Switching modes resets the board. Your current score will be lost."),
+            systemImage: "exclamationmark.triangle",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Cancel"), style: .primary) {
+                    viewModel.cancelModeChange()
+                },
+                GameDrawerDialogAction(title: String(localized: "Abandon"), style: .destructive) {
+                    viewModel.confirmModeChange()
+                }
+            ]
+        )
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { viewModel.saveCurrentState() }
         }

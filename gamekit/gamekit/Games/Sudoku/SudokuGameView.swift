@@ -68,21 +68,29 @@ struct SudokuGameView: View {
         .onChange(of: viewModel.activeHint != nil || viewModel.hintUnavailable != nil) { _, showing in
             if showing { viewModel.pause() } else { viewModel.resume() }
         }
-        .alert("Resume puzzle?", isPresented: Binding(
-            get: { viewModel.pendingSaveState != nil },
-            set: { _ in }
-        )) {
-            Button("Continue") {
-                if let saved = viewModel.pendingSaveState {
-                    viewModel.restoreState(saved)
+        .gameDrawerDialog(
+            isPresented: viewModel.pendingSaveState != nil,
+            theme: theme,
+            title: String(localized: "Resume puzzle?"),
+            message: String(
+                format: String(localized: "You have an unfinished %@ puzzle in %@ mode."),
+                viewModel.difficulty.displayName,
+                viewModel.gameMode == .lives
+                    ? String(localized: "Lives")
+                    : String(localized: "Free")
+            ),
+            systemImage: "arrow.counterclockwise",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Continue"), style: .primary) {
+                    if let saved = viewModel.pendingSaveState {
+                        viewModel.restoreState(saved)
+                    }
+                },
+                GameDrawerDialogAction(title: String(localized: "New Puzzle"), style: .destructive) {
+                    viewModel.discardSaveAndLoadNew()
                 }
-            }
-            Button("New Puzzle", role: .destructive) {
-                viewModel.discardSaveAndLoadNew()
-            }
-        } message: {
-            Text("You have an unfinished \(viewModel.difficulty.displayName) puzzle in \(viewModel.gameMode == .lives ? "Lives" : "Free") mode.")
-        }
+            ]
+        )
         .onChange(of: viewModel.state) { _, newState in
             switch newState {
             case .won, .practiceComplete:

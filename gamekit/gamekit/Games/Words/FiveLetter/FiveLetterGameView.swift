@@ -37,17 +37,21 @@ struct FiveLetterGameView: View {
         .navigationTitle(String(localized: "Five Letter"))
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .alert("Resume puzzle?", isPresented: Binding(
-            get: { viewModel.pendingSaveState != nil },
-            set: { _ in }
-        )) {
-            Button("Continue") {
-                if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
-            }
-            Button("New Puzzle", role: .destructive) { viewModel.discardSaveAndLoadNew() }
-        } message: {
-            Text("You have an unfinished Five Letter puzzle.")
-        }
+        .gameDrawerDialog(
+            isPresented: viewModel.pendingSaveState != nil,
+            theme: theme,
+            title: String(localized: "Resume puzzle?"),
+            message: String(localized: "You have an unfinished Five Letter puzzle."),
+            systemImage: "arrow.counterclockwise",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Continue"), style: .primary) {
+                    if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
+                },
+                GameDrawerDialogAction(title: String(localized: "New Puzzle"), style: .destructive) {
+                    viewModel.discardSaveAndLoadNew()
+                }
+            ]
+        )
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .background:

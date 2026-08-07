@@ -60,17 +60,21 @@ struct WordGridGameView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .alert("Resume game?", isPresented: Binding(
-            get: { viewModel.pendingSaveState != nil },
-            set: { _ in }
-        )) {
-            Button("Continue") {
-                if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
-            }
-            Button("New Grid", role: .destructive) { viewModel.discardSaveAndLoadNew() }
-        } message: {
-            Text("You have an unfinished Word Grid game.")
-        }
+        .gameDrawerDialog(
+            isPresented: viewModel.pendingSaveState != nil,
+            theme: theme,
+            title: String(localized: "Resume game?"),
+            message: String(localized: "You have an unfinished Word Grid game."),
+            systemImage: "arrow.counterclockwise",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Continue"), style: .primary) {
+                    if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
+                },
+                GameDrawerDialogAction(title: String(localized: "New Grid"), style: .destructive) {
+                    viewModel.discardSaveAndLoadNew()
+                }
+            ]
+        )
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { viewModel.saveCurrentState() }
         }

@@ -118,18 +118,24 @@ struct SnakeGameView: View {
             let stats = GameStats(modelContext: modelContext)
             vm.attachGameStats(stats)
         }
-        // Abandon alert — wall-mode toggle with an in-progress run (D-11)
-        .alert(String(localized: "Abandon current game?"),
-               isPresented: Bindable(vm).showingAbandonAlert) {
-            Button(String(localized: "Cancel"), role: .cancel) {
-                vm.cancelWallModeChange()
-            }
-            Button(String(localized: "Abandon"), role: .destructive) {
-                vm.confirmWallModeChange()
-            }
-        } message: {
-            Text(String(localized: "Switching modes resets the run. Your current score will be lost."))
+        .onChange(of: vm.showingAbandonAlert) { _, showing in
+            if showing { vm.pause() } else { vm.resume() }
         }
+        .gameDrawerDialog(
+            isPresented: vm.showingAbandonAlert,
+            theme: theme,
+            title: String(localized: "Abandon current game?"),
+            message: String(localized: "Switching modes resets the run. Your current score will be lost."),
+            systemImage: "exclamationmark.triangle",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Cancel"), style: .primary) {
+                    vm.cancelWallModeChange()
+                },
+                GameDrawerDialogAction(title: String(localized: "Abandon"), style: .destructive) {
+                    vm.confirmWallModeChange()
+                }
+            ]
+        )
     }
 
     // MARK: - Standard layout (off-path + unobstructed Video Mode zones)

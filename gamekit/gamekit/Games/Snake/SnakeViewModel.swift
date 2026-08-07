@@ -41,10 +41,9 @@ final class SnakeViewModel {
     /// SwiftData firewall: opaque GameStats reference (VM never imports SwiftData).
     private(set) var gameStats: GameStats?
 
-    // MARK: - Wall mode + abandon alert (methods wired in Task 2)
+    // MARK: - Wall mode + abandon choice (methods wired in Task 2)
 
-    /// Bound to `.alert(isPresented:)` in SnakeGameView. Mutable (not
-    /// `private(set)`) so the alert binding can dismiss on user choice.
+    /// Drives the branded abandon choice card in SnakeGameView.
     var showingAbandonAlert: Bool = false
     /// true = wall-death mode; false = toroidal wrap (default, D-12).
     /// Persisted under "snake.wallMode" in UserDefaults.
@@ -244,7 +243,7 @@ final class SnakeViewModel {
     // MARK: - Wall mode toggle methods (D-11 / D-12 — Task 2)
 
     /// Entry point for the toolbar "Wall mode" menu button.
-    /// If a run is in progress (score > 0), surfaces the abandon alert.
+    /// If a run is in progress (score > 0), surfaces the abandon choice.
     /// If no progress has been made, applies the toggle immediately.
     func requestWallModeToggle() {
         if engine.score > 0 {
@@ -260,7 +259,7 @@ final class SnakeViewModel {
         applyWallModeToggle()
     }
 
-    /// User tapped Cancel — dismiss alert, keep in-progress game.
+    /// User chose to keep playing — preserve the in-progress game.
     func cancelWallModeChange() {
         showingAbandonAlert = false
     }

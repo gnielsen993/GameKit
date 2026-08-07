@@ -15,8 +15,8 @@
 //      should NOT pause the timer)
 //    - End-state overlay sits in a ZStack with a theme.colors.background.opacity(0.85)
 //      backdrop — NOT a sheet/fullScreenCover; D-02 forbids tap-to-dismiss
-//    - .alert(isPresented: $viewModel.showingAbandonAlert) drives the D-10 mid-game
-//      abandon flow (Cancel = vm.cancelDifficultyChange; Abandon = vm.confirmDifficultyChange)
+//    - The shared GameDrawer choice card drives the D-10 mid-game abandon
+//      flow (Cancel = keep playing; Abandon = confirm).
 //    - NavigationStack is owned by HomeView (per ARCHITECTURE Anti-Pattern 3 — no nested);
 //      this view is pushed via NavigationLink from HomeView (Plan 04 Task 3)
 //
@@ -138,31 +138,8 @@ struct MinesweeperGameView: View {
         // screen (besides win/loss → Home from the end-state card). Matches
         // MergeGameView for cross-game consistency.
         .navigationBarBackButtonHidden(true)
-        .alert("Resume game?", isPresented: Binding(
-            get: { viewModel.pendingSaveState != nil },
-            set: { _ in }
-        )) {
-            Button("Continue") {
-                if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
-            }
-            Button("New Game", role: .destructive) {
-                viewModel.discardSaveAndLoadNew()
-            }
-        } message: {
-            Text("You have an unfinished \(viewModel.difficulty.rawValue) Minesweeper game.")
-        }
-        .alert(
-            String(localized: "Abandon current game?"),
-            isPresented: $viewModel.showingAbandonAlert
-        ) {
-            Button(String(localized: "Cancel"), role: .cancel) {
-                viewModel.cancelDifficultyChange()
-            }
-            Button(String(localized: "Abandon"), role: .destructive) {
-                viewModel.confirmDifficultyChange()
-            }
-        } message: {
-            Text(String(localized: "Your in-progress game will be lost."))
+        .onChange(of: viewModel.showingAbandonAlert) { _, showing in
+            if showing { viewModel.pause() } else { viewModel.resume() }
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
@@ -232,6 +209,58 @@ struct MinesweeperGameView: View {
             let stats = GameStats(modelContext: modelContext)
             viewModel.attachGameStats(stats)
         }
+        .gameDrawerDialog(
+            isPresented: viewModel.pendingSaveState != nil,
+            theme: theme,
+            title: String(localized: "Resume game?"),
+            message: String(
+                format: String(localized: "You have an unfinished %@ Minesweeper game."),
+                viewModel.difficulty.rawValue
+            ),
+            systemImage: "arrow.counterclockwise",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Continue"), style: .primary) {
+                    if let saved = viewModel.pendingSaveState { viewModel.restoreState(saved) }
+                },
+                GameDrawerDialogAction(title: String(localized: "New Game"), style: .destructive) {
+                    viewModel.discardSaveAndLoadNew()
+                }
+            ]
+        )
+        .gameDrawerDialog(
+            isPresented: viewModel.showingAbandonAlert,
+            theme: theme,
+            title: String(localized: "Abandon current game?"),
+            message: String(localized: "Your in-progress game will be lost."),
+            systemImage: "exclamationmark.triangle",
+            actions: [
+                GameDrawerDialogAction(title: String(localized: "Cancel"), style: .primary) {
+                    viewModel.cancelDifficultyChange()
+                },
+                GameDrawerDialogAction(title: String(localized: "Abandon"), style: .destructive) {
+                    viewModel.confirmDifficultyChange()
+                }
+            ]
+        )
+        .gameDrawerDialog(
+            isPresented: showDifficultyPicker,
+            theme: theme,
+            title: String(localized: "Change difficulty"),
+            systemImage: "slider.horizontal.3",
+            actions: MinesweeperDifficulty.allCases.map { difficulty in
+                GameDrawerDialogAction(
+                    title: difficultyDisplayName(difficulty),
+                    style: difficulty == viewModel.difficulty ? .primary : .secondary
+                ) {
+                    showDifficultyPicker = false
+                    viewModel.requestDifficultyChange(difficulty)
+                }
+            } + [
+                GameDrawerDialogAction(title: String(localized: "Cancel"), style: .quiet) {
+                    showDifficultyPicker = false
+                }
+            ]
+        )
     }
 
     // MARK: - End-state overlay (D-01 + D-02 — no tap-to-dismiss; D-18 — no animation P3)
@@ -266,18 +295,6 @@ struct MinesweeperGameView: View {
                 },
                 onRetryBoard: { viewModel.retryCurrentBoard() }
             )
-        }
-        .confirmationDialog(
-            String(localized: "Change difficulty"),
-            isPresented: $showDifficultyPicker,
-            titleVisibility: .visible
-        ) {
-            ForEach(MinesweeperDifficulty.allCases, id: \.self) { difficulty in
-                Button(difficultyDisplayName(difficulty)) {
-                    viewModel.requestDifficultyChange(difficulty)
-                }
-            }
-            Button(String(localized: "Cancel"), role: .cancel) { }
         }
     }
 
