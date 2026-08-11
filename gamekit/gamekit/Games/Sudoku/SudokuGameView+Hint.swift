@@ -17,7 +17,7 @@ extension SudokuGameView {
 
     @ViewBuilder
     var hintBanner: some View {
-        if let hint = viewModel.activeHint {
+        if viewModel.isHintCardVisible, let hint = viewModel.activeHint {
             GameAssistCard(
                 theme: theme,
                 title: String(localized: "Try this square"),
@@ -28,7 +28,7 @@ extension SudokuGameView {
                 ),
                 onDismiss: { viewModel.dismissHint() }
             )
-        } else if let reason = viewModel.hintUnavailable {
+        } else if viewModel.isHintCardVisible, let reason = viewModel.hintUnavailable {
             GameAssistCard(
                 theme: theme,
                 title: reason == .boardHasAMistake

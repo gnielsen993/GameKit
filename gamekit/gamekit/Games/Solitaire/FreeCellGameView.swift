@@ -115,8 +115,8 @@ struct FreeCellGameView: View {
             }
         }
         .gameAssistInset(theme: theme) { hintToast }
-        .feedbackAnimation(.easeInOut(duration: 0.22), value: vm.hintText != nil)
-        .onChange(of: vm.activeHint != nil) { _, showing in
+        .feedbackAnimation(.easeInOut(duration: 0.22), value: vm.isHintCardVisible)
+        .onChange(of: vm.isHintCardVisible) { _, showing in
             if showing { vm.pause() } else { vm.resume() }
         }
         .gameDrawerDialog(
@@ -142,7 +142,7 @@ struct FreeCellGameView: View {
     }
 
     @ViewBuilder private var hintToast: some View {
-        if let hint = vm.hintText, vm.activeHint != nil {
+        if vm.isHintCardVisible, let hint = vm.hintText, vm.activeHint != nil {
             GameAssistCard(
                 theme: theme,
                 title: String(localized: "A useful move"),

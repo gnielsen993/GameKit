@@ -47,6 +47,7 @@ struct FreeCellColumnView: View {
     private var isHighlighted: Bool { isTapTarget || isDragTarget }
 
     private var selectedStartIdx: Int? {
+        if case .column(let col, let idx) = vm.activeHintSource, col == colIdx { return idx }
         if case .column(let col, let idx) = vm.selection, col == colIdx { return idx }
         return nil
     }

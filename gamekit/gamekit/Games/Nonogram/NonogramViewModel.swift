@@ -137,6 +137,9 @@ final class NonogramViewModel {
     /// Why the last talkthrough request produced nothing, when it did.
     private(set) var talkthroughUnavailable: TalkthroughUnavailable?
 
+    /// The coaching card can be dismissed independently of the board marks.
+    private(set) var isTalkthroughCardVisible = false
+
     enum TalkthroughUnavailable: Equatable {
         /// A line contradicts its clues, so no honest next step exists.
         case boardHasAMistake
@@ -170,12 +173,17 @@ final class NonogramViewModel {
         // .idle is allowed: "where do I even start" is a fair question, and
         // the first overlap deduction is the honest answer to it.
         guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
+        if activeTalkthrough != nil {
+            isTalkthroughCardVisible = true
+            return
+        }
         talkthroughUnavailable = nil
 
         if let deduction = NonogramTalkthrough.nextDeduction(
             board: board, rowHints: rowHints, columnHints: columnHints
         ) {
             activeTalkthrough = deduction
+            isTalkthroughCardVisible = true
             assistsUsed += 1
             saveCurrentState()
             return
@@ -188,6 +196,7 @@ final class NonogramViewModel {
         talkthroughUnavailable = (unsatisfiableRows.isEmpty && unsatisfiableColumns.isEmpty)
             ? .noLineDeduction
             : .boardHasAMistake
+        isTalkthroughCardVisible = true
     }
 
     /// Still-unresolved cells the current explanation says to fill.
@@ -238,8 +247,8 @@ final class NonogramViewModel {
     }
 
     func dismissTalkthrough() {
-        activeTalkthrough = nil
-        talkthroughUnavailable = nil
+        isTalkthroughCardVisible = false
+        if activeTalkthrough == nil { talkthroughUnavailable = nil }
     }
 
     /// Recompute cross-off masks. Called after any board mutation.
@@ -264,6 +273,7 @@ final class NonogramViewModel {
            talkthroughFillHighlight.isEmpty,
            talkthroughCrossHighlight.isEmpty {
             activeTalkthrough = nil
+            isTalkthroughCardVisible = false
         }
     }
 
@@ -452,6 +462,7 @@ final class NonogramViewModel {
         assistsUsed = 0
         activeTalkthrough = nil
         talkthroughUnavailable = nil
+        isTalkthroughCardVisible = false
         pendingSaveState = nil
     }
 

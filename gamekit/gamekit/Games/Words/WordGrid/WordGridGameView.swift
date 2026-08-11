@@ -13,14 +13,14 @@ struct WordGridGameView: View {
     /// the disclosure and the pricing in one line.
     @ViewBuilder
     private var hintBanner: some View {
-        if let word = viewModel.hintWord {
+        if viewModel.isHintCardVisible, let word = viewModel.hintWord {
             GameAssistCard(
                 theme: theme,
                 title: String(format: String(localized: "Found %@"), word),
                 message: String(localized: "Follow the highlighted letters. Revealed words score 0."),
                 onDismiss: { viewModel.dismissHint() }
             )
-        } else if viewModel.hintExhausted {
+        } else if viewModel.isHintCardVisible, viewModel.hintExhausted {
             GameAssistCard(
                 theme: theme,
                 title: String(localized: "No word left to reveal"),
@@ -55,7 +55,7 @@ struct WordGridGameView: View {
         }
         .navigationTitle(String(localized: "Word Grid"))
         .gameAssistInset(theme: theme) { hintBanner }
-        .onChange(of: viewModel.hintWord != nil || viewModel.hintExhausted) { _, showing in
+        .onChange(of: viewModel.isHintCardVisible) { _, showing in
             if showing { viewModel.pauseForAssist() }
         }
         .navigationBarTitleDisplayMode(.inline)

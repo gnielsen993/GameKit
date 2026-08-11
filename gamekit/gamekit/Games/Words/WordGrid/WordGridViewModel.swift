@@ -84,6 +84,9 @@ final class WordGridViewModel {
     /// True when the board has no findable word left to reveal.
     private(set) var hintExhausted = false
 
+    /// The words can be dismissed while the path remains on the grid.
+    private(set) var isHintCardVisible = false
+
     var assistsUsed: Int { revealedWords.count }
 
     /// Reveal one word still on the board.
@@ -94,6 +97,11 @@ final class WordGridViewModel {
     /// the number simply does not move.
     func requestHint() {
         guard state == .playing else { return }
+        if hintWord != nil {
+            isHintCardVisible = true
+            pauseForAssist()
+            return
+        }
         hintExhausted = false
         guard let hit = WordGridHint.nextWord(
             board: board,
@@ -102,19 +110,21 @@ final class WordGridViewModel {
             hintPath = []
             hintWord = nil
             hintExhausted = true
+            isHintCardVisible = true
+            pauseForAssist()
             return
         }
         revealedWords.insert(hit.word)
-        foundWords.append(hit.word)   // it counts as found, it just scores 0
         hintPath = hit.path
         hintWord = hit.word
+        isHintCardVisible = true
+        pauseForAssist()
         saveCurrentState()
     }
 
     func dismissHint() {
-        hintPath = []
-        hintWord = nil
-        hintExhausted = false
+        isHintCardVisible = false
+        if hintWord == nil { hintExhausted = false }
         startTimerIfNeeded()
     }
 
@@ -141,12 +151,16 @@ final class WordGridViewModel {
             return
         }
 
+        let scoreDelta = revealedWords.contains(word) ? 0 : WordGridEngine.score(word)
         foundWords.append(word)
-        score += WordGridEngine.score(word)
-        hintPath = []
-        hintWord = nil
+        score += scoreDelta
+        if word == hintWord {
+            hintPath = []
+            hintWord = nil
+            isHintCardVisible = false
+        }
         submitCount += 1
-        message = String(localized: "+\(WordGridEngine.score(word))")
+        message = String(localized: "+\(scoreDelta)")
         saveCurrentState()
     }
 
@@ -155,6 +169,9 @@ final class WordGridViewModel {
         state = .finished
         timer?.invalidate()
         timer = nil
+        hintPath = []
+        hintWord = nil
+        isHintCardVisible = false
         finishCount += 1
         try? gameStats?.record(
             gameKind: .wordGrid,
@@ -172,7 +189,10 @@ final class WordGridViewModel {
         foundWords = []
         score = 0
         revealedWords = []
-        dismissHint()
+        hintPath = []
+        hintWord = nil
+        hintExhausted = false
+        isHintCardVisible = false
         state = .playing
         message = nil
         remainingSeconds = mode == .timed ? WordGridEngine.timedDuration : 0
@@ -201,6 +221,10 @@ final class WordGridViewModel {
         board = rows
         foundWords = saved.foundWords
         revealedWords = Set(saved.revealedWords ?? [])
+        hintPath = saved.hintPath ?? []
+        hintWord = saved.hintWord
+        hintExhausted = false
+        isHintCardVisible = false
         score = saved.score
         remainingSeconds = saved.remainingSeconds
         selectedPath = []
@@ -216,7 +240,8 @@ final class WordGridViewModel {
     }
 
     func saveCurrentState() {
-        guard state == .playing, (!foundWords.isEmpty || !selectedPath.isEmpty) else { return }
+        guard state == .playing,
+              (!foundWords.isEmpty || !revealedWords.isEmpty || !selectedPath.isEmpty) else { return }
         let snapshot = WordGridSaveState(
             boardRows: board.map { String($0) },
             foundWords: foundWords,
@@ -224,7 +249,9 @@ final class WordGridViewModel {
             score: score,
             remainingSeconds: remainingSeconds,
             savedAt: .now,
-            revealedWords: Array(revealedWords).sorted()
+            revealedWords: Array(revealedWords).sorted(),
+            hintPath: hintPath.isEmpty ? nil : hintPath,
+            hintWord: hintWord
         )
         if let data = try? JSONEncoder().encode(snapshot) {
             userDefaults.set(data, forKey: WordGridSaveState.key(mode: mode))
@@ -254,7 +281,7 @@ final class WordGridViewModel {
         let key = WordGridSaveState.key(mode: mode)
         guard let data = userDefaults.data(forKey: key),
               let saved = try? JSONDecoder().decode(WordGridSaveState.self, from: data),
-              !saved.foundWords.isEmpty else { return }
+              (!saved.foundWords.isEmpty || !(saved.revealedWords ?? []).isEmpty) else { return }
         pendingSaveState = saved
     }
 

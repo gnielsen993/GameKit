@@ -220,12 +220,20 @@ final class MinesweeperViewModel {
             pausedElapsed = 0
         }
         guard case .playing = gameState else { return }
-        // The explanation describes the board as it was.
-        activeHint = nil
+        let hintedSafeIndex = activeHint?.safe
         hintFoundNothing = false
 
         let result = RevealEngine.reveal(at: index, on: board)
         board = result.board
+
+        // Closing the explanation does not dismiss its board guidance. The
+        // ring disappears only when the recommended safe square is actually
+        // opened, whether directly or as part of a zero-cell cascade.
+        if let hintedSafeIndex,
+           board.cell(at: hintedSafeIndex).state == .revealed {
+            activeHint = nil
+            isHintCardVisible = false
+        }
 
         // P5 D-05/D-06: publish the engine-ordered reveal list as the
         // animation phase. Idempotent reveal (engine returns []) does not
@@ -247,12 +255,16 @@ final class MinesweeperViewModel {
                 lossContext = computeLossContext()
                 phase = .lossShake(mineIdx: mineIdx)     // P5 D-06
             }
+            activeHint = nil
+            isHintCardVisible = false
             clearSavedState()
             freezeTimer()
             recordTerminalState(outcome: .loss)         // NEW (D-15)
         } else if WinDetector.isWon(board) {
             gameState = .won
             phase = .winSweep                            // P5 D-06
+            activeHint = nil
+            isHintCardVisible = false
             clearSavedState()
             freezeTimer()
             recordTerminalState(outcome: .win)          // NEW (D-15)
@@ -311,6 +323,9 @@ final class MinesweeperViewModel {
     private(set) var activeHint: MinesweeperHint.Step?
     /// Set when the two rules could not prove anything.
     private(set) var hintFoundNothing = false
+    /// Presentation state is separate so dismissing the words keeps the
+    /// board-level target until the player uses it.
+    private(set) var isHintCardVisible = false
 
     /// Squares to outline: the one being recommended.
     var hintSafeIndex: MinesweeperIndex? { activeHint?.safe }
@@ -321,20 +336,26 @@ final class MinesweeperViewModel {
     /// Ask for a square that can be proved safe.
     func requestHint() {
         guard case .playing = gameState else { return }
+        if activeHint != nil {
+            isHintCardVisible = true
+            return
+        }
         hintFoundNothing = false
         guard let step = MinesweeperHint.nextStep(board: board) else {
             activeHint = nil
             hintFoundNothing = true
+            isHintCardVisible = true
             return
         }
         activeHint = step
+        isHintCardVisible = true
         assistsUsed += 1
         saveCurrentState()
     }
 
     func dismissHint() {
-        activeHint = nil
-        hintFoundNothing = false
+        isHintCardVisible = false
+        if activeHint == nil { hintFoundNothing = false }
     }
 
     /// Open a genuinely safe square when the player is out of deductions.
@@ -354,6 +375,7 @@ final class MinesweeperViewModel {
         assistsUsed += 1
         activeHint = nil
         hintFoundNothing = false
+        isHintCardVisible = false
         reveal(at: choice)
     }
 
@@ -412,6 +434,7 @@ final class MinesweeperViewModel {
         assistsUsed = 0
         activeHint = nil
         hintFoundNothing = false
+        isHintCardVisible = false
         flaggedCount = 0
         timerAnchor = nil
         pausedElapsed = 0

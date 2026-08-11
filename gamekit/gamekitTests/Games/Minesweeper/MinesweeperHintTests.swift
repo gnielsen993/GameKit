@@ -183,16 +183,33 @@ struct MinesweeperHintWiringTests {
         }
     }
 
-    @Test("the explanation clears when the board changes")
-    func hintClearsOnReveal() {
+    @Test("dismissing the explanation keeps the board target")
+    func dismissKeepsBoardTarget() {
         for seed in UInt64(1)...20 {
             let vm = playing(seed: seed)
             vm.requestHint()
             guard let step = vm.activeHint else { continue }
+            vm.dismissHint()
+            #expect(vm.isHintCardVisible == false)
+            #expect(vm.hintSafeIndex == step.safe)
+            return
+        }
+        Issue.record("No deterministic board produced a hint")
+    }
+
+    @Test("opening the hinted square consumes the board target")
+    func hintClearsOnTargetReveal() {
+        for seed in UInt64(1)...20 {
+            let vm = playing(seed: seed)
+            vm.requestHint()
+            guard let step = vm.activeHint else { continue }
+            vm.dismissHint()
             vm.reveal(at: step.safe)
             #expect(vm.activeHint == nil)
-            break
+            #expect(vm.isHintCardVisible == false)
+            return
         }
+        Issue.record("No deterministic board produced a hint")
     }
 
     @Test("a new game clears the assist count")

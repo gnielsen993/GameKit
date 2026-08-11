@@ -40,7 +40,11 @@ struct FreeCellTopRowView: View {
     @ViewBuilder
     private func freeCellSlot(_ idx: Int) -> some View {
         let card       = vm.board.freeCells[idx]
-        let isSelected = { if case .freeCell(let ci) = vm.selection { return ci == idx } else { return false } }()
+        let isSelected = {
+            if case .freeCell(let ci) = vm.activeHintSource, ci == idx { return true }
+            if case .freeCell(let ci) = vm.selection { return ci == idx }
+            return false
+        }()
         let isTarget   = vm.activeHintDestination.map { $0 == .freeCell(idx) }
                          ?? vm.validFreeCellTargets.contains(idx)
         let isGhosted: Bool = { if case .freeCell(let ci) = dragSource { return ci == idx } else { return false } }()
@@ -87,7 +91,7 @@ struct FreeCellTopRowView: View {
         let fidx        = vm.board.foundationIndex(for: suit)
         let topRank     = vm.board.foundations[fidx]
         let isTarget    = vm.activeHintDestination == .foundation
-                          ? vm.selectedCards.first?.suit == suit
+                          ? vm.activeHintCard?.suit == suit
                           : vm.selection != nil && vm.canMoveSelectionToFoundation
                             && vm.selectedCards.first?.suit == suit
         let isSelected: Bool = { if case .foundation(let s) = vm.selection { return s == suit } else { return false } }()

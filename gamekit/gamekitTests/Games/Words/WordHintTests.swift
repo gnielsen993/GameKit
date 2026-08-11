@@ -52,11 +52,12 @@ struct WordHintTests {
         let vm = wordGridViewModel()
         let scoreBefore = vm.score
         vm.requestHint()
+        guard let word = vm.hintWord else { return }
+        for position in vm.hintPath { vm.select(position) }
+        vm.submitSelection()
         #expect(vm.score == scoreBefore)
-        if let word = vm.hintWord {
-            #expect(vm.foundWords.contains(word))   // it still counts as found
-            #expect(vm.revealedWords.contains(word))
-        }
+        #expect(vm.foundWords.contains(word))
+        #expect(vm.revealedWords.contains(word))
     }
 
     @Test("the same word is never revealed twice")
@@ -68,16 +69,44 @@ struct WordHintTests {
             guard let word = vm.hintWord else { break }
             #expect(seen.contains(word) == false)
             seen.insert(word)
+            for position in vm.hintPath { vm.select(position) }
+            vm.submitSelection()
         }
     }
 
-    @Test("dismissing clears the outline")
-    func dismissClearsPath() {
+    @Test("dismissing keeps the outline until the word is traced")
+    func dismissKeepsPathUntilUsed() {
         let vm = wordGridViewModel()
         vm.requestHint()
+        guard let word = vm.hintWord else { return }
+        let path = vm.hintPath
         vm.dismissHint()
+        #expect(vm.isHintCardVisible == false)
+        #expect(vm.hintPath == path)
+        #expect(vm.hintWord == word)
+
+        for position in path { vm.select(position) }
+        vm.submitSelection()
         #expect(vm.hintPath.isEmpty)
         #expect(vm.hintWord == nil)
+    }
+
+    @Test("an unused word hint survives save and restore")
+    func pendingHintPersists() throws {
+        let suite = UserDefaults(suiteName: "WordHintPersistence.\(UUID().uuidString)")!
+        let original = WordGridViewModel(userDefaults: suite)
+        original.requestHint()
+        let word = try #require(original.hintWord)
+        let path = original.hintPath
+        original.dismissHint()
+        original.saveCurrentState()
+
+        let restored = WordGridViewModel(userDefaults: suite)
+        let saved = try #require(restored.pendingSaveState)
+        restored.restoreState(saved)
+        #expect(restored.hintWord == word)
+        #expect(restored.hintPath == path)
+        #expect(restored.isHintCardVisible == false)
     }
 
     // MARK: - FiveLetter candidates

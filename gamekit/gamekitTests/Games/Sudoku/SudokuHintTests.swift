@@ -117,17 +117,19 @@ struct SudokuHintTests {
         #expect(vm.assistsUsed == 0)
     }
 
-    @Test("dismissing clears the banner but keeps the count")
-    func dismissKeepsCount() {
+    @Test("dismissing hides the explanation but keeps the board hint")
+    func dismissKeepsBoardHint() {
         let vm = makeViewModel()
         vm.requestHint()
+        let target = vm.hintTargetIndex
         vm.dismissHint()
-        #expect(vm.activeHint == nil)
+        #expect(vm.isHintCardVisible == false)
+        #expect(vm.hintTargetIndex == target)
         #expect(vm.assistsUsed == 1)
     }
 
-    @Test("the explanation does not outlive the board it describes")
-    func hintClearsOnPlacement() throws {
+    @Test("another placement does not consume the board hint")
+    func otherPlacementKeepsHint() throws {
         let vm = makeViewModel()
         vm.requestHint()
         let hint = try #require(vm.activeHint)
@@ -144,7 +146,19 @@ struct SudokuHintTests {
         let target = try #require(other)
         vm.select(row: target.row, col: target.col)
         vm.place(value: board.solutionDigit(atRow: target.row, col: target.col))
+        #expect(vm.activeHint == hint)
+    }
+
+    @Test("placing the hinted digit consumes the board hint")
+    func targetPlacementClearsHint() throws {
+        let vm = makeViewModel()
+        vm.requestHint()
+        let hint = try #require(vm.activeHint)
+        vm.dismissHint()
+        vm.select(row: hint.step.row, col: hint.step.column)
+        vm.place(value: hint.step.value)
         #expect(vm.activeHint == nil)
+        #expect(vm.isHintCardVisible == false)
     }
 
     @Test("both unavailable reasons have copy")

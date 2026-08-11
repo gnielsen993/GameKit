@@ -31,6 +31,7 @@ final class FreeCellViewModel {
     private(set) var isAutoCompleting = false
     private(set) var hintText: String? = nil
     private(set) var activeHint: FreeCellHint.Suggestion? = nil
+    private(set) var isHintCardVisible = false
 
     // Stats write-side firewall
     var gameStats: GameStats?
@@ -141,9 +142,9 @@ final class FreeCellViewModel {
 
     func clearSelection() { selection = nil; rejectStreak = 0 }
     func dismissHint() {
-        hintText = nil
-        activeHint = nil
-        selection = nil
+        isHintCardVisible = false
+        // Automatic frustration copy has no board guidance to preserve.
+        if activeHint == nil { hintText = nil }
     }
 
     /// Assists asked for on this deal.
@@ -156,12 +157,19 @@ final class FreeCellViewModel {
     /// from the same place on screen.
     func requestHint() {
         guard gameState == .playing || gameState == .idle else { return }
+        if let activeHint {
+            isHintCardVisible = true
+            selection = hintSelection(for: activeHint.move)
+            return
+        }
         guard let suggestion = FreeCellHint.nextMove(board: board, previousMove: history.last) else {
             activeHint = nil
+            isHintCardVisible = false
             hintText = String(localized: "No move left to suggest on this board.")
             return
         }
         activeHint = suggestion
+        isHintCardVisible = true
         hintText = FreeCellHintCopy.text(for: suggestion)
         selection = hintSelection(for: suggestion.move)
         assistsUsed += 1
@@ -202,6 +210,24 @@ final class FreeCellViewModel {
 
     var activeHintDestination: FreeCellDest? {
         activeHint.map { hintDestination(for: $0.move) }
+    }
+
+    var activeHintSource: FreeCellSelection? {
+        activeHint.flatMap { hintSelection(for: $0.move) }
+    }
+
+    var activeHintCard: PlayingCard? {
+        guard let move = activeHint?.move else { return nil }
+        switch move {
+        case .columnToFoundation(let card, _),
+             .columnToColumn(let card, _, _),
+             .freeCellToFoundation(let card, _),
+             .freeCellToColumn(let card, _, _),
+             .columnToFreeCell(let card, _, _):
+            return card
+        case .sequenceToColumn(let cards, _, _):
+            return cards.first
+        }
     }
 
     @discardableResult
@@ -368,6 +394,7 @@ final class FreeCellViewModel {
         assistsUsed = 0
         hintText = nil
         activeHint = nil
+        isHintCardVisible = false
         clearSavedState()
         board         = FreeCellBoard(dealNumber: dealNumber)
         history       = []
@@ -430,6 +457,9 @@ final class FreeCellViewModel {
     private func attemptMove(from sel: FreeCellSelection, to dst: FreeCellDest) -> Bool {
         let cards = cards(for: sel)
         guard !cards.isEmpty else { return false }
+        let completesActiveHint = activeHint.map {
+            hintSelection(for: $0.move) == sel && hintDestination(for: $0.move) == dst
+        } ?? false
 
         switch dst {
         case .column(let dstCol):
@@ -439,12 +469,22 @@ final class FreeCellViewModel {
                   FreeCellRules.canPlace(top, onto: dstCards) else { return false }
             let limit = FreeCellRules.maxMoveable(board: board, toEmptyColumn: dstCards.isEmpty)
             guard cards.count <= limit else { rejectTick += 1; selection = nil; return false }
-            applyMove(cards: cards, source: source(for: sel), dest: dst)
+            applyMove(
+                cards: cards,
+                source: source(for: sel),
+                dest: dst,
+                completesActiveHint: completesActiveHint
+            )
             return true
 
         case .freeCell(let cellIdx):
             guard cards.count == 1, board.freeCells[cellIdx] == nil else { return false }
-            applyMove(cards: cards, source: source(for: sel), dest: dst)
+            applyMove(
+                cards: cards,
+                source: source(for: sel),
+                dest: dst,
+                completesActiveHint: completesActiveHint
+            )
             return true
 
         case .foundation:
@@ -452,12 +492,22 @@ final class FreeCellViewModel {
                   FreeCellRules.canMoveToFoundation(card, foundations: board.foundations) else {
                 return false
             }
-            applyMove(cards: cards, source: source(for: sel), dest: dst)
+            applyMove(
+                cards: cards,
+                source: source(for: sel),
+                dest: dst,
+                completesActiveHint: completesActiveHint
+            )
             return true
         }
     }
 
-    private func applyMove(cards: [PlayingCard], source: FreeCellSource, dest: FreeCellDest) {
+    private func applyMove(
+        cards: [PlayingCard],
+        source: FreeCellSource,
+        dest: FreeCellDest,
+        completesActiveHint: Bool
+    ) {
         let snap = board  // snapshot before mutation
         startTimer()
 
@@ -492,8 +542,11 @@ final class FreeCellViewModel {
         history.append(FreeCellMove(cards: cards, source: source, destination: dest, boardBefore: snap))
         selection    = nil
         rejectStreak = 0
-        hintText     = nil
-        activeHint   = nil
+        if completesActiveHint {
+            hintText = nil
+            activeHint = nil
+            isHintCardVisible = false
+        }
         dropTick    += 1
         checkTerminalState()
         if gameState == .playing { saveCurrentState() }
@@ -584,6 +637,9 @@ final class FreeCellViewModel {
         history       = saved.history ?? []
         assistsUsed   = saved.assistsUsed ?? 0
         selection     = nil
+        hintText      = nil
+        activeHint    = nil
+        isHintCardVisible = false
         pausedElapsed = saved.elapsedSeconds
         frozenElapsed = 0
         timerAnchor   = Date.now

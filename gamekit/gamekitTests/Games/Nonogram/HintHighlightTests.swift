@@ -65,14 +65,15 @@ struct HintHighlightTests {
         }
     }
 
-    @Test("dismissing clears the highlight")
-    func nonogramDismissClearsHighlight() throws {
+    @Test("dismissing keeps the highlight")
+    func nonogramDismissKeepsHighlight() throws {
         let vm = nonogramViewModel()
         try #require(vm.currentPuzzle != nil)
         vm.requestTalkthrough()
         #expect(vm.talkthroughHighlight.isEmpty == false)
+        let before = vm.talkthroughHighlight
         vm.dismissTalkthrough()
-        #expect(vm.talkthroughHighlight.isEmpty)
+        #expect(vm.talkthroughHighlight == before)
     }
 
     @Test("the sentence names a concrete span, not \"these\"")
@@ -133,13 +134,15 @@ struct HintHighlightTests {
         #expect(vm.hintSupportingIndices.count >= 9)
     }
 
-    @Test("dismissing clears the ring and the shading")
-    func sudokuDismissClears() {
+    @Test("dismissing keeps the ring and the shading")
+    func sudokuDismissKeepsBoardGuidance() {
         let vm = sudokuViewModel()
         vm.requestHint()
+        let target = vm.hintTargetIndex
+        let support = vm.hintSupportingIndices
         vm.dismissHint()
-        #expect(vm.hintTargetIndex == nil)
-        #expect(vm.hintSupportingIndices.isEmpty)
+        #expect(vm.hintTargetIndex == target)
+        #expect(vm.hintSupportingIndices == support)
     }
 
     @Test("the sentence refers to what is drawn")
@@ -148,6 +151,11 @@ struct HintHighlightTests {
         vm.requestHint()
         let hint = try #require(vm.activeHint)
         let text = SudokuHintCopy.explanation(for: hint.step)
-        #expect(text.contains("ringed"))
+        switch hint.step.technique {
+        case .nakedSingle:
+            #expect(text.contains("Row \(hint.step.row + 1), column \(hint.step.column + 1)"))
+        case .hiddenSingle:
+            #expect(text.contains("ringed"))
+        }
     }
 }

@@ -70,15 +70,17 @@ struct NonogramTalkthroughWiringTests {
         #expect(NonogramTalkthroughCopy.unavailableMessage(.noLineDeduction).isEmpty == false)
     }
 
-    @Test("dismissing clears the banner but keeps the count")
-    func dismissKeepsTheCount() throws {
+    @Test("dismissing hides the explanation but keeps its board actions")
+    func dismissKeepsTheBoardActions() throws {
         let vm = makeViewModel()
         try #require(vm.currentPuzzle != nil)
         vm.requestTalkthrough()
         #expect(vm.assistsUsed == 1)
 
         vm.dismissTalkthrough()
-        #expect(vm.activeTalkthrough == nil)
+        #expect(vm.isTalkthroughCardVisible == false)
+        #expect(vm.activeTalkthrough != nil)
+        #expect(vm.talkthroughHighlight.isEmpty == false)
         // The help was given; dismissing the sentence does not un-give it.
         #expect(vm.assistsUsed == 1)
     }
@@ -124,6 +126,34 @@ struct NonogramTalkthroughWiringTests {
 
         #expect(vm.talkthroughHighlight.count == before - 1)
         #expect(vm.activeTalkthrough != nil || before == 1)
+    }
+
+    @Test("the board actions clear only after the full hint is completed")
+    func completedActionsConsumeTalkthrough() throws {
+        let vm = makeViewModel()
+        try #require(vm.currentPuzzle != nil)
+        vm.requestTalkthrough()
+        let deduction = try #require(vm.activeTalkthrough)
+        vm.dismissTalkthrough()
+
+        for offset in deduction.newFilled {
+            let target: (Int, Int) = switch deduction.line {
+            case .row(let row): (row, offset)
+            case .column(let column): (offset, column)
+            }
+            vm.setCell(at: target.0, col: target.1, to: .filled)
+        }
+        for offset in deduction.newEmpty {
+            let target: (Int, Int) = switch deduction.line {
+            case .row(let row): (row, offset)
+            case .column(let column): (offset, column)
+            }
+            vm.setCell(at: target.0, col: target.1, to: .marked)
+        }
+
+        #expect(vm.talkthroughHighlight.isEmpty)
+        #expect(vm.activeTalkthrough == nil)
+        #expect(vm.isTalkthroughCardVisible == false)
     }
 
     @Test("Keep Solving preserves the failed board without spending more hearts")

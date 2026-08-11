@@ -8,6 +8,8 @@ struct WordGridSaveState: Codable {
     let remainingSeconds: Double
     let savedAt: Date
     var revealedWords: [String]? = nil
+    var hintPath: [WordGridPosition]? = nil
+    var hintWord: String? = nil
 
     static func key(mode: WordGridMode) -> String {
         "wordGrid.saveState.\(mode.rawValue)"

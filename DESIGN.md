@@ -388,6 +388,10 @@ The ZStack centers the pill regardless of the action button's width.
 - Present help in the shared in-game coach card: one plain-language instruction,
   optional progress, one direct action, and a dismiss action. The card persists
   until dismissed or until every highlighted action is complete.
+- Dismissing the coach card hides only its words. Board guidance persists until
+  the player completes the specific hinted action: reveal the named square,
+  place the named digit, finish every Fill/X target, trace the word, or make
+  the suggested card move. Unrelated moves never consume a board hint.
 - The coach card is layout content, never a board overlay. It reserves space
   through the shared assist inset so the highlighted cell/card and its
   destination stay visible while the explanation is open.
@@ -725,7 +729,8 @@ When in doubt, check these before changing chrome for a specific game.
 - Lives chip: `NonogramLivesChip`, hearts, only when `gameMode == .lives`.
 - A talkthrough carries separate Fill and X target sets. Each target gets an
   action marker on its cell, and completed targets disappear individually;
-  the coach card stays until the full step is resolved or dismissed.
+  dismissing the coach card leaves those markers in place until the full step
+  is resolved.
 - At zero lives, record the loss once and freeze the timer. **Keep Solving**
   preserves the board and turns the lives chip into a Practice indicator;
   further mistakes are corrected without another life loss. Completing the

@@ -111,9 +111,9 @@ struct NonogramGameView: View {
         }
         .animation(
             settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
-            value: viewModel.activeTalkthrough
+            value: viewModel.isTalkthroughCardVisible
         )
-        .onChange(of: viewModel.activeTalkthrough != nil || viewModel.talkthroughUnavailable != nil) { _, showing in
+        .onChange(of: viewModel.isTalkthroughCardVisible) { _, showing in
             if showing { viewModel.pause() } else { viewModel.resume() }
         }
         .onChange(of: viewModel.state) { _, newState in

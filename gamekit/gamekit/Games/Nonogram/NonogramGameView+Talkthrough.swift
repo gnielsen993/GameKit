@@ -7,8 +7,8 @@
 //
 //  Presented as a top overlay rather than a chip or a sheet. A sheet would
 //  cover the very grid the sentence is describing, and the compact row has no
-//  free slot (DESIGN.md §7), so this floats above the board and dismisses on
-//  tap or on the player's next move.
+//  free slot (DESIGN.md §7), so this floats above the board. Dismissing the
+//  words leaves the board marks in place until every requested action is done.
 //
 
 import SwiftUI
@@ -18,7 +18,7 @@ extension NonogramGameView {
 
     @ViewBuilder
     var talkthroughBanner: some View {
-        if let deduction = viewModel.activeTalkthrough {
+        if viewModel.isTalkthroughCardVisible, let deduction = viewModel.activeTalkthrough {
             GameAssistCard(
                 theme: theme,
                 title: NonogramTalkthroughCopy.lineName(deduction.line),
@@ -26,7 +26,8 @@ extension NonogramGameView {
                 progress: viewModel.talkthroughProgress,
                 onDismiss: { viewModel.dismissTalkthrough() }
             )
-        } else if let reason = viewModel.talkthroughUnavailable {
+        } else if viewModel.isTalkthroughCardVisible,
+                  let reason = viewModel.talkthroughUnavailable {
             GameAssistCard(
                 theme: theme,
                 title: reason == .boardHasAMistake

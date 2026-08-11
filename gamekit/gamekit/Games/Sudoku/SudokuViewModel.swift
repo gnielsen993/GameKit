@@ -335,6 +335,7 @@ final class SudokuViewModel {
         assistsUsed = 0
         activeHint = nil
         hintUnavailable = nil
+        isHintCardVisible = false
     }
 
     /// Indices of user-placed digits that disagree with the solution.
@@ -384,6 +385,10 @@ final class SudokuViewModel {
 
     private(set) var activeHint: ActiveHint?
 
+    /// The explanation can be closed without discarding its ring and support
+    /// shading. Those remain until the named digit is placed.
+    private(set) var isHintCardVisible = false
+
     /// Set when a request could not produce a step. Singles are the only
     /// techniques this engine proves, so Hard and Extreme puzzles will reach
     /// this — the copy has to own that rather than pretend.
@@ -404,8 +409,13 @@ final class SudokuViewModel {
         guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
         hintUnavailable = nil
 
-        // Second ask on the same step escalates rather than re-charging.
+        // Reopening a dismissed explanation is not another ask. A second tap
+        // while it is already visible still escalates the same step.
         if var hint = activeHint {
+            if !isHintCardVisible {
+                isHintCardVisible = true
+                return
+            }
             hint.stage = .reveal
             activeHint = hint
             return
@@ -415,6 +425,7 @@ final class SudokuViewModel {
         // meaningless — the engine would reason from a false premise.
         if !incorrectCellIndices.isEmpty {
             hintUnavailable = .boardHasAMistake
+            isHintCardVisible = true
             return
         }
 
@@ -422,10 +433,12 @@ final class SudokuViewModel {
         let engine = SudokuHintEngine()
         guard let step = engine.nextStep(board: Self.flatValues(of: board)) else {
             hintUnavailable = .beyondSingles
+            isHintCardVisible = true
             return
         }
 
         activeHint = ActiveHint(step: step, stage: .explanation)
+        isHintCardVisible = true
         assistsUsed += 1
         saveCurrentState()
     }
@@ -451,8 +464,8 @@ final class SudokuViewModel {
     }
 
     func dismissHint() {
-        activeHint = nil
-        hintUnavailable = nil
+        isHintCardVisible = false
+        if activeHint == nil { hintUnavailable = nil }
     }
 
     /// Places the digit the current hint names, if the player asks for it.
@@ -461,6 +474,7 @@ final class SudokuViewModel {
         select(row: hint.step.row, col: hint.step.column)
         place(value: hint.step.value)
         activeHint = nil
+        isHintCardVisible = false
     }
 
     /// Honest fallback when the singles engine cannot narrate a short step.
@@ -475,6 +489,7 @@ final class SudokuViewModel {
         select(row: index / 9, col: index % 9)
         place(value: board.solutionDigit(atRow: index / 9, col: index % 9))
         hintUnavailable = nil
+        isHintCardVisible = false
     }
 
     /// The board as SudokuCore sees it: row-major, 0 for empty.
@@ -509,6 +524,7 @@ final class SudokuViewModel {
             self.board = board
             lockedCells.insert(idx)
             placeCount += 1
+            consumeHintIfMatched(index: idx, value: value)
             if state == .idle { startTimer() }
             fireCompletionEffects(row: row, col: col, value: value, board: board)
             saveCurrentState()
@@ -524,12 +540,20 @@ final class SudokuViewModel {
         board = board.clearingPeerNotes(of: value, fromRow: row, col: col)
         self.board = board
         placeCount += 1
-        // The explanation describes the board as it was.
-        activeHint = nil
+        consumeHintIfMatched(index: idx, value: value)
         if state == .idle { startTimer() }
         fireCompletionEffects(row: row, col: col, value: value, board: board)
         saveCurrentState()
         if board.isSolved { completeBoard() }
+    }
+
+    /// A hint is consumed only by entering the digit it named. Other valid
+    /// placements leave its board guidance intact.
+    private func consumeHintIfMatched(index: Int, value: Int) {
+        guard activeHint?.step.index == index,
+              activeHint?.step.value == value else { return }
+        activeHint = nil
+        isHintCardVisible = false
     }
 
     private func toggleNote(_ value: Int, atRow row: Int, col: Int) {

@@ -172,9 +172,9 @@ struct MinesweeperGameView: View {
         }
         .animation(
             settingsStore.animationsEnabled && !reduceMotion ? theme.motion.ease : nil,
-            value: viewModel.activeHint
+            value: viewModel.isHintCardVisible
         )
-        .onChange(of: viewModel.activeHint != nil || viewModel.hintFoundNothing) { _, showing in
+        .onChange(of: viewModel.isHintCardVisible) { _, showing in
             if showing { viewModel.pause() } else { viewModel.resume() }
         }
         .onChange(of: viewModel.phase) { _, newPhase in

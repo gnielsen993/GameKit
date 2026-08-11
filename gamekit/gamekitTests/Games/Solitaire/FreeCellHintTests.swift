@@ -134,6 +134,31 @@ struct FreeCellHintTests {
         #expect(vm.board.foundations == foundationsBefore)
     }
 
+    @Test("dismissing the explanation keeps the highlighted move")
+    func dismissKeepsMove() throws {
+        let vm = viewModel()
+        vm.requestHint()
+        let hint = try #require(vm.activeHint)
+        let source = vm.activeHintSource
+        let destination = vm.activeHintDestination
+        vm.dismissHint()
+        #expect(vm.isHintCardVisible == false)
+        #expect(vm.activeHint == hint)
+        #expect(vm.activeHintSource == source)
+        #expect(vm.activeHintDestination == destination)
+    }
+
+    @Test("performing the suggested move consumes its highlights")
+    func applyingHintClearsMove() {
+        let vm = viewModel()
+        vm.requestHint()
+        vm.dismissHint()
+        vm.applyHint()
+        #expect(vm.activeHint == nil)
+        #expect(vm.activeHintSource == nil)
+        #expect(vm.activeHintDestination == nil)
+    }
+
     @Test("a new deal resets the assist count")
     func resetClearsAssists() {
         let vm = viewModel()

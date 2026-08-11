@@ -13,14 +13,14 @@ extension MinesweeperGameView {
 
     @ViewBuilder
     var hintBanner: some View {
-        if let step = viewModel.activeHint {
+        if viewModel.isHintCardVisible, let step = viewModel.activeHint {
             GameAssistCard(
                 theme: theme,
                 title: String(localized: "This square is safe"),
                 message: MinesweeperHintCopy.explanation(for: step),
                 onDismiss: { viewModel.dismissHint() }
             )
-        } else if viewModel.hintFoundNothing {
+        } else if viewModel.isHintCardVisible, viewModel.hintFoundNothing {
             // Says what it cannot do, and offers the way out rather than
             // leaving the player stuck with a refusal.
             GameAssistCard(
