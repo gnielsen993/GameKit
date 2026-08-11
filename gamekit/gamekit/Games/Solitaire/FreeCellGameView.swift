@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import DesignKit
 
 struct FreeCellGameView: View {
