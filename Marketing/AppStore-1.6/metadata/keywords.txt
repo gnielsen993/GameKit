@@ -1,0 +1,1 @@
+minesweeper,nonogram,freecell,math,crossword,word,2048,snake,merge,number,logic,relaxing,no ads

@@ -1,0 +1,224 @@
+{
+  "generatedAt": "2026-09-08T20:15:41.795Z",
+  "method": "HTML/CSS framing; native PNGs unchanged, uniformly scaled",
+  "sources": [
+    {
+      "path": "raw/iphone/five-letter.png",
+      "sha256": "207dadcc106471173b49e9ca958f61d58380c09456adef40a87ef29df86e1ab6"
+    },
+    {
+      "path": "raw/iphone/freecell-resume.png",
+      "sha256": "558a67e2c3f2f9c5c6d2e7053b0650afe1f77cf7500249162f9bf8e3d51ad0d9"
+    },
+    {
+      "path": "raw/iphone/freecell.png",
+      "sha256": "04749c72459370791a3af8cb0425058fce21cfcac933e4c19e308a5fcaf80ede"
+    },
+    {
+      "path": "raw/iphone/home-classic.png",
+      "sha256": "0fd16994adbcf8ac70937300c6a063807ac2c9e17143b797ec77f460b7824114"
+    },
+    {
+      "path": "raw/iphone/home-dracula.png",
+      "sha256": "2a81d5edb582e418625db499ba83f328af540cd6a8787b54f172319061c7dce0"
+    },
+    {
+      "path": "raw/iphone/home-voltage.png",
+      "sha256": "f3f838be5f624814814c0d4eb1f5c572c16fe6d22bdaedceff3298825d64c1ea"
+    },
+    {
+      "path": "raw/iphone/math-crossword.png",
+      "sha256": "1f87187420a242eec7b52ed772b0606a3aacd2a4afc19b75561d967dc11de1dc"
+    },
+    {
+      "path": "raw/iphone/merge.png",
+      "sha256": "171a06f0da1424a1ff20087cca4d5e59b69007cedbbd8fe0233d574e5089bb83"
+    },
+    {
+      "path": "raw/iphone/stats.png",
+      "sha256": "60449887ebada5eabf99e851d16c419379ac16c37ff0df85386eb09fa3d297da"
+    },
+    {
+      "path": "raw/iphone/sudoku-hint.png",
+      "sha256": "84020005e48cf2494d3abc2042af212b40a55878a6929f1934e7654350a1823b"
+    },
+    {
+      "path": "raw/iphone/sudoku.png",
+      "sha256": "bf97d6e8c055a0dfe9dff86b1215b710babf36dd7f6b6c64fff6f7225cadca8d"
+    },
+    {
+      "path": "raw/iphone/video-mode-positions.png",
+      "sha256": "1447365099412af8893955719ca2eeeba11c27cc574c0c8c63da0b3c17a4aafd"
+    },
+    {
+      "path": "raw/iphone/word-grid.png",
+      "sha256": "cef769d8963e6d4e7cec72f4572dcb96f36dbab6c3c7247967bb81047e785615"
+    },
+    {
+      "path": "raw/ipad/five-letter.png",
+      "sha256": "68902ae739bc98b96337ea4f221cacf85e04a1e2f0a96d58843033a263e0d846"
+    },
+    {
+      "path": "raw/ipad/freecell-resume.png",
+      "sha256": "61c4ca10e6f672cc3358f604250775fea12d04ed7611ba5ad6af08eef3862010"
+    },
+    {
+      "path": "raw/ipad/freecell.png",
+      "sha256": "a0ef90764be07603ed1c3fb8102e81a2dfaad6d13f92300b69b4de422b09f664"
+    },
+    {
+      "path": "raw/ipad/home-classic.png",
+      "sha256": "6c832cd8ec02df7e1456f56c8034e25456a1486cb5974270d682cb8fddbc7c17"
+    },
+    {
+      "path": "raw/ipad/home-dracula.png",
+      "sha256": "af86ae70b0f1bd5a6bb577be736e5ccc22a7bc1b3e8e6aaf873500b8a278b67f"
+    },
+    {
+      "path": "raw/ipad/home-voltage.png",
+      "sha256": "5a7d3d3cb361f0f728ce93839c0894a9393e6e6799fe1f77a40b6b527eaf3107"
+    },
+    {
+      "path": "raw/ipad/math-crossword.png",
+      "sha256": "efac10f83cf743cf5aabb52b668476b775a745834d8e58cd54d3111fb1d60f78"
+    },
+    {
+      "path": "raw/ipad/merge.png",
+      "sha256": "24b463fc6fe983767e4bf761b751fc9b081fc2bce6c2ffb0cf3a1b5da78a21e1"
+    },
+    {
+      "path": "raw/ipad/stats.png",
+      "sha256": "d3adcc4a0a12e4c9be185f1b52998fea759016a36509aa91a8435a7cc665fec6"
+    },
+    {
+      "path": "raw/ipad/sudoku-hint.png",
+      "sha256": "bce82a780944824b30b159c61ee06f4afb0e0900b89f3ed7dc4e66ce74852e82"
+    },
+    {
+      "path": "raw/ipad/sudoku.png",
+      "sha256": "5d8b088ab11fc9de0f3f3aa35a1acd552e39796ab003f8a4d13e96d79e5f0641"
+    },
+    {
+      "path": "raw/ipad/video-mode-positions.png",
+      "sha256": "00a54c2a1c9e2c3648697a0c8db9b4ed1bfa0a56e1cdd899f5d22080a409b2eb"
+    },
+    {
+      "path": "raw/ipad/word-grid.png",
+      "sha256": "fe616b781595868155a4e3be3b935747e47ca6b15b0379d589a3c27cb0e49103"
+    }
+  ],
+  "exports": [
+    {
+      "path": "exports/iphone/01-favorites.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Your favorites. Without the ads.",
+      "sha256": "5c5677f9c862da97caab368a82bdabbb778dd76a5f5a8ffe6db960d8c7cb4040"
+    },
+    {
+      "path": "exports/iphone/02-hints.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Stuck? See a next step.",
+      "sha256": "e78ebf7215b258245819cc7e8cdd59b2e02343ec6a817d235353e7b35dbf38ff"
+    },
+    {
+      "path": "exports/iphone/03-math.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Make every number fit.",
+      "sha256": "8951c922619fdf68f9b13b91536fdea6f4567c596f7dbd8e56fc6d86a9aaeba1"
+    },
+    {
+      "path": "exports/iphone/04-words.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "One more word. One more try.",
+      "sha256": "28b33b16ba3459f3a4c9c567e9c83e0aaa4f1094c3b37c726dc0ad3f6d501f1c"
+    },
+    {
+      "path": "exports/iphone/05-resume.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Pick up where you left off.",
+      "sha256": "1d804660fa1a9b4aeca6182fd63d2e8e0f3f0be54dc2b7aa1b9b001aca0a5dce"
+    },
+    {
+      "path": "exports/iphone/06-offline.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Good games. No signal needed.",
+      "sha256": "63d843de8ec110f7f3ed3974a0c1170cc9b4b32f96787cce5a81386647b068af"
+    },
+    {
+      "path": "exports/iphone/07-video.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Make room for your video.",
+      "sha256": "75d960c47ddfedb70599ff5fb714b643e656684a797b84ec315afdc6f873d070"
+    },
+    {
+      "path": "exports/iphone/08-themes.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Same favorites. A different mood.",
+      "sha256": "ea4cd2d7726a25794d3918bde4998562cd7752d4238aa9d4d8c2d1e8a41247cd"
+    },
+    {
+      "path": "exports/ipad/01-favorites.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Your favorites. Without the ads.",
+      "sha256": "a97dd0f042458b29c3e4f8f6b834ac34c60784ad05418ad5a94fcfc80bd17051"
+    },
+    {
+      "path": "exports/ipad/02-hints.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Stuck? See a next step.",
+      "sha256": "aba8c00cec8ad332abf00ddf5f59fccc6941519694d9f4d85c1b337c2b3f5046"
+    },
+    {
+      "path": "exports/ipad/03-math.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Make every number fit.",
+      "sha256": "4ffccf847606f10952ee653d13e41b5c27be9108cdc68645adbd043f6e2fd617"
+    },
+    {
+      "path": "exports/ipad/04-words.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "One more word. One more try.",
+      "sha256": "72d5b03e515441644a4a6f5d7efabc7125b9da765014b482606b30ac1ccc1e05"
+    },
+    {
+      "path": "exports/ipad/05-resume.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Pick up where you left off.",
+      "sha256": "4e552269f9b64ee0fb8ec3d5fd75031372089d59bd7fbdb2d1a748cba71688d5"
+    },
+    {
+      "path": "exports/ipad/06-offline.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Good games. No signal needed.",
+      "sha256": "87495a4b7c27e63fa2671cb8922c6d0f539351541d365986bb07c635980fd151"
+    },
+    {
+      "path": "exports/ipad/07-video.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Make room for your video.",
+      "sha256": "1f6a55e7c4664b47a730df46fdba56666727cae7d728faa7a8f2613713bc0040"
+    },
+    {
+      "path": "exports/ipad/08-themes.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Same favorites. A different mood.",
+      "sha256": "16b2573e47ec0d2935d5b97ee3b7aeea473b22baa7e933f1c8e2e0a8f56459ef"
+    }
+  ]
+}

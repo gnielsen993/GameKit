@@ -1,0 +1,55 @@
+{
+  "counts": {
+    "name": 25,
+    "subtitle": 27,
+    "promotional-text": 145,
+    "keywords": 95,
+    "description": 2360,
+    "whats-new": 794
+  },
+  "exports": 16,
+  "checks": [
+    {
+      "width": 375,
+      "device": "iphone",
+      "images": 8,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 375,
+      "device": "ipad",
+      "images": 8,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 768,
+      "device": "iphone",
+      "images": 8,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 768,
+      "device": "ipad",
+      "images": 8,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "device": "iphone",
+      "images": 8,
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "device": "ipad",
+      "images": 8,
+      "overflow": false,
+      "errors": []
+    }
+  ]
+}
