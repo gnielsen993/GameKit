@@ -1,0 +1,91 @@
+Attributes: Application, 0x105e3edf0, pid: 60206, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x105e3edf0, pid: 60206, label: 'GameDrawer'
+    Window (Main), 0x105f07200, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x105f082b0, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x105f083d0, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x105f08730, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x105f08010, {{0.0, 0.0}, {402.0, 874.0}}
+              Other, 0x105f08130, {{0.0, 0.0}, {402.0, 874.0}}
+                NavigationBar, 0x105f084f0, {{0.0, 62.0}, {402.0, 54.0}}, identifier: 'Nonogram'
+                  Other, 0x105f08610, {{20.0, 66.0}, {44.0, 36.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                    Other, 0x105f07620, {{20.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x105f07740, {{20.0, 62.0}, {44.0, 44.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                  Other, 0x105f07860, {{80.0, 66.0}, {44.0, 36.0}}, identifier: 'arrow.counterclockwise', label: 'Restart game'
+                    Other, 0x105f07980, {{80.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x105f07aa0, {{80.0, 62.0}, {44.0, 44.0}}, identifier: 'arrow.counterclockwise', label: 'Restart game'
+                  StaticText, 0x105f07bc0, {{159.0, 73.7}, {83.7, 20.7}}, label: 'Nonogram'
+                  Other, 0x105f07ce0, {{264.0, 66.0}, {44.0, 36.0}}, identifier: 'lightbulb', label: 'Show a Nonogram hint'
+                    Other, 0x105f07e00, {{264.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x105f08af0, {{264.0, 62.0}, {44.0, 44.0}}, identifier: 'lightbulb', label: 'Show a Nonogram hint'
+                  Other, 0x105f08c10, {{324.0, 66.0}, {58.0, 36.0}}, label: 'Game settings'
+                    Other, 0x105f08d30, {{324.0, 66.0}, {58.0, 36.0}}
+                      Button, 0x105f08e50, {{324.0, 66.0}, {58.0, 36.0}}, label: 'Game settings'
+                        Button, 0x105f08f70, {{324.0, 66.0}, {58.0, 36.0}}
+                          Image, 0x105f09090, {{331.0, 62.0}, {44.0, 44.0}}, identifier: 'slider.horizontal.3', label: 'Edit'
+                Other, 0x105f091b0, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x105f092d0, {{0.0, 0.0}, {402.0, 874.0}}
+                    Other, 0x105f093f0, {{0.0, 0.0}, {402.0, 874.0}}
+                      Other, 0x105f09510, {{0.0, 0.0}, {402.0, 874.0}}
+                        Other, 0x105f09630, {{0.0, 116.0}, {402.0, 724.0}}
+                        Other, 0x105f09750, {{18.0, 264.7}, {62.0, 20.3}}, label: 'Puzzle size 5 × 5'
+                          Image, 0x105f09870, {{18.0, 267.3}, {15.3, 15.3}}, identifier: 'square.grid.3x3.square', label: 'square.grid.3x3.square'
+                          StaticText, 0x105f09990, {{39.3, 264.7}, {40.7, 20.3}}, label: '5 × 5'
+                        Other, 0x105f09ab0, {{321.3, 264.7}, {64.7, 20.3}}, label: 'Time elapsed', value: 0 minutes 0 seconds
+                          Image, 0x105f09bd0, {{321.3, 266.3}, {17.0, 17.0}}, identifier: 'clock', label: 'Clock'
+                          StaticText, 0x105f09cf0, {{343.7, 264.7}, {42.3, 20.3}}, label: '0:00'
+                        StaticText, 0x105f09e10, {{94.2, 379.5}, {13.3, 26.3}}, label: '2'
+                        StaticText, 0x105f09f30, {{158.4, 379.5}, {13.3, 26.3}}, label: '2'
+                        StaticText, 0x105f0a050, {{222.7, 379.5}, {13.3, 26.3}}, label: '2'
+                        StaticText, 0x105f0a170, {{286.9, 379.5}, {13.3, 26.3}}, label: '2'
+                        StaticText, 0x105f0a290, {{351.2, 379.5}, {13.3, 26.3}}, label: '2'
+                        StaticText, 0x105f0a3b0, {{50.0, 428.8}, {14.7, 26.3}}, label: '0'
+                        StaticText, 0x105f0a4d0, {{50.0, 493.1}, {14.7, 26.3}}, label: '0'
+                        StaticText, 0x105f0a5f0, {{50.7, 557.3}, {14.0, 26.3}}, label: '5'
+                        StaticText, 0x105f0a710, {{50.7, 621.6}, {14.0, 26.3}}, label: '5'
+                        StaticText, 0x105f0a830, {{50.0, 685.9}, {14.7, 26.3}}, label: '0'
+                        Button, 0x105f0a950, {{68.7, 410.0}, {64.3, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0aa70, {{133.0, 410.0}, {64.3, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0ab90, {{197.3, 410.0}, {64.0, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0acb0, {{261.3, 410.0}, {64.3, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0add0, {{325.7, 410.0}, {64.3, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0aef0, {{68.7, 474.0}, {64.3, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0b010, {{133.0, 474.0}, {64.3, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0b130, {{197.3, 474.0}, {64.0, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0b250, {{261.3, 474.0}, {64.3, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0b370, {{325.7, 474.0}, {64.3, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0b490, {{68.7, 538.3}, {64.3, 64.3}}, label: 'Hint: fill this square'
+                        Button, 0x105f0b5b0, {{133.0, 538.3}, {64.3, 64.3}}, label: 'Hint: fill this square'
+                        Button, 0x105f0b6d0, {{197.3, 538.3}, {64.0, 64.3}}, label: 'Hint: fill this square'
+                        Button, 0x105f0b7f0, {{261.3, 538.3}, {64.3, 64.3}}, label: 'Hint: fill this square'
+                        Button, 0x105f0ba60, {{325.7, 538.3}, {64.3, 64.3}}, label: 'Hint: fill this square'
+                        Button, 0x105f0bb80, {{68.7, 602.7}, {64.3, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0bca0, {{133.0, 602.7}, {64.3, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0bdc0, {{197.3, 602.7}, {64.0, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0bee0, {{261.3, 602.7}, {64.3, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0c000, {{325.7, 602.7}, {64.3, 64.3}}, label: 'Empty square'
+                        Button, 0x105f0c120, {{68.7, 667.0}, {64.3, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0c240, {{133.0, 667.0}, {64.3, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0c360, {{197.3, 667.0}, {64.0, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0c480, {{261.3, 667.0}, {64.3, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0c5a0, {{325.7, 667.0}, {64.3, 64.0}}, label: 'Empty square'
+                        Button, 0x105f0c6c0, {{101.0, 772.0}, {200.0, 52.0}}, label: 'Toggle mode', value: Place
+                          Image, 0x105f0c7e0, {{123.0, 790.7}, {15.0, 15.0}}, identifier: 'square.fill', label: 'Square'
+                          StaticText, 0x105f0c900, {{144.0, 787.8}, {43.7, 20.3}}, label: 'Place'
+                          Image, 0x105f0ca20, {{221.7, 791.7}, {13.0, 13.0}}, identifier: 'xmark', label: 'Close'
+                          StaticText, 0x105f0cb40, {{240.7, 787.8}, {40.3, 20.3}}, label: 'Mark'
+                        Other, 0x105f0cc60, {{11.5, 115.5}, {379.0, 129.7}}
+                          Image, 0x105f0cd80, {{20.0, 124.0}, {44.0, 44.0}}, identifier: 'lightbulb.fill', label: 'Lightbulb'
+                          StaticText, 0x105f0cea0, {{72.0, 134.0}, {49.0, 20.3}}, label: 'Row 3'
+                          Button, 0x105f0cfc0, {{338.0, 124.0}, {44.0, 44.0}}, identifier: 'xmark', label: 'Dismiss hint'
+                          StaticText, 0x105f0d0e0, {{72.0, 172.0}, {294.0, 46.3}}, label: 'Row 3 has a block of 5 in 5 spaces. The highlighted squares are covered wherever that block starts. Fill the 5 highlighted squares.'
+                          StaticText, 0x105f0d200, {{72.0, 222.3}, {41.0, 14.3}}, label: '5 to fill'
+                Other, 0x105f0d520, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x105f0d640, {{0.0, 0.0}, {402.0, 874.0}}
+Path to element:
+ →Application, 0x105e3edf0, pid: 60206, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x105c496b0, pid: 60206, label: 'GameDrawer'
+  }

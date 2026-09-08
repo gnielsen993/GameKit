@@ -1,0 +1,41 @@
+Attributes: Application, 0x104314ae0, pid: 62753, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x104314ae0, pid: 62753, label: 'GameDrawer'
+    Window (Main), 0x104316d50, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x10431a0b0, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x10431a1d0, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x104317cf0, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x104316930, {{0.0, 0.0}, {402.0, 874.0}}
+              Other, 0x10431a2f0, {{0.0, 0.0}, {402.0, 874.0}}
+                NavigationBar, 0x10431a410, {{0.0, 62.0}, {402.0, 54.0}}, identifier: 'Snake'
+                  Other, 0x10431a530, {{20.0, 66.0}, {44.0, 36.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                    Other, 0x10431a650, {{20.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x10431a770, {{20.0, 62.0}, {44.0, 44.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                  StaticText, 0x10431a890, {{176.7, 73.7}, {48.7, 20.7}}, label: 'Snake'
+                  Other, 0x10431a9b0, {{334.0, 66.0}, {48.0, 36.0}}, label: 'Options'
+                    Other, 0x10431aad0, {{334.0, 66.0}, {48.0, 36.0}}
+                      Button, 0x10431abf0, {{334.0, 66.0}, {48.0, 36.0}}, label: 'Options'
+                        Button, 0x10431ad10, {{334.0, 66.0}, {48.0, 36.0}}
+                          Image, 0x10431ae30, {{336.0, 62.0}, {44.0, 44.0}}, identifier: 'ellipsis.circle', label: 'More'
+                Other, 0x10431b030, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x10431b150, {{0.0, 0.0}, {402.0, 874.0}}
+                    Other, 0x10431b270, {{0.0, 0.0}, {402.0, 874.0}}
+                      Other, 0x10431b390, {{0.0, 0.0}, {402.0, 874.0}}
+                        Other, 0x10431b4b0, {{0.0, 116.0}, {402.0, 724.0}}
+                        Other, 0x10431b5d0, {{130.5, 683.5}, {141.0, 141.0}}
+                          Button, 0x10431b6f0, {{178.5, 683.5}, {45.0, 45.0}}, identifier: 'chevron.up', label: 'Move up'
+                          Button, 0x10431b810, {{130.5, 731.5}, {45.0, 45.0}}, identifier: 'chevron.left', label: 'Move left'
+                          Button, 0x10431b930, {{226.5, 731.5}, {45.0, 45.0}}, identifier: 'chevron.right', label: 'Move right'
+                          Button, 0x10431ba50, {{178.5, 779.5}, {45.0, 45.0}}, identifier: 'chevron.down', label: 'Move down'
+                        StaticText, 0x10431bb70, {{154.8, 402.7}, {92.3, 38.3}}, label: 'Snake'
+                        StaticText, 0x10431bc90, {{97.5, 457.0}, {207.0, 20.3}}, label: 'Swipe or tap D-pad to start'
+                        Button, 0x10431bdb0, {{91.0, 493.3}, {220.0, 60.0}}, label: 'Start'
+                Other, 0x10431bed0, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x10431bff0, {{0.0, 0.0}, {402.0, 874.0}}
+Path to element:
+ →Application, 0x104314ae0, pid: 62753, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x10451b890, pid: 62753, label: 'GameDrawer'
+  }

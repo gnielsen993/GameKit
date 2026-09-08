@@ -1,0 +1,72 @@
+Attributes: Application, 0x105c870c0, pid: 60372, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x105c870c0, pid: 60372, label: 'GameDrawer'
+    Window (Main), 0x105c88b80, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x105c87d00, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x105c878e0, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x105c88120, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x105c88540, {{0.0, 0.0}, {402.0, 874.0}}
+              Other, 0x105c874c0, {{0.0, 0.0}, {402.0, 874.0}}
+                NavigationBar, 0x105c86a80, {{0.0, 62.0}, {402.0, 54.0}}, identifier: 'Word Grid'
+                  Other, 0x105c831c0, {{20.0, 66.0}, {36.0, 36.0}}, identifier: 'chevron.left', label: 'Back to The Drawer'
+                    Other, 0x105c82560, {{20.0, 66.0}, {36.0, 36.0}}
+                      Button, 0x105c82da0, {{23.0, 66.0}, {30.0, 36.0}}, identifier: 'chevron.left', label: 'Back to The Drawer'
+                  Other, 0x105c80ab0, {{72.0, 66.0}, {37.0, 36.0}}, identifier: 'arrow.counterclockwise', label: 'New grid'
+                    Other, 0x105c82980, {{72.0, 66.0}, {37.0, 36.0}}
+                      Button, 0x105c88fa0, {{72.0, 66.0}, {37.0, 36.0}}, identifier: 'arrow.counterclockwise', label: 'New grid'
+                  StaticText, 0x105c890c0, {{160.7, 73.7}, {80.3, 20.7}}, label: 'Word Grid'
+                  Other, 0x105c891e0, {{282.0, 66.0}, {44.0, 36.0}}, identifier: 'lightbulb', label: 'Reveal a word'
+                    Other, 0x105c89300, {{282.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x105c89420, {{282.0, 62.0}, {44.0, 44.0}}, identifier: 'lightbulb', label: 'Reveal a word'
+                  Other, 0x105c89540, {{342.0, 66.0}, {40.0, 36.0}}, label: 'Mode'
+                    Other, 0x105c89660, {{342.0, 66.0}, {40.0, 36.0}}
+                      Button, 0x105c89780, {{342.0, 66.0}, {40.0, 36.0}}, label: 'Mode'
+                        Button, 0x105c898a0, {{342.0, 66.0}, {40.0, 36.0}}
+                          Image, 0x105c899c0, {{351.0, 73.0}, {22.0, 22.0}}, identifier: 'ellipsis.circle', label: 'More'
+                Other, 0x105c89ae0, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x105c89c00, {{0.0, 0.0}, {402.0, 874.0}}
+                    Other, 0x105c89d20, {{0.0, 0.0}, {402.0, 874.0}}
+                      Other, 0x105c89e40, {{0.0, 0.0}, {402.0, 874.0}}
+                        Other, 0x105c89f60, {{0.0, 116.0}, {402.0, 724.0}}
+                        Image, 0x105c8a080, {{18.0, 212.3}, {15.0, 16.3}}, identifier: 'number', label: 'number'
+                        StaticText, 0x105c8a1a0, {{39.0, 210.3}, {10.3, 20.3}}, label: '0'
+                        Image, 0x105c8a2c0, {{299.0, 215.7}, {21.7, 10.0}}, identifier: 'infinity', label: 'infinity'
+                        StaticText, 0x105c8a3e0, {{326.0, 210.3}, {60.0, 20.3}}, label: 'Relaxed'
+                        StaticText, 0x105c8a500, {{13.8, 246.2}, {88.3, 88.3}}, label: 'Letter W, row 1, column 1'
+                        StaticText, 0x105c8a620, {{108.7, 245.7}, {89.3, 89.3}}, label: 'Letter D, row 1, column 2'
+                        StaticText, 0x105c8a740, {{204.5, 246.2}, {88.3, 88.3}}, label: 'Letter D, row 1, column 3'
+                        StaticText, 0x105c8a860, {{299.8, 246.2}, {88.3, 88.3}}, label: 'Letter E, row 1, column 4'
+                        StaticText, 0x105c8a980, {{13.8, 341.5}, {88.3, 88.3}}, label: 'Letter F, row 2, column 1'
+                        StaticText, 0x105c8aaa0, {{108.7, 341.0}, {89.3, 89.3}}, label: 'Letter E, row 2, column 2'
+                        StaticText, 0x105c8abc0, {{204.5, 341.5}, {88.3, 88.3}}, label: 'Letter R, row 2, column 3'
+                        StaticText, 0x105c8ace0, {{299.8, 341.5}, {88.3, 88.3}}, label: 'Letter D, row 2, column 4'
+                        StaticText, 0x105c8ae00, {{13.3, 436.3}, {89.3, 89.3}}, label: 'Letter E, row 3, column 1'
+                        StaticText, 0x105c8af20, {{109.2, 436.8}, {88.3, 88.3}}, label: 'Letter N, row 3, column 2'
+                        StaticText, 0x105c8b040, {{204.5, 436.8}, {88.3, 88.3}}, label: 'Letter T, row 3, column 3'
+                        StaticText, 0x105c8b160, {{299.8, 436.8}, {88.3, 88.3}}, label: 'Letter C, row 3, column 4'
+                        StaticText, 0x105c8b280, {{13.8, 532.2}, {88.3, 88.3}}, label: 'Letter A, row 4, column 1'
+                        StaticText, 0x105c8b3a0, {{109.2, 532.2}, {88.3, 88.3}}, label: 'Letter B, row 4, column 2'
+                        StaticText, 0x105c8b4c0, {{204.5, 532.2}, {88.3, 88.3}}, label: 'Letter G, row 4, column 3'
+                        StaticText, 0x105c8b5e0, {{299.8, 532.2}, {88.3, 88.3}}, label: 'Letter A, row 4, column 4'
+                        Other, 0x105c8b700, {{12.0, 632.0}, {378.0, 62.3}}, label: 'No words found yet'
+                          StaticText, 0x105c8b820, {{12.0, 632.0}, {37.0, 14.3}}, label: 'Found'
+                          StaticText, 0x105c8b940, {{382.3, 632.0}, {7.7, 14.3}}, label: '0'
+                          StaticText, 0x105c8ba60, {{12.0, 680.0}, {78.0, 14.3}}, label: 'No words yet.'
+                        StaticText, 0x105c8bb80, {{169.5, 733.8}, {63.0, 20.3}}, label: 'Relaxed'
+                        Button, 0x105c8bca0, {{12.0, 764.0}, {120.7, 60.0}}, label: 'Clear'
+                        Button, 0x105c8bdc0, {{140.7, 764.0}, {120.7, 60.0}}, label: 'Submit'
+                        Button, 0x105c8bee0, {{269.3, 764.0}, {120.7, 60.0}}, label: 'Finish'
+                        Other, 0x105c8c000, {{11.5, 115.5}, {379.0, 79.3}}
+                          Image, 0x105c8c120, {{20.0, 124.0}, {44.0, 44.0}}, identifier: 'lightbulb.fill', label: 'Lightbulb'
+                          StaticText, 0x105c8c240, {{72.0, 134.0}, {86.3, 20.3}}, label: 'Found DEE'
+                          Button, 0x105c8c360, {{338.0, 124.0}, {44.0, 44.0}}, identifier: 'xmark', label: 'Dismiss hint'
+                          StaticText, 0x105c8c480, {{72.0, 172.0}, {308.7, 14.3}}, label: 'Follow the highlighted letters. Revealed words score 0.'
+                Other, 0x105c8c8f0, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x105c8ca10, {{0.0, 0.0}, {402.0, 874.0}}
+Path to element:
+ →Application, 0x105c870c0, pid: 60372, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x105d4bad0, pid: 60372, label: 'GameDrawer'
+  }

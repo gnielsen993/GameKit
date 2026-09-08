@@ -1,0 +1,33 @@
+Attributes: Application, 0x1044b1e20, pid: 62775, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x1044b1e20, pid: 62775, label: 'GameDrawer'
+    Window (Main), 0x1044cd8f0, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x1044cb0d0, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x1044cf490, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x1044cffd0, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x1044a94e0, {{0.0, 0.0}, {402.0, 874.0}}
+              Other, 0x1044a1c00, {{0.0, 0.0}, {402.0, 874.0}}
+                NavigationBar, 0x1044ce070, {{0.0, 62.0}, {402.0, 54.0}}, identifier: 'Stack'
+                  Other, 0x1044c6c80, {{20.0, 66.0}, {44.0, 36.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                    Other, 0x1044cf7d0, {{20.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x1044b7ff0, {{20.0, 62.0}, {44.0, 44.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                  StaticText, 0x1044c33b0, {{178.3, 73.7}, {45.3, 20.7}}, label: 'Stack'
+                Other, 0x1044c7820, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x1044d0310, {{0.0, 0.0}, {402.0, 874.0}}
+                    Other, 0x1044a3070, {{0.0, 0.0}, {402.0, 874.0}}
+                      Other, 0x1044cf070, {{0.0, 0.0}, {402.0, 874.0}}
+                        Other, 0x1044d19b0, {{0.0, 116.0}, {402.0, 724.0}}
+                        Other, 0x1044cec50, {{376.0, 128.0}, {14.0, 26.3}}, label: 'Score 9, perfect streak 0'
+                          StaticText, 0x1044d2630, {{376.0, 128.0}, {14.0, 26.3}}, label: '9'
+                        StaticText, 0x1044d1dd0, {{20.5, 404.5}, {361.0, 147.3}}, label: 'Game over. Score 9. Restart'
+                          StaticText, 0x1044d1370, {{121.2, 420.8}, {159.7, 38.3}}, label: 'Game over'
+                          Button, 0x1044cce70, {{37.0, 475.3}, {328.0, 60.0}}, label: 'Restart'
+                Other, 0x1044d0710, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x1044d0f50, {{0.0, 0.0}, {402.0, 874.0}}
+Path to element:
+ →Application, 0x1044b1e20, pid: 62775, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x1044cc1d0, pid: 62775, label: 'GameDrawer'
+  }

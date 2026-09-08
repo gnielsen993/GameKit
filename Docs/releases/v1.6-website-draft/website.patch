@@ -1,0 +1,166 @@
+--- a/index.html
++++ b/index.html
+@@ -5,7 +5,7 @@
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+   <title>GameDrawer - Classic logic games. Play alongside your video. No ads.</title>
+-  <meta name="description" content="A local-first iOS drawer of classic logic, word, and arcade games - Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, and Snake. Play any game while a video runs in Picture-in-Picture. No ads, no accounts, no tracking." />
++  <meta name="description" content="A local-first iOS drawer of classic logic, word, and arcade games - Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, and Snake. Play any game while a video runs in Picture-in-Picture. No ads, no accounts, no tracking." />
+ 
+   <link rel="canonical" href="https://gamedrawer.lauterstar.com/" />
+   <meta name="robots" content="index,follow,max-image-preview:large" />
+@@ -16,14 +16,14 @@
+   <meta property="og:type" content="website" />
+   <meta property="og:locale" content="en_US" />
+   <meta property="og:title" content="GameDrawer - Classic logic games. Play alongside your video. No ads." />
+-  <meta property="og:description" content="Ten classic logic, word, and arcade games - Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, Snake. Play any of them while a video runs in Picture-in-Picture. No ads, no accounts, no tracking." />
++  <meta property="og:description" content="Eleven classic logic, word, and arcade games - Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, Snake. Play any of them while a video runs in Picture-in-Picture. No ads, no accounts, no tracking." />
+   <meta property="og:url" content="https://gamedrawer.lauterstar.com/" />
+   <meta property="og:image" content="https://gamedrawer.lauterstar.com/assets/images/icon-1024.png" />
+   <meta property="og:image:alt" content="GameDrawer app icon" />
+ 
+   <meta name="twitter:card" content="summary" />
+   <meta name="twitter:title" content="GameDrawer" />
+-  <meta name="twitter:description" content="Ten games. Play alongside your video. No ads, no coins, no noise." />
++  <meta name="twitter:description" content="Eleven games. Play alongside your video. No ads, no coins, no noise." />
+   <meta name="twitter:image" content="https://gamedrawer.lauterstar.com/assets/images/icon-1024.png" />
+ 
+   <link rel="icon" href="assets/images/icon-1024.png" />
+@@ -56,7 +56,7 @@
+         "name": "GameDrawer",
+         "operatingSystem": "iOS 17+",
+         "applicationCategory": "GameApplication",
+-        "description": "Local-first drawer of classic logic, word, and arcade games - Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, Snake. Play any game while a video runs in Picture-in-Picture. No ads, no accounts, no tracking.",
++        "description": "Local-first drawer of classic logic, word, and arcade games - Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, Snake. Play any game while a video runs in Picture-in-Picture. No ads, no accounts, no tracking.",
+         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+         "publisher": { "@id": "https://gamedrawer.lauterstar.com/#org" }
+       }
+@@ -99,7 +99,7 @@
+             </h1>
+ 
+             <p class="sub">
+-              GameDrawer is a drawer of classic logic, word, and arcade games for iPhone - Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, and Snake. Every game supports Picture-in-Picture Video Mode: pick one of six positions for your video window and each layout reflows to stay clear. Local-first, no accounts, no tracking, no fake currency.
++              GameDrawer is a drawer of classic logic, word, and arcade games for iPhone - Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, and Snake. Every game supports Picture-in-Picture Video Mode: pick one of six positions for your video window and each layout reflows to stay clear. Local-first, no accounts, no tracking, no fake currency.
+             </p>
+ 
+             <div class="cta-row">
+@@ -139,15 +139,15 @@
+           </article>
+ 
+           <article class="feature">
+-            <p class="feature-num">02 / Ten games</p>
++            <p class="feature-num">02 / Eleven games</p>
+             <span class="feature-icon" aria-hidden="true">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                 <rect x="3" y="3" width="18" height="18" rx="2" />
+                 <path d="M9 9h.01M15 9h.01M9 15h.01M15 15h.01" />
+               </svg>
+             </span>
+-            <h3>Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, Snake.</h3>
+-            <p>Minesweeper across three difficulties, Merge with 2048 and Infinite modes, Nonogram from 5&times;5 up to 20&times;20, Sudoku with 6,000 curated puzzles, FreeCell with deal-number entry and supermove rules, Klondike Solitaire with draw 1, 2, or 3, Five Letter with daily and unlimited word guessing, Word Grid for tracing words on a 4&times;4 board, Stack for dropping blocks on a 3D tower, and Snake in wrap or walls mode. Each one tuned, none of them loud.</p>
++            <h3>Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, Snake.</h3>
++            <p>Math Crossword with three difficulties and step-by-step equation hints, Minesweeper across three difficulties, Merge with 2048 and Infinite modes, Nonogram from 5&times;5 up to 20&times;20, Sudoku with 6,000 curated puzzles, FreeCell with deal-number entry and supermove rules, Klondike Solitaire with draw 1, 2, or 3, Five Letter with daily and unlimited word guessing, Word Grid for tracing words on a 4&times;4 board, Stack for dropping blocks on a 3D tower, and Snake in wrap or walls mode. Each one tuned, none of them loud.</p>
+           </article>
+ 
+           <article class="feature">
+--- a/about.html
++++ b/about.html
+@@ -5,7 +5,7 @@
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+   <title>About GameDrawer - A Calm Drawer of Classic Logic Games</title>
+-  <meta name="description" content="GameDrawer is a local-first iOS drawer of ten classic logic, word, and arcade games - Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, and Snake. Play any of them while a video runs in Picture-in-Picture. No ads, no accounts, no tracking." />
++  <meta name="description" content="GameDrawer is a local-first iOS drawer of eleven classic logic, word, and arcade games - Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, and Snake. Play any of them while a video runs in Picture-in-Picture. No ads, no accounts, no tracking." />
+ 
+   <link rel="canonical" href="https://gamedrawer.lauterstar.com/about.html" />
+   <meta name="robots" content="index,follow,max-image-preview:large" />
+@@ -16,7 +16,7 @@
+   <meta property="og:type" content="website" />
+   <meta property="og:locale" content="en_US" />
+   <meta property="og:title" content="About GameDrawer - A Calm Drawer of Classic Logic Games" />
+-  <meta property="og:description" content="Why GameDrawer exists, what ten games are in it, and what's on the way. Local-first iOS, no ads, no tracking." />
++  <meta property="og:description" content="Why GameDrawer exists, what eleven games are in it, and what's on the way. Local-first iOS, no ads, no tracking." />
+   <meta property="og:url" content="https://gamedrawer.lauterstar.com/about.html" />
+   <meta property="og:image" content="https://gamedrawer.lauterstar.com/assets/images/icon-1024.png" />
+   <meta property="og:image:alt" content="GameDrawer app icon" />
+@@ -46,10 +46,10 @@
+       "name": "GameDrawer",
+       "operatingSystem": "iOS 17+",
+       "applicationCategory": "GameApplication",
+-      "description": "Local-first drawer of ten classic logic, word, and arcade games for iPhone. Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Klondike Solitaire, Five Letter, Word Grid, Stack, and Snake. Play any game while a video runs in Picture-in-Picture.",
++      "description": "Local-first drawer of eleven classic logic, word, and arcade games for iPhone. Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Klondike Solitaire, Five Letter, Word Grid, Stack, and Snake. Play any game while a video runs in Picture-in-Picture.",
+       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+       "featureList": [
+-        "Ten games: Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Klondike Solitaire, Five Letter, Word Grid, Stack, and Snake",
++        "Eleven games: Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Klondike Solitaire, Five Letter, Word Grid, Stack, and Snake",
+         "Video Mode: six Picture-in-Picture positions across every game",
+         "First-tap safety in Minesweeper; 6,000 curated Sudoku puzzles",
+         "Stats persistence via SwiftData with per-game and per-difficulty records",
+@@ -131,7 +131,7 @@
+     <main id="main-content" class="doc">
+       <p class="eyebrow">About &middot; GameDrawer &middot; Vol. I</p>
+       <h1>A calm drawer of classic games.</h1>
+-      <p class="lede">GameDrawer is a local-first iPhone home for ten classic logic, word, and arcade games. It exists because most of the modern versions of these games have been hollowed out - and the originals deserved better than that.</p>
++      <p class="lede">GameDrawer is a local-first iPhone home for eleven classic logic, word, and arcade games. It exists because most of the modern versions of these games have been hollowed out - and the originals deserved better than that.</p>
+ 
+       <p>Open Solitaire, Sudoku, Minesweeper, or a Merge clone on the App Store today and you'll usually meet the same wall: a banner ad, a forced video ad after every level, fake coins to spend, energy meters that lock you out, paywalls in front of basic features, and a tutorial that won't let you skip. GameDrawer inverts every one of those decisions. The first launch drops you straight into a game. Your stats live on your device. There is no account to make, no email to verify, no upsell to dismiss.</p>
+ 
+@@ -142,7 +142,10 @@
+ 
+       <p>GameDrawer was built to remove every one of those failures. Tap to play. No popups. No paywalls. No tracking. No required network connection. A clean cabinet of games that opens fast, runs offline, and lets the actual game be the thing you remember.</p>
+ 
+-      <h2>The ten games</h2>
++      <h2>The eleven games</h2>
++
++      <h3>Math Crossword</h3>
++      <p>Fill missing numbers so every crossing equation works. Choose Easy, Medium or Hard, use the number bank, undo a move, and resume saved progress. Hints point to a deduction before you choose to reveal and apply its numbers. Assisted wins count without setting records.</p>
+ 
+       <h3>Minesweeper</h3>
+       <p>The full classic, properly tuned. Three difficulties - Easy 9&times;9/10 mines, Medium 16&times;16/40, Hard 16&times;30/99. <strong>First-tap safety</strong> is guaranteed: your first reveal will never land on a mine. Empty cells flood-fill correctly. Tap to reveal, long-press to flag.</p>
+--- a/press.html
++++ b/press.html
+@@ -69,7 +69,7 @@
+       <p class="lede">Logo, app icon, palette, and short copy you're free to use in coverage.</p>
+ 
+       <h2>One-liner</h2>
+-      <p>GameDrawer is the only multi-game puzzle suite that reflows its layouts for Picture-in-Picture - ten classic logic, word, and arcade games (Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, Snake), six PiP positions, zero ads.</p>
++      <p>GameDrawer is the only multi-game puzzle suite that reflows its layouts for Picture-in-Picture - eleven classic logic, word, and arcade games (Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid, Stack, Snake), six PiP positions, zero ads.</p>
+ 
+       <h2>Tagline</h2>
+       <p>Play games while watching a video. No ads.</p>
+@@ -79,7 +79,7 @@
+         <li><strong>App name:</strong> <span data-cfg="displayName">GameDrawer</span></li>
+         <li><strong>Version:</strong> v<span data-cfg="appVersion">1.2</span></li>
+         <li><strong>Platform:</strong> iPhone, iOS 17 or later</li>
+-        <li><strong>Games:</strong> Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid</li>
++        <li><strong>Games:</strong> Math Crossword, Minesweeper, Merge, Nonogram, Sudoku, FreeCell, Solitaire, Five Letter, Word Grid</li>
+         <li><strong>Video Mode:</strong> 6 PiP positions, full layout reflow, all games</li>
+         <li><strong>Sudoku puzzles:</strong> 6,000 curated across Easy / Medium / Hard / Extreme</li>
+         <li><strong>Bundle ID:</strong> <code data-cfg="bundleId">com.lauterstar.gamekit</code></li>
+--- a/updates.html
++++ b/updates.html
+@@ -69,6 +69,13 @@
+       <p class="lede">A running log of what shipped, when, and why. Updated alongside each App Store release.</p>
+ 
+       <ul class="updates-list">
++        <li>
++          <span class="ver">v1.6 &middot; September 2026</span>
++          <strong>Math Crossword joins the drawer. Help gets kinder.</strong>
++          <p><strong>Math Crossword.</strong> Fill missing numbers in crossing equations. Three difficulties, a number bank, undo, saved progress and optional step-by-step hints bring the drawer to eleven games.</p>
++          <p><strong>Be Kind.</strong> Visible help explains a next step in Minesweeper, Nonogram, Sudoku, FreeCell, Five Letter and Word Grid. Assisted wins count without setting records; revealed Word Grid words score zero.</p>
++          <p><strong>Keep playing.</strong> Sudoku and Nonogram can continue in Practice after the last life. Solitaire undo survives a relaunch and can recover a dead end. Small-screen coaching, large text, timer pauses and stats backups receive fixes based on playtesting.</p>
++        </li>
+         <li>
+           <span class="ver">v1.5 &middot; July 2026</span>
+           <strong>Two arcade games join the drawer: Stack and Snake.</strong>
+--- a/assets/config.js
++++ b/assets/config.js
+@@ -4,7 +4,7 @@
+ window.SITE_CONFIG = Object.freeze({
+   appName: "GameDrawer",
+   displayName: "GameDrawer",
+-  appVersion: "1.5",
++  appVersion: "1.6",
+   appStoreUrl: "https://apps.apple.com/us/app/gamedrawer-classic-games/id6765536382",
+   supportEmail: "support@lauterstar.com",
+   copyrightHolder: "Lauterstar",

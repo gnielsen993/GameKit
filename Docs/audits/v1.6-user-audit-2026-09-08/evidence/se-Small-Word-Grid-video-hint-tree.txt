@@ -1,0 +1,58 @@
+Attributes: Application, 0x11a618c60, pid: 61783, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x11a618c60, pid: 61783, label: 'GameDrawer'
+    Window (Main), 0x11a62c620, {{0.0, 0.0}, {375.0, 667.0}}
+      Other, 0x11a630910, {{0.0, 0.0}, {375.0, 667.0}}
+        Other, 0x11a630a30, {{0.0, 0.0}, {375.0, 667.0}}
+          Other, 0x11a6307c0, {{0.0, 0.0}, {375.0, 667.0}}
+            Other, 0x11a62e1a0, {{0.0, 0.0}, {375.0, 667.0}}
+              Other, 0x11a630b50, {{0.0, 0.0}, {375.0, 667.0}}
+                Other, 0x11a630c70, {{0.0, 0.0}, {375.0, 667.0}}
+                  Other, 0x11a630d90, {{0.0, 0.0}, {375.0, 667.0}}
+                    Other, 0x11a630eb0, {{0.0, 0.0}, {375.0, 667.0}}
+                      Other, 0x11a630fd0, {{0.0, 0.0}, {375.0, 667.0}}
+                        Other, 0x11a6310f0, {{0.0, 20.0}, {375.0, 647.0}}
+                        Image, 0x11a631210, {{17.5, 232.5}, {11.0, 11.5}}, identifier: 'number', label: 'number'
+                        StaticText, 0x11a631330, {{34.0, 231.0}, {8.0, 14.5}}, label: '0'
+                        Image, 0x11a631450, {{294.0, 235.0}, {15.5, 7.0}}, identifier: 'infinity', label: 'infinity'
+                        StaticText, 0x11a631570, {{314.5, 231.0}, {44.5, 14.5}}, label: 'Relaxed'
+                        StaticText, 0x11a631690, {{159.5, 247.5}, {9.0, 27.5}}, label: 'Letter U, row 1, column 1'
+                        StaticText, 0x11a6317b0, {{175.0, 247.5}, {9.0, 27.5}}, label: 'Letter U, row 1, column 2'
+                        StaticText, 0x11a6318d0, {{190.5, 247.0}, {10.0, 28.5}}, label: 'Letter A, row 1, column 3'
+                        StaticText, 0x11a6319f0, {{206.5, 247.5}, {9.0, 27.5}}, label: 'Letter A, row 1, column 4'
+                        StaticText, 0x11a631b10, {{159.5, 263.5}, {9.0, 27.5}}, label: 'Letter W, row 2, column 1'
+                        StaticText, 0x11a631c30, {{174.5, 263.0}, {10.0, 28.5}}, label: 'Letter R, row 2, column 2'
+                        StaticText, 0x11a631d50, {{190.5, 263.0}, {10.0, 28.5}}, label: 'Letter T, row 2, column 3'
+                        StaticText, 0x11a631e70, {{206.5, 263.5}, {9.0, 27.5}}, label: 'Letter N, row 2, column 4'
+                        StaticText, 0x11a631f90, {{159.5, 279.0}, {9.0, 27.5}}, label: 'Letter R, row 3, column 1'
+                        StaticText, 0x11a6320b0, {{175.0, 279.0}, {9.0, 27.5}}, label: 'Letter H, row 3, column 2'
+                        StaticText, 0x11a6321d0, {{191.0, 279.0}, {9.0, 27.5}}, label: 'Letter E, row 3, column 3'
+                        StaticText, 0x11a6322f0, {{206.5, 279.0}, {9.0, 27.5}}, label: 'Letter T, row 3, column 4'
+                        StaticText, 0x11a632410, {{159.5, 295.0}, {9.0, 27.5}}, label: 'Letter D, row 4, column 1'
+                        StaticText, 0x11a632530, {{175.0, 295.0}, {9.0, 27.5}}, label: 'Letter H, row 4, column 2'
+                        StaticText, 0x11a632650, {{191.0, 295.0}, {9.0, 27.5}}, label: 'Letter E, row 4, column 3'
+                        StaticText, 0x11a632770, {{206.5, 295.0}, {9.0, 27.5}}, label: 'Letter A, row 4, column 4'
+                        Other, 0x11a632890, {{12.0, 324.5}, {351.0, 62.5}}, label: 'No words found yet'
+                          StaticText, 0x11a6329b0, {{12.0, 324.5}, {37.0, 14.5}}, label: 'Found'
+                          StaticText, 0x11a632ad0, {{355.0, 324.5}, {8.0, 14.5}}, label: '0'
+                          StaticText, 0x11a632bf0, {{12.0, 372.5}, {78.0, 14.5}}, label: 'No words yet.'
+                        StaticText, 0x11a632d10, {{156.0, 426.2}, {63.0, 20.5}}, label: 'Relaxed'
+                        Button, 0x11a632e30, {{12.0, 456.5}, {111.5, 60.0}}, label: 'Clear'
+                        Button, 0x11a632f50, {{131.5, 456.5}, {112.0, 60.0}}, label: 'Submit'
+                        Button, 0x11a633070, {{251.5, 456.5}, {111.5, 60.0}}, label: 'Finish'
+                        Button, 0x11a633190, {{126.5, 524.5}, {24.0, 24.0}}, identifier: 'chevron.left', label: 'Back'
+                        StaticText, 0x11a633400, {{158.5, 529.2}, {8.0, 14.5}}, label: '0'
+                        Button, 0x11a633520, {{198.5, 524.5}, {24.0, 24.0}}, identifier: 'lightbulb', label: 'Reveal a word'
+                        Button, 0x11a633640, {{230.5, 526.5}, {18.0, 20.0}}, identifier: 'arrow.counterclockwise', label: 'New grid'
+                        Other, 0x11a633760, {{11.5, 572.0}, {352.0, 95.5}}
+                          Image, 0x11a633880, {{20.0, 580.5}, {44.0, 44.0}}, identifier: 'lightbulb.fill', label: 'Lightbulb'
+                          StaticText, 0x11a6339a0, {{72.0, 591.0}, {87.5, 20.5}}, label: 'Found ART'
+                          Button, 0x11a633ac0, {{311.0, 580.5}, {44.0, 44.0}}, identifier: 'xmark', label: 'Dismiss hint'
+                          StaticText, 0x11a633be0, {{72.0, 628.5}, {263.5, 30.5}}, label: 'Follow the highlighted letters. Revealed words score 0.'
+Path to element:
+ →Application, 0x11a618c60, pid: 61783, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x11a635860, pid: 61783, label: 'GameDrawer'
+  }

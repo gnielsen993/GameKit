@@ -1,59 +1,52 @@
-# App Store Copy — GameDrawer v1.5
+# App Store Copy - GameDrawer v1.6
 
-Last updated: 2026-07-11
-Marketing version: 1.5
+Last updated: 2026-09-08
+Marketing version: 1.6
+Status: release draft; simulator verification and hardware release checks are tracked in the closure report.
 
-Paste each section into App Store Connect verbatim. Character counts are
-noted where limits apply. Do not include the section headers in submissions.
+Paste only the code blocks into App Store Connect.
 
----
-
-## Promotional Text (170 chars max — shown above description, updatable without a new build)
+## Promotional Text (170 characters maximum)
 
 ```
-The only puzzle game that plays alongside your video. Six PiP positions. Ten games. Zero ads. Sudoku, Minesweeper, Solitaire, Snake, Stack, Five Letter, more.
+Eleven games, no ads. Math Crossword joins the drawer, with clearer hints and room to keep playing alongside your video.
 ```
 
-158 chars ✓
+120 characters.
 
----
-
-## What's New (4000 chars max — shown in the Updates tab and version history)
+## What's New (4000 characters maximum)
 
 ```
-TWO ARCADE GAMES
+MATH CROSSWORD JOINS THE DRAWER
 
-Stack and Snake join the drawer.
+Fill the missing numbers so every crossing equation works. Choose Easy, Medium or Hard, use the number bank, undo a move, and pick up your saved puzzle later. Hints point out an equation before you choose to reveal its numbers.
 
-STACK
-Tap to drop a sliding block on the tower. Land off-center and the overhang gets trimmed; the slide direction alternates every placement, so a sloppy run shrinks the block in both directions. Five perfect drops in a row grow it back. 3D blocks in an isometric camera, colored by your theme. High score and best streak tracked.
+HELP THAT EXPLAINS THE NEXT STEP
 
-SNAKE
-Swipe or tap the D-pad to steer. Eat to grow and beat your high score across endless runs. Wrap mode carries you across the edges; Walls mode ends the run at the border.
+Visible hint buttons and step-by-step coaching help with Minesweeper, Nonogram, Sudoku, FreeCell, Five Letter and Word Grid. Assisted wins still count, but do not set records. Revealed Word Grid words score zero points.
 
-Both support Video Mode and stats.
+KEEP PLAYING
 
-ALSO IN THIS UPDATE
-• Everything moves better: tiles slide and pop, counters roll instead of snapping, keys press down under your finger. All of it turns off with Reduce Motion.
-• Video Mode layouts now only change when your video window actually covers something.
-• Fixed a freeze when a Nonogram puzzle pool ran out, and the puzzle rotation no longer skips puzzles you never actually played.
-• Minesweeper numbers are readable in dark mode on Classic palettes.
+Sudoku and Nonogram offer Keep Solving after your last life. Solitaire undo survives a relaunch and can recover a dead end. Five Letter's daily word stays the same across launches. Merge, Stack and Snake show your stored personal bests.
 
-No ads. No coins. No subscription. Ten games worth playing.
+Also improved: small-screen hint layouts, large-text boards, timer pauses while reading help, and accessibility labels.
+
+Eleven games. No ads, coins or subscription.
 ```
 
-~1,090 chars ✓
+934 characters.
 
----
-
-## Description (4000 chars max — main App Store listing)
+## Description (4000 characters maximum)
 
 ```
 GameDrawer plays alongside your video.
 
-Every game supports Video Mode. Pick one of six positions for your video: large top, large bottom, or any of the four corners. Each layout reflows to keep every control clear and tappable. No other puzzle suite does this. Turn it off and the layout is unchanged.
+Every game supports Video Mode. Pick one of six positions for your video: large top, large bottom, or any of the four corners. Boards and controls adapt around the space you choose.
 
 - THE GAMES -
+
+MATH CROSSWORD
+Fill the missing numbers so every crossing equation works. Use each tile from the number bank, with Easy, Medium and Hard puzzles, undo, saved progress and step-by-step hints.
 
 MINESWEEPER
 Classic 9x9, 16x16, and 16x30 boards. Tap to reveal, hold to flag. First tap is always safe.
@@ -86,69 +79,31 @@ SNAKE
 Steer with swipes or the always-visible D-pad. Eat to grow, chase your high score across endless runs. Wrap around the edges or play classic Walls.
 
 - VIDEO MODE -
-All ten games. Six PiP positions. Every layout reflows. No features lost, no controls buried.
+All eleven games. Six PiP positions. Layouts adapt, with scrolling when a board and its controls need more room.
 
 - THEMES -
-34 presets plus custom colors. Switch instantly. Every theme is legible on every game. Classic Chrome Diner is the default; try Voltage or Dracula for something darker.
+34 presets plus custom colors. Switch instantly. Classic Chrome Diner is the default; try Voltage or Dracula for something darker.
 
 - ZERO NONSENSE -
-No account. No required permissions. No ads, no coins, no subscription, no energy timers, no paywalled features. Stats live on your device. Works fully offline and always will.
+No required account or permissions. No ads, no coins, no subscription, no energy timers, no paywalled features. Stats live on your device, with optional iCloud sync. Play fully offline.
 
 Download once. Play as long as you want.
 ```
 
-~1,840 chars ✓
+2726 characters.
 
----
-
-## Keywords (100 chars max — comma-separated, no spaces after commas)
+## Keywords (100 characters maximum)
 
 ```
-sudoku,minesweeper,solitaire,freecell,nonogram,snake,word game,puzzle,merge,pip,logic,offline,no ads
+math,crossword,sudoku,minesweeper,solitaire,freecell,nonogram,snake,puzzle,logic,offline,word game
 ```
 
-100 chars ✓ (at the limit — "snake" added for v1.5; drop "pip" first if another keyword is ever needed)
+98 characters.
 
----
+## Website / Press Draft
 
-## Website / Press "What's New" Copy
+GameDrawer 1.6 adds Math Crossword, bringing the drawer to eleven games. Fill missing numbers in crossing equations, with three difficulties, undo, saved progress and optional step-by-step help.
 
-Longer-form, for a blog post, website banner, or press release. Less constrained than store copy.
+The Be Kind update also improves hints across six existing games, keeps records separate from assisted wins, and lets Sudoku and Nonogram continue in Practice after a loss. Small-screen coaching, large text, resume and undo receive fixes based on playtesting.
 
----
-
-### Headline options
-
-- **The puzzle app that actually works in Picture-in-Picture.**
-- **GameDrawer plays alongside your video. Ten games. Zero ads.**
-- **GameDrawer 1.5 — two arcade games join the drawer.**
-
----
-
-### Body
-
-GameDrawer 1.5 adds two arcade games, bringing the drawer to ten. Both support Video Mode and stats, day one.
-
-**Stack.** Tap to drop a sliding block on the tower. Land off-center and the overhang gets trimmed away — and because the slide direction alternates between left-right and front-back, a sloppy run shrinks the block in both directions. Land five perfect drops in a row and the block grows back. Real 3D blocks in a fixed isometric camera, trim pieces that tumble off, and a backdrop that shifts with your theme. High score and best perfect streak tracked in Stats.
-
-**Snake.** Swipe or tap the always-visible D-pad to steer, eat food to grow, and beat your high score across endless runs. Two field modes: Wrap (cross an edge, come out the other side) or classic Walls (the edge ends the run). The snake wears a head-to-tail gradient in your theme's palette.
-
-**Everything moves better.** This release also ships an app-wide motion and depth pass: Merge tiles slide and pop instead of teleporting, counters roll instead of snapping, mode pills animate between choices, keys and tiles compress under the finger, and pressable surfaces sit on a soft shadow. Every effect cuts to instant with Reduce Motion or animations off.
-
-**Still no ads. Still no coins. Still no accounts.** GameDrawer has no ad SDK, no coin economy, no energy system, and no paywalled features. You download it once.
-
-[Download on the App Store]
-
----
-
-### Feature bullet list (for website feature grid or press kit)
-
-- Play any game while watching a video — 6 PiP positions, all layouts reflow
-- 10 games: Minesweeper · Merge · Nonogram · Sudoku · FreeCell · Solitaire · Five Letter · Word Grid · Stack · Snake
-- 6,000 Sudoku puzzles, four difficulties, in-progress save state
-- Completion glow on rows, columns, and boxes
-- Exhausted number-pad digits strike through automatically
-- 34 color themes + custom color support
-- Full offline — no account, no permissions, no network required
-- Stats per game, per difficulty — device-local only
-- No ads. No coins. No subscription.
+No ads, coins or subscription. All eleven games support Video Mode. Publish this copy when 1.6 is released.

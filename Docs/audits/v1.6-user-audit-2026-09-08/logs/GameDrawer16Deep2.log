@@ -1,0 +1,12 @@
+2026-09-08 09:47:58.556 xcodebuild[60678:31496059]  DVTDeviceOperation: Encountered a build number "" that is incompatible with DVTBuildVersion.
+2026-09-08 09:47:58.643 xcodebuild[60678:31496028] [MT] DVTDeviceOperation: Encountered a build number "" that is incompatible with DVTBuildVersion.
+2026-09-08 09:47:58.931 xcodebuild[60678:31496028] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+Writing result bundle at path:
+	/tmp/GameDrawer16Deep2.xcresult
+
+2026-09-08 09:51:31.621 xcodebuild[60678:31496028] [MT] IDETestOperationsObserverDebug: 207.156 elapsed -- Testing started completed.
+2026-09-08 09:51:31.621 xcodebuild[60678:31496028] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-09-08 09:51:31.621 xcodebuild[60678:31496028] [MT] IDETestOperationsObserverDebug: 207.156 sec, +207.156 sec -- end
+** TEST FAILED **
+
+Testing started

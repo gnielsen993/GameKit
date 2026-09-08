@@ -1,0 +1,72 @@
+Attributes: Application, 0x105c4c100, pid: 60139, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x105c4c100, pid: 60139, label: 'GameDrawer'
+    Window (Main), 0x105c4eab0, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x105c5fd90, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x105c4ab00, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x105c74c30, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x105c5fa10, {{0.0, 0.0}, {402.0, 874.0}}
+              Other, 0x105c4cdb0, {{0.0, 0.0}, {402.0, 874.0}}
+                NavigationBar, 0x105c600f0, {{0.0, 62.0}, {402.0, 54.0}}, identifier: 'Merge'
+                  Other, 0x105c6e5b0, {{20.0, 66.0}, {44.0, 36.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                    Other, 0x105c50c50, {{20.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x105c50d70, {{20.0, 62.0}, {44.0, 44.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                  Other, 0x105c50e90, {{80.0, 66.0}, {44.0, 36.0}}, identifier: 'arrow.counterclockwise', label: 'Restart game'
+                    Other, 0x105c50fb0, {{80.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x105c6f690, {{80.0, 62.0}, {44.0, 44.0}}, identifier: 'arrow.counterclockwise', label: 'Restart game'
+                  StaticText, 0x105c6f7b0, {{175.3, 73.7}, {51.0, 20.7}}, label: 'Merge'
+                  Other, 0x105c6f8d0, {{334.0, 66.0}, {48.0, 36.0}}, label: 'Mode'
+                    Other, 0x105c6f9f0, {{334.0, 66.0}, {48.0, 36.0}}
+                      Button, 0x105c6fb10, {{334.0, 66.0}, {48.0, 36.0}}, label: 'Mode'
+                        Button, 0x105c6fc30, {{334.0, 66.0}, {48.0, 36.0}}
+                          Image, 0x105c6fd50, {{336.0, 62.0}, {44.0, 44.0}}, identifier: 'slider.horizontal.3', label: 'Edit'
+                Other, 0x105c6fe70, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x105c6ff90, {{0.0, 0.0}, {402.0, 874.0}}
+                    Other, 0x105c700b0, {{0.0, 0.0}, {402.0, 874.0}}
+                      Other, 0x105c701d0, {{0.0, 0.0}, {402.0, 874.0}}
+                        Other, 0x105c702f0, {{0.0, 116.0}, {402.0, 724.0}}
+                        Other, 0x105c70410, {{16.0, 230.7}, {41.7, 40.7}}, label: 'Score 8'
+                          StaticText, 0x105c70530, {{16.0, 230.7}, {41.7, 14.3}}, label: 'SCORE'
+                          StaticText, 0x105c70650, {{16.0, 245.0}, {14.0, 26.3}}, label: '8'
+                        Other, 0x105c70770, {{322.7, 236.7}, {63.3, 34.7}}, label: 'Best 18,432'
+                          StaticText, 0x105c70890, {{322.7, 236.7}, {31.3, 14.3}}, label: 'BEST'
+                          StaticText, 0x105c709b0, {{322.7, 251.0}, {63.3, 20.3}}, label: '18,432'
+                        Other, 0x105c70ad0, {{16.0, 295.3}, {370.0, 370.0}}, label: 'Merge board'
+                          Other, 0x105c70bf0, {{24.0, 303.3}, {82.7, 82.7}}, label: 'Empty'
+                          Other, 0x105c70d10, {{114.7, 303.3}, {82.3, 82.7}}, label: 'Empty'
+                          Other, 0x105c70e30, {{205.0, 303.3}, {82.7, 82.7}}, label: 'Empty'
+                          Other, 0x105c70f50, {{295.7, 303.3}, {82.3, 82.7}}, label: 'Empty'
+                          Other, 0x105c71070, {{24.0, 394.0}, {82.7, 82.3}}, label: 'Empty'
+                          Other, 0x105c71190, {{114.7, 394.0}, {82.3, 82.3}}, label: 'Empty'
+                          Other, 0x105c712b0, {{205.0, 394.0}, {82.7, 82.3}}, label: 'Empty'
+                          Other, 0x105c713d0, {{295.7, 394.0}, {82.3, 82.3}}, label: 'Empty'
+                          Other, 0x105c714f0, {{24.0, 484.3}, {82.7, 82.7}}, label: 'Empty'
+                          Other, 0x105c71610, {{114.7, 484.3}, {82.3, 82.7}}, label: 'Empty'
+                          Other, 0x105c71730, {{205.0, 484.3}, {82.7, 82.7}}, label: 'Empty'
+                          Other, 0x105c71850, {{295.7, 484.3}, {82.3, 82.7}}, label: 'Empty'
+                          Other, 0x105c71970, {{24.0, 575.0}, {82.7, 82.3}}, label: 'Empty'
+                          Other, 0x105c71a90, {{114.7, 575.0}, {82.3, 82.3}}, label: 'Empty'
+                          Other, 0x105c71bb0, {{205.0, 575.0}, {82.7, 82.3}}, label: 'Empty'
+                          Other, 0x105c71cd0, {{295.7, 575.0}, {82.3, 82.3}}, label: 'Empty'
+                          Other, 0x105c71df0, {{114.7, 303.3}, {82.3, 82.7}}, label: 'Tile 2'
+                            StaticText, 0x105c71f10, {{148.7, 331.7}, {14.3, 26.3}}, label: '2'
+                          Other, 0x105c72030, {{204.9, 303.3}, {82.8, 82.8}}, label: 'Tile 4'
+                            StaticText, 0x105c72150, {{239.3, 331.6}, {14.4, 26.4}}, label: '4'
+                          Other, 0x105c72270, {{113.5, 392.8}, {83.5, 83.5}}, label: 'Tile 2'
+                            StaticText, 0x105c72390, {{147.9, 421.2}, {14.5, 26.7}}, label: '2'
+                          Other, 0x105c724b0, {{295.6, 303.3}, {82.4, 82.7}}, label: 'Tile 4'
+                            StaticText, 0x105c725d0, {{329.7, 331.7}, {14.3, 26.3}}, label: '4'
+                        Button, 0x105c726f0, {{96.0, 685.3}, {210.0, 52.0}}, label: 'Toggle mode', value: Win
+                          Image, 0x105c72810, {{118.0, 702.7}, {16.0, 17.7}}, identifier: 'trophy.fill', label: 'trophy.fill'
+                          StaticText, 0x105c72930, {{140.0, 701.2}, {30.7, 20.3}}, label: 'Win'
+                          Image, 0x105c72a50, {{204.0, 706.3}, {21.7, 10.3}}, identifier: 'infinity', label: 'infinity'
+                          StaticText, 0x105c72b70, {{231.0, 701.2}, {55.0, 20.3}}, label: 'Infinite'
+                Other, 0x105c72c90, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x105c72db0, {{0.0, 0.0}, {402.0, 874.0}}
+Path to element:
+ →Application, 0x105c4c100, pid: 60139, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x105c73750, pid: 60139, label: 'GameDrawer'
+  }

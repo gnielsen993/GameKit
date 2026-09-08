@@ -1,0 +1,141 @@
+Building for debugging...
+[0/7] /tmp/GameDrawer16SudokuPackage/arm64-apple-macosx/debug/SudokuCorePackageTests.derived/runner.swift
+[1/7] Write sources
+[4/7] Write swift-version--58304C5D6DBC2206.txt
+[6/18] Compiling SudokuCore SudokuSolver.swift
+[7/18] Compiling SudokuCore SudokuHintEngine.swift
+[8/18] Compiling SudokuCore TechniqueRater.swift
+[9/18] Compiling SudokuCore SudokuPuzzleGenerator.swift
+[10/19] Compiling SudokuCore SHA256Hasher.swift
+[11/19] Compiling SudokuCore SudokuCore.swift
+[12/19] Compiling SudokuCore Protocols.swift
+[13/19] Compiling SudokuCore Errors.swift
+[14/19] Compiling SudokuCore InMemoryPuzzleRepository.swift
+[15/19] Emitting module SudokuCore
+[16/19] Compiling SudokuCore Models.swift
+[17/19] Compiling SudokuCore UseCases.swift
+[18/22] Compiling SudokuCoreTests SudokuHintEngineTests.swift
+[19/22] Emitting module SudokuCoreTests
+[20/22] Compiling SudokuCoreTests SudokuCoreTests.swift
+[21/24] Compiling SudokuCorePackageTests runner.swift
+[22/24] Emitting module SudokuCorePackageTests
+[22/24] Write Objects.LinkFileList
+[23/24] Linking SudokuCorePackageTests
+Build complete! (13.48s)
+Test Suite 'All tests' started at 2026-09-08 09:41:17.374.
+Test Suite 'SudokuCorePackageTests.xctest' started at 2026-09-08 09:41:17.377.
+Test Suite 'SudokuCoreTests' started at 2026-09-08 09:41:17.377.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleCanSaveOffTargetRatedPuzzle]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleCanSaveOffTargetRatedPuzzle]' passed (0.002 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleFailsWhenNotUnique]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleFailsWhenNotUnique]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleFailsWhenRatedDifficultyDoesNotMatchTarget]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleFailsWhenRatedDifficultyDoesNotMatchTarget]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleFailsWhenSolutionDoesNotMatchPuzzle]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleFailsWhenSolutionDoesNotMatchPuzzle]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleFailsWhenSolutionIsInvalid]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzleFailsWhenSolutionIsInvalid]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzlePersistsRatedPuzzle]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratePuzzlePersistsRatedPuzzle]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorIsDeterministicWithSameSeed]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorIsDeterministicWithSameSeed]' passed (3.453 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorProducesUniquePuzzleForEasy]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorProducesUniquePuzzleForEasy]' passed (0.044 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorPuzzleHasFewer81Clues]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorPuzzleHasFewer81Clues]' passed (0.064 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorPuzzleStringIsCorrectLength]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorPuzzleStringIsCorrectLength]' passed (0.116 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorSolutionIsValidGrid]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testGeneratorSolutionIsValidGrid]' passed (0.043 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testPlayNextExcludesNonNewByDefault]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testPlayNextExcludesNonNewByDefault]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterRatesAlEscargotAsExtreme]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterRatesAlEscargotAsExtreme]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterRatesNearTrivialPuzzleAsEasy]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterRatesNearTrivialPuzzleAsEasy]' passed (0.001 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterRatesSparseTwentyThreeCluePuzzleAsExtreme]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterRatesSparseTwentyThreeCluePuzzleAsExtreme]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsForInvalidPuzzleLength]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsForInvalidPuzzleLength]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsForInvalidSolutionGrid]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsForInvalidSolutionGrid]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsForInvalidSolutionLength]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsForInvalidSolutionLength]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsForNon9x9]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsForNon9x9]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsWhenSolutionDoesNotMatchPuzzle]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRaterThrowsWhenSolutionDoesNotMatchPuzzle]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryClearLibraryRemovesAllPuzzles]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryClearLibraryRemovesAllPuzzles]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryExcludesCompletedFromNextPuzzle]' started.
+/Users/gabrielnielsen/Developer/GameKit/Packages/SudokuCore/Tests/SudokuCoreTests/SudokuCoreTests.swift:466: -[SudokuCoreTests.SudokuCoreTests testRepositoryExcludesCompletedFromNextPuzzle] : Test skipped - Requires SQLitePuzzleRepository — markStatus/nextPuzzle not supported in InMemoryPuzzleRepository
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryExcludesCompletedFromNextPuzzle]' skipped (0.001 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryFetchesInProgressPuzzle]' started.
+/Users/gabrielnielsen/Developer/GameKit/Packages/SudokuCore/Tests/SudokuCoreTests/SudokuCoreTests.swift:470: -[SudokuCoreTests.SudokuCoreTests testRepositoryFetchesInProgressPuzzle] : Test skipped - Requires SQLitePuzzleRepository — markStatus/updateProgress/fetchInProgress not supported in InMemoryPuzzleRepository
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryFetchesInProgressPuzzle]' skipped (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryFetchesMostRecentInProgressPuzzle]' started.
+/Users/gabrielnielsen/Developer/GameKit/Packages/SudokuCore/Tests/SudokuCoreTests/SudokuCoreTests.swift:474: -[SudokuCoreTests.SudokuCoreTests testRepositoryFetchesMostRecentInProgressPuzzle] : Test skipped - Requires SQLitePuzzleRepository — markStatus/fetchInProgress not supported in InMemoryPuzzleRepository
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryFetchesMostRecentInProgressPuzzle]' skipped (0.001 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryFiltersNextPuzzleByDifficulty]' started.
+/Users/gabrielnielsen/Developer/GameKit/Packages/SudokuCore/Tests/SudokuCoreTests/SudokuCoreTests.swift:522: -[SudokuCoreTests.SudokuCoreTests testRepositoryFiltersNextPuzzleByDifficulty] : Test skipped - Requires SQLitePuzzleRepository — nextPuzzle not supported in InMemoryPuzzleRepository
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryFiltersNextPuzzleByDifficulty]' skipped (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryInventoryCountsReflectSaves]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryInventoryCountsReflectSaves]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryRejectsDuplicateBeginnerPuzzle]' started.
+/Users/gabrielnielsen/Developer/GameKit/Packages/SudokuCore/Tests/SudokuCoreTests/SudokuCoreTests.swift:514: -[SudokuCoreTests.SudokuCoreTests testRepositoryRejectsDuplicateBeginnerPuzzle] : Test skipped - Requires SQLitePuzzleRepository — saveBeginnerPuzzle/beginnerPuzzleCount are SQLite-only extensions not on PuzzleRepository protocol
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryRejectsDuplicateBeginnerPuzzle]' skipped (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryRejectsInvalidBeginnerPuzzleLength]' started.
+/Users/gabrielnielsen/Developer/GameKit/Packages/SudokuCore/Tests/SudokuCoreTests/SudokuCoreTests.swift:518: -[SudokuCoreTests.SudokuCoreTests testRepositoryRejectsInvalidBeginnerPuzzleLength] : Test skipped - Requires SQLitePuzzleRepository — saveBeginnerPuzzle is a SQLite-only extension not on PuzzleRepository protocol
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryRejectsInvalidBeginnerPuzzleLength]' skipped (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositorySavesAndFetchesNewPuzzle]' started.
+/Users/gabrielnielsen/Developer/GameKit/Packages/SudokuCore/Tests/SudokuCoreTests/SudokuCoreTests.swift:462: -[SudokuCoreTests.SudokuCoreTests testRepositorySavesAndFetchesNewPuzzle] : Test skipped - Requires SQLitePuzzleRepository — nextPuzzle not supported in InMemoryPuzzleRepository
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositorySavesAndFetchesNewPuzzle]' skipped (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryThrowsOnDuplicateHash]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testRepositoryThrowsOnDuplicateHash]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverCustomStepLimitOverridesDefault]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverCustomStepLimitOverridesDefault]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverDefaultStepLimitIs120000For9x9]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverDefaultStepLimitIs120000For9x9]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverDetectsMultipleSolutions]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverDetectsMultipleSolutions]' passed (0.001 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverFindsNoSolution]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverFindsNoSolution]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverFindsUniqueSolution]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverFindsUniqueSolution]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverRejectsFilledGridWithDuplicateGiven]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverRejectsFilledGridWithDuplicateGiven]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverRespectsStepLimit]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverRespectsStepLimit]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverThrowsOnInvalidLength]' started.
+Test Case '-[SudokuCoreTests.SudokuCoreTests testSolverThrowsOnInvalidLength]' passed (0.000 seconds).
+Test Suite 'SudokuCoreTests' passed at 2026-09-08 09:41:21.111.
+	 Executed 38 tests, with 7 tests skipped and 0 failures (0 unexpected) in 3.731 (3.735) seconds
+Test Suite 'SudokuHintEngineTests' started at 2026-09-08 09:41:21.111.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testAFinishedBoardOffersNothing]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testAFinishedBoardOffersNothing]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testEveryReportedStepAgreesWithTheSolution]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testEveryReportedStepAgreesWithTheSolution]' passed (0.010 seconds).
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testFindsAStepOnAnEasyPuzzle]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testFindsAStepOnAnEasyPuzzle]' passed (0.001 seconds).
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testHiddenSingleUnitContainsItsCell]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testHiddenSingleUnitContainsItsCell]' passed (0.010 seconds).
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testNakedSingleIsNamedAndSupported]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testNakedSingleIsNamedAndSupported]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testRaterStillRatesTheKnownEasyPuzzle]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testRaterStillRatesTheKnownEasyPuzzle]' passed (0.010 seconds).
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testRejectsAWronglySizedBoard]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testRejectsAWronglySizedBoard]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testRowAndColumnAreDerivedFromTheIndex]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testRowAndColumnAreDerivedFromTheIndex]' passed (0.000 seconds).
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testSinglesAloneSolveAnEasyPuzzle]' started.
+Test Case '-[SudokuCoreTests.SudokuHintEngineTests testSinglesAloneSolveAnEasyPuzzle]' passed (0.010 seconds).
+Test Suite 'SudokuHintEngineTests' passed at 2026-09-08 09:41:21.156.
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.044 (0.044) seconds
+Test Suite 'SudokuCorePackageTests.xctest' passed at 2026-09-08 09:41:21.156.
+	 Executed 47 tests, with 7 tests skipped and 0 failures (0 unexpected) in 3.775 (3.779) seconds
+Test Suite 'All tests' passed at 2026-09-08 09:41:21.156.
+	 Executed 47 tests, with 7 tests skipped and 0 failures (0 unexpected) in 3.775 (3.782) seconds
+􀟈  Test run started.
+􀄵  Testing Library Version: 1501
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.

@@ -1,0 +1,94 @@
+Attributes: Application, 0x101d4a910, pid: 61776, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x101d4a910, pid: 61776, label: 'GameDrawer'
+    Window (Main), 0x101d49b60, {{0.0, 0.0}, {375.0, 667.0}}
+      Other, 0x101d83c80, {{0.0, 0.0}, {375.0, 667.0}}
+        Other, 0x101d83860, {{0.0, 0.0}, {375.0, 667.0}}
+          Other, 0x101d846e0, {{0.0, 0.0}, {375.0, 667.0}}
+            Other, 0x101d840a0, {{0.0, 0.0}, {375.0, 667.0}}
+              Other, 0x101d83440, {{0.0, 0.0}, {375.0, 667.0}}
+                Other, 0x101d83020, {{0.0, 0.0}, {375.0, 667.0}}
+                  Other, 0x101d82c00, {{0.0, 0.0}, {375.0, 667.0}}
+                    Other, 0x101d84ae0, {{0.0, 0.0}, {375.0, 667.0}}
+                      Other, 0x101d84c00, {{0.0, 0.0}, {375.0, 667.0}}
+                        Other, 0x101d84d20, {{0.0, 20.0}, {375.0, 647.0}}
+                        Other, 0x101d84e40, {{11.5, 0.0}, {59.5, 254.5}}, label: 'Time elapsed', value: 0 minutes 3 seconds
+                          Image, 0x101d84f60, {{17.5, 232.0}, {17.0, 17.0}}, identifier: 'clock', label: 'Clock'
+                          StaticText, 0x101d85080, {{40.0, 233.3}, {26.5, 14.5}}, label: '0:03'
+                        StaticText, 0x101d851a0, {{340.0, 233.3}, {19.0, 14.5}}, label: '0/6'
+                        StaticText, 0x101d852c0, {{167.5, 261.5}, {5.5, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d853e0, {{176.0, 261.5}, {5.5, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85500, {{184.5, 261.5}, {6.0, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85620, {{193.5, 261.5}, {5.5, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85740, {{202.0, 261.5}, {5.5, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85860, {{172.0, 279.5}, {4.0, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85980, {{179.0, 279.5}, {3.5, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85aa0, {{185.5, 279.5}, {4.0, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85bc0, {{192.5, 279.5}, {3.5, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85ce0, {{199.0, 279.5}, {4.0, 15.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85e00, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d85f20, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86040, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86160, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86280, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d863a0, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d864c0, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d865e0, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86700, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86820, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86940, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86a60, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86b80, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86ca0, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d86f10, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d87030, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d87150, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d87270, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d87390, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        StaticText, 0x101d874b0, {{0.0, 0.0}, {0.0, 0.0}}, label: 'Empty letter'
+                        Button, 0x101d875d0, {{12.0, 318.0}, {31.5, 42.0}}, label: 'Letter Q'
+                        Button, 0x101d876f0, {{47.5, 318.0}, {31.5, 42.0}}, label: 'Letter W'
+                        Button, 0x101d87810, {{83.0, 318.0}, {31.5, 42.0}}, label: 'Letter E'
+                        Button, 0x101d87930, {{118.5, 318.0}, {31.5, 42.0}}, label: 'Letter R'
+                        Button, 0x101d87a50, {{154.0, 318.0}, {31.5, 42.0}}, label: 'Letter T'
+                        Button, 0x101d87b70, {{189.5, 318.0}, {31.5, 42.0}}, label: 'Letter Y'
+                        Button, 0x101d87c90, {{225.0, 318.0}, {31.5, 42.0}}, label: 'Letter U'
+                        Button, 0x101d87db0, {{260.5, 318.0}, {31.5, 42.0}}, label: 'Letter I'
+                        Button, 0x101d87ed0, {{296.0, 318.0}, {31.5, 42.0}}, label: 'Letter O'
+                        Button, 0x101d87ff0, {{331.5, 318.0}, {31.5, 42.0}}, label: 'Letter P'
+                        Button, 0x101d86dc0, {{12.0, 364.0}, {35.5, 42.0}}, label: 'Letter A'
+                        Button, 0x101d88330, {{51.5, 364.0}, {35.5, 42.0}}, label: 'Letter S'
+                        Button, 0x101d88450, {{91.0, 364.0}, {35.5, 42.0}}, label: 'Letter D'
+                        Button, 0x101d88570, {{130.5, 364.0}, {35.5, 42.0}}, label: 'Letter F'
+                        Button, 0x101d88690, {{170.0, 364.0}, {35.0, 42.0}}, label: 'Letter G'
+                        Button, 0x101d888e0, {{209.0, 364.0}, {35.5, 42.0}}, label: 'Letter H'
+                        Button, 0x101d88a00, {{248.5, 364.0}, {35.5, 42.0}}, label: 'Letter J'
+                        Button, 0x101d88b20, {{288.0, 364.0}, {35.5, 42.0}}, label: 'Letter K'
+                        Button, 0x101d88c40, {{327.5, 364.0}, {35.5, 42.0}}, label: 'Letter L'
+                        Button, 0x101d88d60, {{12.0, 410.0}, {35.5, 42.0}}, label: 'Enter'
+                        Button, 0x101d88e80, {{51.5, 410.0}, {35.5, 42.0}}, label: 'Letter Z'
+                        Button, 0x101d88fa0, {{91.0, 410.0}, {35.5, 42.0}}, label: 'Letter X'
+                        Button, 0x101d890c0, {{130.5, 410.0}, {35.5, 42.0}}, label: 'Letter C'
+                        Button, 0x101d891e0, {{170.0, 410.0}, {35.0, 42.0}}, label: 'Letter V'
+                        Button, 0x101d89300, {{209.0, 410.0}, {35.5, 42.0}}, label: 'Letter B'
+                        Button, 0x101d89420, {{248.5, 410.0}, {35.5, 42.0}}, label: 'Letter N'
+                        Button, 0x101d89540, {{288.0, 410.0}, {35.5, 42.0}}, label: 'Letter M'
+                        Button, 0x101d7d3c0, {{327.5, 410.0}, {35.5, 42.0}}, identifier: 'delete.left', label: 'Delete'
+                        Button, 0x101d7d4e0, {{103.5, 460.0}, {24.0, 24.0}}, identifier: 'chevron.left', label: 'Back'
+                        StaticText, 0x101d7d600, {{135.5, 464.8}, {54.0, 14.5}}, label: 'Unlimited'
+                        Button, 0x101d7d720, {{221.5, 460.0}, {24.0, 24.0}}, identifier: 'lightbulb', label: 'Suggest a useful guess'
+                        Button, 0x101d7d840, {{253.5, 462.0}, {18.0, 20.0}}, identifier: 'arrow.counterclockwise', label: 'Restart puzzle'
+                        Other, 0x101d7d960, {{11.5, 507.5}, {352.0, 162.0}}
+                          Image, 0x101d7da80, {{20.0, 516.0}, {44.0, 44.0}}, identifier: 'lightbulb.fill', label: 'Lightbulb'
+                          StaticText, 0x101d7dba0, {{72.0, 526.5}, {77.0, 20.5}}, label: 'Try TARIE'
+                          Button, 0x101d7dcc0, {{311.0, 516.0}, {44.0, 44.0}}, identifier: 'xmark', label: 'Dismiss hint'
+                          StaticText, 0x101d7dde0, {{72.0, 564.0}, {270.0, 30.5}}, label: 'TARIE cannot be the answer, but its letters split the remaining possibilities well.'
+                          StaticText, 0x101d7df00, {{72.0, 598.5}, {190.0, 14.5}}, label: '1033 answers still fit your clues.'
+                          Button, 0x101d7e020, {{72.0, 632.0}, {86.5, 14.5}}, label: 'Use this guess'
+Path to element:
+ →Application, 0x101d4a910, pid: 61776, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x101cf4420, pid: 61776, label: 'GameDrawer'
+  }

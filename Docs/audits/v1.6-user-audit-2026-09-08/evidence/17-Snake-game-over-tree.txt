@@ -1,0 +1,43 @@
+Attributes: Application, 0x1044b1e20, pid: 62753, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x1044b1e20, pid: 62753, label: 'GameDrawer'
+    Window (Main), 0x1044cb0d0, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x1044a94e0, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x1044a1c00, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x1044c33b0, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x1044b7ff0, {{0.0, 0.0}, {402.0, 874.0}}
+              Other, 0x1044a3070, {{0.0, 0.0}, {402.0, 874.0}}
+                NavigationBar, 0x1044a2c50, {{0.0, 62.0}, {402.0, 54.0}}, identifier: 'Snake'
+                  Other, 0x1044bf1c0, {{20.0, 66.0}, {44.0, 36.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                    Other, 0x1044bf2e0, {{20.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x1044bf400, {{20.0, 62.0}, {44.0, 44.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                  StaticText, 0x1044bf520, {{176.7, 73.7}, {48.7, 20.7}}, label: 'Snake'
+                  Other, 0x1044c8980, {{334.0, 66.0}, {48.0, 36.0}}, label: 'Options'
+                    Other, 0x1044c8aa0, {{334.0, 66.0}, {48.0, 36.0}}
+                      Button, 0x1044c8bc0, {{334.0, 66.0}, {48.0, 36.0}}, label: 'Options'
+                        Button, 0x1044c8ce0, {{334.0, 66.0}, {48.0, 36.0}}
+                          Image, 0x1044c6fa0, {{336.0, 62.0}, {44.0, 44.0}}, identifier: 'ellipsis.circle', label: 'More'
+                Other, 0x1044c70c0, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x1044c71e0, {{0.0, 0.0}, {402.0, 874.0}}
+                    Other, 0x1044c7300, {{0.0, 0.0}, {402.0, 874.0}}
+                      Other, 0x1044c7420, {{0.0, 0.0}, {402.0, 874.0}}
+                        Other, 0x1044c7540, {{0.0, 116.0}, {402.0, 724.0}}
+                        Other, 0x1044c7660, {{372.0, 120.0}, {14.0, 26.3}}, label: 'Score 1'
+                          StaticText, 0x1044c7780, {{372.0, 120.0}, {14.0, 26.3}}, label: '1'
+                        Other, 0x1044c78a0, {{130.5, 683.5}, {141.0, 141.0}}
+                          Button, 0x1044c6800, {{178.5, 683.5}, {45.0, 45.0}}, identifier: 'chevron.up', label: 'Move up'
+                          Button, 0x1044c6920, {{130.5, 731.5}, {45.0, 45.0}}, identifier: 'chevron.left', label: 'Move left'
+                          Button, 0x1044c6a40, {{226.5, 731.5}, {45.0, 45.0}}, identifier: 'chevron.right', label: 'Move right'
+                          Button, 0x1044c6b60, {{178.5, 779.5}, {45.0, 45.0}}, identifier: 'chevron.down', label: 'Move down'
+                        StaticText, 0x1044c6c80, {{20.5, 404.5}, {361.0, 147.3}}, label: 'Game over. Score 1. Restart'
+                          StaticText, 0x1044cbb30, {{121.2, 420.8}, {159.7, 38.3}}, label: 'Game over'
+                          Button, 0x1044cbc50, {{37.0, 475.3}, {328.0, 60.0}}, label: 'Restart'
+                Other, 0x1044cbd70, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x1044cbe90, {{0.0, 0.0}, {402.0, 874.0}}
+Path to element:
+ →Application, 0x1044b1e20, pid: 62753, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x1044cc1d0, pid: 62753, label: 'GameDrawer'
+  }

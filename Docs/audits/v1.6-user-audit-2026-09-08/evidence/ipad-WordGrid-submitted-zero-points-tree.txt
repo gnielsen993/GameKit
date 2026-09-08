@@ -1,0 +1,69 @@
+Attributes: Application, 0x10447ed00, pid: 62355, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x10447ed00, pid: 62355, label: 'GameDrawer'
+    Window (Main), 0x10447c910, {{0.0, 0.0}, {744.0, 1133.0}}
+      Other, 0x104455f10, {{0.0, 0.0}, {744.0, 1133.0}}
+        Other, 0x104451180, {{0.0, 0.0}, {744.0, 1133.0}}
+          Other, 0x104454f10, {{0.0, 0.0}, {744.0, 1133.0}}
+            Other, 0x1044515a0, {{0.0, 0.0}, {744.0, 1133.0}}
+              Other, 0x104483ae0, {{0.0, 0.0}, {744.0, 1133.0}}
+                Other, 0x10447be90, {{0.0, 0.0}, {744.0, 1133.0}}
+                  NavigationBar, 0x10452fa90, {{0.0, 32.0}, {744.0, 54.0}}, identifier: 'Word Grid'
+                    Other, 0x1045302b0, {{14.0, 36.0}, {36.0, 36.0}}, identifier: 'chevron.left', label: 'Back to The Drawer'
+                      Other, 0x1045303d0, {{14.0, 36.0}, {36.0, 36.0}}
+                        Button, 0x1045304f0, {{17.0, 36.0}, {30.5, 36.0}}, identifier: 'chevron.left', label: 'Back to The Drawer'
+                    Other, 0x104530610, {{66.0, 36.0}, {37.0, 36.0}}, identifier: 'arrow.counterclockwise', label: 'New grid'
+                      Other, 0x104530730, {{66.0, 36.0}, {37.0, 36.0}}
+                        Button, 0x104530850, {{66.0, 36.0}, {37.0, 36.0}}, identifier: 'arrow.counterclockwise', label: 'New grid'
+                    StaticText, 0x104530970, {{331.5, 43.5}, {80.5, 21.0}}, label: 'Word Grid'
+                    Other, 0x104530a90, {{630.0, 36.0}, {44.0, 36.0}}, identifier: 'lightbulb', label: 'Reveal a word'
+                      Other, 0x104530bb0, {{630.0, 36.0}, {44.0, 36.0}}
+                        Button, 0x104530cd0, {{630.0, 32.0}, {44.0, 44.0}}, identifier: 'lightbulb', label: 'Reveal a word'
+                    Other, 0x104530df0, {{690.0, 36.0}, {40.0, 36.0}}, label: 'Mode'
+                      Other, 0x104530f10, {{690.0, 36.0}, {40.0, 36.0}}
+                        Button, 0x104531030, {{690.0, 36.0}, {40.0, 36.0}}, label: 'Mode'
+                          Button, 0x104531150, {{690.0, 36.0}, {40.0, 36.0}}
+                            Image, 0x104531270, {{699.0, 43.0}, {22.0, 22.0}}, identifier: 'ellipsis.circle', label: 'More'
+                  Other, 0x104531390, {{0.0, 0.0}, {744.0, 1133.0}}
+                    Other, 0x1045314b0, {{0.0, 0.0}, {744.0, 1133.0}}
+                      Other, 0x1045315d0, {{0.0, 0.0}, {744.0, 1133.0}}
+                        Other, 0x1045316f0, {{0.0, 0.0}, {744.0, 1133.0}}
+                          Other, 0x104531810, {{0.0, 86.0}, {744.0, 1027.0}}
+                          Image, 0x104531930, {{18.0, 104.0}, {15.0, 16.5}}, identifier: 'number', label: 'number'
+                          StaticText, 0x104531a50, {{39.0, 102.0}, {10.5, 20.5}}, label: '0'
+                          Image, 0x104531b70, {{640.5, 107.5}, {22.0, 10.0}}, identifier: 'infinity', label: 'infinity'
+                          StaticText, 0x104531c90, {{668.0, 102.0}, {60.0, 20.5}}, label: 'Relaxed'
+                          StaticText, 0x104531db0, {{11.5, 297.5}, {130.0, 130.0}}, label: 'Letter I, row 1, column 1'
+                          StaticText, 0x104531ed0, {{148.5, 297.5}, {130.0, 130.0}}, label: 'Letter R, row 1, column 2'
+                          StaticText, 0x104531ff0, {{285.5, 297.5}, {130.0, 130.0}}, label: 'Letter T, row 1, column 3'
+                          StaticText, 0x104532110, {{422.5, 297.5}, {130.0, 130.0}}, label: 'Letter R, row 1, column 4'
+                          StaticText, 0x104532230, {{11.5, 434.5}, {130.0, 130.0}}, label: 'Letter E, row 2, column 1'
+                          StaticText, 0x104532350, {{148.5, 434.5}, {130.0, 130.0}}, label: 'Letter O, row 2, column 2'
+                          StaticText, 0x104532470, {{285.5, 434.5}, {130.0, 130.0}}, label: 'Letter D, row 2, column 3'
+                          StaticText, 0x104532590, {{422.5, 434.5}, {130.0, 130.0}}, label: 'Letter W, row 2, column 4'
+                          StaticText, 0x1045326b0, {{11.5, 571.5}, {130.0, 130.0}}, label: 'Letter R, row 3, column 1'
+                          StaticText, 0x1045327d0, {{148.5, 571.5}, {130.0, 130.0}}, label: 'Letter G, row 3, column 2'
+                          StaticText, 0x1045328f0, {{285.5, 571.5}, {130.0, 130.0}}, label: 'Letter N, row 3, column 3'
+                          StaticText, 0x104532a10, {{422.5, 571.5}, {130.0, 130.0}}, label: 'Letter E, row 3, column 4'
+                          StaticText, 0x104532b30, {{11.5, 708.5}, {130.0, 130.0}}, label: 'Letter T, row 4, column 1'
+                          StaticText, 0x104532c50, {{148.5, 708.5}, {130.0, 130.0}}, label: 'Letter A, row 4, column 2'
+                          StaticText, 0x104532d70, {{285.5, 708.5}, {130.0, 130.0}}, label: 'Letter O, row 4, column 3'
+                          StaticText, 0x104532e90, {{422.5, 708.5}, {130.0, 130.0}}, label: 'Letter S, row 4, column 4'
+                          Other, 0x104532fb0, {{571.5, 138.0}, {161.0, 859.5}}, label: '1 words found: ROD'
+                            StaticText, 0x1045330d0, {{580.0, 146.5}, {37.0, 14.5}}, label: 'Found'
+                            StaticText, 0x1045331f0, {{716.0, 146.5}, {8.0, 14.5}}, label: '1'
+                            ScrollView, 0x104533310, {{580.0, 169.0}, {144.0, 820.0}}
+                              Other, 0x104533430, {{580.0, 169.0}, {144.0, 14.5}}
+                          StaticText, 0x104533550, {{361.0, 1006.8}, {22.0, 20.5}}, label: '+0'
+                          Button, 0x104533670, {{12.0, 1037.0}, {234.5, 60.0}}, label: 'Clear'
+                          Button, 0x104533790, {{254.5, 1037.0}, {235.0, 60.0}}, label: 'Submit'
+                          Button, 0x1045338b0, {{497.5, 1037.0}, {234.5, 60.0}}, label: 'Finish'
+                  Other, 0x104533bd0, {{0.0, 0.0}, {744.0, 1133.0}}
+                    Other, 0x104533cf0, {{0.0, 0.0}, {744.0, 1133.0}}
+Path to element:
+ →Application, 0x10447ed00, pid: 62355, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x104464430, pid: 62355, label: 'GameDrawer'
+  }

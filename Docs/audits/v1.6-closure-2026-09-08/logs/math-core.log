@@ -1,0 +1,43 @@
+[0/1] Planning build
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.20s)
+Test Suite 'All tests' started at 2026-09-08 12:27:35.365.
+Test Suite 'MathCrosswordCorePackageTests.xctest' started at 2026-09-08 12:27:35.367.
+Test Suite 'MathCrosswordCoreTests' started at 2026-09-08 12:27:35.367.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testCancelledGenerationDoesNotProducePuzzle]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testCancelledGenerationDoesNotProducePuzzle]' passed (0.002 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testEraseUndoRestoresTheErasedTile]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testEraseUndoRestoresTheErasedTile]' passed (0.001 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testGeneratedEquationsHoldAndHaveUniqueSolution]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testGeneratedEquationsHoldAndHaveUniqueSolution]' passed (0.301 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testGenerationIsDeterministicForCapturedSeed]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testGenerationIsDeterministicForCapturedSeed]' passed (0.010 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testGenerationReturnsWithinBoundedAttemptBudget]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testGenerationReturnsWithinBoundedAttemptBudget]' passed (0.036 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testHintOnlyUsesTrustedBoardPremises]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testHintOnlyUsesTrustedBoardPremises]' passed (0.007 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testPuzzleValidationRejectsDuplicateCellsAndOverflowingArithmetic]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testPuzzleValidationRejectsDuplicateCellsAndOverflowingArithmetic]' passed (0.000 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testPuzzleValidationRejectsEmptyAndInvalidBank]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testPuzzleValidationRejectsEmptyAndInvalidBank]' passed (0.000 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testPuzzleValidationRejectsUnboundedRestoreCoordinates]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testPuzzleValidationRejectsUnboundedRestoreCoordinates]' passed (0.000 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testRejectedReplacementDoesNotPartiallyMutateSession]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testRejectedReplacementDoesNotPartiallyMutateSession]' passed (0.000 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testReplaceUndoRestoresThePreviousTile]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testReplaceUndoRestoresThePreviousTile]' passed (0.000 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testSessionConsumesDuplicateBankValuesAndUndoesSafely]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testSessionConsumesDuplicateBankValuesAndUndoesSafely]' passed (0.000 seconds).
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testSessionRestoreRejectsHistoryThatDoesNotMatchPlacements]' started.
+Test Case '-[MathCrosswordCoreTests.MathCrosswordCoreTests testSessionRestoreRejectsHistoryThatDoesNotMatchPlacements]' passed (0.001 seconds).
+Test Suite 'MathCrosswordCoreTests' passed at 2026-09-08 12:27:35.727.
+	 Executed 13 tests, with 0 failures (0 unexpected) in 0.359 (0.360) seconds
+Test Suite 'MathCrosswordCorePackageTests.xctest' passed at 2026-09-08 12:27:35.727.
+	 Executed 13 tests, with 0 failures (0 unexpected) in 0.359 (0.360) seconds
+Test Suite 'All tests' passed at 2026-09-08 12:27:35.727.
+	 Executed 13 tests, with 0 failures (0 unexpected) in 0.359 (0.362) seconds
+􀟈  Test run started.
+􀄵  Testing Library Version: 1501
+􀄵  Target Platform: arm64e-apple-macos14.0
+􁁛  Test run with 0 tests in 0 suites passed after 0.001 seconds.

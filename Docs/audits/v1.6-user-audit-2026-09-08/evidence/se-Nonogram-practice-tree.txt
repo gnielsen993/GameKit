@@ -1,0 +1,87 @@
+Attributes: Application, 0x101f36100, pid: 61626, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x101f36100, pid: 61626, label: 'GameDrawer'
+    Window (Main), 0x101f1b6c0, {{0.0, 0.0}, {375.0, 667.0}}
+      Other, 0x101f367a0, {{0.0, 0.0}, {375.0, 667.0}}
+        Other, 0x101f1d030, {{0.0, 0.0}, {375.0, 667.0}}
+          Other, 0x101f40c30, {{0.0, 0.0}, {375.0, 667.0}}
+            Other, 0x101f2ed40, {{0.0, 0.0}, {375.0, 667.0}}
+              Other, 0x101f1a140, {{0.0, 0.0}, {375.0, 667.0}}
+                NavigationBar, 0x101f3c9a0, {{0.0, 20.0}, {375.0, 44.0}}, identifier: 'Nonogram'
+                  Other, 0x101f143f0, {{16.0, 20.0}, {44.0, 44.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                    Other, 0x101f184e0, {{16.0, 20.0}, {44.0, 44.0}}
+                      Button, 0x101f2c0f0, {{16.0, 20.0}, {44.0, 44.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                  Other, 0x101f33b90, {{68.0, 20.0}, {44.0, 44.0}}, identifier: 'arrow.counterclockwise', label: 'Restart game'
+                    Other, 0x101f32b90, {{68.0, 20.0}, {44.0, 44.0}}
+                      Button, 0x101f2b1f0, {{68.0, 20.0}, {44.0, 44.0}}, identifier: 'arrow.counterclockwise', label: 'Restart game'
+                  StaticText, 0x101f40100, {{146.0, 32.0}, {83.5, 20.5}}, label: 'Nonogram'
+                  Other, 0x101f06a60, {{255.0, 20.0}, {44.0, 44.0}}, identifier: 'lightbulb', label: 'Show a Nonogram hint'
+                    Other, 0x101f089d0, {{255.0, 20.0}, {44.0, 44.0}}
+                      Button, 0x101f307c0, {{255.0, 20.0}, {44.0, 44.0}}, identifier: 'lightbulb', label: 'Show a Nonogram hint'
+                  Other, 0x101f12ed0, {{307.0, 20.0}, {52.0, 44.0}}, label: 'Game settings'
+                    Other, 0x101f2a8a0, {{307.0, 20.0}, {52.0, 44.0}}
+                      Button, 0x101f2ac50, {{307.0, 16.0}, {52.0, 52.0}}, label: 'Game settings'
+                        Button, 0x101f3f270, {{307.0, 16.0}, {52.0, 52.0}}
+                          Other, 0x101f39260, {{307.0, 16.0}, {52.0, 52.0}}
+                            Image, 0x101f10470, {{307.0, 16.0}, {52.0, 52.0}}, identifier: 'slider.horizontal.3', label: 'Edit'
+                Other, 0x101f3e920, {{0.0, 0.0}, {375.0, 667.0}}
+                  Other, 0x101f2b590, {{0.0, 0.0}, {375.0, 667.0}}
+                    Other, 0x101f24ae0, {{0.0, 0.0}, {375.0, 667.0}}
+                      Other, 0x101f20b60, {{0.0, 0.0}, {375.0, 667.0}}
+                        Other, 0x101f1bbe0, {{0.0, 64.0}, {375.0, 603.0}}
+                        Other, 0x101f384f0, {{18.0, 84.5}, {62.0, 20.5}}, label: 'Puzzle size 5 × 5'
+                          Image, 0x101f261c0, {{18.0, 87.0}, {15.5, 15.5}}, identifier: 'square.grid.3x3.square', label: 'square.grid.3x3.square'
+                          StaticText, 0x101f262e0, {{39.5, 84.5}, {40.5, 20.5}}, label: '5 × 5'
+                        Other, 0x101f26400, {{96.0, 85.0}, {91.5, 20.5}}, label: 'Practice mode'
+                          Image, 0x101f26520, {{96.0, 85.0}, {19.0, 19.0}}, identifier: 'heart.slash', label: 'Unlove'
+                          StaticText, 0x101f26640, {{96.0, 85.0}, {91.5, 20.5}}, label: 'Practice'
+                        Other, 0x101f42430, {{294.0, 84.5}, {65.0, 20.5}}, label: 'Time elapsed', value: 0 minutes 4 seconds
+                          Image, 0x101f42550, {{294.0, 86.0}, {17.0, 17.0}}, identifier: 'clock', label: 'Clock'
+                          StaticText, 0x101f42670, {{316.5, 84.5}, {42.5, 20.5}}, label: '0:04'
+                        StaticText, 0x101f42790, {{87.7, 214.6}, {13.5, 26.5}}, label: '2'
+                        StaticText, 0x101f428b0, {{147.2, 214.6}, {14.0, 26.5}}, label: '5'
+                        StaticText, 0x101f429d0, {{206.8, 214.6}, {14.0, 26.5}}, label: '5'
+                        StaticText, 0x101f42af0, {{266.2, 214.6}, {14.5, 26.5}}, label: '4'
+                        StaticText, 0x101f42c10, {{327.7, 214.6}, {11.0, 26.5}}, label: '1'
+                        StaticText, 0x101f42d30, {{46.7, 261.7}, {14.0, 26.5}}, label: '3'
+                        StaticText, 0x101f42e50, {{46.2, 321.3}, {14.5, 26.5}}, label: '4'
+                        StaticText, 0x101f42f70, {{46.2, 381.0}, {14.5, 26.5}}, label: '4'
+                        StaticText, 0x101f43090, {{46.7, 440.7}, {14.0, 26.5}}, label: '3'
+                        StaticText, 0x101f431b0, {{46.7, 500.3}, {14.0, 26.5}}, label: '3'
+                        Button, 0x101f432d0, {{64.5, 245.0}, {60.0, 59.5}}, label: 'Filled square'
+                        Button, 0x101f433f0, {{124.5, 245.0}, {59.5, 59.5}}, label: 'Filled square'
+                        Button, 0x101f43510, {{184.0, 245.0}, {59.5, 59.5}}, label: 'Filled square'
+                        Button, 0x101f43630, {{243.5, 245.0}, {60.0, 59.5}}, identifier: 'xmark', label: 'Square marked with X'
+                        Button, 0x101f43750, {{303.5, 245.0}, {59.5, 59.5}}, identifier: 'xmark', label: 'Square marked with X'
+                        Button, 0x101f43870, {{64.5, 304.5}, {60.0, 60.0}}, label: 'Filled square'
+                        Button, 0x101f43990, {{124.5, 304.5}, {59.5, 60.0}}, label: 'Filled square'
+                        Button, 0x101f43ab0, {{184.0, 304.5}, {59.5, 60.0}}, label: 'Filled square'
+                        Button, 0x101f43bd0, {{243.5, 304.5}, {60.0, 60.0}}, label: 'Filled square'
+                        Button, 0x101f43cf0, {{303.5, 304.5}, {59.5, 60.0}}, identifier: 'xmark', label: 'Square marked with X'
+                        Button, 0x101f43e10, {{64.5, 364.5}, {60.0, 59.5}}, label: 'Empty square'
+                        Button, 0x101f43f30, {{124.5, 364.5}, {59.5, 59.5}}, label: 'Empty square'
+                        Button, 0x101f44050, {{184.0, 364.5}, {59.5, 59.5}}, label: 'Empty square'
+                        Button, 0x101f442c0, {{243.5, 364.5}, {60.0, 59.5}}, label: 'Empty square'
+                        Button, 0x101f443e0, {{303.5, 364.5}, {59.5, 59.5}}, label: 'Empty square'
+                        Button, 0x101f44500, {{64.5, 424.0}, {60.0, 59.5}}, label: 'Empty square'
+                        Button, 0x101f44620, {{124.5, 424.0}, {59.5, 59.5}}, label: 'Empty square'
+                        Button, 0x101f44740, {{184.0, 424.0}, {59.5, 59.5}}, label: 'Empty square'
+                        Button, 0x101f44860, {{243.5, 424.0}, {60.0, 59.5}}, label: 'Empty square'
+                        Button, 0x101f44980, {{303.5, 424.0}, {59.5, 59.5}}, label: 'Empty square'
+                        Button, 0x101f44aa0, {{64.5, 483.5}, {60.0, 60.0}}, label: 'Empty square'
+                        Button, 0x101f44bc0, {{124.5, 483.5}, {59.5, 60.0}}, label: 'Empty square'
+                        Button, 0x101f44ce0, {{184.0, 483.5}, {59.5, 60.0}}, label: 'Empty square'
+                        Button, 0x101f44e00, {{243.5, 483.5}, {60.0, 60.0}}, label: 'Empty square'
+                        Button, 0x101f44f20, {{303.5, 483.5}, {59.5, 60.0}}, label: 'Empty square'
+                        Button, 0x101f45040, {{87.5, 599.0}, {200.0, 52.0}}, label: 'Toggle mode', value: Place
+                          Image, 0x101f45160, {{109.5, 617.5}, {15.0, 15.0}}, identifier: 'square.fill', label: 'Square'
+                          StaticText, 0x101f45280, {{130.5, 614.8}, {43.5, 20.5}}, label: 'Place'
+                          Image, 0x101f453a0, {{208.0, 618.5}, {13.0, 13.0}}, identifier: 'xmark', label: 'Close'
+                          StaticText, 0x101f454c0, {{227.0, 614.8}, {40.5, 20.5}}, label: 'Mark'
+Path to element:
+ →Application, 0x101f36100, pid: 61626, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x101c9b400, pid: 61626, label: 'GameDrawer'
+  }

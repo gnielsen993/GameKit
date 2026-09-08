@@ -1,0 +1,51 @@
+{
+  "devicesAndConfigurations": [
+    {
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "BB02A073-8B98-4E65-BD70-A7DFE9B54A73",
+        "deviceName": "iPad mini (A17 Pro)",
+        "modelName": "iPad mini (A17 Pro)",
+        "osBuildNumber": "23C54",
+        "osVersion": "26.2",
+        "platform": "iOS Simulator"
+      },
+      "expectedFailures": 0,
+      "failedTests": 1,
+      "passedTests": 24,
+      "skippedTests": 0,
+      "testPlanConfiguration": {
+        "configurationId": "1",
+        "configurationName": "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription": "gamekit · Built with macOS 26.6",
+  "expectedFailures": 0,
+  "failedTests": 1,
+  "finishTime": 1788891302.532,
+  "passedTests": 24,
+  "result": "Failed",
+  "skippedTests": 0,
+  "startTime": 1788890735.745,
+  "statistics": [],
+  "testFailures": [
+    {
+      "failureText": "XCTAssertEqual failed: (\"0\") is not equal to (\"16\")",
+      "targetName": "gamekitUITests",
+      "testIdentifier": 11,
+      "testIdentifierString": "Release16ClosureTests/testDeepWordGridFollowHintAndFinish()",
+      "testIdentifierURL": "test://com.apple.xcode/gamekit/gamekitUITests/Release16ClosureTests/testDeepWordGridFollowHintAndFinish",
+      "testName": "testDeepWordGridFollowHintAndFinish()"
+    }
+  ],
+  "title": "Test - gamekit",
+  "topInsights": [
+    {
+      "category": "Longest Test Runs",
+      "impact": "11% of duration",
+      "text": "1 longest test run with outlier durations exceeding 57.53s (three standard deviations)"
+    }
+  ],
+  "totalTestCount": 25
+}

@@ -1,0 +1,152 @@
+Attributes: Application, 0x104548660, pid: 61007, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x104548660, pid: 61007, label: 'GameDrawer'
+    Window (Main), 0x104548020, {{0.0, 0.0}, {402.0, 874.0}}
+      Other, 0x1044b1d30, {{0.0, 0.0}, {402.0, 874.0}}
+        Other, 0x104480f00, {{0.0, 0.0}, {402.0, 874.0}}
+          Other, 0x1044a59b0, {{0.0, 0.0}, {402.0, 874.0}}
+            Other, 0x1044b9a80, {{0.0, 0.0}, {402.0, 874.0}}
+              Other, 0x10446ac00, {{0.0, 0.0}, {402.0, 874.0}}
+                NavigationBar, 0x104499ba0, {{0.0, 62.0}, {402.0, 54.0}}, identifier: 'Minesweeper'
+                  Other, 0x10444e6f0, {{20.0, 66.0}, {44.0, 36.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                    Other, 0x1044c82e0, {{20.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x104433080, {{20.0, 62.0}, {44.0, 44.0}}, identifier: 'chevron.backward', label: 'Back to The Drawer'
+                  Other, 0x10444afc0, {{80.0, 66.0}, {44.0, 36.0}}, identifier: 'arrow.counterclockwise', label: 'Restart game'
+                    Other, 0x104474630, {{80.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x1044648d0, {{80.0, 62.0}, {44.0, 44.0}}, identifier: 'arrow.counterclockwise', label: 'Restart game'
+                  StaticText, 0x104441120, {{140.0, 73.7}, {75.0, 20.7}}, label: 'Minesweeper'
+                  Other, 0x104408810, {{239.0, 66.0}, {44.0, 36.0}}, identifier: 'lightbulb', label: 'Show a Minesweeper hint'
+                    Other, 0x10446db70, {{239.0, 66.0}, {44.0, 36.0}}
+                      Button, 0x10446c2b0, {{239.0, 62.0}, {44.0, 44.0}}, identifier: 'lightbulb', label: 'Show a Minesweeper hint'
+                  Other, 0x10446d800, {{299.0, 66.0}, {83.0, 36.0}}, label: 'Difficulty', value: Easy
+                    Other, 0x10446c970, {{299.0, 66.0}, {83.0, 36.0}}
+                      Button, 0x10445dbc0, {{299.0, 66.0}, {83.0, 36.0}}, label: 'Difficulty', value: Easy
+                        Button, 0x1044613d0, {{299.0, 66.0}, {83.0, 36.0}}
+                          StaticText, 0x104463aa0, {{306.0, 73.8}, {37.7, 20.3}}, label: 'Easy'
+                          Image, 0x104446140, {{350.3, 74.7}, {22.0, 18.7}}, identifier: 'slider.horizontal.3', label: 'Edit'
+                Other, 0x104469c90, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x10443eec0, {{0.0, 0.0}, {402.0, 874.0}}
+                    Other, 0x10441af20, {{0.0, 0.0}, {402.0, 874.0}}
+                      Other, 0x10435df30, {{0.0, 0.0}, {402.0, 874.0}}
+                        Other, 0x104360280, {{0.0, 116.0}, {402.0, 724.0}}
+                        Other, 0x10435f650, {{18.7, 262.3}, {52.3, 20.3}}, label: '10 mines remaining'
+                          Image, 0x104369c10, {{18.7, 264.3}, {15.0, 16.3}}, identifier: 'flag.fill', label: 'Flag'
+                          StaticText, 0x1043695d0, {{39.3, 262.3}, {31.7, 20.3}}, label: '010'
+                        Other, 0x1043691b0, {{321.3, 262.3}, {64.7, 20.3}}, label: 'Time elapsed', value: 0 minutes 0 seconds
+                          Image, 0x104368d90, {{321.3, 264.0}, {17.0, 17.0}}, identifier: 'clock', label: 'Clock'
+                          StaticText, 0x104368970, {{343.7, 262.3}, {42.3, 20.3}}, label: '0:00'
+                        Other, 0x104368550, {{12.0, 348.3}, {378.0, 378.0}}
+                          Button, 0x104367b10, {{12.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 1'
+                          Button, 0x1043676f0, {{54.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 2'
+                          Button, 0x1043672d0, {{96.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 3'
+                          Button, 0x104366eb0, {{138.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 4'
+                          Button, 0x104366430, {{180.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 5'
+                          Button, 0x104364df0, {{222.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 6'
+                          Button, 0x104367f30, {{264.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 7'
+                          Button, 0x104368050, {{306.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 8'
+                          Button, 0x104368170, {{348.0, 348.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 1 column 9'
+                          Button, 0x10436a030, {{12.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 2 column 1'
+                          Button, 0x10436a150, {{54.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 2 column 2'
+                          Button, 0x10436a270, {{96.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 1 mines adjacent, row 2 column 3'
+                            StaticText, 0x10436a390, {{96.0, 390.3}, {42.0, 42.0}}, label: '1'
+                          Button, 0x10436a4b0, {{138.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 2 mines adjacent, row 2 column 4'
+                            StaticText, 0x10436a5d0, {{138.0, 390.3}, {42.0, 42.0}}, label: '2'
+                          Button, 0x10436a6f0, {{180.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 2 mines adjacent, row 2 column 5'
+                            StaticText, 0x10436a810, {{180.0, 390.3}, {42.0, 42.0}}, label: '2'
+                          Button, 0x10436a930, {{222.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 1 mines adjacent, row 2 column 6'
+                            StaticText, 0x10436aa50, {{222.0, 390.3}, {42.0, 42.0}}, label: '1'
+                          Button, 0x10436ab70, {{264.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 2 column 7'
+                          Button, 0x10436ac90, {{306.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 2 column 8'
+                          Button, 0x10436adb0, {{348.0, 390.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 2 column 9'
+                          Button, 0x10436aed0, {{12.0, 432.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 3 column 1'
+                          Button, 0x10436aff0, {{54.0, 432.3}, {42.0, 42.0}}, label: 'Revealed, 0 mines adjacent, row 3 column 2'
+                          Button, 0x10436b110, {{96.0, 432.3}, {42.0, 42.0}}, label: 'Revealed, 1 mines adjacent, row 3 column 3'
+                            StaticText, 0x10436b230, {{96.0, 432.3}, {42.0, 42.0}}, label: '1'
+                          Button, 0x10436b350, {{138.0, 432.3}, {42.0, 42.0}}, label: 'Unrevealed, row 3 column 4'
+                            Image, 0x10436b470, {{138.0, 432.3}, {42.0, 42.0}}, identifier: 'burst.fill', label: 'burst.fill'
+                          Button, 0x10436b590, {{180.0, 432.3}, {42.0, 42.0}}, label: 'Unrevealed, row 3 column 5'
+                            Image, 0x10436b6b0, {{180.0, 432.3}, {42.0, 42.0}}, identifier: 'burst.fill', label: 'burst.fill'
+                          Button, 0x10436b7d0, {{222.0, 432.3}, {42.0, 42.0}}, label: 'Revealed, 2 mines adjacent, row 3 column 6'
+                            StaticText, 0x10436b8f0, {{222.0, 432.3}, {42.0, 42.0}}, label: '2'
+                          Button, 0x10436ba10, {{264.0, 432.3}, {42.0, 42.0}}, label: 'Revealed, 1 mines adjacent, row 3 column 7'
+                            StaticText, 0x10436bb30, {{264.0, 432.3}, {42.0, 42.0}}, label: '1'
+                          Button, 0x10436bc50, {{306.0, 432.3}, {42.0, 42.0}}, label: 'Revealed, 1 mines adjacent, row 3 column 8'
+                            StaticText, 0x10436bd70, {{306.0, 432.3}, {42.0, 42.0}}, label: '1'
+                          Button, 0x10436be90, {{348.0, 432.3}, {42.0, 42.0}}, label: 'Revealed, 1 mines adjacent, row 3 column 9'
+                            StaticText, 0x10436bfb0, {{348.0, 432.3}, {42.0, 42.0}}, label: '1'
+                          Button, 0x10436c220, {{12.0, 474.3}, {42.0, 42.0}}, label: 'Revealed, 1 mines adjacent, row 4 column 1'
+                            StaticText, 0x10436c340, {{12.0, 474.3}, {42.0, 42.0}}, label: '1'
+                          Button, 0x10436c460, {{54.0, 474.3}, {42.0, 42.0}}, label: 'Revealed, 1 mines adjacent, row 4 column 2'
+                            StaticText, 0x10436c580, {{54.0, 474.3}, {42.0, 42.0}}, label: '1'
+                          Button, 0x10436c6a0, {{96.0, 474.3}, {42.0, 42.0}}, label: 'Revealed, 2 mines adjacent, row 4 column 3'
+                            StaticText, 0x10436c7c0, {{96.0, 474.3}, {42.0, 42.0}}, label: '2'
+                          Button, 0x10436c8e0, {{138.0, 474.3}, {42.0, 42.0}}, label: 'Unrevealed, row 4 column 4'
+                          Button, 0x10436ca00, {{180.0, 474.3}, {42.0, 42.0}}, label: 'Unrevealed, row 4 column 5'
+                          Button, 0x10436cb20, {{222.0, 474.3}, {42.0, 42.0}}, label: 'Unrevealed, row 4 column 6'
+                          Button, 0x10436cc40, {{264.0, 474.3}, {42.0, 42.0}}, label: 'Unrevealed, row 4 column 7'
+                          Button, 0x10436cd60, {{306.0, 474.3}, {42.0, 42.0}}, label: 'Unrevealed, row 4 column 8'
+                          Button, 0x104466dc0, {{348.0, 474.3}, {42.0, 42.0}}, label: 'Unrevealed, row 4 column 9'
+                          Button, 0x10444c9a0, {{12.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 1'
+                          Button, 0x104424780, {{54.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 2'
+                          Button, 0x104441a20, {{96.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 3'
+                          Button, 0x10445cde0, {{138.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 4'
+                          Button, 0x10443f810, {{180.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 5'
+                          Button, 0x104434430, {{222.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 6'
+                          Button, 0x10442e550, {{264.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 7'
+                          Button, 0x104547c00, {{306.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 8'
+                          Button, 0x10453cea0, {{348.0, 516.3}, {42.0, 42.0}}, label: 'Unrevealed, row 5 column 9'
+                          Button, 0x10453cfc0, {{12.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 1'
+                          Button, 0x10453d0e0, {{54.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 2'
+                          Button, 0x10453d700, {{96.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 3'
+                          Button, 0x10453d820, {{138.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 4'
+                          Button, 0x10453d940, {{180.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 5'
+                          Button, 0x10453da60, {{222.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 6'
+                          Button, 0x10453db80, {{264.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 7'
+                          Button, 0x10453dca0, {{306.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 8'
+                          Button, 0x10453ddc0, {{348.0, 558.3}, {42.0, 42.0}}, label: 'Unrevealed, row 6 column 9'
+                          Button, 0x10453dee0, {{12.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 1'
+                          Button, 0x10453e000, {{54.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 2'
+                          Button, 0x10453e120, {{96.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 3'
+                          Button, 0x10453e240, {{138.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 4'
+                          Button, 0x10453e360, {{180.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 5'
+                          Button, 0x10453e480, {{222.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 6'
+                          Button, 0x10453e5a0, {{264.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 7'
+                          Button, 0x10453e6c0, {{306.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 8'
+                          Button, 0x10453e7e0, {{348.0, 600.3}, {42.0, 42.0}}, label: 'Unrevealed, row 7 column 9'
+                          Button, 0x10453e900, {{12.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 1'
+                          Button, 0x10453ea20, {{54.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 2'
+                          Button, 0x10453eb40, {{96.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 3'
+                          Button, 0x10453ec60, {{138.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 4'
+                          Button, 0x104541300, {{180.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 5'
+                          Button, 0x104541420, {{222.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 6'
+                          Button, 0x1045418b0, {{264.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 7'
+                          Button, 0x1045419d0, {{306.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 8'
+                          Button, 0x104541af0, {{348.0, 642.3}, {42.0, 42.0}}, label: 'Unrevealed, row 8 column 9'
+                          Button, 0x104541c10, {{12.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 1'
+                          Button, 0x104541d30, {{54.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 2'
+                          Button, 0x104541e50, {{96.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 3'
+                          Button, 0x10436c0d0, {{138.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 4'
+                          Button, 0x104541f70, {{180.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 5'
+                          Button, 0x104716560, {{222.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 6'
+                          Button, 0x1047154a0, {{264.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 7'
+                          Button, 0x10471fc10, {{306.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 8'
+                          Button, 0x104715080, {{348.0, 684.3}, {42.0, 42.0}}, label: 'Unrevealed, row 9 column 9'
+                        Button, 0x1047158c0, {{99.3, 788.0}, {203.7, 52.0}}, label: 'Toggle mode', value: Reveal
+                          Image, 0x104714af0, {{120.7, 805.7}, {16.3, 16.7}}, identifier: 'cursorarrow.click', label: 'cursorarrow.click'
+                          StaticText, 0x104714c10, {{142.2, 803.8}, {52.7, 20.3}}, label: 'Reveal'
+                          Image, 0x104714d30, {{229.3, 806.3}, {14.3, 15.7}}, identifier: 'flag.fill', label: 'Flag'
+                          StaticText, 0x104720030, {{249.2, 803.8}, {33.7, 20.3}}, label: 'Flag'
+                        Other, 0x104720150, {{11.5, 115.5}, {379.0, 127.3}}
+                          Image, 0x104720270, {{20.0, 124.0}, {44.0, 44.0}}, identifier: 'lightbulb.fill', label: 'Lightbulb'
+                          StaticText, 0x104720390, {{72.0, 134.0}, {147.7, 20.3}}, label: 'This square is safe'
+                          Button, 0x1047204b0, {{338.0, 124.0}, {44.0, 44.0}}, identifier: 'xmark', label: 'Dismiss hint'
+                          StaticText, 0x1047205d0, {{72.0, 172.0}, {298.3, 62.3}}, label: 'Compare the highlighted 1 and 1. Every square the 1 touches, the 1 touches too — so the 1's mines are all inside that shared group, and the squares only the 1 touches are safe. The outlined one is safe to open.'
+                Other, 0x1047208b0, {{0.0, 0.0}, {402.0, 874.0}}
+                  Other, 0x1047209d0, {{0.0, 0.0}, {402.0, 874.0}}
+Path to element:
+ →Application, 0x104548660, pid: 61007, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x107507df0, pid: 61007, label: 'GameDrawer'
+  }

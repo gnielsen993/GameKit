@@ -1,0 +1,161 @@
+Attributes: Application, 0x1037189b0, pid: 73201, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x1037189b0, pid: 73201, label: 'GameDrawer'
+    Window (Main), 0x10371dd10, {{0.0, 0.0}, {375.0, 667.0}}
+      Other, 0x10371e4a0, {{0.0, 0.0}, {375.0, 667.0}}
+        Other, 0x10371e5c0, {{0.0, 0.0}, {375.0, 667.0}}
+          Other, 0x10371e350, {{0.0, 0.0}, {375.0, 667.0}}
+            Other, 0x103710fc0, {{0.0, 0.0}, {375.0, 667.0}}
+              Other, 0x10371e6e0, {{0.0, 0.0}, {375.0, 667.0}}
+                Other, 0x10371e800, {{0.0, 0.0}, {375.0, 667.0}}
+                  Other, 0x10371e920, {{0.0, 0.0}, {375.0, 667.0}}
+                    Other, 0x10371ea40, {{0.0, 0.0}, {375.0, 667.0}}
+                      Other, 0x10371eb60, {{0.0, 0.0}, {375.0, 667.0}}
+                        Other, 0x10371ec80, {{0.0, 20.0}, {375.0, 647.0}}
+                        ScrollView, 0x10371eda0, {{0.0, 0.0}, {375.0, 667.0}}
+                          Other, 0x104a1ad90, {{0.0, 227.0}, {375.0, 520.0}}
+                            Other, 0x104a28240, {{199.5, 226.5}, {164.0, 69.0}}, label: 'Time elapsed', value: 0 minutes 0 seconds
+                              Image, 0x104a26ae0, {{208.5, 234.5}, {53.0, 53.0}}, identifier: 'clock', label: 'Clock'
+                              StaticText, 0x104a11b30, {{270.1, 235.2}, {89.0, 51.5}}, label: '0:00'
+                            ScrollView, 0x104a21750, {{12.0, 303.0}, {351.0, 251.5}}
+                              Other, 0x104a104f0, {{12.0, 303.0}, {576.0, 576.0}}
+                                StaticText, 0x104e24410, {{12.0, 301.5}, {64.0, 67.0}}, label: 'Given 3, row 1, column 1'
+                                Other, 0x104e25b60, {{76.0, 303.0}, {64.0, 64.0}}, label: 'Empty, row 1, column 2'
+                                StaticText, 0x104e26140, {{140.0, 301.5}, {64.0, 67.0}}, label: 'Given 1, row 1, column 3'
+                                Other, 0x104e25520, {{204.0, 303.0}, {64.0, 64.0}}, label: 'Empty, row 1, column 4'
+                                Other, 0x104e28dd0, {{268.0, 303.0}, {64.0, 64.0}}, label: 'Empty, row 1, column 5'
+                                StaticText, 0x104e28ef0, {{332.0, 301.5}, {64.0, 67.0}}, label: 'Given 6, row 1, column 6'
+                                StaticText, 0x104e29010, {{396.0, 301.5}, {64.0, 67.0}}, label: 'Given 8, row 1, column 7'
+                                StaticText, 0x104e29130, {{460.0, 301.5}, {64.0, 67.0}}, label: 'Given 7, row 1, column 8'
+                                StaticText, 0x104e29250, {{524.0, 301.5}, {64.0, 67.0}}, label: 'Given 9, row 1, column 9'
+                                Other, 0x104e29370, {{12.0, 367.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 1'
+                                StaticText, 0x104e29490, {{76.0, 365.5}, {64.0, 67.0}}, label: 'Given 7, row 2, column 2'
+                                Other, 0x104e295b0, {{140.0, 367.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 3'
+                                StaticText, 0x104e296d0, {{204.0, 365.5}, {64.0, 67.0}}, label: 'Given 3, row 2, column 4'
+                                Other, 0x104e297f0, {{268.0, 367.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 5'
+                                StaticText, 0x104e29910, {{332.0, 365.5}, {64.0, 67.0}}, label: 'Given 5, row 2, column 6'
+                                Other, 0x104e29a30, {{396.0, 367.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 7'
+                                StaticText, 0x104e29b50, {{460.0, 365.5}, {64.0, 67.0}}, label: 'Given 6, row 2, column 8'
+                                Other, 0x104e29c70, {{524.0, 367.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 9'
+                                StaticText, 0x104e26db0, {{12.0, 429.5}, {64.0, 67.0}}, label: 'Given 4, row 3, column 1'
+                                StaticText, 0x104e26ed0, {{76.0, 429.5}, {64.0, 67.0}}, label: 'Given 6, row 3, column 2'
+                                Other, 0x104e26ff0, {{140.0, 431.0}, {64.0, 64.0}}, label: 'Empty, row 3, column 3'
+                                StaticText, 0x104e27110, {{204.0, 429.5}, {64.0, 67.0}}, label: 'Given 9, row 3, column 4'
+                                Other, 0x104e27230, {{268.0, 431.0}, {64.0, 64.0}}, label: 'Empty, row 3, column 5'
+                                StaticText, 0x104e27350, {{332.0, 429.5}, {64.0, 67.0}}, label: 'Given 7, row 3, column 6'
+                                StaticText, 0x104e27470, {{396.0, 429.5}, {64.0, 67.0}}, label: 'Given 1, row 3, column 7'
+                                Other, 0x104e27590, {{460.0, 431.0}, {64.0, 64.0}}, label: 'Empty, row 3, column 8'
+                                Other, 0x104e276b0, {{524.0, 431.0}, {64.0, 64.0}}, label: 'Empty, row 3, column 9'
+                                StaticText, 0x104e27ba0, {{12.0, 493.5}, {64.0, 67.0}}, label: 'Given 5, row 4, column 1'
+                                StaticText, 0x104e27cc0, {{76.0, 493.5}, {64.0, 67.0}}, label: 'Given 1, row 4, column 2'
+                                StaticText, 0x104e27de0, {{140.0, 493.5}, {64.0, 67.0}}, label: 'Given 9, row 4, column 3'
+                                StaticText, 0x104e27f00, {{204.0, 493.5}, {64.0, 67.0}}, label: 'Given 6, row 4, column 4'
+                                StaticText, 0x104e28020, {{268.0, 493.5}, {64.0, 67.0}}, label: 'Given 3, row 4, column 5'
+                                StaticText, 0x104e28140, {{332.0, 493.5}, {64.0, 67.0}}, label: 'Given 2, row 4, column 6'
+                                StaticText, 0x104e28260, {{396.0, 493.5}, {64.0, 67.0}}, label: 'Given 4, row 4, column 7'
+                                StaticText, 0x104e28380, {{460.0, 493.5}, {64.0, 67.0}}, label: 'Given 8, row 4, column 8'
+                                Other, 0x104e284a0, {{524.0, 495.0}, {64.0, 64.0}}, label: 'Empty, row 4, column 9'
+                                Other, 0x104e285c0, {{12.0, 559.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 1'
+                                Other, 0x104e286e0, {{76.0, 559.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 2'
+                                Other, 0x104e28800, {{140.0, 559.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 3'
+                                StaticText, 0x104e28920, {{204.0, 557.5}, {64.0, 67.0}}, label: 'Given 7, row 5, column 4'
+                                StaticText, 0x104e28a40, {{268.0, 557.5}, {64.0, 67.0}}, label: 'Given 4, row 5, column 5'
+                                Other, 0x104e28b60, {{332.0, 559.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 6'
+                                StaticText, 0x104e29fd0, {{396.0, 557.5}, {64.0, 67.0}}, label: 'Given 9, row 5, column 7'
+                                Other, 0x104e27a50, {{460.0, 559.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 8'
+                                StaticText, 0x104e2a310, {{524.0, 557.5}, {64.0, 67.0}}, label: 'Given 5, row 5, column 9'
+                                StaticText, 0x104e2a430, {{12.0, 621.5}, {64.0, 67.0}}, label: 'Given 7, row 6, column 1'
+                                Other, 0x104e2a550, {{76.0, 623.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 2'
+                                Other, 0x104e2a670, {{140.0, 623.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 3'
+                                StaticText, 0x104e2a790, {{204.0, 621.5}, {64.0, 67.0}}, label: 'Given 5, row 6, column 4'
+                                Other, 0x104e2a8b0, {{268.0, 623.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 5'
+                                StaticText, 0x104e2a9d0, {{332.0, 621.5}, {64.0, 67.0}}, label: 'Given 1, row 6, column 6'
+                                Other, 0x104e2aaf0, {{396.0, 623.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 7'
+                                Other, 0x104e2ac10, {{460.0, 623.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 8'
+                                Other, 0x104e2ad30, {{524.0, 623.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 9'
+                                Other, 0x104e2ae50, {{12.0, 687.0}, {64.0, 64.0}}, label: 'Empty, row 7, column 1'
+                                Other, 0x104e2af70, {{76.0, 687.0}, {64.0, 64.0}}, label: 'Empty, row 7, column 2'
+                                StaticText, 0x104e2b090, {{140.0, 685.5}, {64.0, 67.0}}, label: 'Given 7, row 7, column 3'
+                                StaticText, 0x104e2b1b0, {{204.0, 685.5}, {64.0, 67.0}}, label: 'Given 2, row 7, column 4'
+                                StaticText, 0x104e2b2d0, {{268.0, 685.5}, {64.0, 67.0}}, label: 'Given 5, row 7, column 5'
+                                StaticText, 0x104e2b3f0, {{332.0, 685.5}, {64.0, 67.0}}, label: 'Given 3, row 7, column 6'
+                                StaticText, 0x104e2b510, {{396.0, 685.5}, {64.0, 67.0}}, label: 'Given 6, row 7, column 7'
+                                StaticText, 0x104e2b630, {{460.0, 685.5}, {64.0, 67.0}}, label: 'Given 4, row 7, column 8'
+                                StaticText, 0x104e2b750, {{524.0, 685.5}, {64.0, 67.0}}, label: 'Given 8, row 7, column 9'
+                                StaticText, 0x104e2b870, {{12.0, 749.5}, {64.0, 67.0}}, label: 'Given 2, row 8, column 1'
+                                Other, 0x104e2b990, {{76.0, 751.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 2'
+                                StaticText, 0x104e2bab0, {{140.0, 749.5}, {64.0, 67.0}}, label: 'Given 5, row 8, column 3'
+                                Other, 0x104e2bbd0, {{204.0, 751.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 4'
+                                Other, 0x104e2bcf0, {{268.0, 751.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 5'
+                                Other, 0x104e2be10, {{332.0, 751.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 6'
+                                Other, 0x104e2a0f0, {{396.0, 751.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 7'
+                                StaticText, 0x104e2c2a0, {{460.0, 749.5}, {64.0, 67.0}}, label: 'Given 9, row 8, column 8'
+                                Other, 0x104e2c3c0, {{524.0, 751.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 9'
+                                StaticText, 0x104e2c4e0, {{12.0, 813.5}, {64.0, 67.0}}, label: 'Given 8, row 9, column 1'
+                                StaticText, 0x104e2c600, {{76.0, 813.5}, {64.0, 67.0}}, label: 'Given 4, row 9, column 2'
+                                Other, 0x104e2c720, {{140.0, 815.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 3'
+                                StaticText, 0x104e2c840, {{204.0, 813.5}, {64.0, 67.0}}, label: 'Given 1, row 9, column 4'
+                                Other, 0x104e2c960, {{268.0, 815.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 5'
+                                Other, 0x104e2ca80, {{332.0, 815.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 6'
+                                Other, 0x104e2cba0, {{396.0, 815.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 7'
+                                StaticText, 0x104e2ccc0, {{460.0, 813.5}, {64.0, 67.0}}, label: 'Given 3, row 9, column 8'
+                                Other, 0x104e2cde0, {{524.0, 815.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 9'
+                              Other, 0x104e2cf00, {{330.0, 303.0}, {30.0, 251.5}}, label: 'Vertical scroll bar, 3 pages', value: 0%
+                                Other, 0x104e2d020, {{357.0, 544.5}, {3.0, 7.0}}
+                              Other, 0x104e2d140, {{12.0, 521.5}, {351.0, 30.0}}, label: 'Horizontal scroll bar, 2 pages', value: 0%
+                                Other, 0x104e2d260, {{353.0, 548.5}, {7.0, 3.0}}
+                              Other, 0x104e2d380, {{330.0, 303.0}, {30.0, 251.5}}, label: 'Vertical scroll bar, 3 pages', value: 0%
+                                Other, 0x104e2d4a0, {{357.0, 544.5}, {3.0, 7.0}}
+                              Other, 0x104e2d5c0, {{12.0, 521.5}, {351.0, 30.0}}, label: 'Horizontal scroll bar, 2 pages', value: 0%
+                                Other, 0x104e2d6e0, {{353.0, 548.5}, {7.0, 3.0}}
+                            Button, 0x104e2d800, {{11.5, 562.0}, {36.5, 137.5}}, label: 'Place 1, 4 remaining'
+                              StaticText, 0x104e2d920, {{16.5, 570.5}, {26.5, 67.0}}, label: '1'
+                              StaticText, 0x104e2da40, {{16.5, 639.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104e2db60, {{51.0, 562.0}, {36.5, 137.5}}, label: 'Place 2, 6 remaining'
+                              StaticText, 0x104e2dc80, {{52.5, 570.5}, {33.5, 67.0}}, label: '2'
+                              StaticText, 0x104e2dda0, {{55.7, 639.5}, {27.0, 51.5}}, label: '6'
+                            Button, 0x104e2dec0, {{90.5, 562.0}, {36.5, 137.5}}, label: 'Place 3, 4 remaining'
+                              StaticText, 0x104e2dfe0, {{91.2, 570.5}, {35.0, 67.0}}, label: '3'
+                              StaticText, 0x104e2e100, {{95.5, 639.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104e2e220, {{130.0, 562.0}, {36.5, 137.5}}, label: 'Place 4, 4 remaining'
+                              StaticText, 0x104e2e340, {{130.5, 570.5}, {35.5, 67.0}}, label: '4'
+                              StaticText, 0x104e2e460, {{135.0, 639.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104e2e580, {{169.5, 562.0}, {36.5, 137.5}}, label: 'Place 5, 3 remaining'
+                              StaticText, 0x104e2e6a0, {{170.5, 570.5}, {34.5, 67.0}}, label: '5'
+                              StaticText, 0x104e2e7c0, {{174.7, 639.5}, {26.0, 51.5}}, label: '3'
+                            Button, 0x104e2e8e0, {{209.0, 562.0}, {36.5, 137.5}}, label: 'Place 6, 4 remaining'
+                              StaticText, 0x104e2ea00, {{209.5, 570.5}, {35.5, 67.0}}, label: '6'
+                              StaticText, 0x104e2eb20, {{214.0, 639.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104e2ec40, {{248.5, 562.0}, {36.0, 137.5}}, label: 'Place 7, 3 remaining'
+                              StaticText, 0x104e2ed60, {{250.7, 570.5}, {32.0, 67.0}}, label: '7'
+                              StaticText, 0x104e2ee80, {{253.7, 639.5}, {26.0, 51.5}}, label: '3'
+                            Button, 0x104e2efa0, {{287.5, 562.0}, {36.5, 137.5}}, label: 'Place 8, 5 remaining'
+                              StaticText, 0x104e2f0c0, {{288.0, 570.5}, {35.5, 67.0}}, label: '8'
+                              StaticText, 0x104e2f1e0, {{292.8, 639.5}, {26.0, 51.5}}, label: '5'
+                            Button, 0x104e2f300, {{327.0, 562.0}, {36.5, 137.5}}, label: 'Place 9, 4 remaining'
+                              StaticText, 0x104e2f420, {{327.5, 570.5}, {35.5, 67.0}}, label: '9'
+                              StaticText, 0x104e2f540, {{332.0, 639.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104e2f660, {{24.0, 707.0}, {24.0, 24.0}}, identifier: 'chevron.left', label: 'Back'
+                            Button, 0x104e2f780, {{68.0, 707.0}, {143.0, 24.0}}, label: 'Toggle mode', value: Value
+                              Image, 0x104e2f8a0, {{81.5, 713.0}, {12.0, 12.0}}, identifier: 'pencil.slash', label: 'Not Editable'
+                              StaticText, 0x104e2f9c0, {{98.6, 696.7}, {43.5, 44.5}}, label: 'Value'
+                              Image, 0x104e2fae0, {{159.5, 713.5}, {11.5, 11.5}}, identifier: 'pencil', label: 'Edit'
+                              StaticText, 0x104e2fc00, {{176.6, 696.7}, {22.5, 44.5}}, label: 'Notes'
+                            Button, 0x104e2fd20, {{219.0, 707.0}, {24.0, 24.0}}, identifier: 'delete.left', label: 'Erase'
+                            Button, 0x104e2fe40, {{251.0, 707.0}, {24.0, 24.0}}, identifier: 'lightbulb', label: 'Show a Sudoku hint'
+                            Button, 0x104e2ff60, {{295.0, 707.0}, {24.0, 24.0}}, identifier: 'arrow.counterclockwise', label: 'Restart puzzle'
+                            Button, 0x104e30080, {{327.0, 707.0}, {24.0, 24.0}}, label: 'Game settings'
+                              Button, 0x104e301a0, {{327.0, 707.0}, {24.0, 24.0}}
+                                Other, 0x104e302c0, {{327.0, 707.0}, {24.0, 24.0}}
+                                  Image, 0x104e303e0, {{327.0, 707.0}, {24.0, 24.0}}, identifier: 'slider.horizontal.3', label: 'Edit'
+                          Other, 0x104e30500, {{342.0, 227.0}, {30.0, 432.0}}, label: 'Vertical scroll bar, 2 pages', value: 0%
+                            Other, 0x104e30620, {{369.0, 230.0}, {3.0, 376.5}}
+                          Other, 0x104e30740, {{342.0, 227.0}, {30.0, 432.0}}, label: 'Vertical scroll bar, 2 pages', value: 0%
+                            Other, 0x104e30860, {{369.0, 230.0}, {3.0, 376.5}}
+Path to element:
+ →Application, 0x1037189b0, pid: 73201, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x104a22970, pid: 73201, label: 'GameDrawer'
+  }

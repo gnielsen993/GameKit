@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
 status: executing
-stopped_at: v1.6 gameplay choice pop-ups replaced with branded in-game cards
-last_updated: "2026-08-06T00:00:00.000-05:00"
-last_activity: 2026-08-06
+stopped_at: v1.6 closure verified locally; verified batches committed; physical-device release checks remain
+last_updated: "2026-09-08T12:00:00-06:00"
+last_activity: 2026-09-08
 progress:
   total_phases: 0
   completed_phases: 0
@@ -27,10 +27,13 @@ defects that silently punish players. Scope: `.planning/v1.6-BRIEF.md`.
 ## Current Position
 
 Phase: none — v1.6 was executed directly from the brief
-Plan: none authored
-Status: v1.6 in development. The assist experience has been expanded and
-reworked after playtesting; final simulator QA and release wrap-up remain.
-Last activity: 2026-08-06
+Plan: `.planning/v1.6-CLOSURE-PLAN.md` (local implementation and verification complete)
+Status: v1.6 in development. Hint fixes and Math Crossword are implemented and
+verified on SE/iPad simulators. Full app unit suite: 514 passed, 1 skipped;
+MathCrosswordCore: 13 passed. Exporter and accessibility follow-ups passed.
+Verified fixes and Math Crossword committed after Gabe's approval. Physical-device checks and release publication remain.
+Evidence: `Docs/audits/v1.6-closure-2026-09-08/README.md`.
+Last activity: 2026-09-08
 
 ### How to read the zeroed progress block
 
@@ -40,8 +43,9 @@ and the counters above are honestly zero rather than retrofitted. The work
 is real and is in git; the tracking artifacts are not. Use
 `git log --oneline` for what landed.
 
-If v1.6 is reopened for the remaining work, run `/gsd-new-milestone v1.6`
-first — phases continue append-only from 18, so it opens at **Phase 19**.
+Gabe authorized a direct closure plan on 2026-09-08. Follow
+`v1.6-CLOSURE-PLAN.md` for the current fixes, Math Crossword and release checks;
+the historical phase counters remain unchanged.
 
 ### Delivered in v1.6 so far
 

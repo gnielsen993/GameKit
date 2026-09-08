@@ -1,0 +1,172 @@
+Attributes: Application, 0x104a189e0, pid: 73201, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x104a189e0, pid: 73201, label: 'GameDrawer'
+    Window (Main), 0x104a09f80, {{0.0, 0.0}, {375.0, 667.0}}
+      Other, 0x104a27060, {{0.0, 0.0}, {375.0, 667.0}}
+        Other, 0x104a1ff90, {{0.0, 0.0}, {375.0, 667.0}}
+          Other, 0x104a15230, {{0.0, 0.0}, {375.0, 667.0}}
+            Other, 0x104a0d4f0, {{0.0, 0.0}, {375.0, 667.0}}
+              Other, 0x104a28240, {{0.0, 0.0}, {375.0, 667.0}}
+                Other, 0x104a1f260, {{0.0, 0.0}, {375.0, 667.0}}
+                  Other, 0x104a26ae0, {{0.0, 0.0}, {375.0, 667.0}}
+                    Other, 0x104a21750, {{0.0, 0.0}, {375.0, 667.0}}
+                      Other, 0x104a104f0, {{0.0, 0.0}, {375.0, 667.0}}
+                        Other, 0x104a11b30, {{0.0, 20.0}, {375.0, 647.0}}
+                        ScrollView, 0x104a232f0, {{0.0, 0.0}, {375.0, 667.0}}
+                          Other, 0x104a10a50, {{0.0, 155.0}, {375.0, 520.0}}
+                            Other, 0x104a20290, {{199.5, 154.5}, {164.0, 69.0}}, label: 'Time elapsed', value: 0 minutes 0 seconds
+                              Image, 0x104a10160, {{208.5, 162.5}, {53.0, 53.0}}, identifier: 'clock', label: 'Clock'
+                              StaticText, 0x104a275b0, {{270.1, 163.2}, {89.0, 51.5}}, label: '0:00'
+                            ScrollView, 0x104a24db0, {{12.0, 231.0}, {351.0, 251.5}}
+                              Other, 0x104a28970, {{12.0, 231.0}, {576.0, 576.0}}
+                                StaticText, 0x104a17aa0, {{12.0, 229.5}, {64.0, 67.0}}, label: 'Given 3, row 1, column 1', value: Hint evidence
+                                Other, 0x104a1bf90, {{76.0, 231.0}, {64.0, 64.0}}, label: 'Empty, row 1, column 2', value: Hint evidence
+                                StaticText, 0x104a08d20, {{140.0, 229.5}, {64.0, 67.0}}, label: 'Given 1, row 1, column 3', value: Hint evidence
+                                Other, 0x104a213c0, {{204.0, 231.0}, {64.0, 64.0}}, label: 'Empty, row 1, column 4', value: Hint target
+                                Other, 0x104a13e50, {{268.0, 231.0}, {64.0, 64.0}}, label: 'Empty, row 1, column 5', value: Hint evidence
+                                StaticText, 0x104a16c50, {{332.0, 229.5}, {64.0, 67.0}}, label: 'Given 6, row 1, column 6', value: Hint evidence
+                                StaticText, 0x104a12580, {{396.0, 229.5}, {64.0, 67.0}}, label: 'Given 8, row 1, column 7', value: Hint evidence
+                                StaticText, 0x104a090b0, {{460.0, 229.5}, {64.0, 67.0}}, label: 'Given 7, row 1, column 8', value: Hint evidence
+                                StaticText, 0x104a12920, {{524.0, 229.5}, {64.0, 67.0}}, label: 'Given 9, row 1, column 9', value: Hint evidence
+                                Other, 0x104a09450, {{12.0, 295.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 1'
+                                StaticText, 0x104a16880, {{76.0, 293.5}, {64.0, 67.0}}, label: 'Given 7, row 2, column 2'
+                                Other, 0x104a1d4a0, {{140.0, 295.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 3'
+                                StaticText, 0x104a1f7a0, {{204.0, 293.5}, {64.0, 67.0}}, label: 'Given 3, row 2, column 4', value: Hint evidence
+                                Other, 0x104a27ac0, {{268.0, 295.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 5'
+                                StaticText, 0x104a0bf30, {{332.0, 293.5}, {64.0, 67.0}}, label: 'Given 5, row 2, column 6'
+                                Other, 0x104a112e0, {{396.0, 295.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 7'
+                                StaticText, 0x104a2b4b0, {{460.0, 293.5}, {64.0, 67.0}}, label: 'Given 6, row 2, column 8'
+                                Other, 0x104a18250, {{524.0, 295.0}, {64.0, 64.0}}, label: 'Empty, row 2, column 9'
+                                StaticText, 0x104a17e30, {{12.0, 357.5}, {64.0, 67.0}}, label: 'Given 4, row 3, column 1'
+                                StaticText, 0x104a23ed0, {{76.0, 357.5}, {64.0, 67.0}}, label: 'Given 6, row 3, column 2'
+                                Other, 0x104a1b900, {{140.0, 359.0}, {64.0, 64.0}}, label: 'Empty, row 3, column 3'
+                                StaticText, 0x104a14e10, {{204.0, 357.5}, {64.0, 67.0}}, label: 'Given 9, row 3, column 4', value: Hint evidence
+                                Other, 0x104a25e30, {{268.0, 359.0}, {64.0, 64.0}}, label: 'Empty, row 3, column 5'
+                                StaticText, 0x104a0ab70, {{332.0, 357.5}, {64.0, 67.0}}, label: 'Given 7, row 3, column 6'
+                                StaticText, 0x104a11700, {{396.0, 357.5}, {64.0, 67.0}}, label: 'Given 1, row 3, column 7'
+                                Other, 0x104a11820, {{460.0, 359.0}, {64.0, 64.0}}, label: 'Empty, row 3, column 8'
+                                Other, 0x104a2c9d0, {{524.0, 359.0}, {64.0, 64.0}}, label: 'Empty, row 3, column 9'
+                                StaticText, 0x104a2cc40, {{12.0, 421.5}, {64.0, 67.0}}, label: 'Given 5, row 4, column 1'
+                                StaticText, 0x104a2cd60, {{76.0, 421.5}, {64.0, 67.0}}, label: 'Given 1, row 4, column 2'
+                                StaticText, 0x104a2ce80, {{140.0, 421.5}, {64.0, 67.0}}, label: 'Given 9, row 4, column 3'
+                                StaticText, 0x104a2cfa0, {{204.0, 421.5}, {64.0, 67.0}}, label: 'Given 6, row 4, column 4', value: Hint evidence
+                                StaticText, 0x104a2d0c0, {{268.0, 421.5}, {64.0, 67.0}}, label: 'Given 3, row 4, column 5'
+                                StaticText, 0x104a2d1e0, {{332.0, 421.5}, {64.0, 67.0}}, label: 'Given 2, row 4, column 6'
+                                StaticText, 0x104a2d300, {{396.0, 421.5}, {64.0, 67.0}}, label: 'Given 4, row 4, column 7'
+                                StaticText, 0x104a2d420, {{460.0, 421.5}, {64.0, 67.0}}, label: 'Given 8, row 4, column 8'
+                                Other, 0x104a2d540, {{524.0, 423.0}, {64.0, 64.0}}, label: 'Empty, row 4, column 9'
+                                Other, 0x104a2d660, {{12.0, 487.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 1'
+                                Other, 0x104a2d780, {{76.0, 487.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 2'
+                                Other, 0x104a2d8a0, {{140.0, 487.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 3'
+                                StaticText, 0x104a2d9c0, {{204.0, 485.5}, {64.0, 67.0}}, label: 'Given 7, row 5, column 4', value: Hint evidence
+                                StaticText, 0x104a2dae0, {{268.0, 485.5}, {64.0, 67.0}}, label: 'Given 4, row 5, column 5'
+                                Other, 0x104a2dc00, {{332.0, 487.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 6'
+                                StaticText, 0x104a2dd20, {{396.0, 485.5}, {64.0, 67.0}}, label: 'Given 9, row 5, column 7'
+                                Other, 0x104a2caf0, {{460.0, 487.0}, {64.0, 64.0}}, label: 'Empty, row 5, column 8'
+                                StaticText, 0x104a2e060, {{524.0, 485.5}, {64.0, 67.0}}, label: 'Given 5, row 5, column 9'
+                                StaticText, 0x104a2e180, {{12.0, 549.5}, {64.0, 67.0}}, label: 'Given 7, row 6, column 1'
+                                Other, 0x104a2e2a0, {{76.0, 551.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 2'
+                                Other, 0x104a2e3c0, {{140.0, 551.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 3'
+                                StaticText, 0x104a2e4e0, {{204.0, 549.5}, {64.0, 67.0}}, label: 'Given 5, row 6, column 4', value: Hint evidence
+                                Other, 0x104a2e600, {{268.0, 551.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 5'
+                                StaticText, 0x104a2e720, {{332.0, 549.5}, {64.0, 67.0}}, label: 'Given 1, row 6, column 6'
+                                Other, 0x104a2e840, {{396.0, 551.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 7'
+                                Other, 0x104a2e960, {{460.0, 551.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 8'
+                                Other, 0x104a2ea80, {{524.0, 551.0}, {64.0, 64.0}}, label: 'Empty, row 6, column 9'
+                                Other, 0x104a2eba0, {{12.0, 615.0}, {64.0, 64.0}}, label: 'Empty, row 7, column 1'
+                                Other, 0x104a2ecc0, {{76.0, 615.0}, {64.0, 64.0}}, label: 'Empty, row 7, column 2'
+                                StaticText, 0x104a2ede0, {{140.0, 613.5}, {64.0, 67.0}}, label: 'Given 7, row 7, column 3'
+                                StaticText, 0x104a2ef00, {{204.0, 613.5}, {64.0, 67.0}}, label: 'Given 2, row 7, column 4', value: Hint evidence
+                                StaticText, 0x104a2f020, {{268.0, 613.5}, {64.0, 67.0}}, label: 'Given 5, row 7, column 5'
+                                StaticText, 0x104a2f140, {{332.0, 613.5}, {64.0, 67.0}}, label: 'Given 3, row 7, column 6'
+                                StaticText, 0x104a2f260, {{396.0, 613.5}, {64.0, 67.0}}, label: 'Given 6, row 7, column 7'
+                                StaticText, 0x104a2f380, {{460.0, 613.5}, {64.0, 67.0}}, label: 'Given 4, row 7, column 8'
+                                StaticText, 0x104a2f4a0, {{524.0, 613.5}, {64.0, 67.0}}, label: 'Given 8, row 7, column 9'
+                                StaticText, 0x104a2f5c0, {{12.0, 677.5}, {64.0, 67.0}}, label: 'Given 2, row 8, column 1'
+                                Other, 0x104a2f6e0, {{76.0, 679.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 2'
+                                StaticText, 0x104a2f800, {{140.0, 677.5}, {64.0, 67.0}}, label: 'Given 5, row 8, column 3'
+                                Other, 0x104a2f920, {{204.0, 679.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 4', value: Hint evidence
+                                Other, 0x104a2fa40, {{268.0, 679.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 5'
+                                Other, 0x104a2fb60, {{332.0, 679.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 6'
+                                Other, 0x104a2de40, {{396.0, 679.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 7'
+                                StaticText, 0x104a2fff0, {{460.0, 677.5}, {64.0, 67.0}}, label: 'Given 9, row 8, column 8'
+                                Other, 0x104a30110, {{524.0, 679.0}, {64.0, 64.0}}, label: 'Empty, row 8, column 9'
+                                StaticText, 0x104a30230, {{12.0, 741.5}, {64.0, 67.0}}, label: 'Given 8, row 9, column 1'
+                                StaticText, 0x104a30350, {{76.0, 741.5}, {64.0, 67.0}}, label: 'Given 4, row 9, column 2'
+                                Other, 0x104a30470, {{140.0, 743.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 3'
+                                StaticText, 0x104a30590, {{204.0, 741.5}, {64.0, 67.0}}, label: 'Given 1, row 9, column 4', value: Hint evidence
+                                Other, 0x104a306b0, {{268.0, 743.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 5'
+                                Other, 0x104a307d0, {{332.0, 743.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 6'
+                                Other, 0x104a308f0, {{396.0, 743.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 7'
+                                StaticText, 0x104a30a10, {{460.0, 741.5}, {64.0, 67.0}}, label: 'Given 3, row 9, column 8'
+                                Other, 0x104a30b30, {{524.0, 743.0}, {64.0, 64.0}}, label: 'Empty, row 9, column 9'
+                              Other, 0x104a30c50, {{330.0, 231.0}, {30.0, 251.5}}, label: 'Vertical scroll bar, 3 pages', value: 0%
+                                Other, 0x104a30d70, {{357.0, 472.5}, {3.0, 7.0}}
+                              Other, 0x104a30e90, {{12.0, 449.5}, {351.0, 30.0}}, label: 'Horizontal scroll bar, 2 pages', value: 0%
+                                Other, 0x104a30fb0, {{353.0, 476.5}, {7.0, 3.0}}
+                              Other, 0x104a310d0, {{330.0, 231.0}, {30.0, 251.5}}, label: 'Vertical scroll bar, 3 pages', value: 0%
+                                Other, 0x104a311f0, {{357.0, 472.5}, {3.0, 7.0}}
+                              Other, 0x104a31310, {{12.0, 449.5}, {351.0, 30.0}}, label: 'Horizontal scroll bar, 2 pages', value: 0%
+                                Other, 0x104a31430, {{353.0, 476.5}, {7.0, 3.0}}
+                            Button, 0x104a31550, {{11.5, 490.0}, {36.5, 137.5}}, label: 'Place 1, 4 remaining'
+                              StaticText, 0x104a31670, {{16.5, 498.5}, {26.5, 67.0}}, label: '1'
+                              StaticText, 0x104a31790, {{16.5, 567.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104a318b0, {{51.0, 490.0}, {36.5, 137.5}}, label: 'Place 2, 6 remaining'
+                              StaticText, 0x104a319d0, {{52.5, 498.5}, {33.5, 67.0}}, label: '2'
+                              StaticText, 0x104a31af0, {{55.7, 567.5}, {27.0, 51.5}}, label: '6'
+                            Button, 0x104a31c10, {{90.5, 490.0}, {36.5, 137.5}}, label: 'Place 3, 4 remaining'
+                              StaticText, 0x104a31d30, {{91.2, 498.5}, {35.0, 67.0}}, label: '3'
+                              StaticText, 0x104a31e50, {{95.5, 567.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104a31f70, {{130.0, 490.0}, {36.5, 137.5}}, label: 'Place 4, 4 remaining'
+                              StaticText, 0x104a32090, {{130.5, 498.5}, {35.5, 67.0}}, label: '4'
+                              StaticText, 0x104a321b0, {{135.0, 567.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104a322d0, {{169.5, 490.0}, {36.5, 137.5}}, label: 'Place 5, 3 remaining'
+                              StaticText, 0x104a323f0, {{170.5, 498.5}, {34.5, 67.0}}, label: '5'
+                              StaticText, 0x104a32510, {{174.7, 567.5}, {26.0, 51.5}}, label: '3'
+                            Button, 0x104a32630, {{209.0, 490.0}, {36.5, 137.5}}, label: 'Place 6, 4 remaining'
+                              StaticText, 0x104a32750, {{209.5, 498.5}, {35.5, 67.0}}, label: '6'
+                              StaticText, 0x104a32870, {{214.0, 567.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104a32990, {{248.5, 490.0}, {36.0, 137.5}}, label: 'Place 7, 3 remaining'
+                              StaticText, 0x104a32ab0, {{250.7, 498.5}, {32.0, 67.0}}, label: '7'
+                              StaticText, 0x104a32bd0, {{253.7, 567.5}, {26.0, 51.5}}, label: '3'
+                            Button, 0x104a32cf0, {{287.5, 490.0}, {36.5, 137.5}}, label: 'Place 8, 5 remaining'
+                              StaticText, 0x104a32e10, {{288.0, 498.5}, {35.5, 67.0}}, label: '8'
+                              StaticText, 0x104a32f30, {{292.8, 567.5}, {26.0, 51.5}}, label: '5'
+                            Button, 0x104a33050, {{327.0, 490.0}, {36.5, 137.5}}, label: 'Place 9, 4 remaining'
+                              StaticText, 0x104a33170, {{327.5, 498.5}, {35.5, 67.0}}, label: '9'
+                              StaticText, 0x104a33290, {{332.0, 567.5}, {26.5, 51.5}}, label: '4'
+                            Button, 0x104a333b0, {{24.0, 635.0}, {24.0, 24.0}}, identifier: 'chevron.left', label: 'Back'
+                            Button, 0x104a334d0, {{68.0, 635.0}, {143.0, 24.0}}, label: 'Toggle mode', value: Value
+                              Image, 0x104a335f0, {{81.5, 641.0}, {12.0, 12.0}}, identifier: 'pencil.slash', label: 'Not Editable'
+                              StaticText, 0x104a33710, {{98.6, 624.8}, {43.5, 44.5}}, label: 'Value'
+                              Image, 0x104a33830, {{159.5, 641.5}, {11.5, 11.5}}, identifier: 'pencil', label: 'Edit'
+                              StaticText, 0x104a33950, {{176.6, 624.8}, {22.5, 44.5}}, label: 'Notes'
+                            Button, 0x104a33a70, {{219.0, 635.0}, {24.0, 24.0}}, identifier: 'delete.left', label: 'Erase'
+                            Button, 0x104a33b90, {{251.0, 635.0}, {24.0, 24.0}}, identifier: 'lightbulb', label: 'Show a Sudoku hint'
+                            Button, 0x104a33cb0, {{295.0, 635.0}, {24.0, 24.0}}, identifier: 'arrow.counterclockwise', label: 'Restart puzzle'
+                            Button, 0x104a33dd0, {{327.0, 635.0}, {24.0, 24.0}}, label: 'Game settings'
+                              Button, 0x104a33ef0, {{327.0, 635.0}, {24.0, 24.0}}
+                                Other, 0x104a34010, {{327.0, 635.0}, {24.0, 24.0}}
+                                  Image, 0x104a34130, {{327.0, 635.0}, {24.0, 24.0}}, identifier: 'slider.horizontal.3', label: 'Edit'
+                          Other, 0x104a34250, {{342.0, 227.0}, {30.0, 264.5}}, label: 'Vertical scroll bar, 2 pages', value: 28%
+                            Other, 0x104a34370, {{369.0, 250.0}, {3.0, 187.0}}
+                          Other, 0x104a34490, {{342.0, 227.0}, {30.0, 264.5}}, label: 'Vertical scroll bar, 2 pages', value: 28%
+                            Other, 0x104a345b0, {{369.0, 250.0}, {3.0, 187.0}}
+                        Other, 0x104a346d0, {{11.5, 499.0}, {352.0, 168.5}}
+                          ScrollView, 0x104a347f0, {{20.0, 507.5}, {283.0, 96.0}}
+                            Other, 0x104a34910, {{20.0, 211.5}, {283.0, 464.0}}
+                              StaticText, 0x104a34a30, {{20.0, 211.5}, {274.0, 306.5}}, label: 'Row 1, column 4 can only be 4. Every other digit is already used in its row, column, or box.'
+                              StaticText, 0x104a34b50, {{20.0, 522.0}, {281.0, 153.5}}, label: 'Assisted wins count, but do not set records.'
+                            Other, 0x104a34c70, {{270.0, 507.5}, {30.0, 96.0}}, label: 'Vertical scroll bar, 5 pages', value: 80%
+                              Other, 0x104a34d90, {{297.0, 554.0}, {3.0, 36.0}}
+                            Other, 0x104a34eb0, {{270.0, 507.5}, {30.0, 96.0}}, label: 'Vertical scroll bar, 5 pages', value: 80%
+                              Other, 0x104a34fd0, {{297.0, 554.0}, {3.0, 36.0}}
+                          Button, 0x104a350f0, {{20.0, 607.5}, {132.0, 51.5}}, label: 'Fill it in'
+                          Button, 0x104a35210, {{311.0, 507.5}, {44.0, 44.0}}, identifier: 'xmark', label: 'Dismiss hint'
+Path to element:
+ →Application, 0x104a189e0, pid: 73201, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x104a187b0, pid: 73201, label: 'GameDrawer'
+  }

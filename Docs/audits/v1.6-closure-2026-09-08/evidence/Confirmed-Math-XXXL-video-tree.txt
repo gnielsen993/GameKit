@@ -1,0 +1,88 @@
+Attributes: Application, 0x1037167f0, pid: 73196, label: 'GameDrawer'
+Element subtree:
+ →Application, 0x1037167f0, pid: 73196, label: 'GameDrawer'
+    Window (Main), 0x103717aa0, {{0.0, 0.0}, {375.0, 667.0}}
+      Other, 0x103717e60, {{0.0, 0.0}, {375.0, 667.0}}
+        Other, 0x103717f80, {{0.0, 0.0}, {375.0, 667.0}}
+          Other, 0x103717bc0, {{0.0, 0.0}, {375.0, 667.0}}
+            Other, 0x103717ce0, {{0.0, 0.0}, {375.0, 667.0}}
+              Other, 0x1037180a0, {{0.0, 0.0}, {375.0, 667.0}}
+                Other, 0x1037181c0, {{0.0, 0.0}, {375.0, 667.0}}
+                  Other, 0x1037182e0, {{0.0, 0.0}, {375.0, 667.0}}
+                    Other, 0x103718400, {{0.0, 0.0}, {375.0, 667.0}}
+                      Other, 0x103718580, {{0.0, 0.0}, {375.0, 667.0}}
+                        Other, 0x104e25ba0, {{0.0, 20.0}, {375.0, 647.0}}
+                        ScrollView, 0x104e25520, {{0.0, 0.0}, {375.0, 667.0}}
+                          Other, 0x104e26550, {{0.0, 139.0}, {375.0, 520.0}}
+                            Other, 0x104e282d0, {{11.5, 142.5}, {164.0, 69.0}}, label: 'Time elapsed', value: 0 minutes 23 seconds
+                              Image, 0x104e283f0, {{20.5, 150.5}, {53.0, 53.0}}, identifier: 'clock', label: 'Clock'
+                              StaticText, 0x104e28510, {{82.0, 151.2}, {89.0, 51.5}}, label: '0:23'
+                            StaticText, 0x104e28630, {{271.0, 147.0}, {92.5, 60.5}}, label: '3 of 5 blanks filled'
+                            ScrollView, 0x104e28750, {{12.0, 223.0}, {351.0, 144.5}}, label: 'Math crossword board'
+                              Other, 0x104e28870, {{12.0, 223.0}, {892.0, 644.0}}
+                                Button, 0x104e28990, {{23.5, 234.5}, {125.0, 125.0}}, label: 'Blank number at row 1, column 1, 7, does not fit the equations', value: 7
+                                StaticText, 0x104e28ab0, {{192.0, 263.5}, {36.0, 67.0}}, label: '+'
+                                Button, 0x104e28bd0, {{271.5, 234.5}, {125.0, 125.0}}, label: 'Given number at row 1, column 3, 10', value: 10, Disabled
+                                StaticText, 0x104e28cf0, {{440.0, 263.5}, {36.0, 67.0}}, label: 'equals'
+                                Button, 0x104e28e10, {{519.5, 234.5}, {125.0, 125.0}}, label: 'Blank number at row 1, column 5, 12', value: 12
+                                StaticText, 0x104e28f30, {{316.0, 387.5}, {36.0, 67.0}}, label: '+'
+                                StaticText, 0x104e29050, {{564.0, 387.5}, {36.0, 67.0}}, label: '−'
+                                Button, 0x104e29170, {{271.5, 482.5}, {125.0, 125.0}}, label: 'Given number at row 3, column 3, 4', value: 4, Disabled
+                                StaticText, 0x104e29290, {{440.0, 511.5}, {36.0, 67.0}}, label: '×'
+                                Button, 0x104e293b0, {{519.5, 482.5}, {125.0, 125.0}}, label: 'Given number at row 3, column 5, 5', value: 5, Disabled
+                                StaticText, 0x104e294d0, {{688.0, 511.5}, {36.0, 67.0}}, label: 'equals'
+                                Button, 0x104e295f0, {{767.5, 482.5}, {125.0, 125.0}}, label: 'Blank number at row 3, column 7, 2, does not fit the equations', value: 2
+                                StaticText, 0x104e29710, {{316.0, 635.5}, {36.0, 67.0}}, label: 'equals'
+                                StaticText, 0x104e29830, {{564.0, 635.5}, {36.0, 67.0}}, label: 'equals'
+                                Button, 0x104e29950, {{271.5, 730.5}, {125.0, 125.0}}, label: 'Blank number at row 5, column 3', value: empty
+                                  StaticText, 0x104e29a70, {{0.0, 0.0}, {0.0, 0.0}}
+                                Button, 0x104e29b90, {{519.5, 730.5}, {125.0, 125.0}}, label: 'Blank number at row 5, column 5', value: empty
+                                  StaticText, 0x104e29cb0, {{0.0, 0.0}, {0.0, 0.0}}
+                              Other, 0x104e29fd0, {{330.0, 223.0}, {30.0, 144.5}}, label: 'Vertical scroll bar, 5 pages', value: 0%
+                                Other, 0x104e2a0f0, {{357.0, 357.5}, {3.0, 7.0}}
+                              Other, 0x104e2a240, {{12.0, 334.5}, {351.0, 30.0}}, label: 'Horizontal scroll bar, 3 pages', value: 0%
+                                Other, 0x104e2a360, {{353.0, 361.5}, {7.0, 3.0}}
+                              Other, 0x104e2a480, {{330.0, 223.0}, {30.0, 144.5}}, label: 'Vertical scroll bar, 5 pages', value: 0%
+                                Other, 0x104e2a5a0, {{357.0, 357.5}, {3.0, 7.0}}
+                              Other, 0x104e2a6c0, {{12.0, 334.5}, {351.0, 30.0}}, label: 'Horizontal scroll bar, 3 pages', value: 0%
+                                Other, 0x104e2a7e0, {{353.0, 361.5}, {7.0, 3.0}}
+                            StaticText, 0x104e2a900, {{55.2, 375.5}, {264.5, 51.5}}, label: 'Select a blank.'
+                            ScrollView, 0x104e2aa20, {{12.0, 435.0}, {351.0, 124.0}}
+                              Other, 0x104e2ab40, {{12.0, 435.0}, {252.0, 124.0}}
+                                Button, 0x104e2ac60, {{11.5, 465.0}, {125.0, 64.5}}, label: 'Place 14', Disabled
+                                Button, 0x104e2ad80, {{139.5, 465.0}, {125.0, 64.5}}, label: 'Place 20', Disabled
+                              Other, 0x104e2aea0, {{12.0, 526.0}, {351.0, 30.0}}, label: 'Horizontal scroll bar, 1 page', value: 0%
+                                Other, 0x104e2afc0, {{353.0, 553.0}, {7.0, 3.0}}
+                              Other, 0x104e2b0e0, {{12.0, 526.0}, {351.0, 30.0}}, label: 'Horizontal scroll bar, 1 page', value: 0%
+                                Other, 0x104e2b200, {{353.0, 553.0}, {7.0, 3.0}}
+                            Button, 0x104e2b320, {{23.0, 557.2}, {183.0, 63.5}}, label: 'Erase selected tile', Disabled
+                              Image, 0x104e2b440, {{23.0, 565.0}, {57.0, 49.0}}, identifier: 'delete.left', label: 'Backspace', Disabled
+                              StaticText, 0x104e2b560, {{23.0, 557.2}, {183.0, 63.5}}, label: 'Erase', Disabled
+                            Button, 0x104e2b680, {{220.5, 557.2}, {137.5, 63.5}}, label: 'Undo last tile'
+                              Image, 0x104e2b7a0, {{220.5, 566.0}, {50.5, 50.5}}, identifier: 'arrow.uturn.backward', label: 'Undo'
+                              StaticText, 0x104e2b8c0, {{220.5, 557.2}, {137.5, 63.5}}, label: 'Undo'
+                            Button, 0x104e2b9e0, {{122.5, 608.0}, {29.0, 46.5}}, identifier: 'chevron.left', label: 'Back to The Drawer'
+                            Button, 0x104e2bb00, {{153.5, 600.0}, {36.0, 62.5}}, identifier: 'lightbulb', label: 'Show a Math Crossword hint'
+                            Button, 0x104e2bc20, {{180.0, 602.5}, {47.0, 57.0}}, identifier: 'arrow.counterclockwise', label: 'Restart puzzle'
+                            Button, 0x104e2bd40, {{208.5, 604.0}, {54.0, 54.0}}, identifier: 'ellipsis.circle', label: 'Choose difficulty'
+                          Other, 0x104e2be60, {{342.0, 227.0}, {30.0, 320.0}}, label: 'Vertical scroll bar, 2 pages', value: 44%
+                            Other, 0x104e2bf80, {{369.0, 262.0}, {3.0, 241.5}}
+                          Other, 0x104e2c0a0, {{342.0, 227.0}, {30.0, 320.0}}, label: 'Vertical scroll bar, 2 pages', value: 44%
+                            Other, 0x104e2c1c0, {{369.0, 262.0}, {3.0, 241.5}}
+                        Other, 0x104e2c2e0, {{11.5, 554.5}, {352.0, 113.0}}
+                          ScrollView, 0x104e2c400, {{20.0, 563.0}, {283.0, 96.0}}
+                            Other, 0x104e2c520, {{20.0, 563.0}, {283.0, 617.0}}
+                              StaticText, 0x104e2c640, {{20.0, 563.0}, {243.0, 459.5}}, label: 'One or more placed numbers do not fit the equations. Clear the red cells before asking for a deduction.'
+                              StaticText, 0x104e2c760, {{20.0, 1026.5}, {281.0, 153.5}}, label: 'Assisted wins count, but do not set records.'
+                            Other, 0x104e2c880, {{270.0, 563.0}, {30.0, 96.0}}, label: 'Vertical scroll bar, 7 pages', value: 0%
+                              Other, 0x104e2c9a0, {{297.0, 649.0}, {3.0, 7.0}}
+                            Other, 0x104e2cac0, {{270.0, 563.0}, {30.0, 96.0}}, label: 'Vertical scroll bar, 7 pages', value: 0%
+                              Other, 0x104e2cbe0, {{297.0, 649.0}, {3.0, 7.0}}
+                          Button, 0x104e2cd00, {{311.0, 563.0}, {44.0, 44.0}}, identifier: 'xmark', label: 'Dismiss hint'
+Path to element:
+ →Application, 0x1037167f0, pid: 73196, label: 'GameDrawer'
+Query chain:
+ →Find: Target Application 'com.lauterstar.gamekit'
+  Output: {
+    Application, 0x104b4af80, pid: 73196, label: 'GameDrawer'
+  }
