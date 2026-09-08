@@ -1,6 +1,6 @@
 # GameDrawer 1.6 App Store package
 
-Open [the review gallery](index.html). Recommended order: collection, Video Mode in action, hints, Math Crossword, words, resume, offline, Video Mode positions, themes, personal stats. The first three images carry the main download proposition. This is a release draft, not a published listing or a measured conversion winner.
+Open [the review gallery](index.html). New alternate: [Sudoku side-by-side, Video Mode off vs. on](concepts/sudoku-comparison/index.html). All current concepts remain available; the alternate has separate exports and does not replace the ten-slide set. Recommended order: collection, Video Mode in action, hints, Math Crossword, words, resume, offline, Video Mode positions, themes, personal stats. The first three images carry the main download proposition. This is a release draft, not a published listing or a measured conversion winner.
 
 - [Paste-ready metadata](metadata/README.md): name, subtitle, description, promotional text, keywords and What's New.
 - [iPhone exports](exports/iphone): ten 1320 × 2868 PNGs.

@@ -1,0 +1,103 @@
+{
+  "method": "Paired native Sudoku captures. Identical illustrative PiP windows per device. No app pixels altered.",
+  "sources": [
+    {
+      "path": "raw/iphone/sudoku-comparison-on.png",
+      "sha256": "5d4499653dc8a291925a1c16cd65a9c6ca150fee8399feb66dba56ef5c248536",
+      "width": 1206,
+      "height": 2622,
+      "device": "GameDrawer Marketing iPhone",
+      "timestamp": 1788903365.614,
+      "resultBundle": "/tmp/GameDrawerSudokuComparisonPhone.xcresult"
+    },
+    {
+      "path": "raw/iphone/sudoku-comparison-off.png",
+      "sha256": "5ba3a4b1fe9e1e375c2d98341a5fe98e4e069119c507567157c7767445959222",
+      "width": 1206,
+      "height": 2622,
+      "device": "GameDrawer Marketing iPhone",
+      "timestamp": 1788903353.438,
+      "resultBundle": "/tmp/GameDrawerSudokuComparisonPhone.xcresult"
+    },
+    {
+      "path": "raw/ipad/sudoku-comparison-on.png",
+      "sha256": "c4a8a22ad4e09e8ef21845101ba60a3d595d5eb33286650b39ce6e7c2bfe45a8",
+      "width": 1488,
+      "height": 2266,
+      "device": "GameDrawer Marketing iPad",
+      "timestamp": 1788903416.044,
+      "resultBundle": "/tmp/GameDrawerSudokuComparisonPad.xcresult"
+    },
+    {
+      "path": "raw/ipad/sudoku-comparison-off.png",
+      "sha256": "0782833dce611e40863fb6ff565e7ecf61fef0ef47de9a1747677604a2e9e550",
+      "width": 1488,
+      "height": 2266,
+      "device": "GameDrawer Marketing iPad",
+      "timestamp": 1788903404.119,
+      "resultBundle": "/tmp/GameDrawerSudokuComparisonPad.xcresult"
+    }
+  ],
+  "exports": [
+    {
+      "path": "iphone-sudoku-comparison.png",
+      "width": 1320,
+      "height": 2868,
+      "sha256": "d3446794d40e28aa256fea066f61621e3f34dcba6c9e2cb02b05a912a63fc4c2",
+      "checks": {
+        "identicalWindows": true,
+        "offOverlap": 0.06500259090968269,
+        "onClearance": 0.006997409090317264,
+        "normalizedWindows": [
+          {
+            "x": 0.03999660326086957,
+            "y": 0.1049904305597146,
+            "width": 0.9199784873188406,
+            "height": 0.2380121603499681,
+            "bottom": 0.3430025909096827
+          },
+          {
+            "x": 0.03999660326086957,
+            "y": 0.1049904305597146,
+            "width": 0.9199784873188406,
+            "height": 0.2380121603499681,
+            "bottom": 0.3430025909096827
+          }
+        ],
+        "overflow": false,
+        "headerClear": true,
+        "captionsClear": true
+      }
+    },
+    {
+      "path": "ipad-sudoku-comparison.png",
+      "width": 2064,
+      "height": 2752,
+      "sha256": "ac222d6e65781e179c83e9a5dd325a2be028bebfab7637f9f277665b0012dc60",
+      "checks": {
+        "identicalWindows": true,
+        "offOverlap": 0.15093984779595906,
+        "onClearance": 0.024060152204040952,
+        "normalizedWindows": [
+          {
+            "x": 0.1399955568720379,
+            "y": 0.039996109800870434,
+            "width": 0.7199903732227488,
+            "height": 0.26594373799508864,
+            "bottom": 0.30593984779595906
+          },
+          {
+            "x": 0.1399955568720379,
+            "y": 0.039996109800870434,
+            "width": 0.7199903732227488,
+            "height": 0.26594373799508864,
+            "bottom": 0.30593984779595906
+          }
+        ],
+        "overflow": false,
+        "headerClear": true,
+        "captionsClear": true
+      }
+    }
+  ]
+}

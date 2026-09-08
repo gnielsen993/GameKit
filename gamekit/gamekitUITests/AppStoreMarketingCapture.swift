@@ -122,4 +122,16 @@ final class AppStoreMarketingCapture: XCTestCase {
         capture(app, "stats-dashboard")
         app.terminate()
     }
+
+    func testCaptureSudokuVideoComparison() {
+        var app = open("Sudoku", choices: ["Free", "Easy"])
+        XCTAssertTrue(app.buttons["Show a Sudoku hint"].waitForExistence(timeout: 10))
+        capture(app, "sudoku-comparison-off")
+        app.terminate()
+
+        app = open("Sudoku", choices: ["Free", "Easy"], video: true)
+        capture(app, "sudoku-comparison-on")
+        app.terminate()
+    }
+
 }

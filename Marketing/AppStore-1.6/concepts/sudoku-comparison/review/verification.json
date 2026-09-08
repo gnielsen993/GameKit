@@ -1,0 +1,24 @@
+{
+  "preservedExistingExports": 20,
+  "comparisonExports": 2,
+  "checks": [
+    {
+      "width": 375,
+      "overflow": false,
+      "errors": 0,
+      "roundTripNavigation": true
+    },
+    {
+      "width": 768,
+      "overflow": false,
+      "errors": 0,
+      "roundTripNavigation": true
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "errors": 0,
+      "roundTripNavigation": true
+    }
+  ]
+}
