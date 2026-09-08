@@ -263,6 +263,46 @@
       "height": 2266,
       "sha256": "6c832cd8ec02df7e1456f56c8034e25456a1486cb5974270d682cb8fddbc7c17",
       "resultBundle": "/tmp/GameDrawerMarketingPadRelease.xcresult"
+    },
+    {
+      "path": "raw/iphone/stats-dashboard.png",
+      "device": "GameDrawer Marketing iPhone",
+      "deviceId": "C61A5525-3BF9-4AF4-8A39-2304750DE7FE",
+      "timestamp": 1788898854.534,
+      "width": 1206,
+      "height": 2622,
+      "sha256": "6ca6a88ece74d35b2d781cf14582517feeeca89c3f36323b0adf30d0aafa15f8",
+      "resultBundle": "/tmp/GameDrawerMarketingVideoPhone.xcresult"
+    },
+    {
+      "path": "raw/iphone/merge-video-large.png",
+      "device": "GameDrawer Marketing iPhone",
+      "deviceId": "C61A5525-3BF9-4AF4-8A39-2304750DE7FE",
+      "timestamp": 1788898845.941,
+      "width": 1206,
+      "height": 2622,
+      "sha256": "9e4eee222b3fb354d10873111be85c51a55daae173ead6bab71c14b5ab424490",
+      "resultBundle": "/tmp/GameDrawerMarketingVideoPhone.xcresult"
+    },
+    {
+      "path": "raw/ipad/stats-dashboard.png",
+      "device": "GameDrawer Marketing iPad",
+      "deviceId": "C00EAE81-A083-4CC2-A629-01DD76C6932C",
+      "timestamp": 1788898975.964,
+      "width": 1488,
+      "height": 2266,
+      "sha256": "f6ed89c3f15fe452f00fe079494d9ce79435baf7b2f3d8b9c3afabf907bb09fa",
+      "resultBundle": "/tmp/GameDrawerMarketingVideoPad.xcresult"
+    },
+    {
+      "path": "raw/ipad/merge-video-large.png",
+      "device": "GameDrawer Marketing iPad",
+      "deviceId": "C00EAE81-A083-4CC2-A629-01DD76C6932C",
+      "timestamp": 1788898967.182,
+      "width": 1488,
+      "height": 2266,
+      "sha256": "0c28c5a1d6152d77aa372902ec8f184be9c41493c71cfa55bd4ed60b3f5c07e0",
+      "resultBundle": "/tmp/GameDrawerMarketingVideoPad.xcresult"
     }
   ]
 }

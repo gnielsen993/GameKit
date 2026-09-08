@@ -17,6 +17,7 @@ final class AppStoreMarketingCapture: XCTestCase {
         app.launchArguments = ["--returning-launch", "-gamekit.cloudSyncEnabled", "NO",
             "-designkit.theme.preset", preset, "-designkit.theme.mode", mode,
             "-gamekit.videoModeEnabled", video ? "YES" : "NO",
+            "-gamekit.videoModeLocation", "largeTop",
             "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryL"]
         if seed { app.launchArguments.append("--screenshots") }
         app.launch()
@@ -32,8 +33,8 @@ final class AppStoreMarketingCapture: XCTestCase {
         add(attachment)
     }
 
-    private func open(_ game: String, choices: [String], resume: Bool = true) -> XCUIApplication {
-        let app = launch()
+    private func open(_ game: String, choices: [String], resume: Bool = true, video: Bool = false) -> XCUIApplication {
+        let app = launch(video: video)
         app.buttons[game].tap()
         for choice in choices {
             let button = app.buttons.matching(NSPredicate(format: "label == %@ OR label BEGINSWITH %@", choice, choice + ",")).firstMatch
@@ -95,6 +96,7 @@ final class AppStoreMarketingCapture: XCTestCase {
 
         app = launch()
         app.buttons["Profile"].tap()
+        app.buttons["Stats"].tap()
         capture(app, "stats")
         app.terminate()
 
@@ -103,6 +105,21 @@ final class AppStoreMarketingCapture: XCTestCase {
         app.terminate()
         app = launch(preset: "voltage", mode: "dark")
         capture(app, "home-voltage")
+        app.terminate()
+    }
+
+    func testCaptureVideoAndStats() {
+        var app = open("Merge", choices: ["2048"], video: true)
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.7, dy: 0.6))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.6))
+        start.press(forDuration: 0.1, thenDragTo: end)
+        capture(app, "merge-video-large")
+        app.terminate()
+
+        app = launch()
+        app.buttons["Profile"].tap()
+        app.buttons["Stats"].tap()
+        capture(app, "stats-dashboard")
         app.terminate()
     }
 }

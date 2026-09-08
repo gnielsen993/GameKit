@@ -16,12 +16,12 @@ const root=__dirname;
    await page.evaluate(async()=>{document.querySelectorAll('img').forEach(i=>i.loading='eager');await Promise.all([...document.images].map(i=>i.decode()))});
    if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Gallery overflow');
    const links=await page.locator('article a').evaluateAll(a=>a.map(x=>x.getAttribute('href')));
-   if(links.length!==8||links.some(x=>!x.startsWith(`exports/${device}/`)||!fs.existsSync(path.join(root,x))))throw Error('Gallery links invalid');
+   if(links.length!==10||links.some(x=>!x.startsWith(`exports/${device}/`)||!fs.existsSync(path.join(root,x))))throw Error('Gallery links invalid');
    if(errors.length)throw Error(errors.join('\n'));
    checks.push({width,device,images:links.length,overflow:false,errors});
    if(width===1440)await page.screenshot({path:path.join(root,'review',device+'-gallery.png'),fullPage:true});
   }await page.close();
  }}finally{await browser.close()}
  fs.writeFileSync(path.join(root,'review','verification.json'),JSON.stringify({counts,exports:manifest.exports.length,checks},null,2)+'\n');
- console.log('Verified metadata, 16 RGB exports, gallery at 3 widths and both device tabs.');
+ console.log('Verified metadata, 20 RGB exports, gallery at 3 widths and both device tabs.');
 })().catch(e=>{console.error(e);process.exit(1)});

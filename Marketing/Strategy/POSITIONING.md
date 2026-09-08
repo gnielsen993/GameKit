@@ -26,7 +26,7 @@ Current access: every game is free to play, with no subscription or in-app curre
 | A word game for the moment | Five Letter guess feedback; Word Grid letter paths | No Connections game. No unsupported Wordle trademark use. |
 | Return to an unfinished deal | FreeCell resume dialog, persisted moves and undo | Do not promise resumable live arcade runs. |
 | Play without a signal | Local game engines and on-device resources | iCloud sync still needs connectivity; no claim that network is never used. |
-| Play alongside a video | Native Video Mode selector and layout adaptation | Video source must support PiP. Artwork shows position controls, not a fabricated playing video. |
+| Play alongside a video | Native large-top Merge gameplay, an illustrative PiP window, and the position selector | Video source must support PiP. The added window is labeled illustrative; native gameplay is captured in the actual large layout. |
 | Pick a look you enjoy | Separate native Classic, Dracula and Voltage captures | Never recolor an app capture to manufacture a theme. |
 
 ## What changes from the old pitch
@@ -54,7 +54,7 @@ Retain the existing Casual category initially so the first listing refresh does 
 ## Rollout
 
 1. Finish 1.6 release checks; the new game and hints must be in the selected build.
-2. Review the metadata files and the eight-page iPhone/iPad sequence at full size and thumbnail size.
+2. Review the metadata files and the ten-page iPhone/iPad sequence at full size and thumbnail size.
 3. Upload the correct device-family exports and paste the corresponding English (US) fields. Verify the visible preview, name availability and actual upload order.
 4. Coordinate release and website copy. Do not publish eleven-game claims against the current 1.5 build.
 5. Record the release date, storefronts, source baseline and any external promotion; evaluate visibility and downloads separately.

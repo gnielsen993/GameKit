@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T20:15:41.795Z",
+  "generatedAt": "2026-09-08T20:29:09.326Z",
   "method": "HTML/CSS framing; native PNGs unchanged, uniformly scaled",
   "sources": [
     {
@@ -31,8 +31,16 @@
       "sha256": "1f87187420a242eec7b52ed772b0606a3aacd2a4afc19b75561d967dc11de1dc"
     },
     {
+      "path": "raw/iphone/merge-video-large.png",
+      "sha256": "9e4eee222b3fb354d10873111be85c51a55daae173ead6bab71c14b5ab424490"
+    },
+    {
       "path": "raw/iphone/merge.png",
       "sha256": "171a06f0da1424a1ff20087cca4d5e59b69007cedbbd8fe0233d574e5089bb83"
+    },
+    {
+      "path": "raw/iphone/stats-dashboard.png",
+      "sha256": "6ca6a88ece74d35b2d781cf14582517feeeca89c3f36323b0adf30d0aafa15f8"
     },
     {
       "path": "raw/iphone/stats.png",
@@ -83,8 +91,16 @@
       "sha256": "efac10f83cf743cf5aabb52b668476b775a745834d8e58cd54d3111fb1d60f78"
     },
     {
+      "path": "raw/ipad/merge-video-large.png",
+      "sha256": "0c28c5a1d6152d77aa372902ec8f184be9c41493c71cfa55bd4ed60b3f5c07e0"
+    },
+    {
       "path": "raw/ipad/merge.png",
       "sha256": "24b463fc6fe983767e4bf761b751fc9b081fc2bce6c2ffb0cf3a1b5da78a21e1"
+    },
+    {
+      "path": "raw/ipad/stats-dashboard.png",
+      "sha256": "f6ed89c3f15fe452f00fe079494d9ce79435baf7b2f3d8b9c3afabf907bb09fa"
     },
     {
       "path": "raw/ipad/stats.png",
@@ -113,112 +129,180 @@
       "width": 1320,
       "height": 2868,
       "title": "Your favorites. Without the ads.",
+      "source": "raw/iphone/home-classic.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "5c5677f9c862da97caab368a82bdabbb778dd76a5f5a8ffe6db960d8c7cb4040"
     },
     {
-      "path": "exports/iphone/02-hints.png",
+      "path": "exports/iphone/02-watch-and-play.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Keep your show. Make your move.",
+      "source": "raw/iphone/merge-video-large.png",
+      "illustrativeVideoOverlay": true,
+      "sha256": "a9dc64d5c195c9871571b2eacbc546d6f815fb50543f83d53a05d749144a9d6c"
+    },
+    {
+      "path": "exports/iphone/03-hints.png",
       "width": 1320,
       "height": 2868,
       "title": "Stuck? See a next step.",
+      "source": "raw/iphone/sudoku-hint.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "e78ebf7215b258245819cc7e8cdd59b2e02343ec6a817d235353e7b35dbf38ff"
     },
     {
-      "path": "exports/iphone/03-math.png",
+      "path": "exports/iphone/04-math.png",
       "width": 1320,
       "height": 2868,
       "title": "Make every number fit.",
+      "source": "raw/iphone/math-crossword.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "8951c922619fdf68f9b13b91536fdea6f4567c596f7dbd8e56fc6d86a9aaeba1"
     },
     {
-      "path": "exports/iphone/04-words.png",
+      "path": "exports/iphone/05-words.png",
       "width": 1320,
       "height": 2868,
       "title": "One more word. One more try.",
+      "source": "raw/iphone/five-letter.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "28b33b16ba3459f3a4c9c567e9c83e0aaa4f1094c3b37c726dc0ad3f6d501f1c"
     },
     {
-      "path": "exports/iphone/05-resume.png",
+      "path": "exports/iphone/06-resume.png",
       "width": 1320,
       "height": 2868,
       "title": "Pick up where you left off.",
+      "source": "raw/iphone/freecell.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "1d804660fa1a9b4aeca6182fd63d2e8e0f3f0be54dc2b7aa1b9b001aca0a5dce"
     },
     {
-      "path": "exports/iphone/06-offline.png",
+      "path": "exports/iphone/07-offline.png",
       "width": 1320,
       "height": 2868,
       "title": "Good games. No signal needed.",
+      "source": "raw/iphone/merge.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "63d843de8ec110f7f3ed3974a0c1170cc9b4b32f96787cce5a81386647b068af"
     },
     {
-      "path": "exports/iphone/07-video.png",
+      "path": "exports/iphone/08-video.png",
       "width": 1320,
       "height": 2868,
       "title": "Make room for your video.",
+      "source": "raw/iphone/video-mode-positions.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "75d960c47ddfedb70599ff5fb714b643e656684a797b84ec315afdc6f873d070"
     },
     {
-      "path": "exports/iphone/08-themes.png",
+      "path": "exports/iphone/09-themes.png",
       "width": 1320,
       "height": 2868,
       "title": "Same favorites. A different mood.",
+      "source": "raw/iphone/home-dracula.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "ea4cd2d7726a25794d3918bde4998562cd7752d4238aa9d4d8c2d1e8a41247cd"
+    },
+    {
+      "path": "exports/iphone/10-personal-bests.png",
+      "width": 1320,
+      "height": 2868,
+      "title": "Beat your personal best.",
+      "source": "raw/iphone/stats-dashboard.png",
+      "illustrativeVideoOverlay": false,
+      "sha256": "289cac315f492292473c59f05fefeeea41448ce8311b60dbb1b3d6b839ef2fa3"
     },
     {
       "path": "exports/ipad/01-favorites.png",
       "width": 2064,
       "height": 2752,
       "title": "Your favorites. Without the ads.",
+      "source": "raw/ipad/home-classic.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "a97dd0f042458b29c3e4f8f6b834ac34c60784ad05418ad5a94fcfc80bd17051"
     },
     {
-      "path": "exports/ipad/02-hints.png",
+      "path": "exports/ipad/02-watch-and-play.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Keep your show. Make your move.",
+      "source": "raw/ipad/merge-video-large.png",
+      "illustrativeVideoOverlay": true,
+      "sha256": "8716d4c82cbfcb50c1bb305b25001843ad1b321266d0929d44be2a2f6d879496"
+    },
+    {
+      "path": "exports/ipad/03-hints.png",
       "width": 2064,
       "height": 2752,
       "title": "Stuck? See a next step.",
+      "source": "raw/ipad/sudoku-hint.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "aba8c00cec8ad332abf00ddf5f59fccc6941519694d9f4d85c1b337c2b3f5046"
     },
     {
-      "path": "exports/ipad/03-math.png",
+      "path": "exports/ipad/04-math.png",
       "width": 2064,
       "height": 2752,
       "title": "Make every number fit.",
+      "source": "raw/ipad/math-crossword.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "4ffccf847606f10952ee653d13e41b5c27be9108cdc68645adbd043f6e2fd617"
     },
     {
-      "path": "exports/ipad/04-words.png",
+      "path": "exports/ipad/05-words.png",
       "width": 2064,
       "height": 2752,
       "title": "One more word. One more try.",
+      "source": "raw/ipad/five-letter.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "72d5b03e515441644a4a6f5d7efabc7125b9da765014b482606b30ac1ccc1e05"
     },
     {
-      "path": "exports/ipad/05-resume.png",
+      "path": "exports/ipad/06-resume.png",
       "width": 2064,
       "height": 2752,
       "title": "Pick up where you left off.",
+      "source": "raw/ipad/freecell.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "4e552269f9b64ee0fb8ec3d5fd75031372089d59bd7fbdb2d1a748cba71688d5"
     },
     {
-      "path": "exports/ipad/06-offline.png",
+      "path": "exports/ipad/07-offline.png",
       "width": 2064,
       "height": 2752,
       "title": "Good games. No signal needed.",
+      "source": "raw/ipad/merge.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "87495a4b7c27e63fa2671cb8922c6d0f539351541d365986bb07c635980fd151"
     },
     {
-      "path": "exports/ipad/07-video.png",
+      "path": "exports/ipad/08-video.png",
       "width": 2064,
       "height": 2752,
       "title": "Make room for your video.",
+      "source": "raw/ipad/video-mode-positions.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "1f6a55e7c4664b47a730df46fdba56666727cae7d728faa7a8f2613713bc0040"
     },
     {
-      "path": "exports/ipad/08-themes.png",
+      "path": "exports/ipad/09-themes.png",
       "width": 2064,
       "height": 2752,
       "title": "Same favorites. A different mood.",
+      "source": "raw/ipad/home-dracula.png",
+      "illustrativeVideoOverlay": false,
       "sha256": "16b2573e47ec0d2935d5b97ee3b7aeea473b22baa7e933f1c8e2e0a8f56459ef"
+    },
+    {
+      "path": "exports/ipad/10-personal-bests.png",
+      "width": 2064,
+      "height": 2752,
+      "title": "Beat your personal best.",
+      "source": "raw/ipad/stats-dashboard.png",
+      "illustrativeVideoOverlay": false,
+      "sha256": "04ce6852df0738820aadde7c3628cabd5cd416d41464c5fd08f5632b682c87ed"
     }
   ]
 }

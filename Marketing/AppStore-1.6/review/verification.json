@@ -7,47 +7,47 @@
     "description": 2360,
     "whats-new": 794
   },
-  "exports": 16,
+  "exports": 20,
   "checks": [
     {
       "width": 375,
       "device": "iphone",
-      "images": 8,
+      "images": 10,
       "overflow": false,
       "errors": []
     },
     {
       "width": 375,
       "device": "ipad",
-      "images": 8,
+      "images": 10,
       "overflow": false,
       "errors": []
     },
     {
       "width": 768,
       "device": "iphone",
-      "images": 8,
+      "images": 10,
       "overflow": false,
       "errors": []
     },
     {
       "width": 768,
       "device": "ipad",
-      "images": 8,
+      "images": 10,
       "overflow": false,
       "errors": []
     },
     {
       "width": 1440,
       "device": "iphone",
-      "images": 8,
+      "images": 10,
       "overflow": false,
       "errors": []
     },
     {
       "width": 1440,
       "device": "ipad",
-      "images": 8,
+      "images": 10,
       "overflow": false,
       "errors": []
     }
