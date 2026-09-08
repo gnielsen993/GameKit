@@ -222,6 +222,7 @@ final class GameStats {
         MergeSaveState.clearAll()
         FiveLetterSaveState.clearAll()
         WordGridSaveState.clearAll()
+        MathCrosswordSaveState.clearAll()
     }
 
     func record(

@@ -42,6 +42,7 @@ enum AccentRole: Sendable {
     case slot8
     case slot9   // Stack (Phase 15)
     case slot10  // Snake (Phase 15)
+    case slot11  // Math Crossword (v1.6)
 
     /// Index into `theme.catalogueColor(_:)`.
     var index: Int {
@@ -56,6 +57,7 @@ enum AccentRole: Sendable {
         case .slot8: return 7
         case .slot9: return 8
         case .slot10: return 9
+        case .slot11: return 10
         }
     }
 }
@@ -126,6 +128,20 @@ extension GameDescriptor {
     /// Order = render order in the grid. Append new entries here when
     /// a game ships; remove or reorder freely.
     static let all: [GameDescriptor] = [
+        GameDescriptor(
+            kind: .mathCrossword,
+            titleKey: "Math Crossword",
+            captionKey: "Tap to play",
+            symbol: "plus.forwardslash.minus",
+            accent: .slot11,
+            route: .mathCrossword(nil),
+            modes: [
+                GameModeChip(id: "math-easy", labelKey: "Easy", route: .mathCrossword("Easy")),
+                GameModeChip(id: "math-medium", labelKey: "Medium", route: .mathCrossword("Medium")),
+                GameModeChip(id: "math-hard", labelKey: "Hard", route: .mathCrossword("Hard"))
+            ],
+            shortMeta: "Crossing equations"
+        ),
         GameDescriptor(
             kind: .minesweeper,
             titleKey: "Minesweeper",

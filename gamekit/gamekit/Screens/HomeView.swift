@@ -184,13 +184,13 @@ struct HomeView: View {
             VStack(spacing: 8) {
                 ZStack {
                     RoundedRectangle(cornerRadius: tileSize * 0.26, style: .continuous)
-                        .fill(descriptor.kind.accentColor)
+                        .fill(descriptor.kind.accentColor(theme: theme))
                         .overlay(
                             RoundedRectangle(cornerRadius: tileSize * 0.26, style: .continuous)
                                 .fill(SurfaceDepth.raisedSheen)
                         )
                         .shadow(
-                            color: descriptor.kind.accentColor.opacity(
+                            color: descriptor.kind.accentColor(theme: theme).opacity(
                                 expandedKind == descriptor.kind ? 0.55 : 0.38
                             ),
                             radius: expandedKind == descriptor.kind ? 18 : 10,
@@ -358,6 +358,10 @@ struct HomeView: View {
     @ViewBuilder
     private func destination(for route: GameRoute) -> some View {
         switch route {
+        case .mathCrossword(let difficulty):
+            MathCrosswordGameView(initialDifficulty: difficulty)
+                .videoModeAware(minBoardHeight: 480)
+                .disableInteractivePop()
         case .minesweeper(let difficulty):
             MinesweeperGameView(initialDifficulty: difficulty)
                 .videoModeAware(minBoardHeight: 480)

@@ -35,4 +35,5 @@ enum GameRoute: Hashable, Sendable {
     // Phase 15: plain cases — no associated value (D-09; modes: [], no mode chip deep-links here)
     case stack
     case snake
+    case mathCrossword(String?)
 }

@@ -97,11 +97,11 @@ struct HomeDetailPanel: View {
                 .padding(.vertical, theme.spacing.s)
                 .background(
                     RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
-                        .fill(selected ? descriptor.kind.accentColor : theme.colors.background)
+                        .fill(selected ? descriptor.kind.accentColor(theme: theme) : theme.colors.background)
                         .overlay(
                             RoundedRectangle(cornerRadius: theme.radii.chip, style: .continuous)
                                 .stroke(
-                                    selected ? descriptor.kind.accentColor : theme.colors.border.opacity(0.6),
+                                    selected ? descriptor.kind.accentColor(theme: theme) : theme.colors.border.opacity(0.6),
                                     lineWidth: 1
                                 )
                         )
@@ -174,10 +174,10 @@ struct HomeDetailPanel: View {
             HStack(spacing: theme.spacing.xs) {
                 Text(String(localized: "Stats"))
                     .font(theme.typography.caption.weight(.semibold))
-                    .foregroundStyle(descriptor.kind.accentColor)
+                    .foregroundStyle(descriptor.kind.accentColor(theme: theme))
                 Image(systemName: "chevron.right")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(descriptor.kind.accentColor.opacity(0.7))
+                    .foregroundStyle(descriptor.kind.accentColor(theme: theme).opacity(0.7))
             }
         }
         .buttonStyle(.plain)
@@ -187,8 +187,8 @@ struct HomeDetailPanel: View {
     private func iconTile(size: CGFloat) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.26, style: .continuous)
-                .fill(descriptor.kind.accentColor)
-                .shadow(color: descriptor.kind.accentColor.opacity(0.45), radius: 10, x: 0, y: 6)
+                .fill(descriptor.kind.accentColor(theme: theme))
+                .shadow(color: descriptor.kind.accentColor(theme: theme).opacity(0.45), radius: 10, x: 0, y: 6)
             GameIconView(kind: descriptor.kind, size: size * 0.54)
         }
         .frame(width: size, height: size)

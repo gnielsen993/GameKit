@@ -9,12 +9,14 @@
 //
 
 import SwiftUI
+import DesignKit
 
 extension GameKind {
     /// Brand-identity color for each game. Intentionally a raw Color (not a
     /// DesignKit semantic token) — these are per-game constants, not theme-relative.
-    var accentColor: Color {
+    func accentColor(theme: Theme) -> Color {
         switch self {
+        case .mathCrossword: return theme.catalogueColor(10)
         case .minesweeper: return Color(red: 0.184, green: 0.482, blue: 0.965) // #2F7BF6
         case .merge:       return Color(red: 0.161, green: 0.761, blue: 0.329) // #29C254
         case .nonogram:    return Color(red: 0.910, green: 0.278, blue: 0.263) // #E84743

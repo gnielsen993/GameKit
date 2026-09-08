@@ -33,4 +33,5 @@ enum GameKind: String, Codable, Sendable, CaseIterable {
     // Phase 15: permanent serialization keys — locked on first GameRecord write (D-04 additive, no schema-version bump).
     case stack   // raw: "stack" — endless tower; CloudKit-safe additive extension
     case snake   // raw: "snake" — endless grid; CloudKit-safe additive extension
+    case mathCrossword
 }

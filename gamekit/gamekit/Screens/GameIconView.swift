@@ -22,6 +22,9 @@ struct GameIconView: View {
             let s = sz.width / 40
             let sw = max(1.8, sz.width * 0.075)
             switch kind {
+            case .mathCrossword:
+                ctx.draw(Text("+").font(.system(size: 26 * s, weight: .bold)).foregroundStyle(color), at: CGPoint(x: 13 * s, y: 13 * s))
+                ctx.draw(Text("=").font(.system(size: 22 * s, weight: .bold)).foregroundStyle(color), at: CGPoint(x: 28 * s, y: 28 * s))
             case .minesweeper: drawMinesweeper(&ctx, s: s, sw: sw, color: color)
             case .merge:       drawMerge(&ctx, s: s, color: color)
             case .nonogram:    drawNonogram(&ctx, s: s, color: color)

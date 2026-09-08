@@ -45,7 +45,7 @@ Ordered by how often a session needs them.
 | Repo / target name | `gamekit` | locked |
 | Target iOS | 17+ | — |
 | Swift / UI | Swift 6 + SwiftUI | — |
-| Current milestone | `v1.6` in development — Be Kind (`.planning/v1.6-BRIEF.md`); absorbed the never-released 1.5.1 | 2026-07-31 |
+| Current milestone | `v1.6` in development — Be Kind + Math Crossword; closure verification in `.planning/v1.6-CLOSURE-PLAN.md`; absorbed the never-released 1.5.1 | 2026-09-08 |
 | Current MVP game | Minesweeper | — |
 | Next game (post-MVP) | TBD — Flow / Pattern Memory / Chess puzzles remain roadmap candidates | 2026-06-22 |
 | Icon | 9A.2 Video drawer (unified light / dark / tinted) | 2026-07-18 |
@@ -77,6 +77,15 @@ we", read `STATE.md` + `git log` first, then this §0.1 block — do
 not answer from prior-session memory alone.
 
 ## 0.4) Sister repos
+
+### Business partner source
+
+`cxnielsen` is Gabe's business partner's GitHub account. Gabe confirmed on
+2026-09-08 that taking or reusing code from those repositories is generally
+preapproved. Record the source commit and adaptations when reusing it.
+Changes to the partner's upstream repositories are less preapproved: inspect
+and prepare proposed changes, but obtain scoped authorization before writing
+upstream. `cxnielsen/solvara` supplies the Math Crossword engine under review.
 
 | Repo | Path | Purpose |
 |------|------|---------|
