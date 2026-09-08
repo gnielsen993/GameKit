@@ -12,10 +12,16 @@
 .video-window .playback{position:absolute;bottom:22px;left:30px;right:30px;display:flex;align-items:center;gap:20px}
 .pause{width:18px;height:22px;border-left:6px solid currentColor;border-right:6px solid currentColor}.timeline{height:4px;background:#fff6;flex:1;border-radius:4px}.timeline:before{content:'';display:block;background:#fffaf0;width:38%;height:100%;border-radius:4px}
 .ipad .video-window{width:72%;left:14%;top:4%;border-radius:30px}.ipad .video-window strong{font-size:100px}.ipad .video-window span{font-size:28px}
+.comparison.off{background:var(--paper);color:var(--ink)}
+.comparison .video-window{top:10.5%}
+.ipad.comparison .video-window{top:4%}
+.comparison .mode-label{position:absolute;top:600px;left:188px;width:944px;font-size:30px;font-weight:700;letter-spacing:2px;text-align:center}
+.ipad.comparison .mode-label{top:586px;left:382px;width:1300px;font-size:34px}
 </style><header><div class="brand">GameDrawer</div><h1></h1><p class="deck"></p></header><main></main><footer class="note"></footer>
 <script src="slides.js"></script><script>
 const params=new URLSearchParams(location.search), family=params.get('device')==='ipad'?'ipad':'iphone', s=slides.find(x=>x.id===params.get('slide'))||slides[0];
-document.body.className=[family,s.tone,s.themes?'themes':'',s.video?'watch':''].join(' ');document.querySelector('h1').textContent=s.title;document.querySelector('.deck').textContent=s.deck;document.querySelector('.note').textContent=s.note||'';
+document.body.className=[family,s.tone,s.themes?'themes':'',s.video?'watch':'',s.comparison?'comparison '+s.comparison:''].join(' ');document.querySelector('h1').textContent=s.title;document.querySelector('.deck').textContent=s.deck;document.querySelector('.note').textContent=s.note||'';
 function frame(source,cls=''){const div=document.createElement('div');div.className='device '+cls;const img=document.createElement('img');img.src=`raw/${family}/${source}.png`;img.alt=source;div.append(img);document.querySelector('main').append(div);return div}
+if(s.comparison){const label=document.createElement('div');label.className='mode-label';label.textContent='VIDEO MODE '+s.comparison.toUpperCase();document.querySelector('main').append(label)}
 if(s.themes){frame('home-classic','side left');frame('home-voltage','side right')}const primary=frame(s.source);if(s.video){const window=document.createElement('div');window.className='video-window';window.setAttribute('aria-label','Illustrative picture-in-picture video window');window.innerHTML='<span>Picture-in-picture</span><strong>Your video</strong><div class=playback><i class=pause></i><i class=timeline></i></div>';primary.append(window)}
 </script></html>

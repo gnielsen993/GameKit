@@ -22,7 +22,7 @@ const root=__dirname,sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p
    if(!videoFits)throw Error(`${family}/${slide.id} video crosses reserved band`);
    if(problems.length)throw Error(`${family}/${slide.id} overflow: ${problems}`);
    const relative=`exports/${family}/${slide.id}.png`;await page.screenshot({path:path.join(root,relative),omitBackground:false});
-   manifest.exports.push({path:relative,width,height,title:slide.title.replaceAll('\n',' '),source:`raw/${family}/${slide.source}.png`,illustrativeVideoOverlay:!!slide.video,sha256:sha(path.join(root,relative))});
+   manifest.exports.push({path:relative,width,height,title:slide.title.replaceAll('\n',' '),source:`raw/${family}/${slide.source}.png`,illustrativeVideoOverlay:!!slide.video,comparisonMode:slide.comparison||null,sha256:sha(path.join(root,relative))});
   }
   await page.close();
  }

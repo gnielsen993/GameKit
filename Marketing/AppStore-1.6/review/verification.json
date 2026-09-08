@@ -8,6 +8,7 @@
     "whats-new": 794
   },
   "exports": 20,
+  "preservedArchivedExports": 20,
   "checks": [
     {
       "width": 375,

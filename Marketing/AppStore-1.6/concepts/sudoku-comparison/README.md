@@ -1,3 +1,5 @@
+> Superseded for App Store upload by two separate full-size images in slots 2 and 3. This single-image comparison is preserved as an alternate. The prior ten-slide set is archived at `../previous-ten-slide-set/`.
+
 # Sudoku: Video Mode off vs. on
 
 [Open this alternate concept](index.html) · [All current concepts](../../index.html)

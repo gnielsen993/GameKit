@@ -17,7 +17,7 @@ const root=__dirname,campaign=path.resolve(root,'../..'),hash=p=>crypto.createHa
   for(const href of await page.locator('a').evaluateAll(as=>as.map(a=>a.getAttribute('href'))))if(!fs.existsSync(path.resolve(root,href)))throw Error('Broken link: '+href);
   if(errors.length)throw Error(errors.join('\n'));
   if(width===375||width===1440)await page.screenshot({path:path.join(root,'review',`gallery-${width}.png`),fullPage:true});
-  await page.getByRole('link',{name:'All current concepts and the original ten-slide set'}).click();
+  await page.getByRole('link',{name:'Current App Store selection and preserved concepts'}).click();
   if(await page.locator('article a').count()!==10)throw Error('Return link failed');
   checks.push({width,overflow:false,errors:0,roundTripNavigation:true});await page.close();
  }}finally{await browser.close()}

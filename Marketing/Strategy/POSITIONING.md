@@ -26,7 +26,7 @@ Current access: every game is free to play, with no subscription or in-app curre
 | A word game for the moment | Five Letter guess feedback; Word Grid letter paths | No Connections game. No unsupported Wordle trademark use. |
 | Return to an unfinished deal | FreeCell resume dialog, persisted moves and undo | Do not promise resumable live arcade runs. |
 | Play without a signal | Local game engines and on-device resources | iCloud sync still needs connectivity; no claim that network is never used. |
-| Play alongside a video | Native large-top Merge gameplay, an illustrative PiP window, and the position selector | Video source must support PiP. The added window is labeled illustrative; native gameplay is captured in the actual large layout. |
+| Play alongside a video | Two consecutive Sudoku screenshots: Video Mode off, then large-top on, with identical illustrative PiP windows | Video source must support PiP. The added window is labeled illustrative; native gameplay is captured in the actual large layout. |
 | Pick a look you enjoy | Separate native Classic, Dracula and Voltage captures | Never recolor an app capture to manufacture a theme. |
 
 ## What changes from the old pitch

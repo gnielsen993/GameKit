@@ -23,3 +23,10 @@ Gabe requested visual proof of Video Mode with a large reserved space and a roun
 The illustration demonstrates spatial coexistence. It does not close the separate physical-device test of a live third-party PiP session.
 
 Revision verification: native Video Mode + Stats flow passed on iPhone and iPad (one test each); all 20 RGB PNGs passed dimensions, two-line headline, headline/device separation, illustrative-window clearance, source hash preservation, and gallery checks at 375, 768 and 1440 pixels. Visual review caught and shortened the initial stats headline before delivery. Self-evaluation remains 4/5 across the five axes: the requested ten-image package is complete; the remaining evidence limit is live external PiP on physical hardware.
+
+
+## App Store selection: two separate Sudoku screenshots
+
+Gabe asked for a decision and actual App Store-sized assets after finding the side-by-side composition too small. Selected two independent portrait PNGs in slots 2 and 3: one large native Sudoku per image, identical illustrative video windows, Video Mode off then on. Both messages stand alone; nothing crosses the App Store gutter. The Merge video and position-picker concepts moved to a preserved archive, keeping exactly ten selected uploads per device. The original side-by-side artwork also remains available.
+
+No native app behavior changed in this revision. Reused the passed paired-capture evidence, checked the new exports visually, and added a swipe preview that makes the two-upload structure explicit. The verification script checks all twenty archived export hashes. The decision is editorial, not a claim of improved conversion. Self-evaluation: accuracy/completeness/clarity/actionability/conciseness each 4/5; the concrete App Store assets and selection are complete, with live upload previews and release hardware checks still outside this local preparation.
