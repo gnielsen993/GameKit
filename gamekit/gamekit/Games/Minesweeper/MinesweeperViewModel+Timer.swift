@@ -42,7 +42,7 @@ extension MinesweeperViewModel {
     /// scenePhase .active path (D-06). No-op outside .playing.
     /// Idempotent — calling twice without a pause in between is a no-op.
     func resume() {
-        guard case .playing = gameState, timerAnchor == nil else { return }
+        guard case .playing = gameState, timerAnchor == nil, !isHintCardVisible, !showingAbandonAlert else { return }
         timerAnchor = clock()
     }
 

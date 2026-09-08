@@ -285,7 +285,7 @@ final class SudokuViewModel {
     }
 
     func resume() {
-        guard state == .playing, timerAnchor == nil else { return }
+        guard state == .playing, timerAnchor == nil, !isHintCardVisible else { return }
         timerAnchor = clock()
     }
 
@@ -471,10 +471,12 @@ final class SudokuViewModel {
     /// Places the digit the current hint names, if the player asks for it.
     func applyHint() {
         guard let hint = activeHint else { return }
-        select(row: hint.step.row, col: hint.step.column)
-        place(value: hint.step.value)
+        // "Fill it in" commits a value even when the player is currently
+        // taking notes. It still follows the normal value path for lives,
+        // undo, persistence, and completion.
         activeHint = nil
         isHintCardVisible = false
+        commitValue(hint.step.value, atRow: hint.step.row, col: hint.step.column)
     }
 
     /// Honest fallback when the singles engine cannot narrate a short step.
@@ -486,10 +488,13 @@ final class SudokuViewModel {
             return false
         }) else { return }
         assistsUsed += 1
-        select(row: index / 9, col: index % 9)
-        place(value: board.solutionDigit(atRow: index / 9, col: index % 9))
         hintUnavailable = nil
         isHintCardVisible = false
+        commitValue(
+            board.solutionDigit(atRow: index / 9, col: index % 9),
+            atRow: index / 9,
+            col: index % 9
+        )
     }
 
     /// The board as SudokuCore sees it: row-major, 0 for empty.
@@ -575,8 +580,9 @@ final class SudokuViewModel {
 
     private func startTimer() {
         state = .playing
-        timerAnchor = clock()
         pausedElapsed = 0
+        guard !isHintCardVisible else { return }
+        timerAnchor = clock()
     }
 
     private func captureUndo(at row: Int, col: Int, previousCell: SudokuCell) {

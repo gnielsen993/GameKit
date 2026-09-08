@@ -114,7 +114,7 @@ struct NonogramGameView: View {
             value: viewModel.isTalkthroughCardVisible
         )
         .onChange(of: viewModel.isTalkthroughCardVisible) { _, showing in
-            if showing { viewModel.pause() } else { viewModel.resume() }
+            if showing { viewModel.pause() } else { if scenePhase == .active && !(viewModel.isTalkthroughCardVisible || viewModel.pendingSaveState != nil) { viewModel.resume() } }
         }
         .onChange(of: viewModel.state) { _, newState in
             switch newState {
@@ -200,8 +200,8 @@ struct NonogramGameView: View {
             case .background:
                 viewModel.saveCurrentState()
                 viewModel.pause()
-            case .active:     viewModel.resume()
-            case .inactive:   break
+            case .active:     if scenePhase == .active && !(viewModel.isTalkthroughCardVisible || viewModel.pendingSaveState != nil) { viewModel.resume() }
+            case .inactive:   viewModel.pause()
             @unknown default: break
             }
         }

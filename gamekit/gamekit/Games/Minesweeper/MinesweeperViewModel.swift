@@ -210,6 +210,7 @@ final class MinesweeperViewModel {
         // adds another generate() call site outside this branch, the engine
         // contract is broken — this is the firewall.
         if case .idle = gameState {
+            isHintCardVisible = false
             board = BoardGenerator.generate(
                 difficulty: difficulty,
                 firstTap: index,
@@ -335,6 +336,10 @@ final class MinesweeperViewModel {
 
     /// Ask for a square that can be proved safe.
     func requestHint() {
+        if gameState == .idle {
+            isHintCardVisible = true
+            return
+        }
         guard case .playing = gameState else { return }
         if activeHint != nil {
             isHintCardVisible = true

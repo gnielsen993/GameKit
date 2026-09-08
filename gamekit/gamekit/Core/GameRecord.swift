@@ -51,8 +51,8 @@ final class GameRecord {
     var score: Int? = nil
     /// Library puzzle id for puzzle-based games (Nonogram); nil for
     /// procedurally-generated games (Minesweeper / Merge). Optional →
-    /// SwiftData lightweight migration safe; not exported in v2 envelope
-    /// (round-trip determinism preserved). Stored locally to power the
+    /// SwiftData lightweight migration safe; exported as optional metadata
+    /// in v1.6 and later backups. Stored locally to power the
     /// "Solved puzzles" gallery in StatsView.
     var puzzleIdRaw: String? = nil
 

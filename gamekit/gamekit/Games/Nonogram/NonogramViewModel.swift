@@ -173,8 +173,16 @@ final class NonogramViewModel {
         // .idle is allowed: "where do I even start" is a fair question, and
         // the first overlap deduction is the honest answer to it.
         guard state == .idle || state == .playing || state == .practiceAfterLoss else { return }
+        if boardDisagreesWithPuzzle || !unsatisfiableRows.isEmpty || !unsatisfiableColumns.isEmpty {
+            activeTalkthrough = nil
+            talkthroughUnavailable = .boardHasAMistake
+            isTalkthroughCardVisible = true
+            pause()
+            return
+        }
         if activeTalkthrough != nil {
             isTalkthroughCardVisible = true
+            pause()
             return
         }
         talkthroughUnavailable = nil
@@ -184,6 +192,7 @@ final class NonogramViewModel {
         ) {
             activeTalkthrough = deduction
             isTalkthroughCardVisible = true
+            pause()
             assistsUsed += 1
             saveCurrentState()
             return
@@ -197,6 +206,7 @@ final class NonogramViewModel {
             ? .noLineDeduction
             : .boardHasAMistake
         isTalkthroughCardVisible = true
+        pause()
     }
 
     /// Still-unresolved cells the current explanation says to fill.
@@ -249,6 +259,7 @@ final class NonogramViewModel {
     func dismissTalkthrough() {
         isTalkthroughCardVisible = false
         if activeTalkthrough == nil { talkthroughUnavailable = nil }
+        resume()
     }
 
     /// Recompute cross-off masks. Called after any board mutation.
@@ -269,11 +280,19 @@ final class NonogramViewModel {
             unsatisfiableRows = []
             unsatisfiableColumns = []
         }
-        if activeTalkthrough != nil,
-           talkthroughFillHighlight.isEmpty,
-           talkthroughCrossHighlight.isEmpty {
-            activeTalkthrough = nil
-            isTalkthroughCardVisible = false
+        if activeTalkthrough != nil {
+            if boardDisagreesWithPuzzle || !unsatisfiableRows.isEmpty || !unsatisfiableColumns.isEmpty {
+                // The player changed the board after receiving help. Do not
+                // leave an action map visible once its premise is false.
+                activeTalkthrough = nil
+                talkthroughUnavailable = .boardHasAMistake
+                isTalkthroughCardVisible = true
+                pause()
+            } else if talkthroughFillHighlight.isEmpty,
+                      talkthroughCrossHighlight.isEmpty {
+                activeTalkthrough = nil
+                isTalkthroughCardVisible = false
+            }
         }
     }
 
@@ -281,6 +300,24 @@ final class NonogramViewModel {
         switch line {
         case .row(let row): return row * size + offset
         case .column(let column): return offset * size + column
+        }
+    }
+
+    /// A line can remain locally satisfiable even when the player's mark is
+    /// wrong for this particular puzzle. We only consult the known solution
+    /// when a hint is requested or being preserved, never on ordinary swipes.
+    private var boardDisagreesWithPuzzle: Bool {
+        guard let puzzle = currentPuzzle else { return false }
+        let solution = puzzle.solution
+        return board.cells.indices.contains { index in
+            switch board.cells[index] {
+            case .empty:
+                return false
+            case .filled:
+                return solution[index] == false
+            case .marked:
+                return solution[index]
+            }
         }
     }
 
@@ -489,7 +526,7 @@ final class NonogramViewModel {
     }
 
     func resume() {
-        guard state == .playing, timerAnchor == nil else { return }
+        guard state == .playing, timerAnchor == nil, !isTalkthroughCardVisible else { return }
         timerAnchor = clock()
     }
 
@@ -567,7 +604,9 @@ final class NonogramViewModel {
     private func beginPlayingIfNeeded() {
         guard state == .idle else { return }
         state = .playing
-        timerAnchor = clock()
+        if !isTalkthroughCardVisible {
+            timerAnchor = clock()
+        }
         pausedElapsed = 0
         if let id = currentPuzzle?.id {
             NonogramPicker.markSeen(puzzleId: id, difficulty: difficulty, userDefaults: userDefaults)

@@ -45,16 +45,14 @@ import os
 @MainActor
 enum StatsExporter {
 
-    /// Bumped to 2 alongside the Merge schema additions (`GameRecord.score`,
-    /// `BestScore` model, `bestScores` envelope field). The IMPORT path
-    /// accepts both v1 and v2 envelopes (`acceptedSchemaVersions`); the
-    /// EXPORT path always writes the current version.
-    static let envelopeSchemaVersion: Int = 2
+    /// v3 preserves assist counts and puzzle identity. Older envelopes remain
+    /// readable because those record fields are optional.
+    static let envelopeSchemaVersion: Int = 3
 
     /// Schema versions the importer accepts. v1 envelopes are tolerated
     /// because the codec auto-defaults v2-only keys (`bestScores`,
     /// `Record.score`); the v1 → v2 transition is purely additive.
-    static let acceptedSchemaVersions: Set<Int> = [1, 2]
+    static let acceptedSchemaVersions: Set<Int> = [1, 2, 3]
 
     private static let logger = Logger(
         subsystem: "com.lauterstar.gamekit",
@@ -83,7 +81,9 @@ enum StatsExporter {
                     durationSeconds: rec.durationSeconds,
                     playedAt: rec.playedAt,
                     schemaVersion: rec.schemaVersion,
-                    score: rec.score
+                    score: rec.score,
+                    assistCount: rec.assistCount,
+                    puzzleIdRaw: rec.puzzleIdRaw
                 )
             },
             bestTimes: bests.map { best in
@@ -164,7 +164,9 @@ enum StatsExporter {
                     outcome: Outcome(rawValue: r.outcomeRaw) ?? .loss,
                     durationSeconds: r.durationSeconds,
                     playedAt: r.playedAt,
-                    score: r.score
+                    score: r.score,
+                    puzzleId: r.puzzleIdRaw,
+                    assistCount: r.assistCount
                 )
                 rec.id = r.id                          // preserve UUID for round-trip equality
                 rec.schemaVersion = r.schemaVersion

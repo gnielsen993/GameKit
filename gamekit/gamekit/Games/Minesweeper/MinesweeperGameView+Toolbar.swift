@@ -22,6 +22,7 @@ extension MinesweeperGameView {
                 theme: theme,
                 currentDifficulty: viewModel.difficulty,
                 onSelect: { viewModel.requestDifficultyChange($0) },
+                compact: true,
                 onHint: assistIsAvailable ? { viewModel.requestHint() } : nil,
                 onOpenSafeSquare: settingsStore.assistsEnabled && viewModel.hintFoundNothing
                     ? { viewModel.openASafeSquare() } : nil

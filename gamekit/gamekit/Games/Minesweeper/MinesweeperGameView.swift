@@ -139,7 +139,7 @@ struct MinesweeperGameView: View {
         // MergeGameView for cross-game consistency.
         .navigationBarBackButtonHidden(true)
         .onChange(of: viewModel.showingAbandonAlert) { _, showing in
-            if showing { viewModel.pause() } else { viewModel.resume() }
+            if showing { viewModel.pause() } else { if scenePhase == .active && !(viewModel.isHintCardVisible || viewModel.showingAbandonAlert) { viewModel.resume() } }
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
@@ -147,9 +147,9 @@ struct MinesweeperGameView: View {
                 viewModel.saveCurrentState()
                 viewModel.pause()                       // D-06
             case .active:
-                viewModel.resume()                      // D-06
+                if scenePhase == .active && !(viewModel.isHintCardVisible || viewModel.showingAbandonAlert) { viewModel.resume() }                      // D-06
             case .inactive:
-                break                                   // RESEARCH Pitfall 2 — no-op
+                viewModel.pause()                                   // RESEARCH Pitfall 2 — no-op
             @unknown default:
                 break
             }
@@ -175,7 +175,7 @@ struct MinesweeperGameView: View {
             value: viewModel.isHintCardVisible
         )
         .onChange(of: viewModel.isHintCardVisible) { _, showing in
-            if showing { viewModel.pause() } else { viewModel.resume() }
+            if showing { viewModel.pause() } else { if scenePhase == .active && !(viewModel.isHintCardVisible || viewModel.showingAbandonAlert) { viewModel.resume() } }
         }
         .onChange(of: viewModel.phase) { _, newPhase in
             switch newPhase {

@@ -10,6 +10,19 @@ import Foundation
 @MainActor
 struct MinesweeperHintTests {
 
+    @Test("first-move guidance is free and closes when play starts")
+    func firstMoveGuidance() {
+        let vm = MinesweeperViewModel(difficulty: .easy, rng: SeededGenerator(seed: 2))
+        vm.requestHint()
+        #expect(vm.isHintCardVisible)
+        #expect(vm.assistsUsed == 0)
+        #expect(vm.gameState == .idle)
+        vm.reveal(at: MinesweeperIndex(row: 0, col: 0))
+        #expect(!vm.isHintCardVisible)
+        #expect(vm.terminalOutcome != .loss)
+        #expect(vm.board.cell(at: MinesweeperIndex(row: 0, col: 0)).adjacentMineCount == 0)
+    }
+
     /// Plays a board far enough to give the solver something to work with.
     private func openedBoard(seed: UInt64, difficulty: MinesweeperDifficulty = .easy) -> MinesweeperViewModel {
         let vm = MinesweeperViewModel(difficulty: difficulty, rng: SeededGenerator(seed: seed))

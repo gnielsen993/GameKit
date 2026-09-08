@@ -13,7 +13,14 @@ extension MinesweeperGameView {
 
     @ViewBuilder
     var hintBanner: some View {
-        if viewModel.isHintCardVisible, let step = viewModel.activeHint {
+        if viewModel.isHintCardVisible, viewModel.gameState == .idle {
+            GameAssistCard(
+                theme: theme,
+                title: String(localized: "Start anywhere"),
+                message: String(localized: "Tap any square to begin. Your first square and its neighbors are always free of mines. Hints after that keep your win, but do not set records."),
+                onDismiss: { viewModel.dismissHint() }
+            )
+        } else if viewModel.isHintCardVisible, let step = viewModel.activeHint {
             GameAssistCard(
                 theme: theme,
                 title: String(localized: "This square is safe"),

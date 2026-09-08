@@ -28,6 +28,9 @@ struct WordGridBoardView: View {
                                 x: originX + CGFloat(column) * (tileSide + spacing) + tileSide / 2,
                                 y: originY + CGFloat(row) * (tileSide + spacing) + tileSide / 2
                             )
+                            .accessibilityValue(hintPath.firstIndex(of: position).map { Text("Hint letter \($0 + 1) of \(hintPath.count)") } ?? Text(""))
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityAction { onSelect(position) }
                             .accessibilityLabel(Text("Letter \(letter(row: row, column: column)), row \(row + 1), column \(column + 1)"))
                     }
                 }

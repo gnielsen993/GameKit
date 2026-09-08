@@ -15,6 +15,16 @@ nonisolated enum FiveLetterAssist {
     ) -> Result {
         let remaining = FiveLetterCandidates.remaining(after: guesses, answers: answers)
         let answerSet = Set(answers)
+        // A final-turn non-answer cannot help the player win. Keep the
+        // no-answer-reveal policy by offering the existing constraints
+        // instead of pre-filling a guaranteed loss.
+        guard guesses.count < 5 else {
+            return Result(
+                remainingCount: remaining.count,
+                suggestedGuess: nil,
+                fallback: constraintSummary(from: guesses)
+            )
+        }
         let eligibleProbes = acceptedGuesses
             .filter { !answerSet.contains($0) }
             .filter { FiveLetterStrictValidator.violationMessage(for: $0, previousGuesses: guesses) == nil }
@@ -30,7 +40,11 @@ nonisolated enum FiveLetterAssist {
         // The accepted dictionary is intentionally broad (about 16,000
         // words). Rank it cheaply first, then run the exact partition search
         // across a bounded shortlist so opening the coach never stalls play.
-        let probes = shortlist(Array(eligibleProbes), against: remaining)
+        var probes = shortlist(Array(eligibleProbes), against: remaining)
+        if guesses.isEmpty {
+            let familiar = probes.filter { familiarOpeningProbes.contains($0) }
+            if !familiar.isEmpty { probes = familiar }
+        }
 
         // Minimise expected candidates left. Sum of squared partition sizes
         // gives the same ordering without floating-point drift.
@@ -43,6 +57,9 @@ nonisolated enum FiveLetterAssist {
                 buckets[FiveLetterFeedback.evaluate(guess: probe, answer: candidate), default: 0] += 1
             }
             let cost = buckets.values.reduce(0) { $0 + $1 * $1 }
+            // A probe that gives every candidate the same feedback conveys
+            // no new information, even if it looks lexically varied.
+            guard buckets.count > 1 else { continue }
             let uniqueCount = Set(probe).count
             if cost < bestCost || (cost == bestCost && uniqueCount > bestUniqueCount) {
                 bestWord = probe
@@ -50,8 +67,19 @@ nonisolated enum FiveLetterAssist {
                 bestUniqueCount = uniqueCount
             }
         }
-        return Result(remainingCount: remaining.count, suggestedGuess: bestWord, fallback: nil)
+        return Result(
+            remainingCount: remaining.count,
+            suggestedGuess: bestWord,
+            fallback: bestWord == nil ? constraintSummary(from: guesses) : nil
+        )
     }
+
+    /// Familiar, valid opening words keep the coach conversational instead
+    /// of surfacing a dictionary oddity such as a high-scoring obscure probe.
+    private static let familiarOpeningProbes: Set<String> = [
+        "ARISE", "IRATE", "LATER", "LEARN", "LEAST", "ORATE", "RAISE",
+        "SALET", "SLANT", "SLATE", "SNARE", "STARE", "TEARS", "TRAIL"
+    ]
 
     private static func shortlist(_ probes: [String], against remaining: [String]) -> [String] {
         let budget = 64

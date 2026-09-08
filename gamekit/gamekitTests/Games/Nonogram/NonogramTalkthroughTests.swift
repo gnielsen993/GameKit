@@ -10,6 +10,22 @@ import Foundation
 @MainActor
 struct NonogramTalkthroughTests {
 
+    @Test("a contradictory board never produces a confident deduction")
+    func contradictoryBoardHasNoDeduction() {
+        let hints = [[1], [1], [5], [1], [1]]
+        var board = NonogramBoard.empty(size: 5)
+        for col in 0..<5 { board = board.setting(.filled, atRow: 2, col: col) }
+        // This fill is locally plausible in its row, but makes column 0
+        // impossible. A deduction from another line would amplify the error.
+        board = board.setting(.filled, atRow: 0, col: 0)
+
+        #expect(NonogramTalkthrough.nextDeduction(
+            board: board,
+            rowHints: hints,
+            columnHints: hints
+        ) == nil)
+    }
+
     private func emptyBoard(_ size: Int) -> NonogramBoard {
         NonogramBoard(size: size, cells: Array(repeating: .empty, count: size * size))
     }

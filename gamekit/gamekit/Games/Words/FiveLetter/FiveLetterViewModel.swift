@@ -165,7 +165,7 @@ final class FiveLetterViewModel {
     }
 
     func resume() {
-        guard state == .playing, timerAnchor == nil else { return }
+        guard state == .playing, timerAnchor == nil, candidateCount == nil else { return }
         timerAnchor = .now
     }
 
@@ -194,6 +194,7 @@ final class FiveLetterViewModel {
         candidateCount = result.remainingCount
         suggestedGuess = result.suggestedGuess
         assistFallback = result.fallback
+        pause()
         if assistsUsed == 0 { assistsUsed = 1 }
         saveCurrentState()
     }
@@ -202,6 +203,7 @@ final class FiveLetterViewModel {
         candidateCount = nil
         suggestedGuess = nil
         assistFallback = nil
+        resume()
     }
 
     func useSuggestedGuess() {

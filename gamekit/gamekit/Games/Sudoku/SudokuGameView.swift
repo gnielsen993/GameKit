@@ -66,7 +66,7 @@ struct SudokuGameView: View {
             value: viewModel.isHintCardVisible
         )
         .onChange(of: viewModel.isHintCardVisible) { _, showing in
-            if showing { viewModel.pause() } else { viewModel.resume() }
+            if showing { viewModel.pause() } else { if scenePhase == .active && !(viewModel.isHintCardVisible || viewModel.pendingSaveState != nil) { viewModel.resume() } }
         }
         .gameDrawerDialog(
             isPresented: viewModel.pendingSaveState != nil,
@@ -130,8 +130,8 @@ struct SudokuGameView: View {
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .background: viewModel.pause()
-            case .active:     viewModel.resume()
-            case .inactive:   break
+            case .active:     if scenePhase == .active && !(viewModel.isHintCardVisible || viewModel.pendingSaveState != nil) { viewModel.resume() }
+            case .inactive:   viewModel.pause()
             @unknown default: break
             }
         }

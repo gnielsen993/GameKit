@@ -20,11 +20,10 @@ enum MinesweeperHintCopy {
                 format: String(localized: "The highlighted %d already touches all %d of its mines, so every other square around it is safe. The outlined one is safe to open."),
                 number, number
             )
-        case .comparingTwoNumbers(let smaller, let larger):
-            return String(
-                format: String(localized: "Compare the highlighted %d and %d. Every square the %d touches, the %d touches too — so the %d's mines are all inside that shared group, and the squares only the %d touches are safe. The outlined one is safe to open."),
-                smaller, larger, smaller, larger, smaller, larger
-            )
+        case .comparingTwoNumbers:
+            guard step.evidence.count == 2 else { return noStepFound }
+            let first = step.evidence[0], second = step.evidence[1]
+            return String(localized: "Open row \(step.safe.row + 1), column \(step.safe.col + 1). Compare row \(first.row + 1), column \(first.col + 1) with row \(second.row + 1), column \(second.col + 1). After accounting for the marked hint mines, both need the same number of mines. The first number's unopened neighbors are shared by the second, so the second number's extra neighbors are safe.")
         }
     }
 

@@ -159,6 +159,51 @@ struct FreeCellHintTests {
         #expect(vm.activeHintDestination == nil)
     }
 
+    @Test("a hint clears when its named source card has moved")
+    func movedHintSourceDoesNotRetargetTheNewTopCard() throws {
+        let vm = viewModel()
+        vm.requestHint()
+        let source = try #require(vm.activeHintSource)
+        let namedCard = try #require(vm.activeHintCard)
+        // Deal 1's suggestion does not use the second free cell, leaving it
+        // available to move the named card somewhere other than the hint.
+        try #require(vm.activeHintDestination != .freeCell(1))
+
+        #expect(vm.applyDragDrop(from: source, to: .freeCell(1)))
+        #expect(vm.board.freeCells[1]?.id == namedCard.id)
+        #expect(vm.activeHint == nil)
+        #expect(vm.activeHintSource == nil)
+    }
+
+    @Test("a hint survives an unrelated move and its undo")
+    func validHintSurvivesUnrelatedMoveAndUndo() throws {
+        var board = FreeCellBoard(dealNumber: 1)
+        board.columns = Array(repeating: [], count: FreeCellBoard.columnCount)
+        board.columns[0] = [PlayingCard(rank: .ace, suit: .spades, faceUp: true)]
+        board.columns[1] = [PlayingCard(rank: .six, suit: .clubs, faceUp: true)]
+        board.columns[2] = [PlayingCard(rank: .seven, suit: .hearts, faceUp: true)]
+
+        let vm = FreeCellViewModel(mode: .deal(1))
+        vm.restoreState(
+            FreeCellSaveState(
+                board: board,
+                dealNumber: 1,
+                difficulty: nil,
+                elapsedSeconds: 0,
+                savedAt: .now,
+                history: []
+            )
+        )
+        vm.requestHint()
+        let source = try #require(vm.activeHintSource)
+        #expect(source == .column(colIdx: 0, startCardIdx: 0))
+
+        #expect(vm.applyDragDrop(from: .column(colIdx: 1, startCardIdx: 0), to: .column(2)))
+        #expect(vm.activeHintSource == source)
+        vm.undo()
+        #expect(vm.activeHintSource == source)
+    }
+
     @Test("a new deal resets the assist count")
     func resetClearsAssists() {
         let vm = viewModel()

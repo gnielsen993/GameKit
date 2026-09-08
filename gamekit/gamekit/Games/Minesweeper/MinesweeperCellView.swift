@@ -132,6 +132,7 @@ struct MinesweeperCellView: View {
             )
             .accessibilityElement(children: .ignore)  // RESEARCH Pitfall 5
             .accessibilityLabel(accessibilityLabelKey)
+            .accessibilityValue(isHintSafe ? Text("Hint: safe to open") : isHintEvidence ? Text("Hint evidence") : isHintInferredMine ? Text("Hint: inferred mine") : Text(""))
             .accessibilityAddTraits(.isButton)
     }
 

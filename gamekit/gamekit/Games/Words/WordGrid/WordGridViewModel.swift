@@ -16,6 +16,7 @@ final class WordGridViewModel {
     private var gameStats: GameStats?
     private let userDefaults: UserDefaults
     private var timer: Timer?
+    private var sceneIsActive = true
 
     var submitCount = 0
     var selectionCount = 0
@@ -126,6 +127,11 @@ final class WordGridViewModel {
         isHintCardVisible = false
         if hintWord == nil { hintExhausted = false }
         startTimerIfNeeded()
+    }
+
+    func setSceneActive(_ active: Bool) {
+        sceneIsActive = active
+        if active { startTimerIfNeeded() } else { pauseForAssist() }
     }
 
     func pauseForAssist() {
@@ -265,7 +271,7 @@ final class WordGridViewModel {
 
     private func startTimerIfNeeded() {
         timer?.invalidate()
-        guard mode == .timed, state == .playing else { return }
+        guard mode == .timed, state == .playing, sceneIsActive, !isHintCardVisible else { return }
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self, self.state == .playing else { return }

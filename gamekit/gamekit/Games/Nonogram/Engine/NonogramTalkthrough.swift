@@ -74,6 +74,14 @@ enum NonogramTalkthrough {
         rowHints: [[Int]],
         columnHints: [[Int]]
     ) -> Deduction? {
+        // A forced cell in one line can still be wrong for the puzzle when a
+        // player's earlier mark already makes an intersecting line
+        // impossible. Never turn that local fact into confident advice.
+        guard NonogramHints.unsatisfiableRows(board: board, hints: rowHints).isEmpty,
+              NonogramHints.unsatisfiableColumns(board: board, hints: columnHints).isEmpty else {
+            return nil
+        }
+
         var best: Deduction?
 
         for row in 0..<board.size {

@@ -215,6 +215,17 @@ struct FiveLetterAssistTests {
         #expect(answers.contains(probe) == false)
     }
 
+    @Test("an opening coach prefers a familiar useful word")
+    func openingCoachPrefersFamiliarProbe() {
+        let result = FiveLetterAssist.suggestion(
+            after: [],
+            answers: ["CRANE", "TRACE", "GRACE", "BRAVE"],
+            acceptedGuesses: ["SLATE", "TARIE", "CRANE", "TRACE", "GRACE", "BRAVE"]
+        )
+
+        #expect(result.suggestedGuess == "SLATE")
+    }
+
     @Test("one remaining answer is acknowledged without being named")
     func oneAnswerFallsBack() {
         let guess = FiveLetterGuess(
@@ -229,5 +240,34 @@ struct FiveLetterAssistTests {
         #expect(result.remainingCount == 1)
         #expect(result.suggestedGuess == nil)
         #expect(result.fallback?.contains("TRACE") != true)
+    }
+
+    @Test("the final turn gives constraints instead of a guaranteed non-answer")
+    func finalTurnDoesNotSuggestAProbe() {
+        let guess = FiveLetterGuess(
+            word: "BIGHT",
+            marks: FiveLetterFeedback.evaluate(guess: "BIGHT", answer: "LIGHT")
+        )
+        let result = FiveLetterAssist.suggestion(
+            after: Array(repeating: guess, count: 5),
+            answers: ["LIGHT", "NIGHT"],
+            acceptedGuesses: ["DIGHT", "LIGHT", "NIGHT"]
+        )
+
+        #expect(result.remainingCount == 2)
+        #expect(result.suggestedGuess == nil)
+        #expect(result.fallback?.isEmpty == false)
+    }
+
+    @Test("a probe that cannot distinguish candidates is rejected")
+    func zeroInformationProbeFallsBack() {
+        let result = FiveLetterAssist.suggestion(
+            after: [],
+            answers: ["LIGHT", "NIGHT"],
+            acceptedGuesses: ["DIGHT", "LIGHT", "NIGHT"]
+        )
+
+        #expect(result.suggestedGuess == nil)
+        #expect(result.fallback?.isEmpty == false)
     }
 }

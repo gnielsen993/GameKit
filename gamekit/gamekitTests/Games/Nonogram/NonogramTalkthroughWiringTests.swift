@@ -12,6 +12,32 @@ import Foundation
 @MainActor
 struct NonogramTalkthroughWiringTests {
 
+    /// The top-left X conflicts with this exact picture, but every row and
+    /// column still has at least one legal completion. This distinguishes
+    /// puzzle-truth validation from ordinary line-contradiction checks.
+    private func truthFixtureViewModel(withWrongMark: Bool) -> NonogramViewModel {
+        let suite = UserDefaults(suiteName: "NonogramTruth.\(UUID().uuidString)")!
+        let vm = NonogramViewModel(difficulty: .tiny, userDefaults: suite)
+        var cells = Array(repeating: NonogramCellState.empty, count: 25)
+        if withWrongMark { cells[0] = .marked }
+        vm.restoreState(
+            NonogramSaveState(
+                puzzleId: "truth-fixture",
+                puzzleGrid: "1000001000111110001000001",
+                puzzleTitle: "Truth fixture",
+                cells: cells,
+                size: 5,
+                difficulty: NonogramDifficulty.tiny.rawValue,
+                gameMode: NonogramGameMode.free.rawValue,
+                livesRemaining: NonogramGameMode.livesPerPuzzle,
+                lockedCellIndices: [],
+                elapsedSeconds: 0,
+                savedAt: .now
+            )
+        )
+        return vm
+    }
+
     private func makeViewModel() -> NonogramViewModel {
         let suite = UserDefaults(suiteName: "NonogramTalkthroughWiring.\(UUID().uuidString)")!
         return NonogramViewModel(difficulty: .tiny, userDefaults: suite)
@@ -37,6 +63,34 @@ struct NonogramTalkthroughWiringTests {
         let before = vm.board
         vm.requestTalkthrough()
         #expect(vm.board == before)
+    }
+
+    @Test("a locally satisfiable wrong mark blocks truthful help")
+    func locallySatisfiableMistakeBlocksTalkthrough() {
+        let vm = truthFixtureViewModel(withWrongMark: true)
+        #expect(vm.unsatisfiableRows.isEmpty)
+        #expect(vm.unsatisfiableColumns.isEmpty)
+
+        vm.requestTalkthrough()
+
+        #expect(vm.activeTalkthrough == nil)
+        #expect(vm.talkthroughUnavailable == .boardHasAMistake)
+        #expect(vm.assistsUsed == 0)
+    }
+
+    @Test("a persistent talkthrough clears after a locally satisfiable wrong mark")
+    func persistentTalkthroughDoesNotOutliveWrongPremise() throws {
+        let vm = truthFixtureViewModel(withWrongMark: false)
+        vm.requestTalkthrough()
+        try #require(vm.activeTalkthrough != nil)
+        vm.dismissTalkthrough()
+        vm.setCell(at: 0, col: 0, to: .marked)
+
+        #expect(vm.unsatisfiableRows.isEmpty)
+        #expect(vm.unsatisfiableColumns.isEmpty)
+
+        #expect(vm.activeTalkthrough == nil)
+        #expect(vm.talkthroughUnavailable == .boardHasAMistake)
     }
 
     @Test("every explanation is non-empty and names its line")
@@ -179,9 +233,8 @@ struct NonogramTalkthroughWiringTests {
 
     @Test("assist count survives a save and restore")
     func assistCountPersists() throws {
-        let vm = makeViewModel()
+        let vm = truthFixtureViewModel(withWrongMark: false)
         let puzzle = try #require(vm.currentPuzzle)
-        vm.handleTap(at: 0, col: 0)      // enter .playing so the save writes
         vm.requestTalkthrough()
         let used = vm.assistsUsed
         #expect(used >= 1)

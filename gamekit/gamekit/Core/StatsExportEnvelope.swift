@@ -69,6 +69,9 @@ struct StatsExportEnvelope: Sendable, Equatable {
         let playedAt: Date
         let schemaVersion: Int
         let score: Int?
+        // Additive v1.6 metadata; missing keys in older backups decode as nil.
+        let assistCount: Int?
+        let puzzleIdRaw: String?
 
         init(
             id: UUID,
@@ -78,7 +81,9 @@ struct StatsExportEnvelope: Sendable, Equatable {
             durationSeconds: Double,
             playedAt: Date,
             schemaVersion: Int,
-            score: Int? = nil
+            score: Int? = nil,
+            assistCount: Int? = nil,
+            puzzleIdRaw: String? = nil
         ) {
             self.id = id
             self.gameKindRaw = gameKindRaw
@@ -88,6 +93,8 @@ struct StatsExportEnvelope: Sendable, Equatable {
             self.playedAt = playedAt
             self.schemaVersion = schemaVersion
             self.score = score
+            self.assistCount = assistCount
+            self.puzzleIdRaw = puzzleIdRaw
         }
     }
 

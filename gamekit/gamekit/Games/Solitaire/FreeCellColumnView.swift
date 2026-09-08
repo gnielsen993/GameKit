@@ -110,6 +110,9 @@ struct FreeCellColumnView: View {
             .feedbackAnimation(.easeInOut(duration: 0.15), value: isSelected)
             .feedbackAnimation(.easeInOut(duration: 0.15), value: isHighlighted)
             .contentShape(Rectangle())
+            .accessibilityValue(Text("Column \(colIdx + 1)"))
+            .accessibilityHint(isTopOfSel && vm.activeHint != nil ? Text("Hint source") : isHighlighted ? Text("Move destination") : Text(""))
+            .accessibilityAddTraits(.isButton)
             .onTapGesture      { vm.tapColumnCard(colIdx: colIdx, cardIdx: idx) }
             .onLongPressGesture(minimumDuration: 0.4) {
                 if idx == cards.count - 1 { vm.doubleTapColumnCard(colIdx: colIdx) }

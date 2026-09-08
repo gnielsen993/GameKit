@@ -9,6 +9,7 @@ struct WordGridFoundWordsPanel: View {
 
     let theme: Theme
     let words: [String]
+    var revealedWords: Set<String> = []
     let layout: Layout
 
     @ViewBuilder
@@ -83,7 +84,7 @@ struct WordGridFoundWordsPanel: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
             Spacer(minLength: theme.spacing.s)
-            Text("+\(WordGridEngine.score(word))")
+            Text("+\(revealedWords.contains(word) ? 0 : WordGridEngine.score(word))")
                 .monospacedDigit()
                 .foregroundStyle(theme.colors.textSecondary)
         }
@@ -95,7 +96,7 @@ struct WordGridFoundWordsPanel: View {
         HStack(spacing: theme.spacing.xs) {
             Text(word)
                 .lineLimit(1)
-            Text("+\(WordGridEngine.score(word))")
+            Text("+\(revealedWords.contains(word) ? 0 : WordGridEngine.score(word))")
                 .monospacedDigit()
                 .foregroundStyle(theme.colors.textSecondary)
         }

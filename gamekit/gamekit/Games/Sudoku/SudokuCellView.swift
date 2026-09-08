@@ -30,6 +30,8 @@ struct SudokuCellView: View {
     var isHintTarget: Bool = false
     /// A square carrying the hint's argument — softly shaded.
     var isHintSupporting: Bool = false
+    var row: Int = 0
+    var column: Int = 0
 
     enum HighlightTier: Equatable {
         case none                  // no overlay
@@ -50,7 +52,8 @@ struct SudokuCellView: View {
         .feedbackAnimation(.spring(response: 0.25, dampingFraction: 0.7), value: cell)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityText)
+        .accessibilityLabel(accessibilityText + Text(", row \(row + 1), column \(column + 1)"))
+        .accessibilityValue(isHintTarget ? Text("Hint target") : isHintSupporting ? Text("Hint evidence") : Text(""))
     }
 
     private var background: some View {

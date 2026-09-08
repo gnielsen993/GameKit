@@ -75,14 +75,16 @@ final class FreeCellViewModel {
     }
 
     func resume() {
-        guard gameState == .playing, timerAnchor == nil else { return }
+        guard gameState == .playing, timerAnchor == nil, !isHintCardVisible else { return }
         timerAnchor = Date.now
     }
 
     private func startTimer() {
         guard gameState == .idle else { return }
         gameState   = .playing
-        timerAnchor = Date.now
+        if !isHintCardVisible {
+            timerAnchor = Date.now
+        }
     }
 
     private func freezeTimer() {
@@ -145,6 +147,7 @@ final class FreeCellViewModel {
         isHintCardVisible = false
         // Automatic frustration copy has no board guidance to preserve.
         if activeHint == nil { hintText = nil }
+        resume()
     }
 
     /// Assists asked for on this deal.
@@ -158,9 +161,12 @@ final class FreeCellViewModel {
     func requestHint() {
         guard gameState == .playing || gameState == .idle else { return }
         if let activeHint {
-            isHintCardVisible = true
-            selection = hintSelection(for: activeHint.move)
-            return
+            if let source = hintSelection(for: activeHint.move) {
+                isHintCardVisible = true
+                selection = source
+                return
+            }
+            clearActiveHint()
         }
         guard let suggestion = FreeCellHint.nextMove(board: board, previousMove: history.last) else {
             activeHint = nil
@@ -180,10 +186,12 @@ final class FreeCellViewModel {
         guard let suggestion = activeHint,
               let source = hintSelection(for: suggestion.move) else { return }
         let destination = hintDestination(for: suggestion.move)
+        isHintCardVisible = false
         _ = attemptMove(from: source, to: destination)
     }
 
     private func hintSelection(for move: FreeCellHint.Move) -> FreeCellSelection? {
+        guard isHintMoveCurrentlyValid(move) else { return nil }
         switch move {
         case .columnToFoundation(_, let from),
              .columnToColumn(_, let from, _),
@@ -209,7 +217,8 @@ final class FreeCellViewModel {
     }
 
     var activeHintDestination: FreeCellDest? {
-        activeHint.map { hintDestination(for: $0.move) }
+        guard let activeHint, isHintMoveCurrentlyValid(activeHint.move) else { return nil }
+        return hintDestination(for: activeHint.move)
     }
 
     var activeHintSource: FreeCellSelection? {
@@ -217,7 +226,7 @@ final class FreeCellViewModel {
     }
 
     var activeHintCard: PlayingCard? {
-        guard let move = activeHint?.move else { return nil }
+        guard let move = activeHint?.move, isHintMoveCurrentlyValid(move) else { return nil }
         switch move {
         case .columnToFoundation(let card, _),
              .columnToColumn(let card, _, _),
@@ -345,6 +354,7 @@ final class FreeCellViewModel {
         let wasLost = gameState == .lost
         board     = last.boardBefore
         selection = nil
+        invalidateActiveHintIfNeeded()
         if wasLost {
             // Backing out of a dead board returns the deal to play, drops the
             // held loss, and restarts the clock from where it froze.
@@ -458,7 +468,9 @@ final class FreeCellViewModel {
         let cards = cards(for: sel)
         guard !cards.isEmpty else { return false }
         let completesActiveHint = activeHint.map {
-            hintSelection(for: $0.move) == sel && hintDestination(for: $0.move) == dst
+            isHintMoveCurrentlyValid($0.move)
+                && hintSelection(for: $0.move) == sel
+                && hintDestination(for: $0.move) == dst
         } ?? false
 
         switch dst {
@@ -543,9 +555,9 @@ final class FreeCellViewModel {
         selection    = nil
         rejectStreak = 0
         if completesActiveHint {
-            hintText = nil
-            activeHint = nil
-            isHintCardVisible = false
+            clearActiveHint()
+        } else {
+            invalidateActiveHintIfNeeded()
         }
         dropTick    += 1
         checkTerminalState()
@@ -616,6 +628,67 @@ final class FreeCellViewModel {
         let s = sel ?? selection
         if case .column(let src, _) = s { return src == colIdx }
         return false
+    }
+
+    // MARK: - Persistent hint validity
+
+    /// A dismissed hint may survive unrelated moves, but its named source
+    /// card and destination must still describe the same legal move. This
+    /// prevents an exposed replacement card from inheriting old advice.
+    private func isHintMoveCurrentlyValid(_ move: FreeCellHint.Move) -> Bool {
+        switch move {
+        case .columnToFoundation(let card, let from):
+            return board.columns.indices.contains(from)
+                && board.columns[from].last == card
+                && FreeCellRules.canMoveToFoundation(card, foundations: board.foundations)
+        case .freeCellToFoundation(let card, let cell):
+            return board.freeCells.indices.contains(cell)
+                && board.freeCells[cell] == card
+                && FreeCellRules.canMoveToFoundation(card, foundations: board.foundations)
+        case .columnToColumn(let card, let from, let to):
+            return board.columns.indices.contains(from)
+                && board.columns.indices.contains(to)
+                && from != to
+                && board.columns[from].last == card
+                && FreeCellRules.canPlace(card, onto: board.columns[to])
+        case .sequenceToColumn(let cards, let from, let to):
+            guard board.columns.indices.contains(from),
+                  board.columns.indices.contains(to),
+                  from != to,
+                  !cards.isEmpty,
+                  Array(board.columns[from].suffix(cards.count)) == cards,
+                  FreeCellRules.isValidSequence(cards),
+                  let first = cards.first,
+                  FreeCellRules.canPlace(first, onto: board.columns[to]) else {
+                return false
+            }
+            let limit = FreeCellRules.maxMoveable(
+                board: board,
+                toEmptyColumn: board.columns[to].isEmpty
+            )
+            return cards.count <= limit
+        case .freeCellToColumn(let card, let cell, let to):
+            return board.freeCells.indices.contains(cell)
+                && board.columns.indices.contains(to)
+                && board.freeCells[cell] == card
+                && FreeCellRules.canPlace(card, onto: board.columns[to])
+        case .columnToFreeCell(let card, let from, let cell):
+            return board.columns.indices.contains(from)
+                && board.freeCells.indices.contains(cell)
+                && board.columns[from].last == card
+                && board.freeCells[cell] == nil
+        }
+    }
+
+    private func invalidateActiveHintIfNeeded() {
+        guard let activeHint, !isHintMoveCurrentlyValid(activeHint.move) else { return }
+        clearActiveHint()
+    }
+
+    private func clearActiveHint() {
+        hintText = nil
+        activeHint = nil
+        isHintCardVisible = false
     }
 
     // MARK: - Save state

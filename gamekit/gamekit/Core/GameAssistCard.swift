@@ -11,6 +11,8 @@ struct GameAssistCard: View {
     var tone: Tone = .accent
     var primaryAction: Action? = nil
     let onDismiss: () -> Void
+    @Environment(\.gameAssistHeightLimit) private var heightLimit
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     enum Tone { case accent, warning, neutral }
 
@@ -21,45 +23,32 @@ struct GameAssistCard: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: theme.spacing.s) {
-            Image(systemName: tone == .warning ? "exclamationmark.triangle.fill" : "lightbulb.fill")
-                .font(theme.typography.body.weight(.semibold))
-                .foregroundStyle(toneColor)
-                .frame(width: 44, height: 44)
-                .background(
-                    Circle().fill(theme.colors.surfaceElevated)
-                )
-                .accessibilityHidden(true)
-
             VStack(alignment: .leading, spacing: theme.spacing.xs) {
-                HStack(alignment: .firstTextBaseline, spacing: theme.spacing.s) {
-                    Text(title)
-                        .font(theme.typography.body.weight(.semibold))
-                        .foregroundStyle(theme.colors.textPrimary)
-
-                    Spacer(minLength: theme.spacing.s)
-
-                    Button(action: onDismiss) {
-                        Image(systemName: "xmark")
-                            .font(theme.typography.caption.weight(.semibold))
+                ScrollView {
+                    VStack(alignment: .leading, spacing: theme.spacing.xs) {
+                        if !dynamicTypeSize.isAccessibilitySize {
+                            Text(title)
+                                .font(theme.typography.body.weight(.semibold))
+                                .foregroundStyle(theme.colors.textPrimary)
+                                .accessibilityAddTraits(.isHeader)
+                        }
+                        Text(message)
+                            .font(theme.typography.caption)
                             .foregroundStyle(theme.colors.textSecondary)
-                            .frame(width: 44, height: 44)
-                            .contentShape(Rectangle())
+                        Text("Assisted wins count, but do not set records.")
+                            .font(theme.typography.caption)
+                            .foregroundStyle(theme.colors.textSecondary)
+                        if let progress {
+                            Text(progress)
+                                .font(theme.typography.caption.weight(.semibold))
+                                .foregroundStyle(toneColor)
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text("Dismiss hint"))
-                }
-
-                Text(message)
-                    .font(theme.typography.caption)
-                    .foregroundStyle(theme.colors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
-
-                if let progress {
-                    Text(progress)
-                        .font(theme.typography.caption.weight(.semibold))
-                        .foregroundStyle(toneColor)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-
+                .frame(maxHeight: heightLimit)
+                .fixedSize(horizontal: false, vertical: true)
                 if let primaryAction {
                     Button(primaryAction.title, action: primaryAction.perform)
                         .font(theme.typography.caption.weight(.semibold))
@@ -68,6 +57,15 @@ struct GameAssistCard: View {
                         .accessibilityHint(Text("Applies this hint"))
                 }
             }
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+                    .font(theme.typography.caption.weight(.semibold))
+                    .foregroundStyle(theme.colors.textSecondary)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Dismiss hint"))
         }
         .padding(theme.spacing.s)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -115,6 +113,7 @@ struct GameAssistToolbarButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(label))
+        .accessibilityHint(Text("Assisted wins count, but do not set records"))
     }
 }
 
@@ -137,9 +136,19 @@ private struct GameAssistInsetModifier<Assist: View>: ViewModifier {
     let theme: Theme
     let assist: Assist
     @Environment(\.videoModeStore) private var videoModeStore
+    // This is a viewport floor, not a text size. Scaling the whole viewport
+    // moves centered boards below the visible region at accessibility sizes.
+    private let minimumGameHeight: CGFloat = 520
 
     func body(content: Content) -> some View {
-        content.safeAreaInset(
+        GeometryReader { proxy in
+            ScrollView(.vertical) {
+                content.frame(height: max(proxy.size.height, minimumGameHeight))
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .clipped()
+        }
+        .safeAreaInset(
             edge: GameAssistPlacement.edge(
                 videoModeEnabled: videoModeStore.isEnabled,
                 location: videoModeStore.location
@@ -147,7 +156,20 @@ private struct GameAssistInsetModifier<Assist: View>: ViewModifier {
             spacing: theme.spacing.s
         ) {
             assist
+                .environment(\.gameAssistHeightLimit, theme.spacing.xxl * 3)
         }
+        .background(theme.colors.background.ignoresSafeArea())
+    }
+}
+
+private struct GameAssistHeightLimitKey: EnvironmentKey {
+    static let defaultValue: CGFloat = .infinity
+}
+
+private extension EnvironmentValues {
+    var gameAssistHeightLimit: CGFloat {
+        get { self[GameAssistHeightLimitKey.self] }
+        set { self[GameAssistHeightLimitKey.self] = newValue }
     }
 }
 

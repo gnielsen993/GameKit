@@ -67,6 +67,8 @@ struct PlayingCardView: View {
                 CardBackView(theme: theme, isClassic: isClassic, width: width)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(faceUp ? Text("\(rank.display) of \(suit.rawValue)") : Text("Face-down card"))
         .frame(width: width, height: height)
         .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
     }

@@ -76,6 +76,7 @@ struct WordGridGameView: View {
             ]
         )
         .onChange(of: scenePhase) { _, phase in
+            viewModel.setSceneActive(phase == .active)
             if phase == .background { viewModel.saveCurrentState() }
         }
         .task {
@@ -199,6 +200,7 @@ struct WordGridGameView: View {
                 WordGridFoundWordsPanel(
                     theme: theme,
                     words: viewModel.sortedFoundWords,
+                    revealedWords: viewModel.revealedWords,
                     layout: .rail
                 )
                 .frame(width: theme.spacing.xxl * 5)
@@ -213,6 +215,7 @@ struct WordGridGameView: View {
                 WordGridFoundWordsPanel(
                     theme: theme,
                     words: viewModel.sortedFoundWords,
+                    revealedWords: viewModel.revealedWords,
                     layout: .compact
                 )
                 .frame(height: theme.spacing.xxl * 3)

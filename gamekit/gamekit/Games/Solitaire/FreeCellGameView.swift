@@ -80,7 +80,7 @@ struct FreeCellGameView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { vm.saveCurrentState(); vm.pause() }
-            else if phase == .active { vm.resume() }
+            else if phase == .active { if scenePhase == .active && !(vm.isHintCardVisible) { vm.resume() } }
         }
         // Leaving the screen with an unresolved dead end accepts it: the
         // held loss is written here rather than at the moment it was
@@ -117,7 +117,7 @@ struct FreeCellGameView: View {
         .gameAssistInset(theme: theme) { hintToast }
         .feedbackAnimation(.easeInOut(duration: 0.22), value: vm.isHintCardVisible)
         .onChange(of: vm.isHintCardVisible) { _, showing in
-            if showing { vm.pause() } else { vm.resume() }
+            if showing { vm.pause() } else { if scenePhase == .active && !(vm.isHintCardVisible) { vm.resume() } }
         }
         .gameDrawerDialog(
             isPresented: vm.pendingSaveState != nil,

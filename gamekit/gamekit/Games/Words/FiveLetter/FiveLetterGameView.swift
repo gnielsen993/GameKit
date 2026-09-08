@@ -32,7 +32,7 @@ struct FiveLetterGameView: View {
         }
         .gameAssistInset(theme: theme) { candidateBanner }
         .onChange(of: viewModel.candidateCount != nil) { _, showing in
-            if showing { viewModel.pause() } else { viewModel.resume() }
+            if showing { viewModel.pause() } else { if scenePhase == .active && !(viewModel.candidateCount != nil || viewModel.pendingSaveState != nil) { viewModel.resume() } }
         }
         .navigationTitle(String(localized: "Five Letter"))
         .navigationBarTitleDisplayMode(.inline)
@@ -58,9 +58,9 @@ struct FiveLetterGameView: View {
                 viewModel.saveCurrentState()
                 viewModel.pause()
             case .active:
-                viewModel.resume()
+                if scenePhase == .active && !(viewModel.candidateCount != nil || viewModel.pendingSaveState != nil) { viewModel.resume() }
             case .inactive:
-                break
+                viewModel.pause()
             @unknown default:
                 break
             }

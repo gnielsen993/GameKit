@@ -10,12 +10,29 @@ import SudokuCore
 @MainActor
 struct SudokuHintTests {
 
+    @Test("applying a hint commits its value while Notes mode is selected")
+    func applyingHintIgnoresNotesMode() throws {
+        let vm = makeViewModel()
+        vm.setInteractionMode(.note)
+        vm.requestHint()
+        let hint = try #require(vm.activeHint)
+
+        vm.applyHint()
+
+        #expect(vm.board?.cell(row: hint.step.row, col: hint.step.column) == .user(hint.step.value))
+        #expect(vm.activeHint == nil)
+        #expect(vm.state == .playing)
+    }
+
     private static let testGivens   = "530070000600195000098000060800060003400803001700020006060000280000419005000080079"
     private static let testSolution = "534678912672195348198342567859761423426853791713924856961537284287419635345286179"
 
-    private func makeViewModel(mode: SudokuGameMode = .free) -> SudokuViewModel {
+    private func makeViewModel(
+        mode: SudokuGameMode = .free,
+        clock: @escaping () -> Date = { .now }
+    ) -> SudokuViewModel {
         let suite = UserDefaults(suiteName: "SudokuHintTests.\(UUID().uuidString)")!
-        let vm = SudokuViewModel(difficulty: .easy, mode: mode, userDefaults: suite)
+        let vm = SudokuViewModel(difficulty: .easy, mode: mode, userDefaults: suite, clock: clock)
         vm.injectTestBoardForUnitTests(
             puzzle: SudokuPuzzleEntry(
                 id: "hint-fixture",
@@ -25,6 +42,43 @@ struct SudokuHintTests {
             )
         )
         return vm
+    }
+
+    @Test("an open hint keeps a paused timer paused when the app resumes")
+    func openHintBlocksTimerResume() {
+        var now = Date(timeIntervalSince1970: 100)
+        let vm = makeViewModel(clock: { now })
+        vm.select(row: 0, col: 2)
+        vm.place(value: 4)
+        vm.requestHint()
+        vm.pause()
+        now = now.addingTimeInterval(3)
+
+        vm.resume()
+
+        #expect(vm.timerAnchor == nil)
+        #expect(vm.elapsedSeconds == 0)
+    }
+
+    @Test("fallback commits a value while Notes mode is selected")
+    func fallbackIgnoresNotesMode() {
+        let vm = makeViewModel()
+        vm.injectTestBoardForUnitTests(
+            puzzle: SudokuPuzzleEntry(
+                id: "fallback-fixture",
+                givens: String(repeating: "0", count: 81),
+                solution: Self.testSolution,
+                givenCount: 0
+            )
+        )
+        vm.setInteractionMode(.note)
+        vm.requestHint()
+        #expect(vm.hintUnavailable == .beyondSingles)
+
+        vm.applyFallbackHint()
+
+        #expect(vm.board?.cell(row: 0, col: 0) == .user(5))
+        #expect(vm.state == .playing)
     }
 
     @Test("asking produces a step and charges one assist")
