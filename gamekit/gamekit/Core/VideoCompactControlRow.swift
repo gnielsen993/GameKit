@@ -22,14 +22,9 @@
 //    - Preview block at bottom shows all 3 game slot mappings (Mines /
 //      Merge / Nonogram per Phase 8 D-08) — SC4 satisfaction (D-04).
 //      No DEBUG-only standalone screen, no HomeView dev hook — D-04 lock.
-//    - Picker slot is center-anchored via `Spacer(minLength: theme.spacing.s)`
-//      flanking the `picker()` closure. The primary/secondary info chips
-//      hug the outer edges; the picker (typically a Reveal/Flag-style mode
-//      pill) sits visually centered between them regardless of chip width
-//      asymmetry. Adopters that want a symmetric chip-on-each-side layout
-//      (P11-04 round 2 — Mines's Time-on-right slot) inherit the centering
-//      for free; adopters with chips of similar width (Merge / Nonogram)
-//      see no visual change beyond a small horizontal stretch.
+//    - The row measures its intrinsic width and moves the picker below the
+//      tools when needed. Its height follows the content instead of clipping
+//      pills or larger labels to the icon-button height.
 //
 
 import SwiftUI
@@ -50,25 +45,29 @@ struct VideoCompactControlRow<Primary: View, Picker: View, Secondary: View>: Vie
     @Environment(\.videoModeStore) private var videoModeStore
 
     var body: some View {
-        HStack(spacing: theme.spacing.s) {           // D-13 inter-item gap
-            backButton
-            primaryInfo()
-            // User feedback 2026-05-13 (round 4): tightened a further step.
-            // Spacer min 0 → can collapse fully at narrow widths;
-            // max xs → never expands enough to pull side slots to the edges.
-            // Effectively halves the gap relative to round 3's m-cap.
-            Spacer(minLength: 0)
-                .frame(maxWidth: theme.spacing.xs)
-            picker()
-            Spacer(minLength: 0)
-                .frame(maxWidth: theme.spacing.xs)
-            secondaryInfo()
-            if onSettings != nil {
-                settingsButton
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: theme.spacing.s) {
+                backButton
+                primaryInfo()
+                picker()
+                secondaryInfo()
+                if onSettings != nil { settingsButton }
+            }
+            .fixedSize(horizontal: true, vertical: false)
+
+            VStack(spacing: theme.spacing.s) {
+                HStack(spacing: theme.spacing.s) {
+                    backButton
+                    primaryInfo()
+                    Spacer(minLength: 0)
+                    secondaryInfo()
+                    if onSettings != nil { settingsButton }
+                }
+                picker()
             }
         }
-        .padding(.horizontal, theme.spacing.m)       // consistent edge margin across all games
-        .frame(height: theme.spacing.xl)             // D-13 pill height anchor
+        .padding(.horizontal, theme.spacing.m)
+        .fixedSize(horizontal: false, vertical: true)
         .padding(.top, videoModeStore.location == .largeBottom ? theme.spacing.xxl : 0)
     }
 

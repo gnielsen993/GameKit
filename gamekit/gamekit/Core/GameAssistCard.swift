@@ -79,6 +79,7 @@ struct GameAssistCard: View {
         )
         .padding(.horizontal, theme.spacing.m)
         .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("game-assist-card")
     }
 
     private var toneColor: Color {
@@ -136,29 +137,19 @@ private struct GameAssistInsetModifier<Assist: View>: ViewModifier {
     let theme: Theme
     let assist: Assist
     @Environment(\.videoModeStore) private var videoModeStore
-    // This is a viewport floor, not a text size. Scaling the whole viewport
-    // moves centered boards below the visible region at accessibility sizes.
-    private let minimumGameHeight: CGFloat = 520
-
     func body(content: Content) -> some View {
-        GeometryReader { proxy in
-            ScrollView(.vertical) {
-                content.frame(height: max(proxy.size.height, minimumGameHeight))
+        content
+            .safeAreaInset(
+                edge: GameAssistPlacement.edge(
+                    videoModeEnabled: videoModeStore.isEnabled,
+                    location: videoModeStore.location
+                ),
+                spacing: theme.spacing.s
+            ) {
+                assist
+                    .environment(\.gameAssistHeightLimit, theme.spacing.xxl * 3)
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .clipped()
-        }
-        .safeAreaInset(
-            edge: GameAssistPlacement.edge(
-                videoModeEnabled: videoModeStore.isEnabled,
-                location: videoModeStore.location
-            ),
-            spacing: theme.spacing.s
-        ) {
-            assist
-                .environment(\.gameAssistHeightLimit, theme.spacing.xxl * 3)
-        }
-        .background(theme.colors.background.ignoresSafeArea())
+            .background(theme.colors.background.ignoresSafeArea())
     }
 }
 

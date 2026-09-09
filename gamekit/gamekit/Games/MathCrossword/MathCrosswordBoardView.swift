@@ -9,31 +9,32 @@ struct MathCrosswordBoardView: View {
     let selectedCell: GridPos?
     let hintPlacements: [GridPos: Int]
     let onSelect: (GridPos) -> Void
-    @ScaledMetric(relativeTo: .body) private var minimumCell: CGFloat = 44
+    let dropTarget: GridPos?
+    let onFrameChange: (CGRect) -> Void
 
     var body: some View {
         GeometryReader { proxy in
             let columns = max(1, puzzle.colCount)
-            let cellSide = max(minimumCell, min(68, (proxy.size.width - theme.spacing.m * 2) / CGFloat(columns)))
-            ScrollView([.horizontal, .vertical]) {
-                ZStack(alignment: .topLeading) {
-                    ForEach(cells, id: \.self) { position in
-                        cell(for: position)
-                            .frame(width: cellSide, height: cellSide)
-                            .position(
-                                x: CGFloat(position.col) * cellSide + cellSide / 2,
-                                y: CGFloat(position.row) * cellSide + cellSide / 2
-                            )
-                    }
+            let rows = max(1, puzzle.rowCount)
+            let cellSide = max(0, min(
+                proxy.size.width / CGFloat(columns),
+                proxy.size.height / CGFloat(rows)
+            ))
+            ZStack(alignment: .topLeading) {
+                ForEach(cells, id: \.self) { position in
+                    cell(for: position)
+                        .frame(width: cellSide, height: cellSide)
+                        .position(
+                            x: CGFloat(position.col) * cellSide + cellSide / 2,
+                            y: CGFloat(position.row) * cellSide + cellSide / 2
+                        )
                 }
-                .frame(
-                    width: CGFloat(columns) * cellSide,
-                    height: CGFloat(max(1, puzzle.rowCount)) * cellSide,
-                    alignment: .topLeading
-                )
-                .padding(theme.spacing.m)
             }
-            .scrollIndicators(.automatic)
+            .frame(width: CGFloat(columns) * cellSide, height: CGFloat(rows) * cellSide)
+            .onGeometryChange(for: CGRect.self) { geometry in
+                geometry.frame(in: .named(MathCrosswordCoordinateSpace.name))
+            } action: { onFrameChange($0) }
+            .frame(width: proxy.size.width, height: proxy.size.height)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, theme.spacing.m)
@@ -52,7 +53,8 @@ struct MathCrosswordBoardView: View {
             Text(symbol)
                 .font(theme.typography.title.weight(.semibold))
                 .foregroundStyle(theme.colors.textSecondary)
-                .minimumScaleFactor(0.6)
+                .lineLimit(1)
+                .minimumScaleFactor(0.01)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityLabel(Text(symbol == "=" ? "equals" : symbol))
         } else {
@@ -63,7 +65,7 @@ struct MathCrosswordBoardView: View {
     private func numberCell(_ position: GridPos) -> some View {
         let given = puzzle.givens.contains(position)
         let value = given ? puzzle.solution[position] : placements[position]
-        let selected = selectedCell == position
+        let selected = selectedCell == position || dropTarget == position
         let hinted = hintPlacements[position] != nil
         let incorrect = !given && value != nil && value != puzzle.solution[position]
         return Button { onSelect(position) } label: {
@@ -71,7 +73,7 @@ struct MathCrosswordBoardView: View {
                 .font(theme.typography.title.weight(.semibold))
                 .foregroundStyle(selected ? theme.colors.background : incorrect ? theme.colors.danger : theme.colors.textPrimary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.55)
+                .minimumScaleFactor(0.01)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(selected ? theme.colors.accentPrimary : theme.colors.surface)
                 .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
@@ -83,6 +85,7 @@ struct MathCrosswordBoardView: View {
         }
         .buttonStyle(.pressable)
         .disabled(given)
+        .accessibilityIdentifier("math-cell-\(position.row)-\(position.col)")
         .accessibilityLabel(Text(accessibilityLabel(for: position, value: value, given: given, hinted: hinted, incorrect: incorrect)))
         .accessibilityValue(Text(value.map(String.init) ?? "empty"))
         .accessibilityHint(Text(given ? "Given number" : "Select this blank"))
@@ -109,4 +112,8 @@ struct MathCrosswordBoardView: View {
         if incorrect { result += ", does not fit the equations" }
         return result
     }
+}
+
+enum MathCrosswordCoordinateSpace {
+    nonisolated static let name = "math-crossword-board"
 }

@@ -300,9 +300,7 @@ extension SudokuGameView {
     /// PiP in a bottom corner. Board fills the top area (no info header above
     /// it — mirrors the Minesweeper/Nonogram bot-small pattern). Compact info
     /// chips appear BELOW the board, packed to the corner OPPOSITE the PiP.
-    /// Mode pill + numpad follow, with enough bottom padding to lift the numpad
-    /// above the PiP footprint (~192pt) so it remains fully tappable.
-    private static let smallPipFootprint: CGFloat = 200
+    /// Mode pill + numpad follow inside VideoModeAware's shared reservation.
 
     @ViewBuilder
     var bottomSmallZoneLayout: some View {
@@ -331,8 +329,8 @@ extension SudokuGameView {
                     .opacity(isInteractive ? 1 : 0.4)
                     .allowsHitTesting(isInteractive)
             }
-            // Lifts the numpad above the bottom-corner PiP (~192pt tall).
-            .padding(.bottom, Self.smallPipFootprint)
+            // Standard edge spacing; VideoModeAware reserves the PiP footprint.
+            .padding(.bottom, theme.spacing.l)
 
             if isTerminal && endCardVisible {
                 endStateOverlay

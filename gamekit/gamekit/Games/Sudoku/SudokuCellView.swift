@@ -45,6 +45,8 @@ struct SudokuCellView: View {
             background
             glowBackground
             content
+                .lineLimit(1)
+                .minimumScaleFactor(0.1)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .overlay(hintOverlay)

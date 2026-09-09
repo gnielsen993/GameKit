@@ -76,10 +76,7 @@ struct FiveLetterGameView: View {
     /// the covered corner; `.spread` is the off-path arrangement.
     enum InfoPack { case spread, leading, trailing }
 
-    /// ~192pt system small-PiP height + margin (mirrors
-    /// SudokuGameView+VideoMode.smallPipFootprint) — lifts the keyboard above
-    /// a bottom-corner PiP so every key stays tappable.
-    private static let smallPipFootprint: CGFloat = 200
+    // VideoModeAware owns the PiP reservation for all six positions.
 
     /// Necessity principle (2026-07-09, DESIGN §7.7): chrome changes from its
     /// off-path form only where the selected PiP zone actually covers it.
@@ -109,7 +106,7 @@ struct FiveLetterGameView: View {
             // PiP sits on the keyboard's bottom corner — the only genuinely
             // covered element. Lift the stack above the PiP footprint; top
             // chrome stays byte-identical to off-path.
-            normalLayout(bottomClearance: Self.smallPipFootprint)
+            normalLayout()
                 .toolbar { gameToolbar() }
         }
     }
@@ -118,8 +115,7 @@ struct FiveLetterGameView: View {
     /// unobstructed reuse it verbatim; parameters adjust only the covered
     /// element (defaults reproduce off-path exactly).
     @ViewBuilder
-    private func normalLayout(infoPack: InfoPack = .spread,
-                              bottomClearance: CGFloat = 0) -> some View {
+    private func normalLayout(infoPack: InfoPack = .spread) -> some View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
             VStack(spacing: theme.spacing.s) {
@@ -137,7 +133,7 @@ struct FiveLetterGameView: View {
                 .opacity(viewModel.isTerminal ? 0.45 : 1)
                 .allowsHitTesting(!viewModel.isTerminal)
             }
-            .padding(.bottom, bottomClearance > 0 ? bottomClearance : theme.spacing.l)
+            .padding(.bottom, theme.spacing.l)
 
             if viewModel.isTerminal && !bannerDismissed {
                 endBanner

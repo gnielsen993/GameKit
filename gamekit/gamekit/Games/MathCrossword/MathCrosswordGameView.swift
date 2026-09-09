@@ -1,4 +1,5 @@
 import SwiftUI
+import MathCrosswordCore
 import SwiftData
 import DesignKit
 
@@ -18,6 +19,9 @@ struct MathCrosswordGameView: View {
     @State private var showDifficultyDialog = false
     @State private var showReplaceSaveDialog = false
     @State private var viewedCompletedBoard = false
+    @State private var boardFrame: CGRect = .zero
+    @State private var draggedValue: Int?
+    @State private var dragLocation: CGPoint = .zero
 
     init(initialDifficulty: String? = nil) {
         _viewModel = State(initialValue: MathCrosswordViewModel(initialDifficulty: initialDifficulty))
@@ -28,7 +32,7 @@ struct MathCrosswordGameView: View {
 
     var body: some View {
         Group {
-            if videoModeStore.isEnabled && videoModeStore.location == .largeTop {
+            if videoModeStore.isEnabled {
                 gameLayout(showCompactControls: true)
                     .toolbar(.hidden, for: .navigationBar)
             } else {
@@ -128,6 +132,7 @@ struct MathCrosswordGameView: View {
             }
         }
         .onDisappear {
+            draggedValue = nil
             viewModel.pause()
             viewModel.cancelGeneration()
         }
@@ -149,12 +154,13 @@ struct MathCrosswordGameView: View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
             VStack(spacing: theme.spacing.s) {
-                infoRow(compact: showCompactControls)
+                if showCompactControls && controlsAtTop { compactControls }
+                infoRow(compact: videoModeStore.isEnabled)
                 playArea
                 bankAndActions
-                if showCompactControls { compactControls }
+                if showCompactControls && !controlsAtTop { compactControls }
             }
-            .padding(.bottom, bottomClearance)
+            .padding(.bottom, theme.spacing.l)
 
             if viewModel.state == .won && !viewedCompletedBoard {
                 MathCrosswordEndCard(
@@ -171,6 +177,21 @@ struct MathCrosswordGameView: View {
                 )
             }
         }
+        .overlay(alignment: .topLeading) {
+            if let draggedValue, let puzzle = viewModel.puzzle {
+                Text(String(draggedValue))
+                    .font(theme.typography.title.weight(.semibold))
+                    .foregroundStyle(theme.colors.background)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.2)
+                    .frame(width: boardFrame.width / CGFloat(puzzle.colCount), height: boardFrame.height / CGFloat(puzzle.rowCount))
+                    .background(theme.colors.accentPrimary, in: RoundedRectangle(cornerRadius: theme.radii.button))
+                    .position(dragLocation)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+        }
+        .coordinateSpace(name: MathCrosswordCoordinateSpace.name)
         .sensoryFeedback(.selection, trigger: settingsStore.hapticsEnabled ? viewModel.selectionCount : 0)
         .sensoryFeedback(.impact(weight: .light, intensity: 0.7), trigger: settingsStore.hapticsEnabled ? viewModel.placementCount : 0)
         .sensoryFeedback(.error, trigger: settingsStore.hapticsEnabled ? viewModel.wrongAttemptCount : 0)
@@ -237,47 +258,68 @@ struct MathCrosswordGameView: View {
                     placements: viewModel.placements,
                     selectedCell: viewModel.selectedCell,
                     hintPlacements: viewModel.activeHint?.placements ?? [:],
-                    onSelect: viewModel.select
+                    onSelect: viewModel.select,
+                    dropTarget: draggedValue == nil ? nil : dragPosition(at: dragLocation),
+                    onFrameChange: { boardFrame = $0 }
                 )
             }
         }
     }
 
+    private var controlsAtTop: Bool {
+        [VideoModeLocation.largeBottom, .smallBottomLeft, .smallBottomRight].contains(videoModeStore.location)
+    }
+
     private var bankAndActions: some View {
         VStack(spacing: theme.spacing.s) {
-            Text(viewModel.selectedCell == nil
-                 ? (dynamicTypeSize.isAccessibilitySize ? "Select a blank." : "Select a blank, then a number.")
-                 : (dynamicTypeSize.isAccessibilitySize ? "Choose a number." : "Choose a number for the selected square."))
-                .font(theme.typography.caption)
-                .foregroundStyle(theme.colors.textSecondary)
-                .multilineTextAlignment(.center)
+            if !viewModel.isHintCardVisible {
+                Text(viewModel.selectedCell == nil
+                     ? (dynamicTypeSize.isAccessibilitySize ? "Select a blank." : "Drag a number to a blank, or tap to place.")
+                     : (dynamicTypeSize.isAccessibilitySize ? "Choose a number." : "Choose a number for the selected square."))
+                    .font(theme.typography.caption)
+                    .foregroundStyle(theme.colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
             MathCrosswordNumberBank(
                 theme: theme,
                 values: viewModel.remainingBank,
+                compact: videoModeStore.isEnabled,
                 selectedCell: viewModel.selectedCell != nil && isPlaying,
-                onPlace: viewModel.place
+                onPlace: viewModel.place,
+                onDragChanged: { value, location in
+                    draggedValue = value
+                    dragLocation = location
+                },
+                onDragEnded: { value, location in
+                    defer { draggedValue = nil }
+                    guard isPlaying, let position = dragPosition(at: location) else { return }
+                    viewModel.select(position)
+                    viewModel.place(value)
+                }
             )
 
-            HStack(spacing: theme.spacing.s) {
-                Button(action: viewModel.eraseSelected) {
-                    Label("Erase", systemImage: "delete.left")
-                        .frame(minHeight: 44)
-                }
-                .buttonStyle(.pressable)
-                .disabled(viewModel.selectedCell == nil || !isPlaying)
-                .accessibilityLabel(Text("Erase selected tile"))
+            if !videoModeStore.isEnabled {
+                HStack(spacing: theme.spacing.s) {
+                    Button(action: viewModel.eraseSelected) {
+                        Label("Erase", systemImage: "delete.left")
+                            .frame(minHeight: 44)
+                    }
+                    .buttonStyle(.pressable)
+                    .disabled(viewModel.selectedCell == nil || !isPlaying)
+                    .accessibilityLabel(Text("Erase selected tile"))
 
-                Button(action: viewModel.undo) {
-                    Label("Undo", systemImage: "arrow.uturn.backward")
-                        .frame(minHeight: 44)
+                    Button(action: viewModel.undo) {
+                        Label("Undo", systemImage: "arrow.uturn.backward")
+                            .frame(minHeight: 44)
+                    }
+                    .buttonStyle(.pressable)
+                    .disabled(viewModel.placementHistory.isEmpty || !isPlaying)
+                    .accessibilityLabel(Text("Undo last tile"))
                 }
-                .buttonStyle(.pressable)
-                .disabled(viewModel.placementHistory.isEmpty || !isPlaying)
-                .accessibilityLabel(Text("Undo last tile"))
+                .font(theme.typography.body.weight(.semibold))
+                .foregroundStyle(theme.colors.textPrimary)
+                .padding(.horizontal, theme.spacing.m)
             }
-            .font(theme.typography.body.weight(.semibold))
-            .foregroundStyle(theme.colors.textPrimary)
-            .padding(.horizontal, theme.spacing.m)
         }
         .opacity(isPlaying ? 1 : 0.55)
         .allowsHitTesting(isPlaying)
@@ -289,6 +331,10 @@ struct MathCrosswordGameView: View {
             if settingsStore.assistsEnabled {
                 compactButton(symbol: "lightbulb", label: "Show a Math Crossword hint", action: viewModel.requestHint)
             }
+            compactButton(symbol: "delete.left", label: "Erase selected tile", action: viewModel.eraseSelected)
+                .disabled(viewModel.selectedCell == nil || !isPlaying)
+            compactButton(symbol: "arrow.uturn.backward", label: "Undo last tile", action: viewModel.undo)
+                .disabled(viewModel.placementHistory.isEmpty || !isPlaying)
             compactButton(symbol: "arrow.counterclockwise", label: "Restart puzzle", action: { showRestartDialog = true })
             compactButton(symbol: "ellipsis.circle", label: "Choose difficulty", action: { showDifficultyDialog = true })
         }
@@ -298,8 +344,11 @@ struct MathCrosswordGameView: View {
     private func compactButton(symbol: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(theme.typography.body.weight(.semibold))
+                .resizable()
+                .scaledToFit()
+                .fontWeight(.semibold)
                 .foregroundStyle(theme.colors.textPrimary)
+                .frame(width: theme.spacing.m, height: theme.spacing.m)
                 .frame(width: theme.spacing.xl, height: theme.spacing.xl)
                 .background(theme.colors.surface)
                 .clipShape(RoundedRectangle(cornerRadius: theme.radii.button, style: .continuous))
@@ -361,13 +410,14 @@ struct MathCrosswordGameView: View {
         }
     }
 
-    private var bottomClearance: CGFloat {
-        switch videoModeStore.location {
-        case .smallBottomLeft, .smallBottomRight:
-            return 200
-        case .largeTop, .largeBottom, .smallTopLeft, .smallTopRight:
-            return theme.spacing.l
-        }
+    private func dragPosition(at point: CGPoint) -> GridPos? {
+        guard let puzzle = viewModel.puzzle, boardFrame.width > 0, boardFrame.height > 0,
+              boardFrame.contains(point) else { return nil }
+        let position = GridPos(
+            row: Int((point.y - boardFrame.minY) / boardFrame.height * CGFloat(puzzle.rowCount)),
+            col: Int((point.x - boardFrame.minX) / boardFrame.width * CGFloat(puzzle.colCount))
+        )
+        return puzzle.blanks.contains(position) ? position : nil
     }
 
     private func resumeIfPossible() {

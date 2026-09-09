@@ -153,13 +153,16 @@ struct MinesweeperBoardView: View {
         spacing: CGFloat,
         floor: CGFloat = minCellSize
     ) -> CGFloat {
-        let widthBound = cellSize(forWidth: width, cols: cols, padding: padding, spacing: spacing, floor: floor)
+        // A preferred touch size must not push rows beneath the controls when
+        // Video Mode and an open hint share a short viewport. Pinch zoom remains
+        // available when the fitted cells are smaller than the preferred floor.
+        let widthBound = cellSize(forWidth: width, cols: cols, padding: padding, spacing: spacing, floor: 0)
         guard rows > 0 else { return widthBound }
         let rowsF = CGFloat(rows)
         let usableHeight = max(0, height - 2 * padding)
         let spacingTotalH = max(0, rowsF - 1) * spacing
         let heightBound = (usableHeight - spacingTotalH) / rowsF
-        return max(floor, min(widthBound, heightBound))
+        return max(0, min(widthBound, heightBound))
     }
 
     var body: some View {

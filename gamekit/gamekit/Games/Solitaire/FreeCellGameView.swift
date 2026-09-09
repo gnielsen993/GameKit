@@ -20,6 +20,7 @@ struct FreeCellGameView: View {
     @State var dragState:       FreeCellDragState?
     @State var dragTarget:      FreeCellDest? = nil
     @State var headerHeight:    CGFloat = 44
+    @State var columnViewportHeight: CGFloat?
     @State private var hintDismissTask: Task<Void, Never>? = nil
     @State private var showWinFlash = false
 
@@ -203,7 +204,7 @@ struct FreeCellGameView: View {
                 .background(theme.colors.background)
 
                 // ── Board (felt) ───────────────────────────────────────
-                ScrollView(.vertical, showsIndicators: false) {
+                GeometryReader { columnsGeometry in
                     HStack(alignment: .top, spacing: colGap) {
                         ForEach(0..<8, id: \.self) { col in
                             FreeCellColumnView(
@@ -213,16 +214,18 @@ struct FreeCellGameView: View {
                                 theme:     theme,
                                 isClassic: isClassic,
                                 cardWidth: cardW,
+                                availableHeight: columnsGeometry.size.height,
                                 dragSource: dragState?.source,
                                 dragTarget: dragTarget
                             )
                         }
                     }
-                    .padding(.horizontal, boardPad)
-                    .padding(.top, 8)
-                    .padding(.bottom, 16)
+                    .onAppear { columnViewportHeight = columnsGeometry.size.height }
+                    .onChange(of: columnsGeometry.size.height) { _, height in columnViewportHeight = height }
                 }
-                .scrollDisabled(true)
+                .padding(.horizontal, boardPad)
+                .padding(.top, theme.spacing.s)
+                .padding(.bottom, theme.spacing.l)
                 .layoutPriority(1)
             }
             .background(boardColor)

@@ -137,10 +137,9 @@ struct NonogramBoardView: View {
     var body: some View {
         GeometryReader { proxy in
             let layout = computeLayout(in: proxy.size)
-            // Single-side margin: all unused horizontal space sits to the
-            // LEFT of the grid so row hints can claim it. Old symmetric
-            // layout split the margin in two and clipped the long-end
-            // hints under the grid on dense boards.
+            // Give clues their normal rail width, then center the composition.
+            // A short viewport must not turn all horizontal slack into a giant
+            // left rail and pin the smaller board against the right edge.
             let totalWidth = layout.gridWidth + layout.rowHintColumnWidth
             let totalHeight = layout.colHintRowHeight + layout.gridWidth // square grid
 
@@ -168,10 +167,7 @@ struct NonogramBoardView: View {
             }
             // Lock the composition to its exact computed size so SwiftUI's
             // proposal-based layout can't quietly inflate any sub-frame and
-            // open a gap between the column hints and the grid. Pin the
-            // composition to the TRAILING edge — row hints absorb all
-            // unused horizontal margin on the left, grid sits flush at
-            // the right edge of the screen so dense boards never clip.
+            // open a gap between the column hints and the grid.
             .frame(width: totalWidth, height: totalHeight)
             // Center the composition in the available space (both axes).
             // Any horizontal or vertical slack splits symmetrically so
@@ -344,9 +340,8 @@ struct NonogramBoardView: View {
         let pad = Self.hintPaddingOuter + Self.hintPaddingInner
         let maxByHeight = size.height - Self.minColHintHeight
         let preferredEdge = size.width * Self.gridEdgeFraction
-        let floor = Self.minCellSize(videoModeOn: videoModeStore.isEnabled)
-        let gridEdge = max(floor * n,
-                           min(preferredEdge, maxByHeight))
+        // Keep the complete grid and clue rails inside the offered viewport.
+        let gridEdge = max(0, min(preferredEdge, maxByHeight))
         let cs = gridEdge / n
 
         // Hint slots take all leftover margin on each axis. This stays
@@ -354,7 +349,7 @@ struct NonogramBoardView: View {
         // physical size as hint area for 20×20.
         let availableHintW = max(0, size.width - gridEdge)
         let availableHintH = max(0, size.height - gridEdge)
-        let rowHintW = availableHintW
+        let rowHintW = min(availableHintW, size.width * (1 - Self.gridEdgeFraction))
         let colHintH = min(availableHintH,
                            max(Self.minColHintHeight,
                                CGFloat(maxColHints) * cs * 0.55 + pad))

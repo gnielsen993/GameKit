@@ -209,7 +209,7 @@ Shared component: `VideoCompactControlRow` in `Core/`.
 
 | Property | Value |
 |----------|-------|
-| Height | `theme.spacing.xl` (24pt) |
+| Height | Content-driven; wraps the picker onto a second row when the full row does not fit |
 | H-padding | `theme.spacing.m` (inside the component) |
 | Spacing between items | `theme.spacing.s` |
 | Back button size | `theme.spacing.xl` × `theme.spacing.xl` |
@@ -225,8 +225,10 @@ Shared component: `VideoCompactControlRow` in `Core/`.
   is semantically wrong. Do not omit the slot — pass empty.
 - `onSettings: nil` (no gear icon) unless the game has no picker slot to
   carry the settings role.
-- Never exceed `theme.spacing.xl` in any child's height. Use `compact: true`
-  on all sub-components.
+- Use `compact: true` on sub-components. Do not force the container to a
+  24pt height: the mode pill and larger text may need more room.
+- Measure the full row at its intrinsic width. When it does not fit, move the
+  picker to a second row; never truncate a tool label to keep a single row.
 
 ### 3.6 End-State Banner
 Shared component: `VideoModeBanner` in `Core/`.
@@ -334,8 +336,10 @@ ZStack {
   bleed to the screen edges.
 - Always `.frame(maxWidth: .infinity, maxHeight: .infinity)` — fill the
   available square.
-- Board cells: minimum tap target 12pt cell dimension when Video Mode is on;
-  game-specific floor off-path (Minesweeper 18pt, Nonogram 14pt, Sudoku: natural).
+- Fit the whole board to both the offered width and height. Preferred cell
+  sizes never force content outside the viewport or beneath another control.
+- Neither games nor their shared hint container impose a minimum viewport
+  height or scroll the whole game. Only long hint explanations may scroll.
 
 ### 5.4 Mode pill row
 When a game has a mode pill, it lives in a dedicated row between the board
@@ -437,16 +441,21 @@ The ZStack centers the pill regardless of the action button's width.
 - Compact mode pill in bottom-corner small zones (packed in the chrome cluster,
   vertical space is tight).
 
-### 7.4 Small zones — bottom corners
-- Board fills the top area. Chrome cluster (chips + compact pill) anchors in
-  the bottom corner **opposite** the PiP.
-- `padding(.bottom, smallPipFootprint)` or equivalent to clear the ~192pt PiP
-  height — never use `theme.spacing.xxl` (32pt), it's far too small.
+### 7.4 Small zones — shared reservation
+- `VideoModeAware` reserves a 200pt band at the selected top or bottom edge.
+  This is the existing conservative PiP footprint, now owned in one place.
+- Board, controls, and hints all lay out inside the remaining area. Moving
+  chips aside alone does not protect a full-width board from the video.
+- Never add another per-game 200pt bottom padding; that double-reserves space.
+- Corner-specific toolbar routing remains opposite the selected PiP corner.
 
-### 7.5 Cell-size floor (board games)
-- Off-path minimum: game-specific (Minesweeper 18pt, Nonogram 14pt).
-- Video Mode on: 12pt for all board games.
-- Gated on `videoModeStore.isEnabled` only — not per-zone, not per-difficulty.
+### 7.5 Preferred cell sizes (board games)
+- Prefer the normal game-specific size (Minesweeper 18pt, Nonogram 14pt), or
+  12pt in Video Mode, whenever the available viewport permits it.
+- The entire board must still fit when a video and a hint share a small
+  screen. Fit to the actual bounds rather than enforcing a floor that hides
+  rows. Minesweeper retains its existing user-controlled pinch zoom.
+- Keep complete accessibility labels for every cell, including row/column.
 
 ### 7.6 Off-path contract
 - `videoModeStore.isEnabled == false` must be byte-identical to the non-Video
@@ -706,7 +715,7 @@ When in doubt, check these before changing chrome for a specific game.
 - No lives chip — Minesweeper has no lives mode; first touch is always safe.
 - Mode pill: Reveal / Flag. Always present during active play; hidden on terminal state.
 - Difficulty changes via toolbar menu (restartWithOverflowMenu in Video Mode).
-- Cell minimum: 18pt off-path, 12pt Video Mode on.
+- Preferred cells: 18pt off-path, 12pt in Video Mode; actual viewport bounds take precedence (§7.5).
 - The MagnifyGesture / pinch-zoom stack in `MinesweeperBoardView` must never
   be touched when making Video Mode or layout changes (D-17 contract).
 - First-tap safety: mine placement deferred until after first tap; tapped cell
@@ -835,6 +844,19 @@ When in doubt, check these before changing chrome for a specific game.
   shake — brand rule). View-tier `@Environment(\.accessibilityReduceMotion)` only.
 - Stats shape: `SnakeStatsCard` (Phase 18 D-08). Hero = High Score; rows = Average
   Score + Runs Played. No streak row (streak is Stack-only per 16-CONTEXT D-10).
+
+
+### Math Crossword — fitting and placement
+- The full equation grid fits both dimensions of its available area without
+  scrolling. The number bank stays visible below it and wraps when necessary.
+- Drag a bank tile directly onto an editable square, with a tile following the
+  finger and the destination highlighted. Tapping a blank then a bank tile
+  remains supported. Given numbers and equation symbols reject drops.
+- Placement uses the same session validation, inventory counts, save, hint
+  invalidation, feedback, and Undo path as tapping.
+- All Video Mode positions use compact controls opposite the video band.
+  Erase and Undo join the toolbar, and shorter bank tiles preserve board
+  height when a hint is open on the smallest iPhone.
 
 ### 12.5 Future games
 When adding a new game, verify against this checklist:

@@ -72,7 +72,7 @@ extension FreeCellGameView {
     ) -> (FreeCellSelection, CGPoint)? {
         let shelfTopY  = headerHeight
         let shelfBotY  = headerHeight + shelfH
-        let boardTopY  = shelfBotY + 8   // .padding(.top, 8) on board HStack
+        let boardTopY  = shelfBotY + theme.spacing.s
 
         if loc.y >= shelfTopY && loc.y < shelfBotY {
             // Shelf zone — free cells (left) and foundations (right) are draggable
@@ -116,8 +116,10 @@ extension FreeCellGameView {
             let colCards = vm.board.columns[col]
             guard !colCards.isEmpty else { return nil }
             let localY = loc.y - boardTopY
-            let fo = FreeCellColumnView.fanOffset(for: colCards.count, cardWidth: cardW)
-            let cardIdx = max(0, min(colCards.count - 1, Int(localY / fo)))
+            let fo = FreeCellColumnView.fanOffset(for: colCards.count, cardWidth: cardW, availableHeight: columnViewportHeight)
+            let cardIdx = fo > 0
+                ? max(0, min(colCards.count - 1, Int(localY / fo)))
+                : colCards.count - 1
             let dragCards = Array(colCards[cardIdx...])
             guard FreeCellRules.isValidSequence(dragCards) else { return nil }
             let limit = FreeCellRules.maxMoveable(board: vm.board, toEmptyColumn: false)
@@ -163,7 +165,7 @@ extension FreeCellGameView {
     ) -> FreeCellDest? {
         let shelfTopY  = headerHeight
         let shelfBotY  = headerHeight + shelfH
-        let boardTopY  = shelfBotY + 8
+        let boardTopY  = shelfBotY + theme.spacing.s
 
         if loc.y >= shelfTopY && loc.y < shelfBotY {
             let freeCellsW = 4 * cardW + 3 * colGap

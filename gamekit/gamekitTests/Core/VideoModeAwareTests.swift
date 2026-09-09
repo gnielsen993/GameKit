@@ -38,6 +38,16 @@ import SwiftUI
 @Suite("VideoModeAware short-circuit (SC3)")
 struct VideoModeAwareTests {
 
+    @Test("Small PiP corners reserve their footprint before choosing board compactness",
+          arguments: [VideoModeLocation.smallTopLeft, .smallTopRight, .smallBottomLeft, .smallBottomRight])
+    func smallCornersReserveSpace(_ location: VideoModeLocation) {
+        let result = Self.renderAndCapture(
+            store: Self.makeStore(enabled: true, location: location),
+            minBoardHeight: 600, forcedHeight: 700
+        )
+        #expect(result == .reducedTime)
+    }
+
     // MARK: - Helpers
 
     /// Per-test isolated UserDefaults — mirrors VideoModeStoreTests.swift:36-43.

@@ -120,7 +120,6 @@ extension FreeCellGameView {
 
     // MARK: - Bottom-small-zone layout
 
-    private static let fcPipFootprint: CGFloat = 200
 
     @ViewBuilder
     var bottomSmallZoneLayout: some View {
@@ -143,7 +142,7 @@ extension FreeCellGameView {
                         chipsTrailing: videoModeStore.location == .smallBottomLeft
                     )
                 }
-                .padding(.bottom, Self.fcPipFootprint)
+                .padding(.bottom, theme.spacing.l)
 
                 fcCascadeOverlay
             }
@@ -171,7 +170,7 @@ extension FreeCellGameView {
             .padding(.vertical, 10)
             .background(theme.colors.background)
 
-            ScrollView(.vertical, showsIndicators: false) {
+            GeometryReader { columnsGeometry in
                 HStack(alignment: .top, spacing: colGap) {
                     ForEach(0..<8, id: \.self) { col in
                         FreeCellColumnView(
@@ -181,16 +180,18 @@ extension FreeCellGameView {
                             theme:     theme,
                             isClassic: isClassic,
                             cardWidth: cardW,
+                            availableHeight: columnsGeometry.size.height,
                             dragSource: dragState?.source,
                             dragTarget: dragTarget
                         )
                     }
                 }
-                .padding(.horizontal, boardPad)
-                .padding(.top, 8)
-                .padding(.bottom, 16)
+                .onAppear { columnViewportHeight = columnsGeometry.size.height }
+                .onChange(of: columnsGeometry.size.height) { _, height in columnViewportHeight = height }
             }
-            .scrollDisabled(true)
+            .padding(.horizontal, boardPad)
+            .padding(.top, theme.spacing.s)
+            .padding(.bottom, theme.spacing.l)
             .layoutPriority(1)
         }
         .background(boardColor)

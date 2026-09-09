@@ -90,10 +90,7 @@ struct WordGridGameView: View {
     /// the covered corner; `.spread` is the off-path arrangement.
     enum InfoPack { case spread, leading, trailing }
 
-    /// ~192pt system small-PiP height + margin (mirrors
-    /// SudokuGameView+VideoMode.smallPipFootprint) — lifts the Clear/Submit/
-    /// Finish control row above a bottom-corner PiP so it stays tappable.
-    private static let smallPipFootprint: CGFloat = 200
+    // VideoModeAware owns the PiP reservation for all six positions.
 
     /// Necessity principle (2026-07-09, DESIGN §7.7): chrome changes from its
     /// off-path form only where the selected PiP zone actually covers it.
@@ -123,7 +120,7 @@ struct WordGridGameView: View {
             // PiP sits on the control row's bottom corner — the only
             // genuinely covered element. Lift the stack above the PiP
             // footprint; top chrome stays byte-identical to off-path.
-            normalLayout(bottomClearance: Self.smallPipFootprint)
+            normalLayout()
                 .toolbar { gameToolbar() }
         }
     }
@@ -132,8 +129,7 @@ struct WordGridGameView: View {
     /// unobstructed reuse it verbatim; parameters adjust only the covered
     /// element (defaults reproduce off-path exactly).
     @ViewBuilder
-    private func normalLayout(infoPack: InfoPack = .spread,
-                              bottomClearance: CGFloat = 0) -> some View {
+    private func normalLayout(infoPack: InfoPack = .spread) -> some View {
         ZStack {
             theme.colors.background.ignoresSafeArea()
             VStack(spacing: theme.spacing.s) {
@@ -143,7 +139,7 @@ struct WordGridGameView: View {
                 currentWordRow
                 controlRow
             }
-            .padding(.bottom, bottomClearance > 0 ? bottomClearance : theme.spacing.l)
+            .padding(.bottom, theme.spacing.l)
 
             if viewModel.state == .finished && !bannerDismissed {
                 endBanner

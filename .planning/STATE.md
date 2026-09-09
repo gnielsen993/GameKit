@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
 status: executing
-stopped_at: v1.6 closure verified locally; verified batches committed; physical-device release checks remain
-last_updated: "2026-09-08T12:00:00-06:00"
-last_activity: 2026-09-08
+stopped_at: Math Crossword dragging and Video Mode fit corrections verified; physical release checks remain
+last_updated: "2026-09-09"
+last_activity: 2026-09-09
 progress:
   total_phases: 0
   completed_phases: 0
@@ -25,6 +25,18 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 defects that silently punish players. Scope: `.planning/v1.6-BRIEF.md`.
 
 ## Current Position
+
+2026-09-09 correction verified: Math Crossword fits its board and bank and
+supports direct drag/Undo; Minesweeper tools remain visible. Shared hint
+viewport and PiP reservations corrected; Sudoku, Nonogram and FreeCell also
+fit their available space. Corrected SE audit: all 11 games × 6 positions
+passed, plus hint separation and real placement/Undo flows. Final app suite:
+518 unit tests passed, 1 skipped; SE and iPad interaction checks passed.
+Live PiP and actual tablet landscape remain device checks (the simulator kept
+a portrait window after rotation). Evidence:
+`Docs/audits/v1.6-layout-2026-09-09/README.md`.
+The previous closure audit below did not catch these regressions.
+
 
 Phase: none — v1.6 was executed directly from the brief
 Plan: `.planning/v1.6-CLOSURE-PLAN.md` (local implementation and verification complete)

@@ -6,7 +6,7 @@
 //  and applies container-level Video Mode behavior:
 //    - off-restore short-circuit (D-05) — byte-identical to un-wrapped on Off
 //    - large-band reservation (D-08) — .safeAreaInset(.top/.bottom) for
-//      .largeTop / .largeBottom; passthrough on .small* zones (D-11)
+//      .largeTop / .largeBottom; a shared 200pt footprint for small corners
 //    - compactness publication (D-12) — \.videoModeCompactness env value
 //      derived from (proxy.size.height - bandHeight - compactRowHeight) vs
 //      minBoardHeight per the D-14 0.85× threshold
@@ -17,9 +17,8 @@
 //    - largeBandFraction = 0.32 is a private static let (D-10);
 //      NOT promoted to a DesignKit token (CLAUDE.md §2 — single consumer; see
 //      Docs/screenshots/v1.2-design/home-classic-pip-large-bottom.png).
-//    - Small PiP zones do NOT touch board frame / safe area (D-11) — the
-//      modifier only publishes compactness. Slot reposition is the GAME VIEW's
-//      concern in Phases 11/12 via VideoModeSlotRouter.anchors(for:).
+//    - v1.6: small corners reserve space too. Slot routing alone could leave
+//      full-width boards under the video. Games still own toolbar routing.
 //    - Hard-Mines MagnifyGesture stack (06.1-03 / A11Y-05) is UNTOUCHED here
 //      (D-15) — modifier wraps MinesweeperGameView at the outermost layer in
 //      Phase 11, NOT MinesweeperBoardView.
@@ -50,17 +49,12 @@ struct VideoModeAware: ViewModifier {
     ///
     /// CLAUDE.md §2: NOT promoted to a DesignKit token (single consumer).
     private static let largeBandFraction: CGFloat = 0.32
+    // PiP geometry, shared by every game; formerly duplicated in individual games.
+    private static let smallBandHeight: CGFloat = 200
 
-    /// Compact-row height anchor — equals `theme.spacing.xl` (24pt) per Phase 8
-    /// 08-COMPACT-ROW-TOKENS.md and VideoCompactControlRow.swift:38-47 (which
-    /// sets `.frame(height: theme.spacing.xl)`). Resolved as a CGFloat constant
-    /// here per 10-RESEARCH.md §Open Question A1 — the modifier does not have
-    /// direct access to a `theme` env on iOS 17 SwiftUI, and threading a theme
-    /// parameter through would force every call site to pass it. The constant
-    /// keeps the modifier API surface to one parameter.
-    ///
-    /// If DesignKit later exposes `@Environment(\.theme)`, the modifier can
-    /// read `theme.spacing.xl` directly and this constant can be deleted.
+    /// Baseline chrome estimate for the compactness hint, retained from the
+    /// original 24pt icon row. Actual toolbars size themselves to their content;
+    /// board GeometryReaders use the remaining space after that layout.
     private static let compactRowHeight: CGFloat = 24
 
     /// Threshold ratio for the middle compactness level (CONTEXT D-14): when
@@ -121,18 +115,22 @@ struct VideoModeAware: ViewModifier {
             view.safeAreaInset(edge: .bottom, spacing: 0) {
                 Color.clear.frame(height: proxy.size.height * Self.largeBandFraction)
             }
-        case .smallTopLeft, .smallTopRight, .smallBottomLeft, .smallBottomRight:
-            // CONTEXT D-11: Small zones do NOT reserve a band. The board
-            // stays at normal size; slot reposition is handled by the game
-            // view's VideoModeSlotRouter call.
-            view
+        case .smallTopLeft, .smallTopRight:
+            view.safeAreaInset(edge: .top, spacing: 0) {
+                Color.clear.frame(height: bandHeight(for: store.location, in: proxy))
+            }
+        case .smallBottomLeft, .smallBottomRight:
+            view.safeAreaInset(edge: .bottom, spacing: 0) {
+                Color.clear.frame(height: bandHeight(for: store.location, in: proxy))
+            }
         }
     }
 
     private func bandHeight(for loc: VideoModeLocation, in proxy: GeometryProxy) -> CGFloat {
         switch loc {
         case .largeTop, .largeBottom: return proxy.size.height * Self.largeBandFraction
-        case .smallTopLeft, .smallTopRight, .smallBottomLeft, .smallBottomRight: return 0
+        case .smallTopLeft, .smallTopRight, .smallBottomLeft, .smallBottomRight:
+            return min(Self.smallBandHeight, max(0, proxy.size.height))
         }
     }
 
@@ -152,8 +150,8 @@ extension View {
     /// - Off-path: byte-identical to un-wrapped view (D-05).
     /// - Large PiP zones (.largeTop / .largeBottom): reserve a top or bottom
     ///   band sized at `geometry.size.height * 0.32` via `.safeAreaInset`.
-    /// - Small PiP zones: no inset; publish only the compactness env so the
-    ///   game view's slot router can reposition controls.
+    /// - Small PiP zones: reserve the shared 200pt footprint at the selected
+    ///   edge so neither boards nor controls can sit beneath the window.
     /// - Always (when On): publish `\.videoModeCompactness` env value so
     ///   descendants can react to "we're getting cramped — drop Settings into
     ///   the overflow menu / hide the time chip" per the v1.2 plan-doc
@@ -218,7 +216,7 @@ extension EnvironmentValues {
 //
 // SC5 (CLAUDE.md §8.12 theme legibility audit): manually inspect each tile in
 // Xcode canvas, confirm chips / picker / info text are legible on every preset,
-// confirm the reserved band appears on Large zones and not on Small zones.
+// confirm the selected edge is reserved for both large and small zones.
 // Sign-off in 10-VERIFICATION.md.
 //
 // Per CONTEXT D-16 + P9 D-04 precedent: NO DEBUG screen, NO HomeView dev hook.

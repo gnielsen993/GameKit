@@ -80,6 +80,10 @@ struct FreeCellTopRowView: View {
         }
         .frame(width: cardWidth, height: cardHeight)
         .contentShape(Rectangle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Free cell \(idx + 1)"))
+        .accessibilityValue(Text(card.map { "\($0.rank.display) of \($0.suit.rawValue)" } ?? "Empty"))
+        .accessibilityAddTraits(.isButton)
         .onTapGesture { vm.tapFreeCell(cellIdx: idx) }
         .onLongPressGesture(minimumDuration: 0.4) { vm.doubleTapFreeCell(cellIdx: idx) }
     }
@@ -128,6 +132,10 @@ struct FreeCellTopRowView: View {
         }
         .frame(width: cardWidth, height: cardHeight)
         .contentShape(Rectangle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("\(suit.rawValue.capitalized) foundation"))
+        .accessibilityValue(Text(topRank?.display ?? "Empty"))
+        .accessibilityAddTraits(.isButton)
         .onTapGesture { vm.tapFoundation(suit: suit) }
     }
 }

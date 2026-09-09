@@ -24,17 +24,14 @@ struct SudokuBoardView: View {
     let viewModel: SudokuViewModel
     let theme: Theme
 
-    @ScaledMetric(relativeTo: .title) private var minimumCellSide: CGFloat = 32
-
     static let size = SudokuBoard.size       // 9
     static let boxSize = SudokuBoard.boxSize // 3
 
     var body: some View {
         GeometryReader { geo in
-            let side = max(min(geo.size.width, geo.size.height), minimumCellSide * CGFloat(Self.size))
+            let side = max(0, min(geo.size.width, geo.size.height))
             let cellSide = side / CGFloat(Self.size)
 
-            ScrollView([.horizontal, .vertical]) {
             ZStack {
                 gridBackground
                 cellGrid(cellSide: cellSide)
@@ -45,8 +42,7 @@ struct SudokuBoardView: View {
             }
             .feedbackAnimation(theme.motion.ease, value: viewModel.state == .won)
             .frame(width: side, height: side)
-            .frame(minWidth: geo.size.width, minHeight: geo.size.height)
-            }
+            .frame(width: geo.size.width, height: geo.size.height)
         }
     }
 
