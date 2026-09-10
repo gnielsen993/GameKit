@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
 status: executing
-stopped_at: Math Crossword dragging and Video Mode fit corrections verified; physical release checks remain
-last_updated: "2026-09-09"
-last_activity: 2026-09-09
+stopped_at: Version 1.6 build 4 prepared for App Store Connect; upload in progress
+last_updated: "2026-09-10"
+last_activity: 2026-09-10
 progress:
   total_phases: 0
   completed_phases: 0
@@ -25,6 +25,13 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 defects that silently punish players. Scope: `.planning/v1.6-BRIEF.md`.
 
 ## Current Position
+
+2026-09-10 release preparation: Gabe authorized committing, merging, pushing,
+and uploading the current 1.6 build to App Store Connect. Build 4 includes
+Math Crossword arithmetic-only error feedback, valid alternate wins, and tile
+returns. Engine: 23 passed; focused app/simulator run: 13 passed. Final store
+copy includes the corrected behavior. Upload and App Store review status:
+`Docs/releases/v1.6-upload.md`. This is not yet a public App Store release.
 
 2026-09-09 correction verified: Math Crossword fits its board and bank and
 supports direct drag/Undo; Minesweeper tools remain visible. Shared hint

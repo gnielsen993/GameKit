@@ -16,11 +16,11 @@
     "limit": 100
   },
   "description": {
-    "characters": 2360,
+    "characters": 2374,
     "limit": 4000
   },
   "whats-new": {
-    "characters": 794,
+    "characters": 924,
     "limit": 4000
   }
 }

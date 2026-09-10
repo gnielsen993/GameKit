@@ -1,6 +1,6 @@
 # App Store Connect copy - English (US)
 
-Prepared for GameDrawer 1.6, 2026-09-08. Local drafts; not entered into App Store Connect. Each .txt file contains only the field to paste. Character counts exclude the final file newline.
+Prepared for GameDrawer 1.6, 2026-09-10, build 4. Final local copy; not entered into App Store Connect. Each .txt file contains only the field to paste. Character counts exclude the final file newline.
 
 Recommended name: **GameDrawer: Offline Games**. Recommended subtitle: **Sudoku, Solitaire & Puzzles**. The brand and home-screen display name remain GameDrawer. These are search-oriented listing fields, not an in-app rename.
 
@@ -16,5 +16,5 @@ The old live listing named Connections, which is not in the verified roster. Thi
 | subtitle | 27 | [subtitle.txt](subtitle.txt) |
 | promotional-text | 145 | [promotional-text.txt](promotional-text.txt) |
 | keywords | 95 | [keywords.txt](keywords.txt) |
-| description | 2360 | [description.txt](description.txt) |
-| whats-new | 794 | [whats-new.txt](whats-new.txt) |
+| description | 2374 | [description.txt](description.txt) |
+| whats-new | 924 | [whats-new.txt](whats-new.txt) |

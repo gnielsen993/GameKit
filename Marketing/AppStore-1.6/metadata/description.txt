@@ -8,7 +8,7 @@ FIND YOUR NEXT FAVORITE
 
 - Sudoku: 6,000 puzzles across four difficulties, pencil notes and undo.
 - Minesweeper: uncover safe squares, flag mines and work through three board sizes. Your first tap is safe.
-- Math Crossword: fill missing numbers so every crossing equation works. Three difficulties, a number bank and step-by-step help.
+- Math Crossword: fill missing numbers so every crossing equation works. Three difficulties, drag-and-drop numbers, undo and step-by-step help.
 - Nonogram: turn row and column clues into a picture, from 5x5 to 20x20.
 - Solitaire: classic Klondike with draw 1, 2 or 3 and undo.
 - FreeCell: work a deal through four free cells, with undo and deal-number selection.

@@ -45,7 +45,7 @@ Ordered by how often a session needs them.
 | Repo / target name | `gamekit` | locked |
 | Target iOS | 17+ | — |
 | Swift / UI | Swift 6 + SwiftUI | — |
-| Current milestone | `v1.6` in development — Be Kind + Math Crossword; closure verification in `.planning/v1.6-CLOSURE-PLAN.md`; absorbed the never-released 1.5.1 | 2026-09-08 |
+| Current milestone | `v1.6` release candidate — Be Kind + Math Crossword; build 4 prepared for App Store Connect; status in `Docs/releases/v1.6-upload.md`; absorbed the never-released 1.5.1 | 2026-09-10 |
 | Current MVP game | Minesweeper | — |
 | Next game (post-MVP) | TBD — Flow / Pattern Memory / Chess puzzles remain roadmap candidates | 2026-06-22 |
 | Icon | 9A.2 Video drawer (unified light / dark / tinted) | 2026-07-18 |

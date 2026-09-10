@@ -1,8 +1,11 @@
 # App Store Copy - GameDrawer v1.6
+Last updated: 2026-09-10
+Marketing version: 1.6
+Build: 4
 
 Canonical paste-ready fields and verified counts: [Marketing/AppStore-1.6/metadata](../../Marketing/AppStore-1.6/metadata/README.md).
 
-This marketing refresh follows the FitnessTracker release playbook: benefit first, actual product proof, current free access explained clearly. Status: local draft for the 1.6 release.
+This marketing refresh follows the FitnessTracker release playbook: benefit first, actual product proof, current free access explained clearly. Status: final local copy for the 1.6 release; App Store Connect application tracked in the release upload record.
 
 ## Name
 
@@ -49,7 +52,7 @@ FIND YOUR NEXT FAVORITE
 
 - Sudoku: 6,000 puzzles across four difficulties, pencil notes and undo.
 - Minesweeper: uncover safe squares, flag mines and work through three board sizes. Your first tap is safe.
-- Math Crossword: fill missing numbers so every crossing equation works. Three difficulties, a number bank and step-by-step help.
+- Math Crossword: fill missing numbers so every crossing equation works. Three difficulties, drag-and-drop numbers, undo and step-by-step help.
 - Nonogram: turn row and column clues into a picture, from 5x5 to 20x20.
 - Solitaire: classic Klondike with draw 1, 2 or 3 and undo.
 - FreeCell: work a deal through four free cells, with undo and deal-number selection.
@@ -84,14 +87,14 @@ Every game works offline. Stats stay on your device, with optional iCloud sync. 
 Open the drawer. Find your next favorite.
 ```
 
-2360 characters.
+2374 characters.
 
 ## Whats New
 
 ```
 MATH CROSSWORD JOINS THE DRAWER
 
-Fill the missing numbers so every crossing equation works. Choose Easy, Medium or Hard, use the number bank, undo a move, and resume your saved puzzle. Hints point to a deduction before you choose to reveal its numbers.
+Fill the missing numbers so every crossing equation works. Choose Easy, Medium or Hard, drag numbers onto the board or back to the bank, undo a move, and resume your saved puzzle. Any arrangement with correct math counts; errors appear only when a completed equation does not work. Hints point to a deduction before you choose to reveal its numbers.
 
 A LITTLE HELP WHEN YOU NEED IT
 
@@ -104,4 +107,4 @@ Improved small-screen coaching, large-text boards and timer pauses while you rea
 Eleven games. No ads, coins or subscription.
 ```
 
-794 characters.
+924 characters.

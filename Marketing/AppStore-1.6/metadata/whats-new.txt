@@ -1,6 +1,6 @@
 MATH CROSSWORD JOINS THE DRAWER
 
-Fill the missing numbers so every crossing equation works. Choose Easy, Medium or Hard, use the number bank, undo a move, and resume your saved puzzle. Hints point to a deduction before you choose to reveal its numbers.
+Fill the missing numbers so every crossing equation works. Choose Easy, Medium or Hard, drag numbers onto the board or back to the bank, undo a move, and resume your saved puzzle. Any arrangement with correct math counts; errors appear only when a completed equation does not work. Hints point to a deduction before you choose to reveal its numbers.
 
 A LITTLE HELP WHEN YOU NEED IT
 
