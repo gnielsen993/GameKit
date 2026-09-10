@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
 status: executing
-stopped_at: Version 1.6 build 4 prepared for App Store Connect; upload in progress
+stopped_at: Version 1.6 build 4 uploaded to App Store Connect; processing and listing verification pending
 last_updated: "2026-09-10"
 last_activity: 2026-09-10
 progress:
