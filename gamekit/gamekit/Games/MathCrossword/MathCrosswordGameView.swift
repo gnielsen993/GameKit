@@ -20,6 +20,8 @@ struct MathCrosswordGameView: View {
     @State private var showReplaceSaveDialog = false
     @State private var viewedCompletedBoard = false
     @State private var boardFrame: CGRect = .zero
+    @State private var bankFrame: CGRect = .zero
+    @State private var draggedCell: GridPos?
     @State private var draggedValue: Int?
     @State private var dragLocation: CGPoint = .zero
 
@@ -258,9 +260,21 @@ struct MathCrosswordGameView: View {
                     placements: viewModel.placements,
                     selectedCell: viewModel.selectedCell,
                     hintPlacements: viewModel.activeHint?.placements ?? [:],
+                    conflictingCells: viewModel.validation?.conflictingCells ?? [],
                     onSelect: viewModel.select,
-                    dropTarget: draggedValue == nil ? nil : dragPosition(at: dragLocation),
-                    onFrameChange: { boardFrame = $0 }
+                    dropTarget: draggedValue == nil || draggedCell != nil ? nil : dragPosition(at: dragLocation),
+                    onFrameChange: { boardFrame = $0 },
+                    onDragChanged: { position, value, location in
+                        guard isPlaying else { return }
+                        draggedCell = position
+                        draggedValue = value
+                        dragLocation = location
+                    },
+                    onDragEnded: { position, value, location in
+                        defer { draggedValue = nil; draggedCell = nil }
+                        guard bankFrame.contains(location) else { return }
+                        viewModel.returnTile(at: position, expectedValue: value)
+                    }
                 )
             }
         }
@@ -270,15 +284,22 @@ struct MathCrosswordGameView: View {
         [VideoModeLocation.largeBottom, .smallBottomLeft, .smallBottomRight].contains(videoModeStore.location)
     }
 
+    private var placementInstruction: String {
+        if let conflict = viewModel.conflictMessage { return conflict }
+        if viewModel.selectedCell == nil {
+            return dynamicTypeSize.isAccessibilitySize ? "Select a blank." : "Drag a number to a blank, or tap to place."
+        }
+        return dynamicTypeSize.isAccessibilitySize ? "Choose a number." : "Choose a number, or drag this tile back to the bank."
+    }
+
     private var bankAndActions: some View {
         VStack(spacing: theme.spacing.s) {
             if !viewModel.isHintCardVisible {
-                Text(viewModel.selectedCell == nil
-                     ? (dynamicTypeSize.isAccessibilitySize ? "Select a blank." : "Drag a number to a blank, or tap to place.")
-                     : (dynamicTypeSize.isAccessibilitySize ? "Choose a number." : "Choose a number for the selected square."))
+                Text(dynamicTypeSize.isAccessibilitySize && viewModel.hasIncorrectPlacement ? "Check this board." : placementInstruction)
                     .font(theme.typography.caption)
-                    .foregroundStyle(theme.colors.textSecondary)
+                    .foregroundStyle(viewModel.hasIncorrectPlacement ? theme.colors.danger : theme.colors.textSecondary)
                     .multilineTextAlignment(.center)
+                    .accessibilityLabel(Text(placementInstruction))
             }
             MathCrosswordNumberBank(
                 theme: theme,
@@ -287,6 +308,7 @@ struct MathCrosswordGameView: View {
                 selectedCell: viewModel.selectedCell != nil && isPlaying,
                 onPlace: viewModel.place,
                 onDragChanged: { value, location in
+                    draggedCell = nil
                     draggedValue = value
                     dragLocation = location
                 },
@@ -297,6 +319,16 @@ struct MathCrosswordGameView: View {
                     viewModel.place(value)
                 }
             )
+            .onGeometryChange(for: CGRect.self) { geometry in
+                geometry.frame(in: .named(MathCrosswordCoordinateSpace.name))
+            } action: { bankFrame = $0 }
+            .overlay {
+                RoundedRectangle(cornerRadius: theme.radii.button)
+                    .stroke(theme.colors.accentPrimary, lineWidth: 2)
+                    .opacity(draggedCell != nil && bankFrame.contains(dragLocation) ? 1 : 0)
+                    .allowsHitTesting(false)
+            }
+            .accessibilityIdentifier("math-number-bank")
 
             if !videoModeStore.isEnabled {
                 HStack(spacing: theme.spacing.s) {

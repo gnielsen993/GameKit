@@ -45,9 +45,8 @@ public enum Solver {
         }
     }
 
-    /// Returns a sequence of deductions only if every supplied placement is a
-    /// legal tile and equals the puzzle's verified solution. This prevents help
-    /// from reasoning from a mistaken board premise.
+    /// Returns deductions only when the current placements have a proven
+    /// completion. Alternative solutions are valid premises too.
     public static func forcedChain(puzzle: TallyPuzzle, placements: [GridPos: Int]) -> [ChainStep]? {
         guard trusted(puzzle: puzzle, placements: placements) else { return nil }
         var assignments = placements
@@ -83,12 +82,7 @@ public enum Solver {
 
 private extension Solver {
     static func trusted(puzzle: TallyPuzzle, placements: [GridPos: Int]) -> Bool {
-        let blankSet = Set(puzzle.blanks)
-        guard placements.keys.allSatisfy(blankSet.contains),
-              placements.allSatisfy({ puzzle.solution[$0.key] == $0.value }) else { return false }
-        let used = multiset(placements.values)
-        let bank = multiset(puzzle.bank)
-        return used.allSatisfy { value, count in count <= bank[value, default: 0] }
+        assessCompletion(puzzle: puzzle, placements: placements).status == .solvable
     }
 
     static func uniqueFills(

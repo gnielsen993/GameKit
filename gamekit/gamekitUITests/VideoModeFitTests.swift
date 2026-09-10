@@ -107,6 +107,17 @@ final class VideoModeFitTests: XCTestCase {
             .press(forDuration: 0.05, thenDragTo: destination)
         let placed = app.buttons[cellIdentifier]
         XCTAssertEqual(placed.value as? String, expected)
+        let bank = app.descendants(matching: .any)["math-number-bank"].firstMatch
+        XCTAssertTrue(bank.exists)
+        placed.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.05, thenDragTo: bank.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)))
+        XCTAssertEqual(placed.value as? String, "empty", "Dragging back to the bank must return the placed tile")
+        app.buttons["Undo last tile"].tap()
+        XCTAssertEqual(placed.value as? String, expected, "Undo must restore the returned tile")
+        let invalidTarget = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Given number'")).firstMatch
+        placed.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            .press(forDuration: 0.05, thenDragTo: invalidTarget.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)))
+        XCTAssertEqual(placed.value as? String, expected, "Dropping on a given must cancel the return")
         app.buttons["Undo last tile"].tap()
         XCTAssertEqual(placed.value as? String, "empty")
         let given = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Given number'")).firstMatch

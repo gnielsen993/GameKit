@@ -31,18 +31,18 @@ struct MathCrosswordViewModelTests {
 
     @Test("Math Crossword never draws a hint from an incorrect premise")
     func hintRejectsIncorrectBoard() throws {
-        let puzzle = try PuzzleFactory.generate(difficulty: .easy, seed: 1)
-        let defaults = makeDefaults()
-        let viewModel = MathCrosswordViewModel(session: try MathCrosswordSession(puzzle: puzzle), userDefaults: defaults)
-        let target = try #require(puzzle.blanks.first)
-        let wrongTile = try #require(puzzle.bank.first(where: { $0 != puzzle.solution[target] }))
-
-        viewModel.select(target)
-        viewModel.place(wrongTile)
+        let puzzle = try alternativePuzzle()
+        let viewModel = MathCrosswordViewModel(session: try MathCrosswordSession(puzzle: puzzle), userDefaults: makeDefaults())
+        let equation = puzzle.equations[0]
+        for (position, value) in [(equation.a, 1), (equation.b, 4), (equation.r, 3)] {
+            viewModel.select(position)
+            viewModel.place(value)
+        }
         viewModel.requestHint()
 
         #expect(viewModel.activeHint == nil)
-        #expect(viewModel.hintUnavailableMessage?.contains("do not fit") == true)
+        #expect(viewModel.hasIncorrectPlacement)
+        #expect(viewModel.hintUnavailableMessage == viewModel.conflictMessage)
     }
 
     @Test("Math Crossword saves the entire puzzle session for resume")
@@ -138,6 +138,74 @@ struct MathCrosswordViewModelTests {
         #expect(restored.hasUnreadableSave)
         #expect(restored.state != .playing)
         #expect(defaults.data(forKey: key) == data)
+    }
+
+    @Test("A valid alternative stays neutral, can request help and wins")
+    func alternativePlacementDoesNotWarn() throws {
+        let puzzle = try alternativePuzzle()
+        let equation = puzzle.equations[0]
+        let viewModel = MathCrosswordViewModel(session: try MathCrosswordSession(puzzle: puzzle), userDefaults: makeDefaults())
+        viewModel.select(equation.a)
+        viewModel.place(3)
+        #expect(!viewModel.hasIncorrectPlacement)
+        #expect(viewModel.wrongAttemptCount == 0)
+        #expect(viewModel.conflictMessage == nil)
+        viewModel.requestHint()
+        #expect(viewModel.activeHint != nil)
+        viewModel.applyHint()
+        #expect(viewModel.state == .won)
+        #expect(viewModel.wrongAttemptCount == 0)
+    }
+
+    @Test("Returning a tile clears its conflict and preserves inventory, save and undo")
+    func returnTileUsesReversibleErase() throws {
+        let puzzle = try alternativePuzzle()
+        let equation = puzzle.equations[0]
+        let defaults = makeDefaults()
+        let viewModel = MathCrosswordViewModel(session: try MathCrosswordSession(puzzle: puzzle), userDefaults: defaults)
+        viewModel.select(equation.r)
+        viewModel.place(1)
+        #expect(!viewModel.hasIncorrectPlacement)
+        #expect(viewModel.wrongAttemptCount == 0)
+        #expect(viewModel.conflictMessage == nil)
+        viewModel.select(equation.a)
+        viewModel.place(3)
+        #expect(!viewModel.hasIncorrectPlacement)
+        viewModel.select(equation.b)
+        viewModel.place(4)
+        #expect(viewModel.hasIncorrectPlacement)
+        #expect(viewModel.wrongAttemptCount == 1)
+        viewModel.returnTile(at: equation.r, expectedValue: 1)
+        #expect(viewModel.placements[equation.r] == nil)
+        #expect(!viewModel.hasIncorrectPlacement)
+        #expect(viewModel.remainingBank == [1])
+        let data = try #require(defaults.data(forKey: MathCrosswordSaveState.key(difficulty: .easy)))
+        let saved = try JSONDecoder().decode(MathCrosswordSaveState.self, from: data)
+        #expect(saved.session.placements[equation.r] == nil)
+        viewModel.restoreState(saved)
+        viewModel.undo()
+        #expect(viewModel.placements[equation.r] == 1)
+        #expect(viewModel.hasIncorrectPlacement)
+    }
+
+    @Test("A stale drag cannot erase a replacement tile")
+    func staleReturnDoesNotChangeBoard() throws {
+        let puzzle = try alternativePuzzle()
+        let position = puzzle.equations[0].a
+        let viewModel = MathCrosswordViewModel(session: try MathCrosswordSession(puzzle: puzzle), userDefaults: makeDefaults())
+        viewModel.select(position)
+        viewModel.place(1)
+        viewModel.place(3)
+        viewModel.returnTile(at: position, expectedValue: 1)
+        #expect(viewModel.placements[position] == 3)
+        #expect(viewModel.placementHistory.count == 2)
+    }
+
+    private func alternativePuzzle() throws -> TallyPuzzle {
+        let equation = Equation(a: GridPos(row: 0, col: 0), opCell: GridPos(row: 0, col: 1),
+                                b: GridPos(row: 0, col: 2), eqCell: GridPos(row: 0, col: 3), r: GridPos(row: 0, col: 4), op: .add)
+        return try TallyPuzzle(seed: 1, difficulty: .easy, equations: [equation],
+                              solution: [equation.a: 1, equation.b: 3, equation.r: 4], givens: [], bank: [1, 3, 4])
     }
 
     private func makeDefaults() -> UserDefaults {

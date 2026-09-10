@@ -25,6 +25,8 @@ The original 614-line engine is split by concern:
 | `LayoutTemplates.swift` | internal crossword layouts |
 | `PuzzleFactory.swift` | deterministic bounded generation |
 | `Solver.swift` | solution count and forced hints |
+| `PlacementValidation.swift` | completed-equation arithmetic feedback, matching Solvara |
+| `CompletionValidation.swift` | bounded feasibility check used internally for explicit hints |
 | `MathCrosswordSession.swift` | Codable player placement, inventory, erase, undo, and hint application |
 
 The package adds validation at the persistence boundary. A restored session
@@ -32,9 +34,17 @@ rejects invalid puzzles, coordinates outside the 64×64 supported layout bound,
 placements outside blank cells, overspent duplicate tiles, or history that does
 not replay to its placement state. Erase and replacement are recorded as
 reversible moves, so Undo restores the actual previous tile. Arithmetic uses
-overflow-reporting operations for malformed saved operands. Hints only use a
-board whose placements match the verified solution and available bank, so a
-wrong player tile cannot produce an authoritative but false next move.
+overflow-reporting operations for malformed saved operands. As of 2026-09-10,
+hints use any board with a proven completion using its remaining bank, rather
+than requiring a match with the stored solution. Complete alternative
+arrangements win when every equation holds. Gameplay validation marks a conflict only
+when a completed equation fails its arithmetic. Incomplete equations remain
+neutral even when no global completion exists. This matches `GameState.status(of:)`
+and `BoardView.background(for:)` inspected at upstream commit
+`02203a86dbc78895bfd98f7bd3a1091b3e645b16` on 2026-09-10. Feasibility search
+is separate from visible validation and used only to protect requested hint
+chains from false premises; it never drives error styling or haptics.
+
 
 ## Integration assessment
 
@@ -68,6 +78,7 @@ also honor cancellation when generation is run from a task.
 - The generator accepts only puzzles with one bank-constrained solution.
 - Generation has a per-seed attempt budget and cancellation exit.
 - Forced hints reject untrusted board premises.
+- Alternative arrangements are accepted when their equations and inventory work.
 - Duplicate-valued tiles retain multiplicity through placement, undo, and
   Codable restoration.
 

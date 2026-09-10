@@ -852,6 +852,17 @@ When in doubt, check these before changing chrome for a specific game.
 - Drag a bank tile directly onto an editable square, with a tile following the
   finger and the destination highlighted. Tapping a blank then a bank tile
   remains supported. Given numbers and equation symbols reject drops.
+- Drag a placed tile back to the number bank to return it, including when the
+  bank is empty. The tile follows the finger and the bank gains an accent
+  outline on hover; release returns the tile with light placement feedback.
+  Invalid drops cancel without mutation. Erase remains the tap/VoiceOver
+  alternative. Returning a tile is one saved, undoable action.
+- Match Solvara's equation feedback: incomplete equations remain neutral.
+  Red highlights and error feedback appear only when all three numbers of an
+  equation are filled and its arithmetic fails. Never compare placements to
+  the stored answer or expose a global completion check during gameplay.
+  Any complete arrangement satisfying every equation wins. Explicit hints
+  may check feasibility internally and must respect valid alternatives.
 - Placement uses the same session validation, inventory counts, save, hint
   invalidation, feedback, and Undo path as tapping.
 - All Video Mode positions use compact controls opposite the video band.

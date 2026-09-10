@@ -7,7 +7,12 @@ import os
 @MainActor
 final class MathCrosswordViewModel {
     private(set) var difficulty: MathCrosswordDifficulty
-    private(set) var session: MathCrosswordSession?
+    private(set) var session: MathCrosswordSession? {
+        didSet {
+            validation = session.map { Solver.validatePlacements(puzzle: $0.puzzle, placements: $0.placements) }
+        }
+    }
+    private(set) var validation: PlacementValidation?
     private(set) var state: MathCrosswordState = .loading
     private(set) var pendingSaveState: MathCrosswordSaveState?
     private(set) var activeHint: MathCrosswordActiveHint?
@@ -47,6 +52,7 @@ final class MathCrosswordViewModel {
         difficulty = MathCrosswordDifficulty(rawValue: session.puzzle.difficulty.rawValue.lowercased()) ?? .easy
         self.userDefaults = userDefaults
         self.session = session
+        validation = Solver.validatePlacements(puzzle: session.puzzle, placements: session.placements)
         state = .playing
         timerAnchor = .now
     }
@@ -67,8 +73,12 @@ final class MathCrosswordViewModel {
     var filledCount: Int { placements.count }
     var blankCount: Int { puzzle?.blanks.count ?? 0 }
     var hasIncorrectPlacement: Bool {
-        guard let puzzle else { return false }
-        return placements.contains { position, value in puzzle.solution[position] != value }
+        validation?.hasBrokenEquation == true
+    }
+
+    var conflictMessage: String? {
+        guard hasIncorrectPlacement else { return nil }
+        return "The highlighted equation does not work. Try moving a number."
     }
 
     func attachGameStats(_ stats: GameStats) {
@@ -93,7 +103,7 @@ final class MathCrosswordViewModel {
         }
         self.session = session
         placementCount += 1
-        if puzzle?.solution[target] != value { wrongAttemptCount += 1 }
+        if hasIncorrectPlacement { wrongAttemptCount += 1 }
         validateActiveHintAfterMove()
         saveCurrentState()
         checkForWin()
@@ -103,8 +113,15 @@ final class MathCrosswordViewModel {
         guard state == .playing, let selectedCell, var session else { return }
         guard (try? session.erase(at: selectedCell)) != nil else { return }
         self.session = session
+        placementCount += 1
         validateActiveHintAfterMove()
         saveCurrentState()
+    }
+
+    func returnTile(at position: GridPos, expectedValue: Int) {
+        guard state == .playing, placements[position] == expectedValue else { return }
+        selectedCell = position
+        eraseSelected()
     }
 
     func undo() {
@@ -124,7 +141,7 @@ final class MathCrosswordViewModel {
             return
         }
         guard !hasIncorrectPlacement else {
-            hintUnavailableMessage = "One or more placed numbers do not fit the equations. Clear the red cells before asking for a deduction."
+            hintUnavailableMessage = conflictMessage
             isHintCardVisible = true
             return
         }

@@ -62,7 +62,13 @@ public struct MathCrosswordSession: Codable, Sendable {
     }
 
     public var isComplete: Bool {
-        placements.count == puzzle.blanks.count && placements.allSatisfy { puzzle.solution[$0.key] == $0.value }
+        guard placements.count == puzzle.blanks.count else { return false }
+        var numbers = placements
+        for given in puzzle.givens { numbers[given] = puzzle.solution[given] }
+        return puzzle.equations.allSatisfy { equation in
+            guard let a = numbers[equation.a], let b = numbers[equation.b], let r = numbers[equation.r] else { return false }
+            return equation.holds(a, b, r)
+        }
     }
 
     public mutating func place(_ value: Int, at position: GridPos) throws {

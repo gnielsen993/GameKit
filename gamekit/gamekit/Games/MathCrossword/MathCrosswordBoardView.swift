@@ -8,9 +8,12 @@ struct MathCrosswordBoardView: View {
     let placements: [GridPos: Int]
     let selectedCell: GridPos?
     let hintPlacements: [GridPos: Int]
+    let conflictingCells: Set<GridPos>
     let onSelect: (GridPos) -> Void
     let dropTarget: GridPos?
     let onFrameChange: (CGRect) -> Void
+    let onDragChanged: (GridPos, Int, CGPoint) -> Void
+    let onDragEnded: (GridPos, Int, CGPoint) -> Void
 
     var body: some View {
         GeometryReader { proxy in
@@ -67,7 +70,7 @@ struct MathCrosswordBoardView: View {
         let value = given ? puzzle.solution[position] : placements[position]
         let selected = selectedCell == position || dropTarget == position
         let hinted = hintPlacements[position] != nil
-        let incorrect = !given && value != nil && value != puzzle.solution[position]
+        let incorrect = conflictingCells.contains(position)
         return Button { onSelect(position) } label: {
             Text(value.map(String.init) ?? "")
                 .font(theme.typography.title.weight(.semibold))
@@ -85,10 +88,22 @@ struct MathCrosswordBoardView: View {
         }
         .buttonStyle(.pressable)
         .disabled(given)
+        .contentShape(Rectangle())
+        .highPriorityGesture(
+            DragGesture(minimumDistance: theme.spacing.s, coordinateSpace: .named(MathCrosswordCoordinateSpace.name))
+                .onChanged { gesture in
+                    guard !given, let value else { return }
+                    onDragChanged(position, value, gesture.location)
+                }
+                .onEnded { gesture in
+                    guard !given, let value else { return }
+                    onDragEnded(position, value, gesture.location)
+                }
+        )
         .accessibilityIdentifier("math-cell-\(position.row)-\(position.col)")
         .accessibilityLabel(Text(accessibilityLabel(for: position, value: value, given: given, hinted: hinted, incorrect: incorrect)))
         .accessibilityValue(Text(value.map(String.init) ?? "empty"))
-        .accessibilityHint(Text(given ? "Given number" : "Select this blank"))
+        .accessibilityHint(Text(given ? "Given number" : value == nil ? "Select this blank" : "Drag back to the number bank, or select and erase"))
     }
 
     private func symbol(at position: GridPos) -> String? {
@@ -109,7 +124,7 @@ struct MathCrosswordBoardView: View {
         var result = "\(given ? "Given" : "Blank") number at row \(position.row + 1), column \(position.col + 1)"
         if let value { result += ", \(value)" }
         if hinted { result += ", hint target" }
-        if incorrect { result += ", does not fit the equations" }
+        if incorrect { result += ", part of a conflicting board" }
         return result
     }
 }
