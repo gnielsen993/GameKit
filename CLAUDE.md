@@ -45,7 +45,7 @@ Ordered by how often a session needs them.
 | Repo / target name | `gamekit` | locked |
 | Target iOS | 17+ | — |
 | Swift / UI | Swift 6 + SwiftUI | — |
-| Shipped version | `v1.6` (Be Kind + Math Crossword, build 4) — tag `v1.6`, which is where `main` sits; absorbed the never-released 1.5.1 | 2026-11-21 |
+| Shipped version | `v1.6` (Be Kind + Math Crossword, build 4) — tag `v1.6` marks the uploaded commit; absorbed the never-released 1.5.1 | 2026-11-21 |
 | Current milestone | `2.0` — personal Home (Pinned, Continue Playing, Library); direction in `.planning/v2.0-VISION.md`. Release line `2.0` is cut; the milestone has not been opened in GSD yet (phases continue at 19). `MARKETING_VERSION` stays 1.6 until a slice is ready to ship — the vision says version labels are earned at ship time | 2026-11-21 |
 | Shipped games (11) | Minesweeper · Merge · Nonogram · Sudoku · Klondike · FreeCell · Five Letter · Word Grid · Stack · Snake · Math Crossword | 2026-11-21 |
 | Next game (post-MVP) | TBD — Flow / Pattern Memory / Chess puzzles remain roadmap candidates | 2026-06-22 |
@@ -496,9 +496,13 @@ severity is carried by the `Logger` level, not by a glyph.
 Same model as FitnessTracker and the account-wide rule; stated here because
 this repo committed straight to `main` through 1.6 and that habit is over.
 
-- **`main` is the last released state** — what is in the App Store. It only
-  receives a merge when a version ships, plus doc commits that record a
-  shipped fact.
+- **`main` is the last released state of the code** — what is in the App
+  Store. App code only reaches it when a version ships.
+- **Planning documents and agent rules live on `main`; branches carry code.**
+  A plan, a roadmap edit, a `CLAUDE.md` rule or a hook changes no shipped
+  behavior, and a document that exists only on a branch is invisible to any
+  session that starts elsewhere. Commit those on `main`, then merge `main`
+  into the release line so both stay current.
 - **Work happens on the release line**, named for the version in flight
   (currently `2.0`), branched from `main`. Normal verified work commits
   straight to it. Risky or large work (schema migration, root-navigation
