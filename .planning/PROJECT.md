@@ -1,5 +1,11 @@
 # GameKit
 
+> **Status 2026-11-21:** this file is stale below this note. v1.5 and v1.6
+> have shipped and the suite is eleven games, not a Minesweeper-only MVP. The
+> next milestone is 2.0 (`v2.0-VISION.md`); `/gsd-new-milestone` rewrites the
+> milestone block and requirements here when it is opened. Until then, read
+> `STATE.md` and CLAUDE.md §0.1 for current facts.
+
 ## Current Milestone: v1.5 Endless Arcade Primitive
 
 **Goal:** Expand the suite into a new category — real-time endless arcade — by building one reusable game-loop substrate and shipping two *calm* endless games on it.

@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
 status: shipped
-stopped_at: Version 1.6 build 4 shipped (confirmed by Gabe 2026-11-21); no milestone open
+stopped_at: 1.6 shipped and tagged v1.6; release line 2.0 cut from main; 2.0 milestone not yet opened in GSD
 last_updated: "2026-11-21"
 last_activity: 2026-11-21
 progress:
@@ -26,10 +26,15 @@ defects that silently punish players. Scope: `.planning/v1.6-BRIEF.md`.
 
 ## Current Position
 
-2026-11-21: Gabe confirmed 1.6 (build 4, source `61ab63b`) is shipped. No
-milestone is open. The entries below are the 1.6 history, kept as written;
-their "not yet released" and "known-remaining" wording is superseded by this
-line. The next milestone has not been opened yet.
+2026-11-21: Gabe confirmed 1.6 (build 4, source `61ab63b`) is shipped; it is
+tagged `v1.6` and `main` sits there. Next is 2.0 (`.planning/v2.0-VISION.md`).
+The release line `2.0` is cut and all work happens on it (CLAUDE.md §8.18).
+The milestone itself has not been opened: run `/gsd-new-milestone` to do that —
+it refreshes PROJECT.md and REQUIREMENTS.md, and phases continue at 19.
+
+Everything below this paragraph is history, kept as written. Its "not yet
+released", "known-remaining", "carry-over" and "pending" wording is superseded
+by this entry; the sections that were left dangling are each marked closed.
 
 2026-09-10 release preparation: Gabe authorized committing, merging, pushing,
 and uploading the current 1.6 build to App Store Connect. Build 4 includes
@@ -108,7 +113,10 @@ The device and preset checks were never recorded as run in this repo.
 - Release wrap-up per CLAUDE §8.15, and bump `CURRENT_PROJECT_VERSION`
   (still 2, already consumed by the 1.5.1 TestFlight upload).
 
-## v1.0 Carry-Over
+## v1.0 Carry-Over (closed 2026-11-21)
+
+Closed as moot: every item here was a pre-launch task for 1.0, and the app has
+shipped six public versions since (1.0 through 1.6). Kept for the record only.
 
 v1.0 verification is paused in `executing` status with these open items, tracked in `.planning/phases/07-release/07-CHECKLIST.md`:
 
@@ -484,13 +492,19 @@ Recent decisions affecting current work:
 - [Phase ?]: Engine purity gate SC5 verified against flat files (Games/Stack/ and Games/Snake/) — not the non-existent Games/*/Engine subdir
 - [Phase ?]: Phase 18-02
 
-### Pending Todos
+### Pending Todos (none open — closed 2026-11-21)
+
+The three entries below describe v1.5, v1.2 and v1.0 work that has all
+shipped. Nothing here is pending.
 
 - **v1.5 work queued:** Roadmap written 2026-06-25. 4 phases (15–18), 22 requirements. Phase 15 = Arcade Substrate + Skeleton. All phases proceed directly to planning. Next: `/gsd:plan-phase 15` (Arcade Substrate + Skeleton — ARCADE-01..06, ARCADE-09). See `.planning/ROADMAP.md` §Milestone v1.5 for full phase details.
 - **v1.2 work queued:** Phases 8 (Design) and 9 (Foundation) are **complete** as of 2026-05-12. v1.2 shipped 2026-05-14. See `.planning/ROADMAP.md` §Milestone v1.2 for archived details.
 - **P7 work queued (v1.0 carry-over):** Plans 07-02 (icon production), 07-03 (CloudKit Production schema deploy), 07-04 (App Store metadata + privacy policy + screenshots), 07-05 (release checklist + 07-VERIFICATION.md template), 07-06 (TestFlight upload + SC1-SC5 manual sweep + submit). See `.planning/phases/07-release/` for plan files. v1.0 release work runs in parallel as non-coding tasks (DNS / ASC / nutrition label) and is NOT a blocker for v1.2 code work.
 
-### Blockers/Concerns
+### Blockers/Concerns (none open — closed 2026-11-21)
+
+Both entries below are from v1.2 (shipped 2026-05-14); Phase 12.1 was
+completed in that milestone.
 
 - *(no active v1.2 blockers — Phase 9 foundation closed 2026-05-12; Phase 10 layout primitives ready to plan (research-flagged). v1.0 Phase 7 release pre-flight items continue in parallel; see §v1.0 Carry-Over for the open checklist.)*
 - Phase 12.1 required — small-zone ModePill + HeaderBar chip routing across all 3 adopter games (Mines, Merge, Nonogram). VideoModeSlotRouter.anchors(for:).picker not wired into existingLayout on Small zones.

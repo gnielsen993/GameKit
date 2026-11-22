@@ -19,10 +19,10 @@ file.
 
 ## 0) What you are building
 
-**GameKit** — a clean, ad-free iOS suite of classic logic games
-(Minesweeper first; Merge / Word Grid / Solitaire / Sudoku / Nonogram
-/ Flow / Pattern Memory / Chess puzzles later). Local-only. No
-accounts. No ads. Powered by the shared **DesignKit** Swift Package.
+**GameKit** (ships as **GameDrawer**) — a clean, ad-free iOS suite of
+classic logic, card, word and arcade games; the eleven that ship are listed
+in §0.1. Local-only. No accounts. No ads. Powered by the shared
+**DesignKit** Swift Package.
 
 Sister projects in the same ecosystem (same DesignKit, same rules):
 DesignKit · HabitTracker · FitnessTracker (ships as **Stack**). PantryPlanner
@@ -45,8 +45,9 @@ Ordered by how often a session needs them.
 | Repo / target name | `gamekit` | locked |
 | Target iOS | 17+ | — |
 | Swift / UI | Swift 6 + SwiftUI | — |
-| Current milestone | none open — `v1.6` (Be Kind + Math Crossword, build 4) is the shipped version, confirmed by Gabe 2026-11-21; absorbed the never-released 1.5.1. Next milestone not yet opened | 2026-11-21 |
-| Current MVP game | Minesweeper | — |
+| Shipped version | `v1.6` (Be Kind + Math Crossword, build 4) — tag `v1.6`, which is where `main` sits; absorbed the never-released 1.5.1 | 2026-11-21 |
+| Current milestone | `2.0` — personal Home (Pinned, Continue Playing, Library); direction in `.planning/v2.0-VISION.md`. Release line `2.0` is cut; the milestone has not been opened in GSD yet (phases continue at 19). `MARKETING_VERSION` stays 1.6 until a slice is ready to ship — the vision says version labels are earned at ship time | 2026-11-21 |
+| Shipped games (11) | Minesweeper · Merge · Nonogram · Sudoku · Klondike · FreeCell · Five Letter · Word Grid · Stack · Snake · Math Crossword | 2026-11-21 |
 | Next game (post-MVP) | TBD — Flow / Pattern Memory / Chess puzzles remain roadmap candidates | 2026-06-22 |
 | Icon | 9A.2 Video drawer (unified light / dark / tinted) | 2026-07-18 |
 | Classic preset | Chrome Diner (cream + brushed grey + diner red) | 2026-04-28 |
@@ -66,7 +67,7 @@ sources at session start instead.
 |----------|--------|
 | What changed recently? | `git log --oneline -20` |
 | What phase / plan are we on? | `.planning/STATE.md` (front-matter + Current Position) |
-| What's the milestone scope? | `.planning/ROADMAP.md` + `v1.0-MILESTONE-AUDIT.md` |
+| What's the milestone scope? | `.planning/v2.0-VISION.md` (direction) + `.planning/ROADMAP.md` (phases, once the milestone is opened) |
 | What's the active phase doing? | `.planning/phases/<NN>-<name>/PLAN.md` (latest mtime) |
 | Why was X chosen? | matching ADR/PRD in `.planning/phases/.../` + commit body |
 | Icon / branding history | `assets/icon/AI_PROVENANCE.md` |
@@ -124,7 +125,7 @@ open gamekit/gamekit.xcodeproj
 - Don't claim "verified" without saying which of {build, test,
   simulator run} you actually ran.
 - Install the git hooks once per clone: `./scripts/install-hooks.sh`
-  (sets `core.hooksPath` to `.githooks`).
+  (sets `core.hooksPath` to `.githooks`). What the hook enforces: §8.19.
 
 ---
 
@@ -465,9 +466,8 @@ never costs much. Push when **either** trigger fires:
 Plus push as part of release wrap-up (§8.15). Don't push a commit you
 know leaves the build broken unless the ≥3 cap forces it — finish the
 fix first when you can. No need to ask before pushing once a trigger
-is met; this rule is the standing authorization. Branch first if on a
-protected branch per the harness rules; otherwise push the current
-branch to its upstream.
+is met; this rule is the standing authorization. Push the current
+branch to its upstream; which branch that should be is §8.18.
 
 ### 8.17 Logging — `os.Logger` via `AppLog`, never `print()`
 Diagnostics go through `Core/AppLog.swift` (`AppLog.puzzles.error(...)`,
@@ -491,6 +491,47 @@ them. No other file is.
 
 **No emoji in log strings** (per the account-wide no-emoji rule) —
 severity is carried by the `Logger` level, not by a glyph.
+
+### 8.18 Branching — release line + tags, never develop on `main`
+Same model as FitnessTracker and the account-wide rule; stated here because
+this repo committed straight to `main` through 1.6 and that habit is over.
+
+- **`main` is the last released state** — what is in the App Store. It only
+  receives a merge when a version ships, plus doc commits that record a
+  shipped fact.
+- **Work happens on the release line**, named for the version in flight
+  (currently `2.0`), branched from `main`. Normal verified work commits
+  straight to it. Risky or large work (schema migration, root-navigation
+  change, anything that could leave the line unshippable) gets a short-lived
+  `feat/<slug>` or `fix/<slug>` off the line and merges back once verified.
+- **Tag every App Store Connect upload** at the exact uploaded commit:
+  `v<version>-rcN` for candidates, `v<version>` for the one that ships. The
+  first tag here is `v1.6`; earlier versions are untagged legacy.
+- **A slice that ships as a 1.x** (the 2.0 vision allows it) still merges the
+  line into `main` and is tagged with the version it shipped as; the line
+  keeps its name and carries on.
+- **Production hotfix while the line is in flight:** `fix/<slug>` off `main`,
+  merge to `main`, tag, then forward-merge `main` into the release line.
+- **On ship:** merge the line into `main`, tag, then update §0.1.
+
+If a session starts on `main`, switch to the release line before editing code.
+
+### 8.19 Pre-commit hook — what is mechanical
+`.githooks/pre-commit` blocks commits that violate rules already stated
+above; it adds no policy. It covers §8.7 (Finder dupes), §1 (hard-coded
+colors, numeric `cornerRadius:` / `.padding()`), §8.17 (`print`), and §8.5
+(the 500-line hard cap).
+
+The size check is a ratchet. Files that were already over 500 lines when
+enforcement began are listed in `.githooks/file-size-baseline.txt`: each may
+shrink or be edited at its recorded size, but not grow. A new file over 500
+lines, or any other file crossing it, fails. After splitting a baseline file
+run `scripts/refresh-size-baseline.sh` so the ratchet tightens. Splitting
+those files is not a standalone task — do it when the work touches them.
+
+Read the hook itself for the specifics; do not restate them here. Line-level
+escape hatch: a trailing `// token-exempt: <reason>` comment.
+`git commit --no-verify` is the last resort, not the habit.
 
 ---
 
@@ -534,3 +575,22 @@ Worth capturing here: game-engine design decisions and rationale, preset/
 legibility learnings from theme passes, App Store learnings, approaches tried
 and rejected. Ecosystem-wide learnings (DesignKit usage, SwiftUI patterns)
 become atomic notes linked from every relevant MOC, not buried here.
+
+---
+
+## 11) Project skills
+
+Rules that always apply live in this file. A procedure that only applies to
+one kind of task is a skill; a repeated command sequence is a script in
+`scripts/`; a rule that can be checked mechanically goes in the hook (§8.19).
+Reach for the lightest of those, and only once the friction has recurred.
+
+- **`impeccable`** — design planning, critique, audit and polish for any
+  screen or UI work. Tracked in `.claude/skills/impeccable` (Claude) and
+  `.agents/skills/impeccable` (Codex, wired by `.codex/hooks.json`), copied
+  from FitnessTracker at its commit `859f314` (v4.1.1) so both repos run the
+  same version. Update both repos together. It reads `PRODUCT.md` for product
+  truth and `DESIGN.md` for the visual contract; `DESIGN.md` still wins.
+
+> Codex note: skills are a Claude Code feature. Under Codex, read the
+> referenced material as docs.
