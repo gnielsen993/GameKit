@@ -98,4 +98,54 @@ if [ -n "$bad" ]; then
   fail=1
 fi
 
+# ---------------------------------------------------------------------------
+# 3. File-size cap (CLAUDE.md §8.5 -- 500-line hard cap), as a ratchet
+# ---------------------------------------------------------------------------
+# Mirrors FitnessTracker's ratchet so both repos behave the same way. Unlike
+# the checks above this reads WHOLE files, because growth is invisible in a
+# diff that only shows the added lines.
+#
+#   - A NEW .swift file over the cap fails outright.
+#   - A file listed in .githooks/file-size-baseline.txt predates enforcement.
+#     It may shrink freely and be edited at its recorded size, but growing it
+#     past that number fails. The baseline is closed to new entries.
+#   - Any other file that crosses the cap fails.
+#
+# After splitting a baseline file, run scripts/refresh-size-baseline.sh so the
+# ratchet tightens to the new number instead of leaving reclaimable slack.
+MAX_LINES=500
+BASELINE="$(git rev-parse --show-toplevel)/.githooks/file-size-baseline.txt"
+size_bad=""
+size_note=""
+
+baseline_for() {
+  [ -f "$BASELINE" ] || return 1
+  awk -v p="$1" '$1 !~ /^#/ && $2 == p { print $1; found = 1 } END { exit !found }' "$BASELINE"
+}
+
+while IFS= read -r -d '' f; do
+  case "$f" in *.swift) ;; *) continue ;; esac
+  lines=$(git show ":$f" 2>/dev/null | wc -l | tr -d ' ')
+
+  if allowed=$(baseline_for "$f"); then
+    if [ "$lines" -gt "$allowed" ]; then
+      size_bad="${size_bad}${f}: grew to ${lines} lines, over its baseline of ${allowed} (may shrink, not grow -- split by concern, §8.1)\n"
+    elif [ "$lines" -le "$MAX_LINES" ]; then
+      size_note="${size_note}${f}: now ${lines} lines, back under the cap -- run scripts/refresh-size-baseline.sh to drop it from the baseline\n"
+    elif [ "$lines" -lt "$allowed" ]; then
+      size_note="${size_note}${f}: down to ${lines} lines from ${allowed} -- run scripts/refresh-size-baseline.sh to tighten the ratchet\n"
+    fi
+  elif [ "$lines" -gt "$MAX_LINES" ]; then
+    size_bad="${size_bad}${f}: ${lines} lines, over the ${MAX_LINES}-line hard cap (§8.5 -- split by concern; the baseline is closed to new entries)\n"
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+if [ -n "$size_note" ]; then
+  echo -e "pre-commit notes (not blocking):\n${size_note}"
+fi
+if [ -n "$size_bad" ]; then
+  echo -e "ERROR: file-size cap violations:\n${size_bad}"
+  fail=1
+fi
+
 exit $fail
