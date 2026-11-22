@@ -108,9 +108,10 @@ lowercase `gamekit` (schemes: `gamekit`, `DesignKit`, `SudokuCore`).
 xcodebuild -project gamekit/gamekit.xcodeproj -scheme gamekit \
   -destination 'platform=iOS Simulator,name=iPhone 17' -quiet build
 
-# Test
+# Test — unit tests (the default; about 5 minutes, 522 tests)
 xcodebuild -project gamekit/gamekit.xcodeproj -scheme gamekit \
-  -destination 'platform=iOS Simulator,name=iPhone 17' -quiet test
+  -destination 'platform=iOS Simulator,name=iPhone 17' -quiet \
+  -only-testing:gamekitTests test
 
 # Open
 open gamekit/gamekit.xcodeproj
@@ -120,6 +121,13 @@ open gamekit/gamekit.xcodeproj
   installed under two runtimes (iOS 18.4 and 18.5) on this machine, so
   that destination fails to resolve — "Unable to find a device matching
   the provided destination specifier". Verified 2026-07-26.
+- **A bare `test` with no `-only-testing` also runs all 45 UI tests** —
+  layout audits, the 1.6 closure journeys and App Store screenshot capture.
+  That takes well over 30 minutes and looks hung. Run UI tests by name
+  (`-only-testing:gamekitUITests/<Class>/<test>`) with
+  `-parallel-testing-enabled NO`: under parallel clones the 3-second startup
+  assertion in `testDelayedStartupShowsProgressFeedback` fails from load
+  alone. Verified 2026-11-21.
 - Bundle ID for `xcrun simctl uninstall` (see §8.9): `com.lauterstar.gamekit`.
 - Prefer `-quiet`; drop it only when diagnosing a failure.
 - Don't claim "verified" without saying which of {build, test,
