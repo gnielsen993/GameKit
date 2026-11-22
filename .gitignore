@@ -8,3 +8,6 @@ tools/nonogram/__pycache__/
 
 # Claude Code local config (permissions, lock files — not shared)
 .claude/
+
+# R session history (stray, created by a tool in Marketing/)
+.Rhistory

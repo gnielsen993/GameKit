@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Be Kind
-status: executing
-stopped_at: Version 1.6 build 4 uploaded to App Store Connect; processing and listing verification pending
-last_updated: "2026-09-10"
-last_activity: 2026-09-10
+status: shipped
+stopped_at: Version 1.6 build 4 shipped (confirmed by Gabe 2026-11-21); no milestone open
+last_updated: "2026-11-21"
+last_activity: 2026-11-21
 progress:
   total_phases: 0
   completed_phases: 0
@@ -25,6 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 defects that silently punish players. Scope: `.planning/v1.6-BRIEF.md`.
 
 ## Current Position
+
+2026-11-21: Gabe confirmed 1.6 (build 4, source `61ab63b`) is shipped. No
+milestone is open. The entries below are the 1.6 history, kept as written;
+their "not yet released" and "known-remaining" wording is superseded by this
+line. The next milestone has not been opened yet.
 
 2026-09-10 release preparation: Gabe authorized committing, merging, pushing,
 and uploading the current 1.6 build to App Store Connect. Build 4 includes
@@ -89,7 +94,10 @@ card, while completed-game New puzzle / New board actions stay immediate.
 Settings support, reset, import, and account-deletion choices use the same
 visual language as inline cards; no stock alert or action-sheet surfaces remain.
 
-### Known-remaining before v1.6 can ship
+### Known-remaining before v1.6 can ship (historical — 1.6 shipped)
+
+Written before the release. The build-number bullet was resolved (build 4).
+The device and preset checks were never recorded as run in this repo.
 
 - Visual pass on Classic + a Loud/Moody preset (CLAUDE §8.12). Seven commits
   carry color, banner, or highlight work verified only by construction.

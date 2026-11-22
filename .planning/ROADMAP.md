@@ -14,7 +14,7 @@ GameKit ships in named, append-only milestones. Phase numbering never resets —
 | **v1.0** | 1 → 7 (incl. 6.1) | Phase 7 in progress (pre-flight) | MVP — Minesweeper-only ship to TestFlight / App Store |
 | **v1.2** | 8 → 13 (incl. 12.1) | Complete (2026-05-14) | Video Mode — optional layout adaptation for PiP video overlays |
 | **v1.5** | 15 → 18 | Shipped 2026-07-10 | Endless Arcade Primitive — real-time loop substrate + Stack + Snake |
-| **v1.6** | none — see note | In development (2026-08-02) | Be Kind — assist talkthroughs + repair of the defects that silently punish players |
+| **v1.6** | none — see note | Shipped (build 4 uploaded 2026-09-10; release confirmed by Gabe 2026-11-21) | Be Kind — assist talkthroughs + repair of the defects that silently punish players |
 
 v1.6 has no phase rows on purpose: it was executed directly from
 `v1.6-BRIEF.md` without running `/gsd-new-milestone`, so no phase
