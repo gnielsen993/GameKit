@@ -6,8 +6,12 @@ xcuserdata/
 *.xcuserstate
 tools/nonogram/__pycache__/
 
-# Claude Code local config (permissions, lock files — not shared)
-.claude/
+# Claude Code: local-only state stays out; project skills under
+# .claude/skills/ are tracked so every machine runs the same tooling
+# (same split as FitnessTracker).
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/
 
 # R session history (stray, created by a tool in Marketing/)
 .Rhistory
