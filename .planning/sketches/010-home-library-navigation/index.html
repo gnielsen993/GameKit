@@ -194,6 +194,7 @@ const VARIANTS = {
   A:{name:'A · Home and Library tabs', hint:'Tab bar returns; Home is personal, Library is complete'},
   B:{name:'B · One scrolling Home', hint:'No tab bar; All Games is the last section'},
   C:{name:'C · Drawer with a personal shelf', hint:'1.6 grid stays the root; saves and pins sit above it'},
+  D:{name:'D · Shelf Home plus Library tab', hint:'Synthesis: C\'s shelf and a few suggestions on Home, the full grid on its own tab'},
 };
 const TASKS = ['Find FreeCell and start a game','Carry on with the puzzle you were playing yesterday','Make Sudoku · Free · Medium a favorite you can reach in one tap','Pick something to play while a video is on','Start a new Hard Sudoku without losing your saved one'];
 let st = {variant:'A', fixture:'returning', tab:'home', stack:[], sheet:null, group:0, editing:false, saves:[], pins:[], dailyDone:false, toast:'', task:-1, t0:0};
@@ -240,6 +241,20 @@ function homeC(){
     st.pins.map((p, i) => pinTile(p, i, 56)).join('') + `</div>` : '';
   return `<div class="bar"><button class="icon-btn" data-a="toast" data-t="Opens the existing Video Mode sheet" data-l="Video Mode button" aria-label="Video Mode">${IC.video}</button>${profile}</div><div class="scroll"><h2 class="title">The Drawer</h2>${strip}${todaySec()}${featuredSec()}${sec('All Games')}<div class="grid">${GAMES.map(g => gameBtn(g, g.video ? 'Fits beside a video' : '')).join('')}</div></div>`;
 }
+function shelf(){
+  const saves = sorted(); if (!saves.length && !st.pins.length) return '';
+  return sec('Jump back in', `<button class="link" data-a="edit" data-l="Edit shelf">${st.editing ? 'Done' : 'Edit'}</button>`) + `<div class="strip">` +
+    saves.slice(0, 3).map(s => `<button class="mini" data-a="launch" data-g="${s.gid}" data-m="${s.sid}" data-l="Shelf resume: ${game(s.gid).title} ${slotLabel(s.gid, s.sid)}">${tile(s.gid, 44)}<span><b>Resume ${game(s.gid).title}</b><br><span class="sub">${slotLabel(s.gid, s.sid)}</span></span></button>`).join('') +
+    (saves.length > 3 ? `<button class="mini" data-a="push" data-s="saved" data-l="See all saved"><span><b>All ${saves.length} saved</b></span></button>` : '') +
+    st.pins.map((p, i) => pinTile(p, i, 56)).join('') + `</div>`;
+}
+function homeD(){
+  // Suggestions: games the player has no save or pin for, video-friendly ones first. Three at most.
+  const known = new Set(['fiveLetter', ...st.saves.map(s => s.gid), ...st.pins.map(p => p[0])]); // Five Letter already has the Today card
+  const pick = GAMES.filter(g => !known.has(g.id)).sort((a, b) => !!b.video - !!a.video).slice(0, 3);
+  const suggest = pick.length ? sec(st.saves.length ? 'Something different' : 'Good places to start', `<button class="link" data-a="tab" data-t="library" data-l="All games link">All ${GAMES.length} games</button>`) + `<div class="grid">${pick.map(g => gameBtn(g, g.video ? 'Fits beside a video' : g.meta)).join('')}</div>` : '';
+  return `<div class="bar"><button class="icon-btn" data-a="toast" data-t="Opens the existing Video Mode sheet" data-l="Video Mode button" aria-label="Video Mode">${IC.video}</button>${profile}</div><div class="scroll"><h2 class="title">The Drawer</h2>${shelf()}${todaySec()}${suggest}</div>`;
+}
 function savedScreen(){ return `<div class="bar"><button class="icon-btn" data-a="pop" data-l="Back" aria-label="Back">${IC.back}</button></div><div class="scroll"><h2 class="title">Saved Games</h2>${sorted().map(resumeRow).join('') || '<p class="sub">No unfinished games. Anything you leave mid-play will wait here.</p>'}</div>`; }
 function gameScreen({gid, sid, phase}){
   const g = game(gid), label = slotLabel(gid, sid), save = st.saves.find(s => saveKey(s.gid, s.sid) === saveKey(gid, sid));
@@ -262,8 +277,8 @@ function render(){
   const top = st.stack.at(-1); let body;
   if (top?.name === 'game') body = gameScreen(top);
   else if (top?.name === 'saved') body = savedScreen();
-  else body = st.variant === 'A' ? (st.tab === 'home' ? homeA() : libA()) : st.variant === 'B' ? homeB() : homeC();
-  const tabs = st.variant === 'A' && !top ? `<nav class="tabs" aria-label="Main">${[['home','Home'],['library','Library']].map(([k, l]) => `<button data-a="tab" data-t="${k}" data-l="Tab: ${l}" ${st.tab === k ? 'aria-current="page"' : ''}>${k === 'home' ? IC.home : IC.grid}${l}</button>`).join('')}</nav>` : '';
+  else body = st.variant === 'A' ? (st.tab === 'home' ? homeA() : libA()) : st.variant === 'D' ? (st.tab === 'home' ? homeD() : libA()) : st.variant === 'B' ? homeB() : homeC();
+  const tabs = 'AD'.includes(st.variant) && !top ? `<nav class="tabs" aria-label="Main">${[['home','Home'],['library','Library']].map(([k, l]) => `<button data-a="tab" data-t="${k}" data-l="Tab: ${l}" ${st.tab === k ? 'aria-current="page"' : ''}>${k === 'home' ? IC.home : IC.grid}${l}</button>`).join('')}</nav>` : '';
   app.innerHTML = `<div class="view">${body}${tabs}</div>${st.sheet ? sheet(st.sheet) : ''}${st.toast ? `<div class="toast" role="status">${st.toast}</div>` : ''}`;
   panels();
 }

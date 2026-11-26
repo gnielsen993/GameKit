@@ -22,6 +22,7 @@ open .planning/sketches/010-home-library-navigation/index.html
 - **A: Home and Library tabs** — a two-item tab bar returns. Home is personal, Library is the complete grid.
 - **B: One scrolling Home** — no tab bar. Personal sections first, All Games as the last section, with a jump link in the bar.
 - **C: Drawer with a personal shelf** — the 1.6 grid stays the root. Saves and pins sit in one horizontal shelf above it. Smallest change from what ships.
+- **D: Shelf Home plus Library tab** — synthesis added after Gabe's first look (2026-11-26). Home keeps C's compact shelf and Today, shows at most three suggested games the player has no save or pin for, and the complete grid moves to a Library tab. Structurally this is A with C's density.
 
 ## What it models from the shipped code
 - Saves are per game and mode: 32 slots (`*SaveState.key(...)`), FreeCell being the one single-slot game. Starting a different mode never replaces another mode's save.
@@ -32,6 +33,9 @@ open .planning/sketches/010-home-library-navigation/index.html
 
 Tile colors for the five games not in the older sketch theme are approximations,
 and the icons are redrawn, not exported from `GameIconView`.
+
+## First reaction (2026-11-26)
+Gabe prefers C, and thinks D may be better still. Not yet a winner: no player walkthrough has run. He also found the overall design language lacking, which is a question about the app's identity rather than this sketch's navigation and is tracked separately.
 
 ## Running the walkthrough
 Pick a variant and a player, press Start on a task, read it aloud, then stay
