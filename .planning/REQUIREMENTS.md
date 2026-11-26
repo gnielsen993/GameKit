@@ -3,6 +3,14 @@
 **Defined:** 2026-04-24
 **Core Value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
 
+## 2.0 acceptance requirements
+
+- [ ] NAV-20 · Phase 19. Players locate a named game, a saved board, and mode pinning without coaching in the navigation prototype.
+- [ ] HOME-20 · Phase 20. Library, Featured, Best While Watching, ordered pins, and newest-first resumable games (read from the existing per-mode save slots) work offline. Replacing a saved board stays an explicit choice, made in the prompt each game already shows. Pins survive relaunch and backup.
+- [ ] INTRO-20 · Phase 21. Immediate play, optional first pin and Video Mode discovery work on fresh install. Existing players retain saves, stats and settings after upgrade.
+- [ ] DAILY-20 · Phase 22, optional. Home shows the existing Five Letter Daily as Today, with completion for the local date and no penalty for a missed day.
+- [ ] SHIP-20 · Phase 23. Accessible themed navigation passes real player journeys. Approved positioning and release materials match the shipping binary.
+
 ## v1 Requirements
 
 Requirements for initial TestFlight → App Store release. MVP scope: **Minesweeper only.** Each maps to a roadmap phase.

@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: Be Kind
-status: shipped
-stopped_at: 1.6 shipped and tagged v1.6; release line 2.0 cut from main; 2.0 milestone not yet opened in GSD
-last_updated: "2026-11-21"
-last_activity: 2026-11-21
+milestone: v2.0
+milestone_name: Personal Home
+status: planning
+stopped_at: Phase 19 sketch 010 (three navigation variants) ready for player walkthrough
+last_updated: "2026-11-26"
+last_activity: 2026-11-26
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,16 +21,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** v1.6 "Be Kind" — assist talkthroughs plus repair of the
-defects that silently punish players. Scope: `.planning/v1.6-BRIEF.md`.
+**Current focus:** 2.0 personal Home and Library discovery.
 
 ## Current Position
 
-2026-11-21: Gabe confirmed 1.6 (build 4, source `61ab63b`) is shipped; it is
-tagged `v1.6` and `main` sits there. Next is 2.0 (`.planning/v2.0-VISION.md`).
-The release line `2.0` is cut and all work happens on it (CLAUDE.md §8.18).
-The milestone itself has not been opened: run `/gsd-new-milestone` to do that —
-it refreshes PROJECT.md and REQUIREMENTS.md, and phases continue at 19.
+2026-11-26: Milestone open, Phase 19 underway. [Sketch 010](sketches/010-home-library-navigation/index.html) compares three navigation models (tabs, one scrolling Home, drawer with a shelf) against the real save model: saves are per game and mode, each game already prompts Resume or New, and Five Letter Daily already ships and serves as Today. It replaced a same-day first prototype that assumed one save per game. Next is an observed player walkthrough using the sketch tap log, then a navigation decision. The [roadmap](ROADMAP.md) tracks phases 19–23. Production app baseline is v1.6 build 4. Implementation belongs on release line 2.0.
 
 Everything below this paragraph is history, kept as written. Its "not yet
 released", "known-remaining", "carry-over" and "pending" wording is superseded

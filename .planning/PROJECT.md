@@ -1,12 +1,10 @@
 # GameKit
 
-> **Status 2026-11-21:** this file is stale below this note. v1.5 and v1.6
-> have shipped and the suite is eleven games, not a Minesweeper-only MVP. The
-> next milestone is 2.0 (`v2.0-VISION.md`); `/gsd-new-milestone` rewrites the
-> milestone block and requirements here when it is opened. Until then, read
-> `STATE.md` and CLAUDE.md §0.1 for current facts.
+## Current milestone · 2.0 Personal Home
 
-## Current Milestone: v1.5 Endless Arcade Primitive
+Help first-time players choose a game and returning players reach their favorite mode or exact unfinished board. Preserve access to all eleven games and the Video Mode experience. The [roadmap](ROADMAP.md) tracks the five phases and release evidence.
+
+## Historical milestone: v1.5 Endless Arcade Primitive
 
 **Goal:** Expand the suite into a new category — real-time endless arcade — by building one reusable game-loop substrate and shipping two *calm* endless games on it.
 

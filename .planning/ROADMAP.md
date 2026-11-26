@@ -15,7 +15,21 @@ GameKit ships in named, append-only milestones. Phase numbering never resets —
 | **v1.2** | 8 → 13 (incl. 12.1) | Complete (2026-05-14) | Video Mode — optional layout adaptation for PiP video overlays |
 | **v1.5** | 15 → 18 | Shipped 2026-07-10 | Endless Arcade Primitive — real-time loop substrate + Stack + Snake |
 | **v1.6** | none — see note | Shipped (build 4 uploaded 2026-09-10; release confirmed by Gabe 2026-11-21; tag `v1.6`) | Be Kind — assist talkthroughs + repair of the defects that silently punish players |
-| **2.0** | 19 → (not yet planned) | Not opened — direction approved in `v2.0-VISION.md`; release line `2.0` cut 2026-11-21 | Personal Home: Pinned, Continue Playing, Library, value-first onboarding |
+| **2.0** | 19 → 23 | Open for discovery. Phase 19 prototype ready for player review | Personal Home: Pinned, Continue Playing, Library, value-first onboarding |
+
+### 2.0 delivery sequence
+
+| Phase | Deliverable | Evidence to exit |
+|---|---|---|
+| 19 · Navigation and game entry | Compare the shipped drawer with [sketch 010](sketches/010-home-library-navigation/index.html), which walks the same tasks through three navigation models: Home and Library tabs, one scrolling Home, and the 1.6 drawer with a personal shelf. It models the real save slots (per game and mode), the newest three saves plus See all, six pins, and the resume prompt each game already shows. | A new player finds FreeCell, a returning player resumes Hard Sudoku, and both can pin Sudoku · Free · Medium and predict what happens next. Record first taps and hesitation from the sketch tap log. Pick a navigation model and obtain approval before changing the root. |
+| 20 · Personal Home | Build navigation on a short-lived branch off 2.0. Derive Continue from the existing per-mode save slots (32 across nine games; FreeCell has one), newest three plus a full list, include Math Crossword, exclude arcade runs, leave the in-game Resume or New prompt as the only replacement decision, and retain the grid and existing game destinations. Persist six ordered, mode-aware pins and round-trip them through versioned backup. Add Featured and Best While Watching. | Test fresh install, upgrade from 1.6 with saves, replaced/completed boards, pin ordering after relaunch, backup import, and returning from a game. Compare cold start with 1.6. Exercise small phone, iPad, accessibility text, Classic and a Loud/Moody preset. |
+| 21 · First visit and interrupted play | Offer immediate play, an optional Video Mode demonstration and an optional first pin. Reconcile the shipped intro, Settings, stats, sign-in, and Be Kind behavior with new entry paths. | Players can skip setup, start a game, leave, resume, and explain how to play alongside video. Check that equivalent launches from Home and Library preserve hints and assisted records. |
+| 22 · Today on Home, independently deferrable | Five Letter already ships a date-deterministic Daily with a stored result. Surface it as the Today card rather than building a second daily puzzle. Decide whether the result should be recorded for assisted solves, which the shipped code skips. | Today reflects the local date, shows completion after restart and rollover, never disturbs ordinary saves, and shows no penalty for a missed day. Defer if the card misses these criteria. |
+| 23 · Identity and release | Decide positioning from first impressions and Video Mode discovery. Align the approved app experience, App Store screenshots and copy, and website. Assess the existing palette after hierarchy testing. | Run the release journeys from a clean install and an upgraded store. Verify eleven games, assist records, accessibility, optional sync and backup. Use the release wrap-up and tag the uploaded commit. Assign the marketing version at ship time. |
+
+The review uses the three player fixtures and five timed tasks in the sketch; its README describes the walkthrough. Compare with the same tasks in 1.6. Use the results to pick the navigation model and to decide whether Library needs a default-landing preference.
+
+Store product-page experiments follow the identity release. Monetization needs a separate product decision. Roster expansion and standalone apps stay in the longer-term vision. The project branch policy supersedes the July vision’s candidate branch names.
 
 v1.6 has no phase rows on purpose: it was executed directly from
 `v1.6-BRIEF.md` without running `/gsd-new-milestone`, so no phase

@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GameDrawer 2.0 · Home and Library navigation</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+:root{
+  --ink:#1F1D1A; --muted:#6B655C; --line:#DDD6C9; --accent:#A32923; --accent-ink:#fff;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --c-minesweeper:#2F7BF6; --c-merge:#1FA348; --c-nonogram:#E04440; --c-sudoku:#C97F0E;
+  --c-klondike:#0F97A5; --c-freecell:#9A4FE8; --c-fiveLetter:#C93F84; --c-wordGrid:#4F60D6;
+  --c-stack:#B8612C; --c-snake:#2E8B5E; --c-mathCrossword:#5A6472;
+}
+*{box-sizing:border-box}
+::selection{background:var(--accent);color:#fff}
+html{background:#E9E3D8;color:var(--ink);font:15px/1.4 var(--font-sans)}
+body{margin:0;min-height:100vh;display:grid;grid-template-columns:minmax(15rem,19rem) auto minmax(15rem,19rem);gap:2rem;justify-content:center;align-items:start;padding:1.5rem}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;text-align:inherit}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- facilitator panels (outside the phone) ---------- */
+.side h1{font-size:1.15rem;margin:0 0 .25rem;letter-spacing:-.01em}
+.side h2{font-size:.85rem;margin:1.6rem 0 .5rem;color:var(--muted);font-weight:600}
+.side p{margin:.3rem 0;color:var(--muted);font-size:.87rem}
+.opt{display:block;width:100%;padding:.55rem .7rem;border-radius:10px;border:1px solid var(--line);background:#F5F0E8;margin-bottom:.4rem;transition:background .15s,border-color .15s}
+.opt:hover{border-color:#B9B0A0}
+.opt[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.opt small{display:block;color:inherit;opacity:.72;font-size:.8rem}
+.task{display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:center;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.task button{padding:.3rem .6rem;border-radius:8px;border:1px solid var(--line);background:#F5F0E8;font-size:.8rem}
+.task.on{font-weight:600}.task.on button{background:var(--accent);color:#fff;border-color:var(--accent)}
+#log{font:12px/1.5 ui-monospace,Menlo,monospace;background:#F5F0E8;border:1px solid var(--line);border-radius:10px;padding:.6rem;height:26rem;overflow:auto;white-space:pre-wrap;scrollbar-width:thin;scrollbar-color:#B9B0A0 transparent}
+.row{display:flex;gap:.4rem;margin-top:.5rem}.row .opt{margin:0;text-align:center}
+
+/* ---------- phone ---------- */
+.phone{width:390px;height:844px;border-radius:52px;background:var(--color-bg);box-shadow:0 0 0 11px #1c1b1a,0 30px 60px -20px rgba(40,30,15,.45);position:relative;overflow:hidden;font-size:var(--fs,16px)}
+.phone.big{--fs:19.5px}
+.island{position:absolute;top:11px;left:50%;translate:-50% 0;width:112px;height:32px;border-radius:20px;background:#111;z-index:9}
+.view{position:absolute;inset:0;padding:58px 0 0;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;padding:0 1em 2.2em;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:.2em 1em;min-height:44px}
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;font-size:1.45em;border-radius:50%}
+.icon-btn:active{background:rgba(0,0,0,.06)}
+.title{font-size:2.05em;font-weight:800;letter-spacing:-.025em;margin:.1em 0 .5em;text-wrap:balance}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:1.5em 0 .6em}
+.sec h3{margin:0;font-size:1.18em;font-weight:700;letter-spacing:-.01em}
+.link{color:var(--accent);font-weight:600;font-size:.9em;min-height:44px;display:inline-flex;align-items:center}
+.sub{color:var(--muted);font-size:.84em}
+
+.tile{--c:var(--muted);display:grid;place-items:center;background:var(--c);color:#fff;border-radius:26%;aspect-ratio:1;width:var(--s,78px);font-size:calc(var(--s,78px)*.5);box-shadow:0 6px 12px -4px color-mix(in srgb,var(--c) 55%,transparent);background-image:linear-gradient(160deg,rgba(255,255,255,.18),transparent 55%)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5em .5em;justify-items:center;align-items:start}
+.game{display:grid;justify-items:center;gap:.5em;font-weight:600;font-size:.82em;text-align:center;transition:transform .25s var(--ease)}
+.game:active{transform:scale(.94)}
+.game .sub{font-weight:500;font-size:.92em;margin-top:-.35em}
+
+.resume{display:grid;grid-template-columns:auto 1fr auto;gap:.8em;align-items:center;width:100%;background:var(--color-surface);border-radius:var(--radius-lg);padding:.7em .9em .7em .7em;margin-bottom:.5em;box-shadow:var(--shadow-sm);transition:transform .25s var(--ease)}
+.resume:active{transform:scale(.98)}
+.resume b{display:block;font-size:1em}
+.go{background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.85em;padding:.5em .9em;border-radius:99px}
+.strip{display:flex;gap:.9em;overflow-x:auto;margin:0 -1em;padding:.2em 1em 1em;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip>*{flex:none}
+.mini{display:grid;grid-template-columns:auto auto;gap:.6em;align-items:center;background:var(--color-surface);border-radius:var(--radius-md);padding:.5em .9em .5em .5em;box-shadow:var(--shadow-sm)}
+.feature{display:grid;grid-template-columns:auto 1fr;gap:1em;align-items:center;background:var(--color-surface);border-radius:var(--radius-lg);padding:1em;box-shadow:var(--shadow-md)}
+.feature b{font-size:1.2em;display:block;letter-spacing:-.01em}
+.feature .go{display:inline-block;margin-top:.6em}
+.edit{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:14px;display:grid;place-items:center}
+.edit.left{right:auto;left:-6px}
+.pinwrap{position:relative}
+
+.tabs{display:flex;border-top:1px solid var(--line);background:color-mix(in srgb,var(--color-bg) 92%,#fff);padding:.3em 0 1.4em}
+.tabs button{flex:1;display:grid;justify-items:center;gap:.1em;font-size:.68em;font-weight:600;color:var(--muted);min-height:48px;align-content:center}
+.tabs svg{font-size:1.75rem}
+.tabs [aria-current=page]{color:var(--accent)}
+
+/* sheet + game screen */
+.scrim{position:absolute;inset:0;background:rgba(25,20,10,.32);z-index:5;animation:fade .25s var(--ease)}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;background:var(--color-surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:1.2em 1em 2.2em;max-height:82%;overflow:auto;animation:rise .38s var(--ease)}
+@keyframes rise{from{translate:0 40%;opacity:.4}}@keyframes fade{from{opacity:0}}
+.head{display:grid;grid-template-columns:auto 1fr auto;gap:.9em;align-items:center}
+.head b{font-size:1.15em;display:block}
+.pill{border:1px solid var(--line);border-radius:99px;padding:.45em .85em;font-size:.82em;font-weight:600;display:inline-flex;gap:.35em;align-items:center;min-height:40px}
+.pill[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:.5em;margin:1.1em 0 .8em}
+.seg button{padding:.6em;border-radius:var(--radius-md);border:1px solid var(--line);text-align:center;font-weight:600}
+.seg [aria-pressed=true]{background:var(--c);border-color:var(--c);color:#fff}
+.label{font-size:.72em;font-weight:700;color:var(--muted);letter-spacing:.06em;margin:1.1em 0 .5em}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:.5em}
+.chip{display:grid;grid-template-columns:1fr auto;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--color-bg);overflow:hidden}
+.chip .play{padding:.6em .7em;font-weight:600;min-height:52px}
+.chip .play small{display:block;font-weight:500;color:var(--muted);font-size:.78em}
+.chip .play small.saved{color:var(--accent);font-weight:600}
+.chip .pin{width:44px;display:grid;place-items:center;font-size:1.15em;color:var(--muted);border-left:1px solid var(--line)}
+.chip .pin[aria-pressed=true]{color:#fff;background:var(--accent)}
+.note{font-size:.84em;color:var(--muted);margin:.9em 0 0}
+.board{flex:1;margin:0 1em;border-radius:var(--radius-lg);background:var(--color-surface) center/cover no-repeat;box-shadow:var(--shadow-sm);display:grid;place-items:center;color:var(--muted);text-align:center;padding:1em;position:relative;overflow:hidden}
+.card{background:var(--color-surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:1.1em;width:86%;animation:rise .38s var(--ease)}
+.card b{font-size:1.1em;color:var(--ink)}
+.btn{display:block;width:100%;text-align:center;padding:.8em;border-radius:var(--radius-md);font-weight:700;margin-top:.55em;border:1px solid var(--line);color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.foot{padding:.8em 1em 2em;display:grid;grid-template-columns:1fr 1fr;gap:.5em}
+.toast{position:absolute;left:50%;bottom:6.5em;translate:-50% 0;background:var(--ink);color:#fff;padding:.6em 1em;border-radius:99px;font-size:.82em;z-index:8;animation:rise .38s var(--ease);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:1080px){body{grid-template-columns:auto;justify-items:center}.side{width:390px}}
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <h1>Home and Library navigation</h1>
+  <p>Sketch 010 for Phase 19. Same data and tasks in each variant; only the route to a game changes.</p>
+  <h2>Navigation variant</h2>
+  <div id="variants"></div>
+  <h2>Player</h2>
+  <div id="fixtures"></div>
+  <h2>Display</h2>
+  <button class="opt" id="big" aria-pressed="false">Larger accessibility text</button>
+</aside>
+
+<div class="phone" id="phone"><div class="island"></div><div id="app"></div></div>
+
+<aside class="side">
+  <h2 style="margin-top:0">Tester tasks</h2>
+  <p>Press Start, read the task aloud, then say nothing. Every tap is timed below.</p>
+  <div id="tasks"></div>
+  <h2>Tap log</h2>
+  <div id="log" aria-live="off"></div>
+  <div class="row"><button class="opt" id="copy">Copy log</button><button class="opt" id="clear">Clear</button></div>
+</aside>
+
+<script>
+/* ---------- icons: one stroke family ---------- */
+const svg = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+const F = 'fill="currentColor" stroke="none"';
+const IC = {
+  minesweeper: svg(`<path d="M8 20V4l9 3.5-9 3.5"/><path d="M5 20h12"/>`),
+  merge: svg(`<rect x="4" y="4" width="10" height="10" rx="2.5" opacity=".6"/><rect x="10" y="10" width="10" height="10" rx="2.5" ${F}/>`),
+  nonogram: svg(`<path d="M5 5h4v4H5zM15 5h4v4h-4zM10 10h4v4h-4zM5 15h4v4H5zM15 15h4v4h-4z" ${F}/>`),
+  sudoku: svg(`<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/>`),
+  klondike: svg(`<rect x="5" y="7" width="9" height="13" rx="2" transform="rotate(-10 9.5 13.5)" opacity=".6"/><rect x="11" y="4" width="9" height="13" rx="2" transform="rotate(10 15.5 10.5)" ${F}/>`),
+  freecell: svg(`<path d="M3 5h3.6v5H3zM8 5h3.6v5H8zM13 5h3.6v5H13zM18 5h3v5h-3z"/><rect x="8.5" y="13.5" width="7" height="7.5" rx="1.5" ${F}/>`),
+  fiveLetter: svg(`<rect x="3" y="9" width="18" height="6" rx="1.5"/><path d="M6.6 9v6M10.2 9v6M13.8 9v6M17.4 9v6"/>`),
+  wordGrid: svg(`<rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8 16l4-8 4 8M9.6 13h4.8"/>`),
+  stack: svg(`<path d="M6 19h12M7.5 15h10M8 11h7M10.5 7h6" stroke-width="3"/>`),
+  snake: svg(`<path d="M4 18h7a3 3 0 000-6H9a3 3 0 010-6h8"/><circle cx="19" cy="6" r="1.4" ${F}/>`),
+  mathCrossword: svg(`<path d="M5 8h6M8 5v6M13 16h6M13 19.5h6M14 6l5 5M19 6l-5 5"/>`),
+  pin: svg(`<path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/>`),
+  back: svg(`<path d="M15 5l-7 7 7 7"/>`), left: svg(`<path d="M15 5l-7 7 7 7"/>`), x: svg(`<path d="M6 6l12 12M18 6L6 18"/>`),
+  person: svg(`<circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.5 18.2a6.5 6.5 0 0111 0"/>`),
+  video: svg(`<rect x="3" y="6" width="18" height="12" rx="2.5"/><rect x="12" y="11" width="6.5" height="4.5" rx="1" ${F}/>`),
+  home: svg(`<path d="M4 11l8-7 8 7v8a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/>`),
+  grid: svg(`<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>`),
+};
+
+/* ---------- catalog: mirrors GameDescriptor.all (modes, groups, save slots) ---------- */
+const m = (id, label, detail = '') => ({id, label, detail});
+const diff4 = p => ['Easy','Medium','Hard','Extreme'].map(l => m(p + l.toLowerCase(), l));
+const size4 = p => [['5×5','Tiny'],['10×10','Small'],['15×15','Medium'],['20×20','Large']].map(([l,d]) => m(p + d.toLowerCase(), l, d));
+const GAMES = [
+  {id:'mathCrossword', title:'Math Crossword', meta:'Crossing equations', groups:[{label:'', items:[m('easy','Easy'),m('medium','Medium'),m('hard','Hard')]}]},
+  {id:'minesweeper', title:'Minesweeper', meta:'Mine clearance', shot:'gameplay-minesweeper-medium.png', groups:[{label:'', items:[m('easy','Easy','9×9 · 10'),m('medium','Medium','16×16 · 40'),m('hard','Hard','24×16 · 80')]}]},
+  {id:'merge', title:'Merge', meta:'Slide & merge', video:true, shot:'gameplay-merge.png', groups:[{label:'', items:[m('win','2048','Classic'),m('infinite','Infinite','Endless')]}]},
+  {id:'nonogram', title:'Nonogram', meta:'Picture logic', video:true, shot:'gameplay-nonogram-large.png', groups:[{label:'Free', items:size4('free-')},{label:'Lives', items:size4('lives-')}]},
+  {id:'sudoku', title:'Sudoku', meta:'Number grids', video:true, shot:'gameplay-sudoku-hard.png', groups:[{label:'Free', items:diff4('free-')},{label:'Lives', items:diff4('lives-')}]},
+  {id:'klondike', title:'Solitaire', meta:'Klondike', shot:'gameplay-solitaire-medium.png', groups:[{label:'', items:[m('easy','Easy','Draw 1'),m('medium','Medium','Draw 2'),m('hard','Hard','Draw 3')]}]},
+  {id:'freecell', title:'FreeCell', meta:'Standard', video:true, oneSlot:true, shot:'gameplay-freecell-medium.png', groups:[{label:'', items:[m('easy','Easy'),m('medium','Medium'),m('hard','Hard'),m('expert','Expert')]}]},
+  {id:'fiveLetter', title:'Five Letter', meta:'Word guess', groups:[{label:'', items:[m('daily','Daily','One word a day'),m('unlimited','Unlimited')]}]},
+  {id:'wordGrid', title:'Word Grid', meta:'Trace words', groups:[{label:'', items:[m('timed','Timed','3 min'),m('relaxed','Relaxed','No timer')]}]},
+  {id:'stack', title:'Stack', meta:'Endless tower', arcade:true, groups:[]},
+  {id:'snake', title:'Snake', meta:'Endless grid', arcade:true, groups:[]},
+];
+const game = id => GAMES.find(g => g.id === id);
+const slotOf = (g, sid) => { for (const gr of g.groups) for (const it of gr.items) if (it.id === sid) return {gr, it}; };
+const slotLabel = (gid, sid) => { if (!sid) return ''; const {gr, it} = slotOf(game(gid), sid); return [gr.label, it.label].filter(Boolean).join(' · '); };
+// FreeCell keeps a single "current" save regardless of difficulty; every other game saves per mode.
+const saveKey = (gid, sid) => game(gid).oneSlot ? gid : gid + ':' + sid;
+
+/* ---------- state ---------- */
+const S = (gid, sid, days) => ({gid, sid, days});
+const FIX = {
+  first: {name:'First visit', hint:'No saves, no pins', saves:[], pins:[]},
+  returning: {name:'Returning player', hint:'5 saved boards, 3 pins',
+    saves:[S('sudoku','lives-hard',1),S('nonogram','free-medium',3),S('klondike','easy',6),S('minesweeper','medium',13),S('sudoku','free-easy',20)],
+    pins:[['sudoku','free-medium'],['freecell',null],['snake',null]]},
+  heavy: {name:'Heavy player', hint:'9 saved boards, 6 pins',
+    saves:[S('sudoku','lives-hard',0),S('mathCrossword','medium',1),S('nonogram','lives-large',1),S('freecell','hard',2),S('merge','infinite',4),S('klondike','hard',5),S('wordGrid','relaxed',9),S('sudoku','free-extreme',12),S('minesweeper','hard',30)],
+    pins:[['sudoku','lives-hard'],['merge','infinite'],['freecell',null],['nonogram','free-medium'],['snake',null],['fiveLetter','daily']]},
+};
+const VARIANTS = {
+  A:{name:'A · Home and Library tabs', hint:'Tab bar returns; Home is personal, Library is complete'},
+  B:{name:'B · One scrolling Home', hint:'No tab bar; All Games is the last section'},
+  C:{name:'C · Drawer with a personal shelf', hint:'1.6 grid stays the root; saves and pins sit above it'},
+};
+const TASKS = ['Find FreeCell and start a game','Carry on with the puzzle you were playing yesterday','Make Sudoku · Free · Medium a favorite you can reach in one tap','Pick something to play while a video is on','Start a new Hard Sudoku without losing your saved one'];
+let st = {variant:'A', fixture:'returning', tab:'home', stack:[], sheet:null, group:0, editing:false, saves:[], pins:[], dailyDone:false, toast:'', task:-1, t0:0};
+const logEl = document.getElementById('log'), app = document.getElementById('app');
+const log = s => { const t = st.task >= 0 ? ((performance.now() - st.t0) / 1000).toFixed(1).padStart(5) + 's' : '   --'; logEl.textContent += `${t}  [${st.variant}] ${s}\n`; logEl.scrollTop = 1e6; };
+function load(f){ st.fixture = f; st.saves = FIX[f].saves.map(x => ({...x})); st.pins = FIX[f].pins.map(x => [...x]); Object.assign(st, {tab:'home', stack:[], sheet:null, editing:false, dailyDone:false}); }
+
+/* ---------- pieces ---------- */
+const tile = (gid, s = 78) => `<span class="tile" style="--c:var(--c-${gid});--s:${s}px">${IC[gid]}</span>`;
+const ago = d => d === 0 ? 'Saved today' : d === 1 ? 'Saved yesterday' : `Saved ${d} days ago`;
+const sorted = () => [...st.saves].sort((a, b) => a.days - b.days);
+const isPinned = (gid, sid) => st.pins.some(p => p[0] === gid && p[1] === (sid || null));
+const sec = (h, extra = '') => `<div class="sec"><h3>${h}</h3>${extra}</div>`;
+const gameBtn = (g, sub = '') => `<button class="game" data-a="open" data-g="${g.id}" data-l="Library tile: ${g.title}">${tile(g.id)}<span>${g.title}</span>${sub ? `<span class="sub">${sub}</span>` : ''}</button>`;
+const libraryGrid = () => `<div class="grid">${GAMES.map(g => gameBtn(g)).join('')}</div>`;
+
+function continueSec(limit = 3){
+  const all = sorted(); if (!all.length) return '';
+  const more = all.length > limit ? `<button class="link" data-a="push" data-s="saved" data-l="See all saved">See all ${all.length}</button>` : '';
+  return sec('Continue Playing', more) + all.slice(0, limit).map(resumeRow).join('');
+}
+const resumeRow = s => `<button class="resume" data-a="launch" data-g="${s.gid}" data-m="${s.sid}" data-l="Continue: ${game(s.gid).title} ${slotLabel(s.gid, s.sid)}">${tile(s.gid, 52)}<span><b>${game(s.gid).title}</b><span class="sub">${slotLabel(s.gid, s.sid)}<br>${ago(s.days)}</span></span><span class="go">Resume</span></button>`;
+function pinnedSec(){
+  if (!st.pins.length) return '';
+  return sec('Pinned', `<button class="link" data-a="edit" data-l="Edit pins">${st.editing ? 'Done' : 'Edit'}</button>`) +
+    `<div class="grid">${st.pins.map((p, i) => pinTile(p, i)).join('')}</div>`;
+}
+const pinTile = ([gid, sid], i, s = 78) => `<div class="pinwrap"><button class="game" data-a="launch" data-g="${gid}" data-m="${sid || ''}" data-l="Pin: ${game(gid).title} ${slotLabel(gid, sid)}" aria-label="Play ${game(gid).title} ${slotLabel(gid, sid)}">${tile(gid, s)}<span>${game(gid).title}</span><span class="sub">${slotLabel(gid, sid) || game(gid).meta}</span></button>${st.editing ? `<button class="edit" data-a="unpin" data-i="${i}" data-l="Unpin" aria-label="Unpin">${IC.x}</button>${i ? `<button class="edit left" data-a="earlier" data-i="${i}" data-l="Move pin earlier" aria-label="Move earlier">${IC.left}</button>` : ''}` : ''}</div>`;
+const todaySec = () => sec('Today') + `<button class="resume" data-a="launch" data-g="fiveLetter" data-m="daily" data-l="Today: Five Letter Daily">${tile('fiveLetter', 52)}<span><b>Five Letter · Daily</b><span class="sub">${st.dailyDone ? 'Solved today. A new word arrives tomorrow.' : 'One word, about three minutes'}</span></span>${st.dailyDone ? '' : '<span class="go">Play</span>'}</button>`;
+const featuredSec = () => st.saves.length ? '' : sec('A good place to start') + `<button class="feature" data-a="launch" data-g="minesweeper" data-m="easy" data-l="Featured: Minesweeper Easy">${tile('minesweeper', 84)}<span><b>Minesweeper</b><span class="sub">The small board takes a couple of minutes, and your first tap is always safe.</span><br><span class="go">Play Easy</span></span></button>`;
+const videoSec = () => sec('Best While Watching', `<button class="link" data-a="toast" data-t="Opens the existing Video Mode sheet" data-l="Video Mode info">${IC.video}&nbsp;Video Mode</button>`) +
+  `<div class="strip">${GAMES.filter(g => g.video).map(g => gameBtn(g, 'Fits beside a video')).join('')}</div>`;
+
+/* ---------- screens ---------- */
+const profile = `<button class="icon-btn" data-a="toast" data-t="Stats and Settings stay in this menu" data-l="Profile menu" aria-label="Profile">${IC.person}</button>`;
+function homeA(){ return `<div class="bar"><span></span>${profile}</div><div class="scroll"><h2 class="title">Home</h2>${continueSec()}${pinnedSec()}${todaySec()}${featuredSec()}${videoSec()}</div>`; }
+function libA(){ return `<div class="bar"><span></span>${profile}</div><div class="scroll"><h2 class="title">Library</h2>${libraryGrid()}</div>`; }
+function homeB(){ return `<div class="bar"><button class="link" data-a="jump" data-l="All Games shortcut">${IC.grid}&nbsp;All Games</button>${profile}</div><div class="scroll"><h2 class="title">GameDrawer</h2>${continueSec()}${pinnedSec()}${todaySec()}${featuredSec()}${videoSec()}<div id="all">${sec('All Games', `<span class="sub">${GAMES.length} games</span>`)}${libraryGrid()}</div></div>`; }
+function homeC(){
+  const saves = sorted(), shelf = saves.length || st.pins.length;
+  const strip = shelf ? sec('Jump back in', `<button class="link" data-a="edit" data-l="Edit shelf">${st.editing ? 'Done' : 'Edit'}</button>`) + `<div class="strip">` +
+    saves.slice(0, 3).map(s => `<button class="mini" data-a="launch" data-g="${s.gid}" data-m="${s.sid}" data-l="Shelf resume: ${game(s.gid).title} ${slotLabel(s.gid, s.sid)}">${tile(s.gid, 44)}<span><b>Resume ${game(s.gid).title}</b><br><span class="sub">${slotLabel(s.gid, s.sid)}</span></span></button>`).join('') +
+    (saves.length > 3 ? `<button class="mini" data-a="push" data-s="saved" data-l="See all saved"><span><b>All ${saves.length} saved</b></span></button>` : '') +
+    st.pins.map((p, i) => pinTile(p, i, 56)).join('') + `</div>` : '';
+  return `<div class="bar"><button class="icon-btn" data-a="toast" data-t="Opens the existing Video Mode sheet" data-l="Video Mode button" aria-label="Video Mode">${IC.video}</button>${profile}</div><div class="scroll"><h2 class="title">The Drawer</h2>${strip}${todaySec()}${featuredSec()}${sec('All Games')}<div class="grid">${GAMES.map(g => gameBtn(g, g.video ? 'Fits beside a video' : '')).join('')}</div></div>`;
+}
+function savedScreen(){ return `<div class="bar"><button class="icon-btn" data-a="pop" data-l="Back" aria-label="Back">${IC.back}</button></div><div class="scroll"><h2 class="title">Saved Games</h2>${sorted().map(resumeRow).join('') || '<p class="sub">No unfinished games. Anything you leave mid-play will wait here.</p>'}</div>`; }
+function gameScreen({gid, sid, phase}){
+  const g = game(gid), label = slotLabel(gid, sid), save = st.saves.find(s => saveKey(s.gid, s.sid) === saveKey(gid, sid));
+  const prompt = phase === 'ask' && save ? `<div class="card"><b>Welcome back</b><p class="sub">You left a ${g.title}${slotLabel(save.gid, save.sid) ? ' · ' + slotLabel(save.gid, save.sid) : ''} board unfinished.${g.oneSlot ? '' : ' Your other saved games are not affected.'}</p><button class="btn primary" data-a="resume" data-l="Resume prompt: Resume">Resume</button><button class="btn" data-a="fresh" data-l="Resume prompt: New game">New ${label || g.title} game</button></div>` : `<span>${g.shot ? '' : g.title + ' board'}</span>`;
+  return `<div class="bar"><button class="icon-btn" data-a="leave" data-l="Leave game" aria-label="Back">${IC.back}</button><b>${g.title}${label ? ' · ' + label : ''}</b><span style="width:44px"></span></div>
+    <div class="board" style="${g.shot && phase !== 'ask' ? `background-image:url(../../../assets/screenshots/${g.shot})` : ''}">${prompt}</div>
+    <div class="foot"><button class="btn" data-a="leave" data-l="Leave mid-game">${g.arcade ? 'End run' : 'Leave mid-game'}</button><button class="btn" data-a="finish" data-l="Finish game">Finish the game</button></div>`;
+}
+function sheet(gid){
+  const g = game(gid), two = g.groups.length > 1, gr = g.groups[two ? st.group : 0];
+  const hasSave = sid => st.saves.some(s => s.gid === gid && (g.oneSlot || s.sid === sid));
+  const chips = gr.items.map(it => `<div class="chip"><button class="play" data-a="launch" data-g="${gid}" data-m="${it.id}" data-l="Mode chip: ${g.title} ${slotLabel(gid, it.id)}">${it.label}<small class="${hasSave(it.id) ? 'saved' : ''}">${hasSave(it.id) ? 'Game in progress' : it.detail || '&nbsp;'}</small></button><button class="pin" data-a="pin" data-g="${gid}" data-m="${it.id}" data-l="Pin toggle: ${g.title} ${slotLabel(gid, it.id)}" aria-pressed="${isPinned(gid, it.id)}" aria-label="Pin ${g.title} ${slotLabel(gid, it.id)} to Home">${IC.pin}</button></div>`).join('');
+  return `<div class="scrim" data-a="close" data-l="Dismiss sheet"></div><div class="sheet" style="--c:var(--c-${gid})" role="dialog" aria-label="${g.title}">
+    <div class="head">${tile(gid, 60)}<span><b>${g.title}</b><span class="sub">${g.meta}</span></span><button class="pill" data-a="pin" data-g="${gid}" data-m="" data-l="Pin toggle: ${g.title} (game)" aria-pressed="${isPinned(gid, null)}">${IC.pin}${isPinned(gid, null) ? 'Pinned' : 'Pin game'}</button></div>
+    ${two ? `<div class="seg">${g.groups.map((x, i) => `<button data-a="group" data-i="${i}" data-l="Mode: ${x.label}" aria-pressed="${i === st.group}">${x.label}</button>`).join('')}</div>` : ''}
+    <div class="label">${two ? 'DIFFICULTY' : 'MODE'}</div><div class="chips">${chips}</div>
+    <p class="note">Tap a mode to play. Tap its pin to keep that exact mode on Home${st.pins.length >= 6 ? '. Six pins is the limit; remove one to add another' : ''}.</p></div>`;
+}
+function render(){
+  const top = st.stack.at(-1); let body;
+  if (top?.name === 'game') body = gameScreen(top);
+  else if (top?.name === 'saved') body = savedScreen();
+  else body = st.variant === 'A' ? (st.tab === 'home' ? homeA() : libA()) : st.variant === 'B' ? homeB() : homeC();
+  const tabs = st.variant === 'A' && !top ? `<nav class="tabs" aria-label="Main">${[['home','Home'],['library','Library']].map(([k, l]) => `<button data-a="tab" data-t="${k}" data-l="Tab: ${l}" ${st.tab === k ? 'aria-current="page"' : ''}>${k === 'home' ? IC.home : IC.grid}${l}</button>`).join('')}</nav>` : '';
+  app.innerHTML = `<div class="view">${body}${tabs}</div>${st.sheet ? sheet(st.sheet) : ''}${st.toast ? `<div class="toast" role="status">${st.toast}</div>` : ''}`;
+  panels();
+}
+function toast(t){ st.toast = t; render(); clearTimeout(toast.h); toast.h = setTimeout(() => { st.toast = ''; render(); }, 2200); }
+
+/* ---------- actions ---------- */
+const dropSave = (gid, sid) => st.saves = st.saves.filter(s => saveKey(s.gid, s.sid) !== saveKey(gid, sid));
+const ACT = {
+  tab: d => { st.tab = d.t; st.editing = false; },
+  open: d => { const g = game(d.g); if (!g.groups.length) return ACT.launch({g: d.g, m: ''}); st.sheet = d.g; st.group = 0; },
+  close: () => st.sheet = null,
+  group: d => st.group = +d.i,
+  launch: d => { const g = game(d.g); if (!d.m && g.groups.length) return ACT.open(d); st.sheet = null; st.editing = false; st.stack.push({name:'game', gid:d.g, sid:d.m || null, phase:'ask'}); if (!st.saves.some(s => saveKey(s.gid, s.sid) === saveKey(d.g, d.m))) st.stack.at(-1).phase = 'play'; },
+  resume: () => { const t = st.stack.at(-1), s = st.saves.find(x => saveKey(x.gid, x.sid) === saveKey(t.gid, t.sid)); t.sid = s.sid; t.phase = 'play'; },
+  fresh: () => { const t = st.stack.at(-1); dropSave(t.gid, t.sid); t.phase = 'play'; },
+  leave: () => { const t = st.stack.pop(), g = game(t.gid); if (!g.arcade && t.phase === 'play' && !(t.gid === 'fiveLetter' && t.sid === 'daily' && st.dailyDone)) { dropSave(t.gid, t.sid); st.saves.push(S(t.gid, t.sid, 0)); } },
+  finish: () => { const t = st.stack.pop(); dropSave(t.gid, t.sid); if (t.gid === 'fiveLetter' && t.sid === 'daily') st.dailyDone = true; },
+  push: d => st.stack.push({name: d.s}),
+  pop: () => st.stack.pop(),
+  edit: () => st.editing = !st.editing,
+  unpin: d => st.pins.splice(+d.i, 1),
+  earlier: d => st.pins.splice(+d.i - 1, 0, st.pins.splice(+d.i, 1)[0]),
+  pin: d => { const sid = d.m || null, i = st.pins.findIndex(p => p[0] === d.g && p[1] === sid); if (i >= 0) st.pins.splice(i, 1); else if (st.pins.length >= 6) return toast('Six pins is the limit'); else { st.pins.push([d.g, sid]); return toast(`Pinned ${game(d.g).title}${sid ? ' · ' + slotLabel(d.g, sid) : ''} to Home`); } },
+  toast: d => toast(d.t),
+  jump: () => requestAnimationFrame(() => document.getElementById('all')?.scrollIntoView({behavior:'smooth'})),
+};
+app.addEventListener('click', e => { const b = e.target.closest('[data-a]'); if (!b) return; log(b.dataset.l || b.dataset.a); const keep = app.querySelector('.scroll')?.scrollTop, same = ['pin','edit','unpin','earlier','group','toast'].includes(b.dataset.a); ACT[b.dataset.a](b.dataset); render(); if (same && keep && app.querySelector('.scroll')) app.querySelector('.scroll').scrollTop = keep; });
+
+/* ---------- facilitator panels ---------- */
+function panels(){
+  document.getElementById('variants').innerHTML = Object.entries(VARIANTS).map(([k, v]) => `<button class="opt" data-v="${k}" aria-pressed="${st.variant === k}">${v.name}<small>${v.hint}</small></button>`).join('');
+  document.getElementById('fixtures').innerHTML = Object.entries(FIX).map(([k, v]) => `<button class="opt" data-f="${k}" aria-pressed="${st.fixture === k}">${v.name}<small>${v.hint}</small></button>`).join('');
+  document.getElementById('tasks').innerHTML = TASKS.map((t, i) => `<div class="task ${st.task === i ? 'on' : ''}"><span>${i + 1}. ${t}</span><button data-k="${i}">${st.task === i ? 'Stop' : 'Start'}</button></div>`).join('');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-v],[data-f],[data-k]'); if (!b) return;
+  if (b.dataset.v) { st.variant = b.dataset.v; load(st.fixture); }
+  if (b.dataset.f) load(b.dataset.f);
+  if (b.dataset.k) { const i = +b.dataset.k; if (st.task === i) { log('-- task stopped'); st.task = -1; } else { st.task = i; st.t0 = performance.now(); load(st.fixture); logEl.textContent += `\n# Task ${i + 1}: ${TASKS[i]} (${FIX[st.fixture].name})\n`; } }
+  render();
+});
+document.getElementById('big').onclick = e => { const on = document.getElementById('phone').classList.toggle('big'); e.currentTarget.setAttribute('aria-pressed', on); };
+document.getElementById('copy').onclick = () => navigator.clipboard?.writeText(logEl.textContent);
+document.getElementById('clear').onclick = () => logEl.textContent = '';
+const fit = () => document.getElementById('phone').style.zoom = Math.min(1, (innerHeight - 40) / 866);
+addEventListener('resize', fit); fit();
+load('returning'); render();
+</script>
+</body>
+</html>

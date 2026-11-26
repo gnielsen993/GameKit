@@ -46,7 +46,7 @@ Ordered by how often a session needs them.
 | Target iOS | 17+ | — |
 | Swift / UI | Swift 6 + SwiftUI | — |
 | Shipped version | `v1.6` (Be Kind + Math Crossword, build 4) — tag `v1.6` marks the uploaded commit; absorbed the never-released 1.5.1 | 2026-11-21 |
-| Current milestone | `2.0` — personal Home (Pinned, Continue Playing, Library); direction in `.planning/v2.0-VISION.md`. Release line `2.0` is cut; the milestone has not been opened in GSD yet (phases continue at 19). `MARKETING_VERSION` stays 1.6 until a slice is ready to ship — the vision says version labels are earned at ship time | 2026-11-21 |
+| Current milestone | `2.0` — personal Home (Pinned, Continue Playing, Library); direction in `.planning/v2.0-VISION.md`. Release line `2.0` is cut. Phase 19 navigation discovery is underway; phases 19–23 are mapped in the roadmap. `MARKETING_VERSION` stays 1.6 until a slice is ready to ship — the vision says version labels are earned at ship time | 2026-11-26 |
 | Shipped games (11) | Minesweeper · Merge · Nonogram · Sudoku · Klondike · FreeCell · Five Letter · Word Grid · Stack · Snake · Math Crossword | 2026-11-21 |
 | Next game (post-MVP) | TBD — Flow / Pattern Memory / Chess puzzles remain roadmap candidates | 2026-06-22 |
 | Icon | 9A.2 Video drawer (unified light / dark / tinted) | 2026-07-18 |
