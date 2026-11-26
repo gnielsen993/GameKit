@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GameDrawer 2.0 · Where does the life come from</title>
+<style>
+/* Presets stand in for DesignKit themes: every direction must hold under all three. */
+.p-classic{--bg:#F5F0E8;--surface:#FFFFFF;--ink:#1F1D1A;--muted:#6B655C;--line:#DDD6C9;--accent:#A32923;--on-accent:#fff;--well:#EAE3D6}
+.p-dracula{--bg:#282A36;--surface:#343746;--ink:#F8F8F2;--muted:#B4B7C9;--line:#4A4D61;--accent:#BD93F9;--on-accent:#1E1F29;--well:#21222C}
+.p-voltage{--bg:#FFE14A;--surface:#FFF6CC;--ink:#2A1B00;--muted:#6B5310;--line:#DDBF36;--accent:#6D1FD1;--on-accent:#fff;--well:#F2D232}
+:root{--ease:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.34,1.56,.64,1);
+  --c-minesweeper:#2F7BF6;--c-merge:#1FA348;--c-nonogram:#E04440;--c-sudoku:#C97F0E;--c-klondike:#0F97A5;--c-freecell:#9A4FE8;--c-fiveLetter:#C93F84;--c-wordGrid:#4F60D6;--c-stack:#B8612C;--c-snake:#2E8B5E;--c-mathCrossword:#5A6472}
+*{box-sizing:border-box}
+::selection{background:#A32923;color:#fff}
+html{background:#E9E3D8;color:#1F1D1A;font:15px/1.4 -apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+body{margin:0;min-height:100vh;display:grid;grid-template-columns:minmax(16rem,21rem) auto;gap:2.5rem;justify-content:center;align-items:start;padding:1.5rem}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;text-align:inherit}
+button:focus-visible{outline:2px solid #A32923;outline-offset:2px}
+.side h1{font-size:1.15rem;margin:0 0 .3rem}
+.side h2{font-size:.85rem;margin:1.5rem 0 .5rem;color:#6B655C;font-weight:600}
+.side p{margin:.3rem 0;color:#6B655C;font-size:.87rem}
+.opt{display:block;width:100%;padding:.55rem .7rem;border-radius:10px;border:1px solid #DDD6C9;background:#F5F0E8;margin-bottom:.4rem;transition:border-color .15s}
+.opt:hover{border-color:#B9B0A0}
+.opt[aria-pressed=true]{background:#1F1D1A;color:#fff;border-color:#1F1D1A}
+.opt small{display:block;opacity:.75;font-size:.8rem}
+.row{display:flex;gap:.4rem}.row .opt{text-align:center}
+
+/* ---------- phone ---------- */
+.phone{width:390px;height:844px;border-radius:52px;background:var(--bg);color:var(--ink);box-shadow:0 0 0 11px #1c1b1a,0 30px 60px -20px rgba(40,30,15,.45);position:relative;overflow:hidden;font-size:16px;transition:background .4s var(--ease),color .4s var(--ease)}
+.island{position:absolute;top:11px;left:50%;translate:-50% 0;width:112px;height:32px;border-radius:20px;background:#111;z-index:9}
+.view{position:absolute;inset:0;padding-top:62px;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;padding:0 1em 2em;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.tabs{display:flex;border-top:1px solid var(--line);padding:.4em 0 1.5em;background:var(--bg)}
+.tabs button{flex:1;text-align:center;font-size:.72em;font-weight:700;color:var(--muted);min-height:44px}
+.tabs [aria-current=page]{color:var(--accent)}
+.title{font-size:2.05em;font-weight:800;letter-spacing:-.025em;margin:.2em 0 .6em}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:1.5em 0 .6em;font-size:1.15em;font-weight:700}
+.sec small{font-size:.75em;color:var(--accent);font-weight:600}
+.sub{color:var(--muted);font-size:.84em}
+.go{background:var(--accent);color:var(--on-accent);font-weight:700;font-size:.85em;padding:.5em .95em;border-radius:99px;display:inline-block}
+
+/* ---------- mini boards: the games drawn from theme tokens ---------- */
+.mini{--n:3;--g:var(--ink);display:grid;grid-template-columns:repeat(var(--n),1fr);gap:calc(var(--s)*.03);width:var(--s);height:var(--s);align-content:center;font-size:calc(var(--s)/var(--n)*.52);font-weight:700;flex:none}
+.mini i{font-style:normal;aspect-ratio:1;display:grid;place-items:center;border-radius:14%;background:color-mix(in srgb,var(--g) 9%,var(--surface));color:var(--ink);transition:background .5s var(--ease),color .5s var(--ease),scale .5s var(--spring);line-height:1}
+.mini i.fill{color:var(--g)} .mini i.on{background:var(--g);color:#fff}
+.mini i.hid{background:color-mix(in srgb,var(--g) 30%,var(--surface))}
+.mini i.open{background:transparent;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--g) 22%,transparent);color:var(--g)}
+.mini i.near{background:color-mix(in srgb,var(--g) 38%,var(--surface))}
+.mini i.empty{background:transparent}
+.mini i.card{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);font-size:.78em}.mini i.red{color:#D0342C}
+.mini i.pop{scale:1.14}
+.mono .mini{--g:var(--ink)!important}
+.white .mini{--g:#fff}.white .mini i{background:rgba(255,255,255,.2);color:#fff}.white .mini i.on,.white .mini i.hid{background:#fff;color:var(--c)}.white .mini i.open,.white .mini i.empty{background:transparent;box-shadow:none}.white .mini i.card{background:#fff;color:var(--c);box-shadow:none}
+
+/* ---------- A · attract mode ---------- */
+.a-card{display:grid;grid-template-columns:auto 1fr;gap:1em;align-items:center;width:100%;background:var(--surface);border-radius:22px;padding:.9em;margin-bottom:.6em;box-shadow:0 2px 8px -2px rgba(0,0,0,.12)}
+.a-card b{display:block;font-size:1.1em;letter-spacing:-.01em}
+.a-card .go{margin-top:.6em}
+.a-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6em}
+.a-tile{background:var(--surface);border-radius:20px;padding:.7em .5em .6em;display:grid;justify-items:center;gap:.5em;font-size:.82em;font-weight:600;box-shadow:0 2px 8px -2px rgba(0,0,0,.12);transition:scale .3s var(--ease),box-shadow .5s var(--ease)}
+.a-tile:active{scale:.95}
+.a-tile.live{box-shadow:0 0 0 2px color-mix(in srgb,var(--g) 55%,transparent),0 8px 18px -8px color-mix(in srgb,var(--g) 60%,transparent)}
+.zoom{position:absolute;inset:0;z-index:7;background:var(--bg);display:grid;place-items:center;align-content:center;gap:1.2em;animation:zoom .5s var(--ease)}
+@keyframes zoom{from{clip-path:circle(8% at var(--x) var(--y));opacity:.5}to{clip-path:circle(140% at var(--x) var(--y))}}
+
+/* ---------- B · today's page ---------- */
+.b .title{font-size:3.1em;letter-spacing:-.045em;line-height:.95;margin:.1em 0 .1em;text-transform:none}
+.b .dateline{display:flex;justify-content:space-between;font-size:.74em;font-weight:700;letter-spacing:.04em;border-block:2px solid var(--ink);padding:.45em 0;margin-bottom:1em}
+.b .lead{display:grid;grid-template-columns:1fr auto;gap:1em;align-items:end;padding-bottom:1.1em;border-bottom:1px solid var(--line)}
+.b .lead b{font-size:1.75em;line-height:1.02;letter-spacing:-.03em;display:block;margin-bottom:.3em;text-wrap:balance}
+.b h3{font-size:.8em;font-weight:800;margin:1.3em 0 .2em}
+.b .item{display:grid;grid-template-columns:auto 1fr auto;gap:.9em;align-items:center;width:100%;padding:.75em 0;border-bottom:1px solid var(--line)}
+.b .item b{display:block}
+.b .cols{display:grid;grid-template-columns:repeat(3,1fr)}
+.b .cols button{padding:.8em .6em;display:grid;gap:.5em;justify-items:start;font-weight:700;font-size:.86em}
+.b .cols button+button{border-left:1px solid var(--line)}
+.b .arrow{font-weight:800;color:var(--accent)}
+
+/* ---------- C · pieces ---------- */
+.c{font-family:ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif}
+.c .title{font-weight:900}
+.well{background:var(--well);border-radius:28px;padding:.8em;box-shadow:inset 0 2px 5px rgba(0,0,0,.14)}
+.c-row{display:flex;gap:.7em;overflow-x:auto;scrollbar-width:none}
+.piece{--c:var(--muted);background:var(--c);color:#fff;border-radius:24px;display:grid;place-items:center;flex:none;box-shadow:0 6px 0 color-mix(in srgb,var(--c) 70%,#000),0 12px 16px -6px rgba(0,0,0,.3);transition:translate .18s var(--spring),box-shadow .18s var(--spring);animation:drop .7s var(--spring) both;animation-delay:calc(var(--i,0)*70ms)}
+.piece:hover{translate:0 -3px}
+.piece:active{translate:0 5px;box-shadow:0 1px 0 color-mix(in srgb,var(--c) 70%,#000),0 3px 6px -2px rgba(0,0,0,.3)}
+@keyframes drop{from{translate:0 -40px;opacity:0;rotate:-8deg}}
+.c-big{display:grid;grid-template-columns:auto 1fr;gap:.9em;align-items:center;padding:.8em 1em .8em .8em;width:100%;text-align:left;margin-bottom:.9em}
+.c-big b{display:block;font-size:1.15em}.c-big span span{opacity:.85;font-size:.85em}
+.c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1em .6em;justify-items:center;font-weight:700;font-size:.82em;text-align:center}
+.c-grid .piece{width:84px;height:84px;margin-bottom:.9em}
+.toast{position:absolute;left:50%;bottom:6.5em;translate:-50% 0;background:var(--ink);color:var(--bg);padding:.6em 1em;border-radius:99px;font-size:.82em;z-index:8;white-space:nowrap}
+.still *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:860px){body{grid-template-columns:auto;justify-items:center}.side{width:390px}}
+</style>
+</head>
+<body>
+<aside class="side">
+  <h1>Where does the life come from</h1>
+  <p>Sketch 011. Same Home, same content, three different sources of life. Navigation is settled elsewhere (sketch 010); taps here only show the feel.</p>
+  <h2>Direction</h2><div id="variants"></div>
+  <h2>Theme preset</h2><div class="row" id="presets"></div>
+  <p>Players choose the colors, so the life cannot depend on them. Switch presets to check each direction survives.</p>
+  <h2>Settings</h2>
+  <button class="opt" id="anim" aria-pressed="true">Animations on<small>Off shows what a Reduce Motion player gets</small></button>
+  <button class="opt" id="replay">Replay arrival</button>
+  <h2 id="why-h"></h2><p id="why"></p><p id="risk"></p>
+</aside>
+<div class="phone p-classic" id="phone"><div class="island"></div><div id="app"></div></div>
+
+<script>
+/* ---------- mini boards: a start position plus the moves that follow ---------- */
+const c = (t, k = '') => ({t, k}), E = c('', 'empty'), H = c('', 'hid');
+const rows = s => s.split('').map(x => x === '1' ? c('', 'on') : c(''));
+const MINI = {
+  sudoku: {n:3, init:['5','','3','','7','','6','','1'].map(t => c(t)), steps:[[[1,c('2','fill')]],[[3,c('4','fill')]],[[5,c('9','fill')]],[[7,c('8','fill')]]]},
+  minesweeper: {n:5, init:Array(25).fill(H), steps:[[[12,c('','open')],[11,c('1','open')],[13,c('1','open')]],[[7,c('','open')],[6,c('1','open')],[8,c('2','open')]],[[17,c('','open')],[16,c('2','open')],[18,c('1','open')]],[[3,c('','on')]],[[2,c('1','open')],[22,c('','open')],[21,c('1','open')]]]},
+  nonogram: {n:5, init:Array(25).fill(c('')), steps:[[1,3],[5,6,7,8,9],[10,11,12,13,14],[16,17,18],[22]].map(r => r.map(i => [i, c('', 'on')]))},
+  merge: {n:3, init:[c('2','near'),E,c('4','near'),E,c('2','near'),E,E,c('8','on'),E], steps:[[[0,E],[4,E],[3,c('4','near')]],[[2,E],[3,E],[5,c('8','on')]],[[5,E],[7,E],[8,c('16','on')]],[[0,c('2','near')],[4,c('2','near')]]]},
+  snake: {n:6, init:Array(36).fill(c('')).map((x, i) => [13,14,15].includes(i) ? c('', 'on') : i === 28 ? c('', 'near') : x), steps:[[16,13],[22,14],[28,15],[29,16],[30,22]].map(([h, t]) => [[h, c('', 'on')], [t, c('')]])},
+  fiveLetter: {n:5, init:[...'CRANE'].map((l, i) => c(l, ['', 'near', '', '', 'on'][i])).concat(Array(5).fill(c(''))), steps:[...'SHORE'].map((l, i) => [[5 + i, c(l, ['', '', 'near', 'on', 'on'][i])]])},
+  wordGrid: {n:3, init:[...'PLAYTIMES'].map(l => c(l)), steps:[[0],[1],[2],[3],[]].map(a => a.map(i => [i, c('PLAY'[i], 'on')]))},
+  mathCrossword: {n:5, init:['3','+','','=','7','×','','','','','2','×','4','=',''].map(t => t ? c(t) : E).map((x, i) => [2,14].includes(i) ? c('') : x), steps:[[[2,c('4','fill')]],[[14,c('8','fill')]]]},
+  klondike: {n:4, init:[c('K♠','card'),c('Q♥','card red'),E,c('J♣','card'),E,E,c('10♦','card red'),E,E,E,E,E], steps:[[[1,E],[4,c('Q♥','card red')]],[[3,E],[8,c('J♣','card')]],[[6,E],[1,c('10♦','card red')]]]},
+  freecell: {n:4, init:[E,E,E,c('A♠','card'),c('7♥','card red'),c('6♣','card'),c('9♦','card red'),c('8♠','card'),E,E,E,E], steps:[[[5,E],[8,c('6♣','card')]],[[7,E],[10,c('8♠','card')]],[[4,E],[11,c('7♥','card red')]]]},
+  stack: {n:5, init:rows('0000000000000000000001110'), steps:[rows('01110'),rows('01100'),rows('01100'),rows('00100')].map((r, k) => r.map((x, i) => [15 - k * 5 + i, x]))},
+};
+const TITLE = {sudoku:'Sudoku', minesweeper:'Minesweeper', nonogram:'Nonogram', merge:'Merge', snake:'Snake', fiveLetter:'Five Letter', wordGrid:'Word Grid', mathCrossword:'Math Crossword', klondike:'Solitaire', freecell:'FreeCell', stack:'Stack'};
+const cellHtml = x => `<i class="${x.k}">${x.t}</i>`;
+/* played: how many moves are already made (a saved board shows its real state) */
+function mini(g, s, played = 0){ const m = MINI[g], cells = m.init.map(x => ({...x})); m.steps.slice(0, played).forEach(st => st.forEach(([i, x]) => cells[i] = x)); return `<div class="mini" data-g="${g}" data-p="${played}" style="--n:${m.n};--s:${s}px;--g:var(--c-${g})">${cells.map(cellHtml).join('')}</div>`; }
+function play(el){ // advance one move; loop back to the start when the game is done
+  const m = MINI[el.dataset.g]; let p = +el.dataset.p;
+  if (p >= m.steps.length) { p = 0; el.innerHTML = m.init.map(cellHtml).join(''); }
+  else { m.steps[p].forEach(([i, x]) => { const n = el.children[i]; n.className = x.k + ' pop'; n.textContent = x.t; setTimeout(() => n.classList.remove('pop'), 420); }); p++; }
+  el.dataset.p = p;
+}
+
+/* ---------- content shared by all three directions ---------- */
+const SAVES = [{g:'sudoku', label:'Lives · Hard', when:'yesterday', p:2, note:'31 of 81 filled'}, {g:'nonogram', label:'Free · 15×15', when:'3 days ago', p:3, note:'About two thirds done'}];
+const SUGGEST = ['merge','freecell','mathCrossword'], ALL = Object.keys(TITLE);
+const DATE = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+const tabs = `<nav class="tabs" aria-label="Main"><button data-a="tab" data-t="home" ${'%H'}>Home</button><button data-a="tab" data-t="lib" ${'%L'}>Library</button></nav>`;
+
+const V = {
+  A: {name:'A · The games are alive', hint:'Every tile is the real game, quietly playing itself one at a time',
+    why:'Life comes from the games. Tiles are small boards drawn from the theme, not icons, and one at a time plays a few moves, like an arcade cabinet waiting. Your saved boards show your actual position. Home and the game screens finally speak one language.',
+    risk:'Risk: eleven mini renderers to build and keep honest, and motion must stay to one tile at a time or it becomes a casino.',
+    home: () => `<h2 class="title">The Drawer</h2><div class="sec">Jump back in</div>` +
+      SAVES.map(s => `<button class="a-card" data-a="zoom" data-g="${s.g}">${mini(s.g, 96, s.p)}<span><b>${TITLE[s.g]}</b><span class="sub">${s.label}<br>${s.note} · ${s.when}</span><br><span class="go">Resume</span></span></button>`).join('') +
+      `<div class="sec">Today</div><button class="a-card" data-a="zoom" data-g="fiveLetter">${mini('fiveLetter', 96)}<span><b>Five Letter · Daily</b><span class="sub">One word, about three minutes</span><br><span class="go">Play</span></span></button>` +
+      `<div class="sec">Something different <small>All 11 games</small></div><div class="a-grid">${SUGGEST.map(g => `<button class="a-tile" data-a="zoom" data-g="${g}" style="--g:var(--c-${g})">${mini(g, 84)}${TITLE[g]}</button>`).join('')}</div>`,
+    lib: () => `<h2 class="title">Library</h2><div class="a-grid">${ALL.map(g => `<button class="a-tile" data-a="zoom" data-g="${g}" style="--g:var(--c-${g})">${mini(g, 84)}${TITLE[g]}</button>`).join('')}</div>`},
+  B: {name:'B · Today\'s page', hint:'Home is a fresh page each day: a date, a lead puzzle, your unfinished ones',
+    why:'Life comes from today. These games grew up on the newspaper puzzle page, so Home is laid out as one: dated, with today\'s puzzle as the lead and your unfinished boards as printed diagrams in ink. Nothing moves; it feels alive because it is different every day and it knows where you left off.',
+    risk:'Risk: without a daily in more than one game the page is thin, and a returning player sees much the same thing two days running.',
+    home: () => `<div class="dateline"><span>${DATE.toUpperCase()}</span><span>GAMEDRAWER</span></div><h2 class="title">Today's page</h2>` +
+      `<button class="lead" data-a="toast" data-t="Opens Five Letter Daily" style="width:100%"><span><b>A new five-letter word is waiting.</b><span class="sub">Six guesses. Most people take about three minutes.</span><br><span class="go" style="margin-top:.7em">Play today's word</span></span><span class="mono">${mini('fiveLetter', 96)}</span></button>` +
+      `<h3>UNFINISHED</h3>` + SAVES.map(s => `<button class="item mono" data-a="toast" data-t="Resumes ${TITLE[s.g]}">${mini(s.g, 56, s.p)}<span><b>${TITLE[s.g]} <span class="sub">${s.label}</span></b><span class="sub">${s.note}. Left ${s.when}.</span></span><span class="arrow">Resume</span></button>`).join('') +
+      `<h3>ALSO IN THE DRAWER</h3><div class="cols mono">${SUGGEST.map(g => `<button data-a="toast" data-t="Opens ${TITLE[g]}">${mini(g, 64)}${TITLE[g]}</button>`).join('')}</div>`,
+    lib: () => `<div class="dateline"><span>ALL ELEVEN</span><span>GAMEDRAWER</span></div><h2 class="title">Library</h2><div class="cols mono" style="row-gap:.4em">${ALL.map(g => `<button data-a="toast" data-t="Opens ${TITLE[g]}">${mini(g, 64)}${TITLE[g]}</button>`).join('')}</div>`},
+  C: {name:'C · Pieces in a tray', hint:'Each game is a chunky piece you press; life comes from touch',
+    why:'Life comes from touch. The drawer becomes literal: games are solid pieces sitting in a tray, they drop in when you arrive, sink when pressed and spring back. Rounded type, deep color, real weight. The most immediately friendly of the three.',
+    risk:'Risk: the closest to a kids\' game or a casual-games portal, it leans on the saturated tiles you already have, and the depth cuts against the "no skeuomorphic depth" rule in CLAUDE.md.',
+    home: () => `<h2 class="title">The Drawer</h2><div class="sec">Jump back in</div>` +
+      SAVES.map((s, i) => `<button class="piece c-big white" data-a="toast" data-t="Resumes ${TITLE[s.g]}" style="--c:var(--c-${s.g});--i:${i}">${mini(s.g, 64, s.p)}<span><b>${TITLE[s.g]}</b><span>${s.label} · ${s.when}</span></span></button>`).join('') +
+      `<div class="sec">Today</div><button class="piece c-big white" data-a="toast" data-t="Opens Five Letter Daily" style="--c:var(--c-fiveLetter);--i:2">${mini('fiveLetter', 64)}<span><b>Today's word</b><span>Five Letter · about three minutes</span></span></button>` +
+      `<div class="sec">Something different <small>All 11 games</small></div><div class="well"><div class="c-grid">${SUGGEST.map((g, i) => `<div><button class="piece white" data-a="toast" data-t="Opens ${TITLE[g]}" style="--c:var(--c-${g});--i:${i + 3}">${mini(g, 50)}</button>${TITLE[g]}</div>`).join('')}</div></div>`,
+    lib: () => `<h2 class="title">Library</h2><div class="well"><div class="c-grid">${ALL.map((g, i) => `<div><button class="piece white" data-a="toast" data-t="Opens ${TITLE[g]}" style="--c:var(--c-${g});--i:${i}">${mini(g, 50)}</button>${TITLE[g]}</div>`).join('')}</div></div>`},
+};
+
+/* ---------- state + render ---------- */
+let st = {v:'A', tab:'home', preset:'classic', anim:true, zoom:null, toast:''};
+const app = document.getElementById('app'), phone = document.getElementById('phone');
+function render(){
+  const v = V[st.v];
+  app.innerHTML = `<div class="view ${st.v.toLowerCase()}"><div class="scroll">${st.tab === 'home' ? v.home() : v.lib()}</div>${tabs.replace('%H', st.tab === 'home' ? 'aria-current="page"' : '').replace('%L', st.tab === 'lib' ? 'aria-current="page"' : '')}</div>` +
+    (st.zoom ? `<button class="zoom" data-a="unzoom" style="--x:${st.zoom.x}px;--y:${st.zoom.y}px">${mini(st.zoom.g, 300, st.zoom.p)}<b style="font-size:1.4em">${TITLE[st.zoom.g]}</b><span class="sub">The tile grows into the board. Tap to go back.</span></button>` : '') +
+    (st.toast ? `<div class="toast" role="status">${st.toast}</div>` : '');
+  phone.className = `phone p-${st.preset} ${st.anim ? '' : 'still'}`;
+  document.getElementById('variants').innerHTML = Object.entries(V).map(([k, x]) => `<button class="opt" data-v="${k}" aria-pressed="${st.v === k}">${x.name}<small>${x.hint}</small></button>`).join('');
+  document.getElementById('presets').innerHTML = [['classic','Classic'],['dracula','Dracula'],['voltage','Voltage']].map(([k, l]) => `<button class="opt" data-p="${k}" aria-pressed="${st.preset === k}">${l}</button>`).join('');
+  document.getElementById('why-h').textContent = v.name; document.getElementById('why').textContent = v.why; document.getElementById('risk').textContent = v.risk;
+}
+function toast(t){ st.toast = t; render(); clearTimeout(toast.h); toast.h = setTimeout(() => { st.toast = ''; render(); }, 1800); }
+app.addEventListener('click', e => { const b = e.target.closest('[data-a]'); if (!b) return; const d = b.dataset;
+  if (d.a === 'tab') { st.tab = d.t; render(); }
+  if (d.a === 'toast') toast(d.t);
+  if (d.a === 'zoom') { const r = b.getBoundingClientRect(), p = phone.getBoundingClientRect(), z = +phone.style.zoom || 1; st.zoom = {g:d.g, p:+b.querySelector('.mini').dataset.p, x:(r.left + r.width / 2 - p.left) / z, y:(r.top + r.height / 2 - p.top) / z}; render(); }
+  if (d.a === 'unzoom') { st.zoom = null; render(); } });
+document.addEventListener('click', e => { const b = e.target.closest('[data-v],[data-p]'); if (!b) return; if (b.dataset.v) { st.v = b.dataset.v; st.tab = 'home'; st.zoom = null; } if (b.dataset.p) st.preset = b.dataset.p; render(); });
+document.getElementById('anim').onclick = e => { st.anim = !st.anim; e.currentTarget.setAttribute('aria-pressed', st.anim); e.currentTarget.firstChild.textContent = st.anim ? 'Animations on' : 'Animations off'; render(); };
+document.getElementById('replay').onclick = render;
+
+/* Attract mode: in A only, one tile at a time plays a move every 900ms, then the turn passes on. Saved boards never self-play. */
+let turn = 0, moves = 0;
+setInterval(() => {
+  if (!st.anim || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const zoomed = app.querySelector('.zoom .mini'); if (zoomed) return play(zoomed);
+  if (st.v !== 'A') return;
+  const tiles = [...app.querySelectorAll('.a-tile')]; if (!tiles.length) return;
+  const t = tiles[turn % tiles.length]; tiles.forEach(x => x.classList.toggle('live', x === t)); play(t.querySelector('.mini'));
+  if (++moves > MINI[t.dataset.g].steps.length + 1) { moves = 0; turn++; }
+}, 900);
+const fit = () => phone.style.zoom = Math.min(1, (innerHeight - 40) / 866); addEventListener('resize', fit); fit();
+render();
+</script>
+</body>
+</html>
