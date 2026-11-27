@@ -659,7 +659,7 @@ Plans:
 - [ ] 19.1-04-PLAN.md — Win record path: GameStats reports a new best, view model split below its ratchet, DEBUG near-win fixture
 - [ ] 19.1-05-PLAN.md — Win card: Solved, counting time, truthful best badge, piece actions; DEBUG strengths and near-win in Sudoku's menu
 - [ ] 19.1-06-PLAN.md — Preset, small-phone, Video Mode, large-text and motion-off matrix; Gabe picks the strength on his iPhone (checkpoint)
-- [ ] 19.1-07-PLAN.md — Lock the picked strength, delete the switch, record DESIGN.md §3.8, open the 2.0 release log
+- [ ] 19.1-07-PLAN.md — Lock the picked strength, delete the switch, record DESIGN.md §3.8, hold release notes for the version-bump commit
 
 ### Phase 20: Personal Home
 **Goal**: Returning players reach an unfinished game or a pinned mode in one tap, and every game stays one tap away in Library.
