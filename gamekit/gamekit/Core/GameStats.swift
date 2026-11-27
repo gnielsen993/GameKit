@@ -58,8 +58,12 @@ final class GameStats {
     /// Record one terminal-state outcome. Inserts a `GameRecord`
     /// unconditionally; if `outcome == .win`, evaluates `BestTime`
     /// (insert-or-mutate, faster-only). Calls `try modelContext.save()`
-    /// synchronously before returning (PERSIST-02 / SC1).
-    func record(
+    /// synchronously before returning (PERSIST-02 / SC1). Returns whether
+    /// this result set a best time and what stood before (`RecordResult`);
+    /// the Void `record(...)` forwarder in RecordResult.swift keeps the
+    /// original call shape for games that do not need the answer.
+    @discardableResult
+    func recordReportingBest(
         gameKind: GameKind,
         difficulty: String,
         outcome: Outcome,
@@ -67,7 +71,7 @@ final class GameStats {
         puzzleId: String? = nil,
         assistCount: Int? = nil,
         countsTowardRecords: Bool = true
-    ) throws {
+    ) throws -> RecordResult {
         // 1. Insert GameRecord unconditionally (D-12 step 1).
         //    Done BEFORE BestTime evaluation so a flaky predicate cannot
         //    block GameRecord persistence (Discretion lock from CONTEXT).
@@ -93,9 +97,10 @@ final class GameStats {
         // replaying a board you already lost is not comparable to a first
         // solve. Kept separate from `assistCount` deliberately — the player
         // used no hint, and reporting one would be a lie in the disclosure.
+        var result = RecordResult.noRecord
         if outcome == .win && !record.wasAssisted && countsTowardRecords {
             do {
-                try evaluateBestTime(
+                result = try evaluateBestTime(
                     gameKind: gameKind,
                     difficulty: difficulty,
                     seconds: durationSeconds
@@ -112,6 +117,7 @@ final class GameStats {
         //    PERSIST-02 force-quit survival rests on this call returning
         //    before the user can swipe-up.
         try modelContext.save()
+        return result
     }
 
     /// Score-record overload (Merge). Inserts a `GameRecord` carrying both
@@ -263,7 +269,7 @@ final class GameStats {
         gameKind: GameKind,
         difficulty: String,
         seconds: Double
-    ) throws {
+    ) throws -> RecordResult {
         let kindRaw = gameKind.rawValue
         let descriptor = FetchDescriptor<BestTime>(
             predicate: #Predicate {
@@ -273,11 +279,14 @@ final class GameStats {
 
         let existing = try modelContext.fetch(descriptor)
         if let current = existing.first {
+            let previous = current.seconds
             // Faster-only — equal-seconds is a no-op.
-            if seconds < current.seconds {
+            if seconds < previous {
                 current.seconds = seconds
                 current.achievedAt = .now
+                return RecordResult(setBestTime: true, previousBest: previous)
             }
+            return RecordResult(setBestTime: false, previousBest: previous)
         } else {
             let best = BestTime(
                 gameKind: gameKind,
@@ -286,6 +295,7 @@ final class GameStats {
                 achievedAt: .now
             )
             modelContext.insert(best)
+            return RecordResult(setBestTime: true, previousBest: nil)
         }
     }
 
