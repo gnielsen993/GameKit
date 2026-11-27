@@ -147,6 +147,8 @@ uses `accentPrimary`; a peer cell uses a separate, lower-opacity overlay.
 ### 3.0 Depth rules
 > Phase 19.1 replaces the pressable treatments below (ambient shadow, raised
 > sheen) with the piece from §0 rule 2. The table describes what ships in 1.6.
+> Sudoku's pad keys, erase and Value/Notes are pieces (§3.8) since Phase 19.1;
+> the table still describes the other ten games until Phase 20.1.
 
 Interactive surfaces carry a consistent, physical depth treatment from
 `Core/SurfaceDepth.swift` — light always comes from the top, on every preset:
@@ -238,6 +240,7 @@ interaction modes (e.g. Reveal/Flag, Place/Mark, Value/Notes).
 | Outer shape | `Capsule` |
 | Outer background | `theme.colors.surface` |
 | Outer stroke | 1pt `theme.colors.border` |
+| Sudoku | The pill is a capsule piece (§3.8): solid face over a lower edge, no outer stroke and no ambient shadow. The table describes the other games' pill until Phase 20.1 |
 | Outer padding | `theme.spacing.xs` (wraps both segments) |
 | Segment font (full) | `theme.typography.headline`, icon 16pt semibold |
 | Segment font (compact) | `theme.typography.body`, icon 13pt semibold, `.lineLimit(1)` + `.minimumScaleFactor(0.7)` |
@@ -283,6 +286,9 @@ Shared component: `VideoCompactControlRow` in `Core/`.
   carry the settings role.
 - Use `compact: true` on sub-components. Do not force the container to a
   24pt height: the mode pill and larger text may need more room.
+- Sudoku's large-zone row uses a minimum height (`theme.spacing.xl`) so
+  compact pieces fit. Back, restart, hint and the settings menu in that row
+  stay flat navigation chrome; only the mode pill and erase are pieces (§3.8).
 - Measure the full row at its intrinsic width. When it does not fit, move the
   picker to a second row; never truncate a tool label to keep a single row.
 
@@ -333,6 +339,43 @@ Settings actions such as support, stats reset/import errors, or account deletion
 - In scrolling Settings screens, present the card inline beneath the section
   that caused it. Keep the triggering control and consequence in one context.
 
+### 3.8 Piece (provisional until the Phase 19.1 device pick)
+
+The piece is §0 rule 2 made concrete: a solid face over a visible lower edge.
+The face sinks by `travel` under the finger and springs back. One style,
+`PieceButtonStyle` in `Core/`, is the only source of depth for a converted
+control; game views carry no depth literals. It is identical on every preset
+and in light and dark (no per-preset branch).
+
+Sizes (Medium, from sketch 012; `PieceSpec` in `Core/`):
+
+| Size | Edge depth | Travel | Used for |
+|------|-----------|--------|----------|
+| compact | 2.5pt | 1.5pt | Video Mode controls and pad |
+| regular | 4pt | 3pt | Off-path pad keys, erase, Value/Notes |
+| large | 6pt | 5pt | Primary buttons (later plans) |
+
+Travel is depth minus one, so a pressed face still leaves 1pt of edge.
+
+- **Press in** 0.05s ease-out; **release** spring, response 0.2, damping 0.55.
+- **Edge color.** Neutral: opaque `surface` with `textPrimary` at 28% on top,
+  which reads lighter than the face on dark presets and darker on light ones.
+  Filled: the fill with a 32% black shade (`SurfaceDepth`). Never "darken the
+  face": it is invisible on Dracula and Voltage dark.
+- **Contact shadow** on large pieces only; the nine pad keys carry none.
+- **Disabled** pieces sit flat on their edge: no travel, dimmed, and a strike
+  or other mark where meaning would otherwise rest on opacity.
+- **Motion off or Reduce Motion:** the face does not travel; a pressed piece
+  shows the `fillPressed` fill, and shape and edge stay.
+- **Hit region** is the un-offset frame including the edge, so the top of a
+  key does not flicker as the face sinks.
+- **Labels** are rounded (`RoundedType`, local to GameDrawer): pad digits,
+  mode pill labels, titles and primary buttons only.
+- **Video Mode** uses compact pieces.
+
+DEBUG builds also offer Subtle and Bold until Gabe picks on device; the pick
+replaces this table.
+
 ---
 
 ## 4. Typography Rules
@@ -345,6 +388,8 @@ Settings actions such as support, stats reset/import errors, or account deletion
 | Timer (all contexts) | `theme.typography.monoNumber` full; `theme.typography.caption` compact — always `.monospacedDigit()` |
 | Chip labels | `theme.typography.body` full; `theme.typography.caption` compact |
 | Mode pill labels | `theme.typography.headline` full; `theme.typography.body` compact |
+| Number pad digits (Sudoku) | title size, bold, rounded (`RoundedType`) |
+| Mode pill labels (Sudoku) | rounded (`RoundedType`), headline full, body compact |
 | Screen titles (nav bar) | Default `navigationBarTitleDisplayMode(.inline)` |
 | Empty state copy | `theme.typography.body` or `.callout` |
 | Loading text | `theme.typography.body` |
@@ -660,7 +705,7 @@ a "softer" or "reduced" animation. Skip it entirely.
 | End-state appear | `.easeOut(duration: 0.3)` + `.opacity.combined(with: .scale(0.96))` | After win/loss pre-roll delay | `animationsEnabled` only (the overlay itself is functional) |
 | Mode pill transition | Active-segment thumb slides via `matchedGeometryEffect`, `.spring(response: 0.3, dampingFraction: 0.82)` | Mode toggle | both (hard-cut to instant) |
 | Chip count update | Numeric roll via `.contentTransition(.numericText(value:))` + `theme.motion.ease` | Any counter change (score, best, mines, found words) | both (hard-cut to instant) |
-| Press feedback | `PressableButtonStyle` (`Core/`) — scale 0.94 (0.97 large surfaces) + slight dim, spring back on release | Finger down on pads, keyboards, Home tiles | both (dim stays; scale cuts) |
+| Press feedback | `PressableButtonStyle` (`Core/`) — scale 0.94 (0.97 large surfaces) + slight dim, spring back on release. Sudoku's pad, erase and Value/Notes use the piece (§3.8) instead; other games keep this until Phase 20.1 | Finger down on pads, keyboards, Home tiles | both (dim stays; scale cuts) |
 | Tile slide (Merge) | Position glide keyed by `MergeTile.id`, `.spring(response: 0.24, dampingFraction: 0.9)`; spawn scales in delayed 90ms; merged tile pops 1.15× keyframe | Every swipe | both (hard-cut to instant) |
 | Placement pop | Placed value scales in (`.scale(0.55) + .opacity` transition, spring ~0.25s) — Sudoku digits, Five Letter typing (1.12× keyframe) | On placement / letter entry | both |
 | Guess reveal (Five Letter) | Mark colors sweep the row left→right, `theme.motion.normal` easeInOut, 60ms/column stagger | On guess submit | both |
@@ -833,9 +878,11 @@ When in doubt, check these before changing chrome for a specific game.
 - Large Video Mode zones: lives chip overlays board **top-leading** corner;
   timer chip overlays board **top-trailing** corner. Both `compact: true`,
   both `allowsHitTesting(false)`, padded inside the board's horizontal margin.
-- Mode pill: Value / Notes. Always present during active play.
+- Mode pill: Value / Notes. Always present during active play. A capsule
+  piece (§3.8).
 - Number pad: digits span full pad width; erase floats trailing in the mode-pill
-  row, NOT as a 10th pad button.
+  row, NOT as a 10th pad button. Pad keys, erase and Value/Notes are pieces
+  (§3.8); Video Mode layouts use compact pieces.
 - Remaining-count badge under each digit: dims to `textSecondary` and disables
   when count reaches 0.
 
