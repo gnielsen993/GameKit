@@ -46,10 +46,14 @@ enum SudokuCellFeedback {
     /// not in the wave (`step == nil`) runs the same durations with flat
     /// values: a zero-length timeline made the whole board render blank
     /// when it fired (seen on the first simulator run).
+    ///
+    /// The leading hold is never zero: a zero-length first keyframe blanked
+    /// every cell that had one (the origin cell and all cells outside the
+    /// unit) for the first ~200ms of every unit ripple (plan 06 matrix).
     @KeyframesBuilder<SudokuWaveValues>
     static func waveKeyframes(step: Int?) -> some Keyframes<SudokuWaveValues> {
         let live = step != nil
-        let hold = Double(step ?? 0) * SudokuCompletionWave.stepInterval
+        let hold = waveHold(step: step)
         let rise = SudokuCompletionWave.cellDuration * SudokuCompletionWave.peakFraction
         let fall = SudokuCompletionWave.cellDuration * (1 - SudokuCompletionWave.peakFraction)
         KeyframeTrack(\.fill) {
@@ -63,6 +67,15 @@ enum SudokuCellFeedback {
             CubicKeyframe(1, duration: fall)
         }
     }
+
+    /// Seconds a cell holds before its rise: its step times the step
+    /// interval, floored at `minimumHold` so no keyframe has zero length.
+    static func waveHold(step: Int?) -> Double {
+        max(Double(step ?? 0) * SudokuCompletionWave.stepInterval, minimumHold)
+    }
+
+    /// One millisecond: invisible as a delay, and not a zero-length keyframe.
+    static let minimumHold: Double = 0.001
 
     // MARK: Wrong-cell shake
 

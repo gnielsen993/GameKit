@@ -183,4 +183,11 @@ struct SudokuCompletionWaveViewModelTests {
         #expect(vm.completionGlowCount == 1)
         #expect(vm.completionGlowIndices == Set(0...8))
     }
+
+    @Test("no wave keyframe has zero length: the origin cell and cells outside the unit hold briefly")
+    func waveHoldIsNeverZero() {
+        #expect(SudokuCellFeedback.waveHold(step: nil) > 0)
+        #expect(SudokuCellFeedback.waveHold(step: 0) > 0)
+        #expect(SudokuCellFeedback.waveHold(step: 3) == 3 * SudokuCompletionWave.stepInterval)
+    }
 }
