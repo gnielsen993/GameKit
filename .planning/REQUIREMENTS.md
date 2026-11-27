@@ -6,6 +6,7 @@
 ## 2.0 acceptance requirements
 
 - [ ] NAV-20 · Phase 19. Players locate a named game, a saved board, and mode pinning without coaching in the navigation prototype.
+- [ ] LANG-20 · Phase 19.1. The piece and mini-board primitives exist, and one shipped game plays open to win in the `DESIGN.md` §0 language on a device, under four presets, with animations off, and with Reduce Motion.
 - [ ] HOME-20 · Phase 20. Library, Featured, Best While Watching, ordered pins, and newest-first resumable games (read from the existing per-mode save slots) work offline. Replacing a saved board stays an explicit choice, made in the prompt each game already shows. Pins survive relaunch and backup.
 - [ ] INTRO-20 · Phase 21. Immediate play, optional first pin and Video Mode discovery work on fresh install. Existing players retain saves, stats and settings after upgrade.
 - [ ] DAILY-20 · Phase 22, optional. Home shows the existing Five Letter Daily as Today, with completion for the local date and no penalty for a missed day.

@@ -16,6 +16,59 @@ contract for how that consistency is achieved.
 
 ---
 
+## 0. Identity: less, with weight
+
+Approved by Gabe 2026-11-26 from sketches 011 and 012
+(`.planning/sketches/012-pieces-full-loop/`). The rest of this document keeps
+eleven games consistent with each other. This section says what they are
+consistent *as*.
+
+The player owns the palette: the same screen ships cream, dark or bright
+yellow depending on the preset. So nothing that makes GameDrawer recognizable
+may depend on color. Identity lives in shape, feedback and restraint.
+
+Few things on screen. Each one solid, and each one answering when touched.
+
+1. **One thing first.** Every non-game screen leads with a single primary
+   action. Home leads with the most recent unfinished game, or a first game
+   when there is none. Everything else is one step back, not removed.
+2. **Everything you press is a piece.** One signature object: a solid cap with
+   a visible lower edge that sinks under the finger and springs back. Home
+   tiles, pad and keyboard keys, hidden cells, and primary buttons are all
+   pieces. Things that are not pressable are flat. This is §3.0's "depth marks
+   interactivity" made strong enough to be felt, and it is the same on every
+   preset, so it is not a Classic-only skin (CLAUDE.md §1 restomod policy is
+   unaffected).
+3. **Every move answers back.** A valid move lands with a visible response, a
+   completed unit (row, line, set, clear) is acknowledged in sequence, and a
+   rejected move says why. This is §1.4's triple, applied to ordinary moves and
+   not only to wins.
+4. **The game is the decoration.** A game is represented by its own board, not
+   an icon: the face of a game's piece is a small board in theme tokens, and a
+   saved game shows its real position. On a screen with several, at most one
+   plays itself at a time, slowly. No ornament that is not a game.
+5. **Endings are rewarded.** Finishing shows the result large, names a personal
+   best when there is one, and offers the next game as the primary action.
+   Never a countdown, a streak threat, or a prompt to buy.
+
+What this is not: loud. No praise callouts, no particle bursts on ordinary
+moves, no screen shake, no stimulation that competes with a video playing
+beside the game. The reference is a well-made physical game set, not a
+casino. Rules 1, 3 and 5 are borrowed from what large casual games do well;
+their skin is deliberately not.
+
+Settings still govern all of it: with animations off or Reduce Motion on,
+pieces keep their shape and edge, moves still register visibly, and only the
+travel, pops and sequences are removed (§10.4).
+
+**Status.** The principles are binding for new 2.0 work. The concrete specs
+(edge depth, press travel, timings, haptic pairing, the mini-board component)
+are set on device in Phase 19.1 and recorded in §3 then. Until that lands, do
+not invent piece styling ad hoc in a game view, and do not retrofit shipped
+screens outside a planned phase.
+
+---
+
 ## 1. Philosophy
 
 ### 1.1 One product, many games
@@ -92,6 +145,9 @@ uses `accentPrimary`; a peer cell uses a separate, lower-opacity overlay.
 ## 3. Component Dictionary
 
 ### 3.0 Depth rules
+> Phase 19.1 replaces the pressable treatments below (ambient shadow, raised
+> sheen) with the piece from §0 rule 2. The table describes what ships in 1.6.
+
 Interactive surfaces carry a consistent, physical depth treatment from
 `Core/SurfaceDepth.swift` — light always comes from the top, on every preset:
 

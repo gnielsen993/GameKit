@@ -2,7 +2,7 @@
 sketch: 012
 name: pieces-full-loop
 question: "Does the pieces language (011 C's look, 011 A's living faces) hold across a whole session: open, play, win, play again?"
-winner: null
+winner: "approved"
 tags: [identity, design-language, sudoku, win-moment, phase-19]
 ---
 

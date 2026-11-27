@@ -2,7 +2,7 @@
 sketch: 011
 name: home-life
 question: "Where does the life in GameDrawer come from, when it must stay calm and the player owns the colors?"
-winner: null
+winner: "C with A's living faces"
 tags: [identity, design-language, home, motion, phase-19]
 ---
 

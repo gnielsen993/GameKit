@@ -2,7 +2,7 @@
 sketch: 010
 name: home-library-navigation
 question: "Which navigation model lets a new player find a game and a returning player resume or jump to a pinned mode without coaching?"
-winner: null
+winner: "D"
 tags: [home, library, navigation, pins, continue-playing, phase-19]
 ---
 
