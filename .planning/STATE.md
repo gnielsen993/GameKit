@@ -4,11 +4,11 @@ milestone: v2.0
 current_phase: "19.1"
 current_phase_name: "Design Language: Pieces (INSERTED)"
 status: executing
-stopped_at: Completed 19.1-01-PLAN.md
-last_updated: "2026-11-27T06:54:30.300Z"
+stopped_at: Completed 19.1-02-PLAN.md
+last_updated: "2026-11-27T07:36:44.267Z"
 last_activity: 2026-11-26
 last_activity_desc: Phase 19.1 execution started
-state_head: 099beda94279866376c3b92cb3613ecd420b5307
+state_head: 49c5c5286f35cbd09eb2c628d023dd807af3d5b9
 progress:
   total_phases: 7
   completed_phases: 0
@@ -54,7 +54,7 @@ The previous closure audit below did not catch these regressions.
 
 
 Phase: 19.1 (Design Language: Pieces (INSERTED)) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 
 v1.6 closure status, kept as history (its Phase/Plan/Status header lines were
@@ -246,6 +246,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 19.1 P01 | 25 min | 2 tasks | 1 files |
+| Phase 19.1 P02 | 95min | 3 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -500,6 +501,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 18-02
 - [Phase 19.1]: A1 FAIL: rounded type is RoundedType.font(_:weight:) with an explicit rounded design; never .fontDesign(.rounded) on a container (it overrides monoNumber)
 - [Phase 19.1]: Wave 0 spikes A2, A3, A4, A6, A8 PASS: plans 02, 03, 05, 06 take primary paths; PHASE_BASE eb0839ba0bcdc50e0bf21305c205ff708aa0bd11 in 19.1-SPIKES.md
+- [Phase 19.1]: A1 FAIL: rounded type is RoundedType.font (explicit design), never fontDesign on a container
+- [Phase 19.1]: Piece edge: neutral = surface plus textPrimary 28%, filled = fill plus 32% black; contact shadow on large only
+- [Phase 19.1]: Strength switch is DEBUG-only via @AppStorage in the style; not in SettingsStore
 
 ### Pending Todos (none open — closed 2026-11-21)
 
@@ -528,8 +532,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-11-27T06:54:29.839Z
-Stopped at: Completed 19.1-01-PLAN.md
+Last session: 2026-11-27T07:36:43.780Z
+Stopped at: Completed 19.1-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
