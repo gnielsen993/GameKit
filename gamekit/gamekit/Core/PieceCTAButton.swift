@@ -45,6 +45,11 @@ struct PieceCTAButton: View {
                 .font(RoundedType.font(.headline, weight: .bold))
                 .foregroundStyle(primary ? theme.colors.background : theme.colors.textPrimary)
                 .multilineTextAlignment(.center)
+                // At the largest text sizes a long label wraps instead of
+                // truncating ("Back to th...").
+                .lineLimit(3)
+                .minimumScaleFactor(0.8)
+                .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, theme.spacing.m)
         }

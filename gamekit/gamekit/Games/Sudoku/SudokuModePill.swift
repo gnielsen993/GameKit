@@ -46,6 +46,9 @@ struct SudokuModePill: View {
             .padding(theme.spacing.xs)
         }
         .buttonStyle(.piece(theme: theme, shape: .capsule, size: compact ? .compact : .regular))
+        // The pill shares a row with Erase; past these sizes its labels
+        // overran into the Erase key (plan 06, AccessibilityXXXL).
+        .dynamicTypeSize(...(compact ? DynamicTypeSize.xxxLarge : DynamicTypeSize.accessibility1))
         .disabled(!isInteractive)
         .accessibilityLabel(Text(String(localized: "Toggle mode")))
         .accessibilityValue(Text(mode == .value ? String(localized: "Value") : String(localized: "Notes")))

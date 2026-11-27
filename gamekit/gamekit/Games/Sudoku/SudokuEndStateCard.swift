@@ -40,51 +40,62 @@ struct SudokuEndStateCard: View {
 
     var body: some View {
         DKCard(theme: theme) {
-            VStack(spacing: theme.spacing.l) {
-                VStack(spacing: theme.spacing.xs) {
-                    Text(headline)
-                        .font(theme.typography.titleLarge)
-                        .foregroundStyle(theme.colors.textPrimary)
-                        .multilineTextAlignment(.center)
-                    Text(subtitle)
-                        .font(theme.typography.body)
-                        .foregroundStyle(theme.colors.textSecondary)
-                        .multilineTextAlignment(.center)
-                }
-
-                timeBlock
-
-                VStack(spacing: theme.spacing.s) {
-                    PieceCTAButton(
-                        primaryButtonLabel,
-                        theme: theme,
-                        identifier: "sudoku.endCard.primary",
-                        action: onPrimary
-                    )
-                    if outcome == .won, let onBack {
-                        PieceCTAButton(
-                            String(localized: "Back to the drawer"),
-                            theme: theme,
-                            prominence: .secondary,
-                            identifier: "sudoku.endCard.secondary",
-                            action: onBack
-                        )
-                    }
-                    if outcome == .gameOver, let onRetry {
-                        PieceCTAButton(
-                            String(localized: "Retry this puzzle"),
-                            theme: theme,
-                            prominence: .secondary,
-                            identifier: "sudoku.endCard.secondary",
-                            action: onRetry
-                        )
-                    }
-                    viewBoardButton
-                }
+            // At the largest text sizes on a small phone the content is
+            // taller than the screen: it scrolls instead of running off it.
+            ViewThatFits(in: .vertical) {
+                cardContent
+                ScrollView { cardContent }
+                    .scrollBounceBehavior(.basedOnSize)
             }
-            .padding(theme.spacing.l)
         }
         .padding(.horizontal, theme.spacing.xl)
+        .padding(.vertical, theme.spacing.m)
+    }
+
+    private var cardContent: some View {
+        VStack(spacing: theme.spacing.l) {
+            VStack(spacing: theme.spacing.xs) {
+                Text(headline)
+                    .font(theme.typography.titleLarge)
+                    .foregroundStyle(theme.colors.textPrimary)
+                    .multilineTextAlignment(.center)
+                Text(subtitle)
+                    .font(theme.typography.body)
+                    .foregroundStyle(theme.colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            timeBlock
+
+            VStack(spacing: theme.spacing.s) {
+                PieceCTAButton(
+                    primaryButtonLabel,
+                    theme: theme,
+                    identifier: "sudoku.endCard.primary",
+                    action: onPrimary
+                )
+                if outcome == .won, let onBack {
+                    PieceCTAButton(
+                        String(localized: "Back to the drawer"),
+                        theme: theme,
+                        prominence: .secondary,
+                        identifier: "sudoku.endCard.secondary",
+                        action: onBack
+                    )
+                }
+                if outcome == .gameOver, let onRetry {
+                    PieceCTAButton(
+                        String(localized: "Retry this puzzle"),
+                        theme: theme,
+                        prominence: .secondary,
+                        identifier: "sudoku.endCard.secondary",
+                        action: onRetry
+                    )
+                }
+                viewBoardButton
+            }
+        }
+        .padding(theme.spacing.l)
     }
 
     // MARK: - Time
