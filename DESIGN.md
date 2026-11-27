@@ -308,7 +308,8 @@ Shared component: `VideoModeBanner` in `Core/`.
 **Rules:**
 - Never use a full-screen `EndStateCard` as the primary win/loss surface.
   `VideoModeBanner` is the standard going forward.
-- Primary CTA is ALWAYS a single `DKButton`. Tapping the overlay backdrop
+- Primary CTA is ALWAYS a single button (`DKButton`; since Phase 19.1 Sudoku
+  uses `PieceCTAButton` pieces, see below). Tapping the overlay backdrop
   does NOT trigger the primary action (D-11 lock).
 - Delay before showing: 1500ms for win, 500ms for game over (when
   `settingsStore.animationsEnabled && !reduceMotion`). Show immediately
@@ -316,6 +317,20 @@ Shared component: `VideoModeBanner` in `Core/`.
 - Transition: `.opacity.combined(with: .scale(scale: 0.96))`. Collapses
   to `.identity` on Reduce Motion.
 - Haptics on win: `.success` (if `hapticsEnabled`).
+
+**Sudoku exception (Phase 19.1).** Sudoku's card uses `PieceCTAButton` pieces
+(§3.8) instead of `DKButton`: Next puzzle (filled, large), Back to the drawer
+(neutral, large) and View board (quiet text button, 44pt tall). The other ten
+games keep the 1.6 buttons until Phase 20.1. The card stays one centered
+overlay shared by all four layouts, not the sketch's bottom sheet (D-15).
+
+Sudoku win content, top to bottom: title "Solved"; subtitle the difficulty,
+followed by the hint disclosure when hints were used; the time, large and
+counting up (§4, §10.2); the badge "Your best <difficulty> time" only when
+`GameStats` reports a new best (a first unassisted win counts; assisted wins
+never do); Next puzzle; Back to the drawer; View board. No praise, countdown,
+streak or purchase copy. Game over and practice-complete keep their existing
+copy with the same piece actions and a static clock row.
 
 ### 3.7 Game Choice Card
 
@@ -353,7 +368,7 @@ Sizes (Medium, from sketch 012; `PieceSpec` in `Core/`):
 |------|-----------|--------|----------|
 | compact | 2.5pt | 1.5pt | Video Mode controls and pad |
 | regular | 4pt | 3pt | Off-path pad keys, erase, Value/Notes |
-| large | 6pt | 5pt | Primary buttons (later plans) |
+| large | 6pt | 5pt | Primary and secondary call-to-action buttons (`PieceCTAButton`) |
 
 Travel is depth minus one, so a pressed face still leaves 1pt of edge.
 
@@ -362,7 +377,10 @@ Travel is depth minus one, so a pressed face still leaves 1pt of edge.
   which reads lighter than the face on dark presets and darker on light ones.
   Filled: the fill with a 32% black shade (`SurfaceDepth`). Never "darken the
   face": it is invisible on Dracula and Voltage dark.
-- **Contact shadow** on large pieces only; the nine pad keys carry none.
+- **Contact shadow** on large pieces only; the nine pad keys carry none. It is
+  cast by the edge itself (black 22%, radius 3, y 2), so it reads as the edge
+  resting on the surface. A softer shadow cast from the face position read as
+  a halo around the whole button and smeared into the next one.
 - **Disabled** pieces sit flat on their edge: no travel, dimmed, and a strike
   or other mark where meaning would otherwise rest on opacity.
 - **Motion off or Reduce Motion:** the face does not travel; a pressed piece
@@ -388,6 +406,7 @@ replaces this table.
 | Timer (all contexts) | `theme.typography.monoNumber` full; `theme.typography.caption` compact — always `.monospacedDigit()` |
 | Chip labels | `theme.typography.body` full; `theme.typography.caption` compact |
 | Mode pill labels | `theme.typography.headline` full; `theme.typography.body` compact |
+| Win time (Sudoku end card) | `RoundedType.winTime` (largeTitle, heavy, rounded) with `.monospacedDigit()`, `accentPrimary`; the only timer that is not `monoNumber` |
 | Number pad digits (Sudoku) | title size, bold, rounded (`RoundedType`) |
 | Mode pill labels (Sudoku) | rounded (`RoundedType`), headline full, body compact |
 | Screen titles (nav bar) | Default `navigationBarTitleDisplayMode(.inline)` |
@@ -710,6 +729,7 @@ a "softer" or "reduced" animation. Skip it entirely.
 | Placement pop | Placed value scales in (`.scale(0.55) + .opacity` transition, spring ~0.25s) — Five Letter typing (1.12× keyframe). **Sudoku:** digits scale in from 0.3 scale and 0.2 opacity on a 0.45s spring (`response 0.45`, `damping 0.6`, slight overshoot); removal cuts | On placement / letter entry | both |
 | Unit wave (Sudoku) | A correctly completed row, column or box ripples out from the placed cell: 45ms per step, 0.7s per cell, peak at 35% with accent fill, background-colored digit and 1.08 scale. A full unit holding a wrong digit does not ripple. Motion off: static 22% accent glow for 1.2s | On the placement that completes the unit | both |
 | Win wave (Sudoku) | All 81 cells ripple by distance from the final placement, same per-cell curve; at most 16 steps, so it finishes inside the 1500ms pre-roll. Motion off: the success wash only | On win, before the banner | both |
+| Win count-up (Sudoku) | The end-card time counts 0 to the final time over 1.1s, cubic ease-out, starting 0.3s after the card appears. Motion off or Reduce Motion: the final time at once. VoiceOver always hears the final time | When the win card appears | both |
 | Guess reveal (Five Letter) | Mark colors sweep the row left→right, `theme.motion.normal` easeInOut, 60ms/column stagger | On guess submit | both |
 
 The shared gate idiom is `feedbackAnimation(_:value:)` (`Core/MotionGate.swift`)
