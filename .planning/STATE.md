@@ -4,11 +4,11 @@ milestone: v2.0
 current_phase: "19.1"
 current_phase_name: "Design Language: Pieces (INSERTED)"
 status: executing
-stopped_at: Completed 19.1-02-PLAN.md
-last_updated: "2026-11-27T07:36:44.267Z"
+stopped_at: Completed 19.1-03-PLAN.md
+last_updated: "2026-11-27T19:18:43.261Z"
 last_activity: 2026-11-26
 last_activity_desc: Phase 19.1 execution started
-state_head: 49c5c5286f35cbd09eb2c628d023dd807af3d5b9
+state_head: 78d57d1e3148177b9cb5cc47f1b3be97bc0c84dd
 progress:
   total_phases: 7
   completed_phases: 0
@@ -54,7 +54,7 @@ The previous closure audit below did not catch these regressions.
 
 
 Phase: 19.1 (Design Language: Pieces (INSERTED)) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 
 v1.6 closure status, kept as history (its Phase/Plan/Status header lines were
@@ -247,6 +247,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 |------|----------|-------|-------|
 | Phase 19.1 P01 | 25 min | 2 tasks | 1 files |
 | Phase 19.1 P02 | 95min | 3 tasks | 15 files |
+| Phase 19.1 P03 | 75 min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -504,6 +505,7 @@ Recent decisions affecting current work:
 - [Phase 19.1]: A1 FAIL: rounded type is RoundedType.font (explicit design), never fontDesign on a container
 - [Phase 19.1]: Piece edge: neutral = surface plus textPrimary 28%, filled = fill plus 32% black; contact shadow on large only
 - [Phase 19.1]: Strength switch is DEBUG-only via @AppStorage in the style; not in SettingsStore
+- [Phase 19.1]: 03: unit and win ripple use per-cell KeyframeAnimator (A3 PASS); keyframe timelines must never be zero-length (blanked the board); correctCompletedCells is @MainActor
 
 ### Pending Todos (none open — closed 2026-11-21)
 
@@ -532,8 +534,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-11-27T07:36:43.780Z
-Stopped at: Completed 19.1-02-PLAN.md
+Last session: 2026-11-27T19:18:42.769Z
+Stopped at: Completed 19.1-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
