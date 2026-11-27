@@ -70,6 +70,11 @@ extension SudokuViewModel {
     }
 
     func saveCurrentState() {
+        #if DEBUG
+        // A near-win fixture game must never overwrite the player's real
+        // saved puzzle for this difficulty and mode (CLAUDE.md data safety).
+        if isNearWinFixture { return }
+        #endif
         guard state == .playing || state == .gameOver || state == .practiceAfterLoss,
               let board, let puzzle = currentPuzzle else { return }
         let snapshot = SudokuSaveState(
@@ -95,6 +100,10 @@ extension SudokuViewModel {
     }
 
     func clearSavedState() {
+        #if DEBUG
+        // ... nor delete it.
+        if isNearWinFixture { return }
+        #endif
         userDefaults.removeObject(forKey: SudokuSaveState.key(difficulty: difficulty, gameMode: gameMode))
         pendingSaveState = nil
     }
