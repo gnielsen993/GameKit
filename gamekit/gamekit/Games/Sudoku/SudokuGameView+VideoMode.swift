@@ -67,7 +67,7 @@ extension SudokuGameView {
                             .foregroundStyle(theme.colors.textSecondary)
                         Spacer()
                     }
-                    SudokuNumberPad(viewModel: viewModel, theme: theme)
+                    SudokuNumberPad(viewModel: viewModel, theme: theme, size: .compact)
                         .opacity(isInteractive ? 1 : 0.4)
                         .allowsHitTesting(isInteractive)
                     largeZoneControlRow
@@ -87,7 +87,7 @@ extension SudokuGameView {
                             .foregroundStyle(theme.colors.textSecondary)
                         Spacer()
                     }
-                    SudokuNumberPad(viewModel: viewModel, theme: theme)
+                    SudokuNumberPad(viewModel: viewModel, theme: theme, size: .compact)
                         .opacity(isInteractive ? 1 : 0.4)
                         .allowsHitTesting(isInteractive)
                 }
@@ -159,18 +159,12 @@ extension SudokuGameView {
             )
 
             // Erase
-            Button { viewModel.erase() } label: {
-                Image(systemName: "delete.left")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(theme.colors.textPrimary)
-                    .frame(width: theme.spacing.xl, height: theme.spacing.xl)
-                    .background(theme.colors.surface)
-                    .clipShape(RoundedRectangle(cornerRadius: theme.radii.button,
-                                               style: .continuous))
-            }
-            .disabled(!isInteractive)
-            .opacity(isInteractive ? 1 : 0.4)
-            .accessibilityLabel(Text("Erase"))
+            SudokuEraseButton(
+                theme: theme,
+                isInteractive: isInteractive,
+                compact: true,
+                action: { viewModel.erase() }
+            )
 
             if settingsStore.assistsEnabled && isInteractive {
                 GameAssistToolbarButton(
@@ -208,7 +202,7 @@ extension SudokuGameView {
             )
         }
         .padding(.horizontal, theme.spacing.m)
-        .frame(height: theme.spacing.xl)
+        .frame(minHeight: theme.spacing.xl)
     }
 
     // MARK: - Small zone shared helpers
@@ -282,7 +276,7 @@ extension SudokuGameView {
 
                 smallZoneModePillRow
 
-                SudokuNumberPad(viewModel: viewModel, theme: theme)
+                SudokuNumberPad(viewModel: viewModel, theme: theme, size: .compact)
                     .opacity(isInteractive ? 1 : 0.4)
                     .allowsHitTesting(isInteractive)
             }
@@ -325,7 +319,7 @@ extension SudokuGameView {
 
                 smallZoneModePillRow
 
-                SudokuNumberPad(viewModel: viewModel, theme: theme)
+                SudokuNumberPad(viewModel: viewModel, theme: theme, size: .compact)
                     .opacity(isInteractive ? 1 : 0.4)
                     .allowsHitTesting(isInteractive)
             }

@@ -3,8 +3,9 @@
 //  gamekit
 //
 //  Two-segment pill toggling SudokuInteractionMode between .value and .note.
-//  Mirrors NonogramModePill's shape 1:1: Capsule fill, xs padding wrapper,
-//  per-segment active highlight (accentPrimary), min-height 44pt off-path.
+//  A capsule piece (DESIGN.md §3.8): solid face over a lower edge, no outer
+//  stroke, no ambient shadow. xs padding wrapper, per-segment active
+//  highlight (accentPrimary), min-height 44pt off-path.
 //
 //  Labels:
 //    - .value → "Value" (pencil off — committing digits)
@@ -43,16 +44,8 @@ struct SudokuModePill: View {
             }
             .feedbackAnimation(.spring(response: 0.3, dampingFraction: 0.82), value: mode)
             .padding(theme.spacing.xs)
-            .background(
-                Capsule().fill(theme.colors.surface)
-            )
-            .overlay(
-                Capsule().stroke(theme.colors.border, lineWidth: 1)
-            )
-            .chipShadow()
-            .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.piece(theme: theme, shape: .capsule, size: compact ? .compact : .regular))
         .disabled(!isInteractive)
         .accessibilityLabel(Text(String(localized: "Toggle mode")))
         .accessibilityValue(Text(mode == .value ? String(localized: "Value") : String(localized: "Notes")))
@@ -68,7 +61,9 @@ struct SudokuModePill: View {
             Image(systemName: glyph)
                 .font(.system(size: compact ? 13 : 16, weight: .semibold))
             Text(label)
-                .font(compact ? theme.typography.body : theme.typography.headline)
+                .font(compact
+                      ? RoundedType.font(.body, weight: .regular)
+                      : RoundedType.font(.headline, weight: .semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(compact ? 0.7 : 1.0)
         }

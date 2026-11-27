@@ -41,6 +41,7 @@ final class PiecesSudokuTests: XCTestCase {
         let after = cellText(app, suffix: placed.suffix)
         XCTAssertFalse(after.hasPrefix("Empty"), "the pad key filled the cell: \(after)")
         capturePieces(app, "pad-key-places-digit")
+        app.buttons["Erase"].tap() // leave no saved mistake for other suites
     }
 
     func testPadKeyTopEdgeTapRegisters() {
@@ -49,6 +50,22 @@ final class PiecesSudokuTests: XCTestCase {
         let after = cellText(app, suffix: placed.suffix)
         XCTAssertFalse(after.hasPrefix("Empty"), "a tap on the key's top edge filled the cell: \(after)")
         capturePieces(app, "pad-key-top-edge")
+        app.buttons["Erase"].tap() // leave no saved mistake for other suites
+    }
+
+    func testEraseAndModeArePieces() {
+        let app = launchSudoku()
+        let placed = placeDigit(app, keyOffset: nil)
+        XCTAssertFalse(cellText(app, suffix: placed.suffix).hasPrefix("Empty"))
+        let erase = app.buttons["Erase"]
+        XCTAssertTrue(erase.waitForExistence(timeout: 3))
+        erase.tap()
+        XCTAssertTrue(cellText(app, suffix: placed.suffix).hasPrefix("Empty"), "erase cleared the cell")
+        let toggle = app.buttons["Toggle mode"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 3))
+        toggle.tap()
+        XCTAssertEqual(toggle.value as? String, "Notes")
+        capturePieces(app, "erase-and-mode")
     }
 }
 

@@ -351,24 +351,6 @@ extension SudokuGameView {
     /// digits can span the full pad width without a 10th off-center slot.
     @ViewBuilder
     var eraseButton: some View {
-        Button {
-            viewModel.erase()
-        } label: {
-            Image(systemName: "delete.left")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(theme.colors.textPrimary)
-                .frame(width: 36, height: 36)
-                .background(theme.colors.surface)
-                .clipShape(Circle())
-                .overlay(
-                    Circle()
-                        .stroke(theme.colors.border, lineWidth: 1)
-                )
-                .chipShadow()
-        }
-        .buttonStyle(.pressable)
-        .disabled(!isInteractive)
-        .opacity(isInteractive ? 1 : 0.4)
-        .accessibilityLabel(Text("Erase"))
+        SudokuEraseButton(theme: theme, isInteractive: isInteractive, action: { viewModel.erase() })
     }
 }
