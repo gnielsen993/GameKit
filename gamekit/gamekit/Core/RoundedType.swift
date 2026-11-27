@@ -19,3 +19,10 @@ enum RoundedType {
         Font.system(style, design: .rounded, weight: weight)
     }
 }
+
+extension RoundedType {
+    /// The Sudoku win card's time (DESIGN.md §4): the one timer that is not
+    /// `monoNumber`. Pair with `.monospacedDigit()` so the digits keep one
+    /// width while they count (spike A8).
+    static let winTime: Font = .system(.largeTitle, design: .rounded, weight: .heavy)
+}
