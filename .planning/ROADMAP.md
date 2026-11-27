@@ -651,13 +651,13 @@ tooling reads. Keep the two in step.
   4. Legible and intact on Classic, Dracula, Voltage and one Soft preset; on the smallest supported iPhone; at accessibility text sizes; and in Video Mode large and small zones.
   5. `DESIGN.md` §3 records the piece's specs (edge depth, travel, timings, haptic pairing) as set on device, replacing the §3.0 forward note.
   6. Gabe approves the feel on a device before Phase 20 starts.
-**Plans:** 4/7 plans executed
+**Plans:** 5/7 plans executed
 Plans:
 - [x] 19.1-01-PLAN.md — Wave 0 spikes (rounded type, live debug read in a ButtonStyle, keyframe wave, SE edge taps, Reduce Motion by simctl), findings only
 - [x] 19.1-02-PLAN.md — Tracer: the piece primitive on Sudoku's pad, then erase and Value/Notes in every layout, plus the DEBUG strength switch in Settings
 - [x] 19.1-03-PLAN.md — Every move answers back: placement pop, ripple for correct units only, wrong-cell shake, win ripple, all motion-gated
 - [x] 19.1-04-PLAN.md — Win record path: GameStats reports a new best, view model split below its ratchet, DEBUG near-win fixture
-- [ ] 19.1-05-PLAN.md — Win card: Solved, counting time, truthful best badge, piece actions; DEBUG strengths and near-win in Sudoku's menu
+- [x] 19.1-05-PLAN.md — Win card: Solved, counting time, truthful best badge, piece actions; DEBUG strengths and near-win in Sudoku's menu
 - [ ] 19.1-06-PLAN.md — Preset, small-phone, Video Mode, large-text and motion-off matrix; Gabe picks the strength on his iPhone (checkpoint)
 - [ ] 19.1-07-PLAN.md — Lock the picked strength, delete the switch, record DESIGN.md §3.8, hold release notes for the version-bump commit
 
