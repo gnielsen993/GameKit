@@ -168,6 +168,24 @@ final class PiecesSudokuTests: XCTestCase {
         XCTAssertTrue(app.buttons["Sudoku"].waitForExistence(timeout: 5), "back on Home")
     }
 
+    /// D-16, D-17: Sudoku's settings menu offers the strengths and a one-tap
+    /// jump to three cells from a win (Debug builds only).
+    func testDebugMenuJumpsToNearWin() {
+        let app = launchSudoku()
+        let menu = app.buttons["Game settings"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 5))
+        menu.tap()
+        XCTAssertTrue(app.buttons["Bold"].waitForExistence(timeout: 3), "the strengths are in the menu")
+        let jump = app.buttons["Three cells from a win"]
+        XCTAssertTrue(jump.exists)
+        jump.tap()
+        let empties = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label BEGINSWITH 'Empty, row'"))
+        XCTAssertTrue(firstEmptyCell(app).waitForExistence(timeout: 3))
+        XCTAssertEqual(empties.count, 3, "exactly three cells are left")
+        capturePieces(app, "debug-menu-near-win")
+    }
+
     /// Plan 07 deletes this test together with the strength switch.
     func testDebugSettingsOffersThreeStrengths() {
         let app = XCUIApplication()

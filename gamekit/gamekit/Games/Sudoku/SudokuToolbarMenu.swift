@@ -4,7 +4,8 @@
 //
 //  Toolbar trailing menu — difficulty picker + game-mode picker.
 //  Mirrors NonogramToolbarMenu shape: a Menu with sectioned content,
-//  current pick gets a checkmark.
+//  current pick gets a checkmark. Debug builds add a section with the piece
+//  strengths and a near-win jump (Phase 19.1, D-16, D-17); Release has none.
 //
 
 import SwiftUI
@@ -21,6 +22,13 @@ struct SudokuToolbarMenu: View {
     /// Compact variant for Video Mode large-zone control row — smaller frame +
     /// surface background to match VideoCompactControlRow button style.
     var compact: Bool = false
+    /// Jumps the loaded puzzle to three cells from a win. Always declared so
+    /// call sites need no conditional compilation; only DEBUG shows it.
+    var onDebugNearWin: (() -> Void)? = nil
+
+    #if DEBUG
+    @AppStorage(PieceStrength.defaultsKey) private var strengthRaw: String = PieceStrength.medium.rawValue
+    #endif
 
     var body: some View {
         Menu {
@@ -63,6 +71,25 @@ struct SudokuToolbarMenu: View {
                     }
                 }
             }
+
+            #if DEBUG
+            Section(header: Text(verbatim: "Debug")) {
+                Picker(selection: $strengthRaw) {
+                    ForEach(PieceStrength.allCases) { strength in
+                        Text(verbatim: strength.title).tag(strength.rawValue)
+                    }
+                } label: {
+                    Text(verbatim: "Piece strength")
+                }
+                if let onDebugNearWin {
+                    Button {
+                        onDebugNearWin()
+                    } label: {
+                        Text(verbatim: "Three cells from a win")
+                    }
+                }
+            }
+            #endif
         } label: {
             if compact {
                 Image(systemName: "slider.horizontal.3")

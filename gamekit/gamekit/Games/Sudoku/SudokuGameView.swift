@@ -313,7 +313,8 @@ extension SudokuGameView {
                 currentGameMode: viewModel.gameMode,
                 onSelectDifficulty: { viewModel.setDifficulty($0) },
                 onSelectGameMode: { viewModel.setGameMode($0) },
-                onHint: settingsStore.assistsEnabled && isInteractive ? { viewModel.requestHint() } : nil
+                onHint: settingsStore.assistsEnabled && isInteractive ? { viewModel.requestHint() } : nil,
+                onDebugNearWin: debugNearWinAction
             )
         }
     }
