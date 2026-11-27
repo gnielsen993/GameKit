@@ -168,6 +168,7 @@ struct SudokuGameView: View {
                 difficulty: viewModel.difficulty,
                 elapsed: viewModel.frozenElapsed,
                 assistCount: viewModel.assistsUsed,
+                record: viewModel.state == .won ? viewModel.lastWinRecord : nil,
                 onPrimary: {
                     bannerDismissed = false
                     endCardVisible = false
@@ -180,6 +181,7 @@ struct SudokuGameView: View {
                     }
                 },
                 onRetry: viewModel.state == .gameOver ? { viewModel.restart() } : nil,
+                onBack: { dismiss() },
                 onDismiss: {
                     bannerDismissed = true
                 }

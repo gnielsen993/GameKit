@@ -61,10 +61,11 @@ extension View {
         shadow(color: SurfaceDepth.shadow, radius: 5, x: 0, y: 2)
     }
 
-    /// Contact shadow for a large piece, cast by a layer drawn at the face
-    /// position: it falls `depth` (the edge) plus 3pt below that layer.
-    func pieceContactShadow(depth: CGFloat) -> some View {
-        shadow(color: SurfaceDepth.pieceContactShadow, radius: 6, x: 0, y: depth + 3)
+    /// Contact shadow for a large piece, cast by its lower edge (apply it to
+    /// the edge layer, after the edge's offset). Tight and close, so it reads
+    /// as the edge resting on the surface rather than a halo around the face.
+    func pieceContactShadow() -> some View {
+        shadow(color: SurfaceDepth.pieceContactShadow, radius: 3, x: 0, y: 2)
     }
 
     /// Accent-tinted glow for an element the player is actively holding or

@@ -95,15 +95,15 @@ struct PieceButtonStyle: ButtonStyle {
     }
 
     /// The lower edge, drawn at the face's frame and pushed down by `depth`.
-    /// Large pieces add a contact shadow, cast by a face-position layer
-    /// behind the edge (no blurred shadow on the nine pad keys, pitfall 10).
+    /// Large pieces add a tight contact shadow cast by the edge itself (no
+    /// blurred shadow on the nine pad keys, pitfall 10).
     @ViewBuilder
     private func edge(_ anyShape: AnyShape, depth: CGFloat) -> some View {
-        ZStack(alignment: .top) {
-            if size == .large {
-                edgeFill(anyShape)
-                    .pieceContactShadow(depth: depth)
-            }
+        if size == .large {
+            edgeFill(anyShape)
+                .offset(y: depth)
+                .pieceContactShadow()
+        } else {
             edgeFill(anyShape)
                 .offset(y: depth)
         }

@@ -2,14 +2,16 @@
 //  SudokuEndStateCard.swift
 //  gamekit
 //
-//  Terminal-state overlay for the Sudoku scene. Two variants:
-//    - .won      → "You solved it!" headline, difficulty + elapsed subtitle,
-//                  "New puzzle" primary CTA, "View board" secondary.
-//    - .gameOver → "Out of mistakes" headline, "You used all 3 lives."
-//                  subtitle, "Try again" primary CTA, "View board" secondary.
-//
-//  Mirrors NonogramEndStateCard chrome: DKCard wrapper, VStack(spacing: l),
-//  DKButton primary + secondary. Copy locked per plan §design-decisions #3.
+//  Terminal-state overlay for the Sudoku scene, restyled with the pieces
+//  design language (Phase 19.1, DESIGN.md 3.6). One centered card shared by
+//  all four layouts (D-15). Three variants:
+//    - .won              "Solved", difficulty (plus hint disclosure), the
+//                        time counting up, "Your best <difficulty> time"
+//                        only when GameStats says a best was set, then
+//                        Next puzzle and Back to the drawer as pieces.
+//    - .gameOver         "Out of mistakes", "Keep solving" / "Retry".
+//    - .practiceComplete "Finished in practice", "Retry this puzzle".
+//  Actions are PieceCTAButton pieces; "View board" stays a quiet text button.
 //
 
 import SwiftUI
@@ -27,8 +29,13 @@ struct SudokuEndStateCard: View {
     let difficulty: SudokuDifficulty
     let elapsed: TimeInterval
     var assistCount: Int = 0
+    /// What GameStats said about this win. Only `.won` reads it; the badge
+    /// is built from `setBestTime` and nothing else (D-09, D-13).
+    var record: RecordResult? = nil
     let onPrimary: () -> Void
     var onRetry: (() -> Void)? = nil
+    /// Leaves Sudoku for Home. Shown on the win only.
+    var onBack: (() -> Void)? = nil
     let onDismiss: () -> Void
 
     var body: some View {
@@ -45,35 +52,34 @@ struct SudokuEndStateCard: View {
                         .multilineTextAlignment(.center)
                 }
 
-                HStack(spacing: theme.spacing.xs) {
-                    Image(systemName: "clock")
-                        .foregroundStyle(theme.colors.textPrimary)
-                    Text(formatElapsed(elapsed))
-                        .font(theme.typography.monoNumber)
-                        .foregroundStyle(theme.colors.textPrimary)
-                        .monospacedDigit()
-                }
+                timeBlock
 
                 VStack(spacing: theme.spacing.s) {
-                    DKButton(
+                    PieceCTAButton(
                         primaryButtonLabel,
                         theme: theme,
+                        identifier: "sudoku.endCard.primary",
                         action: onPrimary
                     )
-                    if let onRetry {
-                        DKButton(
-                            String(localized: "Retry this puzzle"),
-                            style: .secondary,
+                    if outcome == .won, let onBack {
+                        PieceCTAButton(
+                            String(localized: "Back to the drawer"),
                             theme: theme,
+                            prominence: .secondary,
+                            identifier: "sudoku.endCard.secondary",
+                            action: onBack
+                        )
+                    }
+                    if outcome == .gameOver, let onRetry {
+                        PieceCTAButton(
+                            String(localized: "Retry this puzzle"),
+                            theme: theme,
+                            prominence: .secondary,
+                            identifier: "sudoku.endCard.secondary",
                             action: onRetry
                         )
                     }
-                    DKButton(
-                        String(localized: "View board"),
-                        style: .secondary,
-                        theme: theme,
-                        action: onDismiss
-                    )
+                    viewBoardButton
                 }
             }
             .padding(theme.spacing.l)
@@ -81,9 +87,56 @@ struct SudokuEndStateCard: View {
         .padding(.horizontal, theme.spacing.xl)
     }
 
+    // MARK: - Time
+
+    @ViewBuilder
+    private var timeBlock: some View {
+        if outcome == .won {
+            VStack(spacing: theme.spacing.s) {
+                SudokuCountUpTime(seconds: elapsed, theme: theme)
+                if record?.setBestTime == true {
+                    bestBadge
+                }
+            }
+        } else {
+            HStack(spacing: theme.spacing.xs) {
+                Image(systemName: "clock")
+                    .foregroundStyle(theme.colors.textPrimary)
+                Text(SudokuWinTime.string(elapsed))
+                    .font(theme.typography.monoNumber)
+                    .foregroundStyle(theme.colors.textPrimary)
+                    .monospacedDigit()
+            }
+        }
+    }
+
+    private var bestBadge: some View {
+        Text(String(format: String(localized: "Your best %@ time"), difficulty.displayName))
+            .font(RoundedType.font(.caption, weight: .bold))
+            .foregroundStyle(theme.colors.accentPrimary)
+            .padding(.horizontal, theme.spacing.m)
+            .padding(.vertical, theme.spacing.xs)
+            .background(Capsule().fill(theme.colors.accentPrimary.opacity(0.14)))
+            .accessibilityIdentifier("sudoku.endCard.bestBadge")
+    }
+
+    private var viewBoardButton: some View {
+        Button(action: onDismiss) {
+            Text(String(localized: "View board"))
+                .font(theme.typography.body)
+                .foregroundStyle(theme.colors.textSecondary)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("sudoku.endCard.viewBoard")
+    }
+
+    // MARK: - Copy
+
     private var headline: String {
         switch outcome {
-        case .won: return String(localized: "You solved it!")
+        case .won: return String(localized: "Solved")
         case .gameOver: return String(localized: "Out of mistakes")
         case .practiceComplete: return String(localized: "Finished in practice")
         }
@@ -92,7 +145,7 @@ struct SudokuEndStateCard: View {
     private var subtitle: String {
         switch outcome {
         case .won:
-            let base = "\(difficulty.displayName) · \(formatElapsed(elapsed))"
+            let base = difficulty.displayName
             guard assistCount > 0 else { return base }
             let disclosure = assistCount == 1
                 ? String(localized: "Solved with 1 hint")
@@ -107,20 +160,9 @@ struct SudokuEndStateCard: View {
 
     private var primaryButtonLabel: String {
         switch outcome {
-        case .won: return String(localized: "New puzzle")
+        case .won: return String(localized: "Next puzzle")
         case .gameOver: return String(localized: "Keep solving")
         case .practiceComplete: return String(localized: "Retry this puzzle")
         }
-    }
-
-    private func formatElapsed(_ t: TimeInterval) -> String {
-        let total = max(0, Int(t))
-        let h = total / 3600
-        let m = (total % 3600) / 60
-        let s = total % 60
-        if h > 0 {
-            return String(format: "%d:%02d:%02d", h, m, s)
-        }
-        return String(format: "%d:%02d", m, s)
     }
 }

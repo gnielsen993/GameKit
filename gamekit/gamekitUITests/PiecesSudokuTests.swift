@@ -110,6 +110,64 @@ final class PiecesSudokuTests: XCTestCase {
         app.buttons["Erase"].tap() // leave no saved mistake for other suites
     }
 
+    // MARK: - The win card (plan 05)
+
+    /// Reaches the win from the DEBUG near-win fixture; the board is three
+    /// cells of one digit from solved and the fixture never writes stats.
+    func testNearWinReachesRewardedWin() {
+        let app = launchSudoku(args: ["--sudoku-near-win"])
+        finishNearWin(app)
+        XCTAssertTrue(app.buttons["sudoku.endCard.primary"].waitForExistence(timeout: 6),
+                      "the win card appears after the pre-roll")
+        XCTAssertTrue(app.staticTexts["Solved"].exists, "the card says Solved")
+        XCTAssertTrue(app.descendants(matching: .any)["sudoku.endCard.bestBadge"].exists,
+                      "the fixture previews an unassisted best")
+        let time = app.descendants(matching: .any)["sudoku.endCard.time"]
+        XCTAssertTrue(time.exists)
+        XCTAssertNotNil(time.label.range(of: "^[0-9]+:[0-9]{2}$", options: .regularExpression),
+                        "VoiceOver label is the final time: \(time.label)")
+        XCTAssertTrue(app.buttons["Back to the drawer"].exists)
+        capturePieces(app, "win-card")
+    }
+
+    /// Animations off: no pre-roll and no counting; the final time is there at once.
+    func testNearWinMotionOffShowsFinalTimeAtOnce() {
+        let app = launchSudoku(args: ["--sudoku-near-win", "-gamekit.animationsEnabled", "<false/>"])
+        finishNearWin(app)
+        XCTAssertTrue(app.buttons["sudoku.endCard.primary"].waitForExistence(timeout: 1.5),
+                      "no pre-roll with animations off")
+        let time = app.descendants(matching: .any)["sudoku.endCard.time"]
+        let first = time.label
+        Thread.sleep(forTimeInterval: 0.6)
+        XCTAssertEqual(time.label, first, "the time is not counting")
+        capturePieces(app, "win-card-motion-off")
+    }
+
+    /// CLAUDE.md 8.12: the card's pieces on Classic plus Loud and Moody
+    /// presets. The screenshots are the evidence; the assertion is only that
+    /// the card appeared.
+    func testWinCardAcrossPresets() {
+        for (preset, mode) in [("classicMuted", "light"), ("dracula", "dark"), ("voltage", "dark")] {
+            let app = launchSudoku(args: [
+                "--sudoku-near-win", "-designkit.theme.preset", preset, "-designkit.theme.mode", mode
+            ])
+            finishNearWin(app)
+            XCTAssertTrue(app.buttons["sudoku.endCard.primary"].waitForExistence(timeout: 6), preset)
+            Thread.sleep(forTimeInterval: 2) // let the count-up settle
+            capturePieces(app, "win-card-" + preset)
+            app.terminate()
+        }
+    }
+
+    func testBackToDrawerLeavesSudoku() {
+        let app = launchSudoku(args: ["--sudoku-near-win"])
+        finishNearWin(app)
+        let back = app.buttons["sudoku.endCard.secondary"]
+        XCTAssertTrue(back.waitForExistence(timeout: 6))
+        back.tap()
+        XCTAssertTrue(app.buttons["Sudoku"].waitForExistence(timeout: 5), "back on Home")
+    }
+
     /// Plan 07 deletes this test together with the strength switch.
     func testDebugSettingsOffersThreeStrengths() {
         let app = XCUIApplication()
@@ -135,6 +193,22 @@ final class PiecesSudokuTests: XCTestCase {
 }
 
 extension XCTestCase {
+    /// Fill the three open cells of the near-win fixture: tap the first empty
+    /// cell, then the enabled pad key that still has digits to place.
+    @MainActor
+    func finishNearWin(_ app: XCUIApplication) {
+        for _ in 0..<3 {
+            let cell = firstEmptyCell(app)
+            XCTAssertTrue(cell.waitForExistence(timeout: 5), "an empty cell exists")
+            cell.tap()
+            let key = app.buttons.matching(NSPredicate(
+                format: "label BEGINSWITH 'Place ' AND NOT (label ENDSWITH ', 0 remaining') AND enabled == 1"
+            )).firstMatch
+            XCTAssertTrue(key.waitForExistence(timeout: 3), "a pad key with digits left")
+            key.tap()
+        }
+    }
+
     /// Launch into a Sudoku game. `choices` are tapped in order, matching a
     /// button whose label is the choice or begins with "<choice>,".
     @MainActor
