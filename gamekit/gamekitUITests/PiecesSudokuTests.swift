@@ -67,6 +67,29 @@ final class PiecesSudokuTests: XCTestCase {
         XCTAssertEqual(toggle.value as? String, "Notes")
         capturePieces(app, "erase-and-mode")
     }
+
+    /// Plan 07 deletes this test together with the strength switch.
+    func testDebugSettingsOffersThreeStrengths() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--returning-launch", "-gamekit.cloudSyncEnabled", "NO"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Profile"].waitForExistence(timeout: 10))
+        app.buttons["Profile"].tap()
+        XCTAssertTrue(app.buttons["Settings"].waitForExistence(timeout: 5))
+        app.buttons["Settings"].tap()
+        let bold = app.buttons["Bold"]
+        var swipes = 0
+        while !bold.exists && swipes < 4 {
+            app.swipeUp()
+            swipes += 1
+        }
+        XCTAssertTrue(bold.waitForExistence(timeout: 3), "Bold exists in the DEBUG section")
+        XCTAssertTrue(app.buttons["Subtle"].exists)
+        XCTAssertTrue(app.buttons["Medium"].exists)
+        bold.tap()
+        capturePieces(app, "debug-strength-bold")
+        app.buttons["Medium"].tap() // restore the default
+    }
 }
 
 extension XCTestCase {

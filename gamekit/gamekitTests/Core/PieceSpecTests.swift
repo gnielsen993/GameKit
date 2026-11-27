@@ -79,3 +79,47 @@ nonisolated struct PieceSpecTests {
         }
     }
 }
+
+#if DEBUG
+@Suite("PieceSpec strengths (DEBUG)")
+nonisolated struct PieceStrengthTests {
+
+    @Test("subtle < medium < bold depths for every size")
+    func strengthsAreOrdered() {
+        for size in [PieceSize.compact, .regular, .large] {
+            #expect(PieceSpec.subtle.depth(for: size) < PieceSpec.current.depth(for: size))
+            #expect(PieceSpec.current.depth(for: size) < PieceSpec.bold.depth(for: size))
+        }
+    }
+
+    @Test("medium is the shipping spec")
+    func mediumIsCurrent() {
+        #expect(PieceStrength.medium.spec == PieceSpec.current)
+    }
+
+    @Test("every strength keeps travel inside the edge")
+    func travelInsideEdge() {
+        for strength in PieceStrength.allCases {
+            for size in [PieceSize.compact, .regular, .large] {
+                let spec = strength.spec
+                #expect(spec.travel(for: size) >= 1)
+                #expect(spec.travel(for: size) < spec.depth(for: size))
+            }
+        }
+    }
+
+    @Test("resolved maps raw values and falls back to medium")
+    func resolvedMapping() {
+        #expect(PieceSpec.resolved(strengthRaw: nil) == .current)
+        #expect(PieceSpec.resolved(strengthRaw: "bold") == .bold)
+        #expect(PieceSpec.resolved(strengthRaw: "subtle") == .subtle)
+        #expect(PieceSpec.resolved(strengthRaw: "nonsense") == .current)
+    }
+
+    @Test("three strengths and a stable defaults key")
+    func casesAndKey() {
+        #expect(PieceStrength.allCases.count == 3)
+        #expect(PieceStrength.defaultsKey == "gamekit.debug.pieceStrength")
+    }
+}
+#endif
