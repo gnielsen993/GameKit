@@ -61,7 +61,9 @@ final class SudokuViewModel {
 
     // Sensory feedback counters
     private(set) var placeCount: Int = 0
-    private(set) var winCount: Int = 0
+    var winCount: Int = 0
+    /// Whether the last win set a personal best (from GameStats); nil until a recorded win.
+    var lastWinRecord: RecordResult?
     private(set) var wrongAttemptCount: Int = 0
     /// Flat index of the most-recent wrong placement, for the red-flash +
     /// shake animation in CellView. Auto-cleared ~600ms after being set.
@@ -308,6 +310,9 @@ final class SudokuViewModel {
                 for i in 0..<81 where b.cells[i].isGiven { locked.insert(i) }
             }
             lockedCells = locked
+            #if DEBUG
+            applyNearWinFixtureIfLaunched()
+            #endif
         } catch {
             currentPuzzle = nil
             board = nil
@@ -316,6 +321,7 @@ final class SudokuViewModel {
 
     private func resetSessionState() {
         state = .idle
+        lastWinRecord = nil
         timerAnchor = nil
         pausedElapsed = 0
         frozenElapsed = 0
@@ -617,52 +623,6 @@ final class SudokuViewModel {
         }
     }
 
-    private func recordGameOver() {
-        if let anchor = timerAnchor {
-            pausedElapsed += clock().timeIntervalSince(anchor)
-            timerAnchor = nil
-        }
-        frozenElapsed = pausedElapsed
-        state = .gameOver
-        try? gameStats?.record(
-            gameKind: .sudoku,
-            difficulty: difficulty.rawValue,
-            outcome: .loss,
-            durationSeconds: frozenElapsed,
-            puzzleId: currentPuzzle?.id,
-            assistCount: assistsUsed
-        )
-        saveCurrentState()
-    }
-
-    private func completeBoard() {
-        if state == .practiceAfterLoss {
-            clearSavedState()
-            state = .practiceComplete
-        } else {
-            recordWin()
-        }
-    }
-
-    private func recordWin() {
-        clearSavedState()
-        if let anchor = timerAnchor {
-            pausedElapsed += clock().timeIntervalSince(anchor)
-            timerAnchor = nil
-        }
-        frozenElapsed = pausedElapsed
-        state = .won
-        winCount += 1
-        try? gameStats?.record(
-            gameKind: .sudoku,
-            difficulty: difficulty.rawValue,
-            outcome: .win,
-            durationSeconds: frozenElapsed,
-            puzzleId: currentPuzzle?.id,
-            assistCount: assistsUsed
-        )
-    }
-
     // MARK: - Save state + completion feedback
     //
     // Persistence I/O lives in SudokuViewModel+SaveState.swift; the
@@ -674,23 +634,3 @@ final class SudokuViewModel {
     static let lastDifficultyKey = "sudoku.lastDifficulty"
     static let lastGameModeKey   = "sudoku.lastGameMode"
 }
-
-// MARK: - Test injection seam (#if DEBUG)
-
-#if DEBUG
-extension SudokuViewModel {
-    /// Test-only entry point that bypasses the async pool load.
-    @MainActor
-    func injectTestBoardForUnitTests(puzzle: SudokuPuzzleEntry) {
-        self.currentPuzzle = puzzle
-        self.board = SudokuBoard(givens: puzzle.givens, solution: puzzle.solution)
-        var locked = Set<Int>()
-        if let b = self.board {
-            for i in 0..<81 where b.cells[i].isGiven {
-                locked.insert(i)
-            }
-        }
-        self.lockedCells = locked
-    }
-}
-#endif

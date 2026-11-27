@@ -8,6 +8,6 @@
 793 gamekit/gamekit/Games/Nonogram/NonogramViewModel.swift
 748 gamekit/gamekit/Games/Solitaire/FreeCellViewModel.swift
 503 gamekit/gamekit/Games/Solitaire/SolitaireViewModel.swift
-696 gamekit/gamekit/Games/Sudoku/SudokuViewModel.swift
+636 gamekit/gamekit/Games/Sudoku/SudokuViewModel.swift
 618 gamekit/gamekitTests/Games/Minesweeper/MinesweeperViewModelTests.swift
 524 Packages/SudokuCore/Tests/SudokuCoreTests/SudokuCoreTests.swift
