@@ -621,7 +621,7 @@ a haptic without checking this first.
 |-------|---------|---------|
 | Normal move | `.impact(weight: .light, intensity: 0.7)` | Standard board interaction — placing a digit, revealing a safe cell, filling a Nonogram cell |
 | Secondary action | `.selection` | A distinct but lesser interaction — adding a pencil note, flagging a cell, marking a Nonogram cell |
-| Milestone completion | `.impact(weight: .medium, intensity: 1.0)` | A meaningful sub-goal reached — completing a Nonogram row/column, completing a Sudoku box |
+| Milestone completion | `.impact(weight: .medium, intensity: 1.0)` | A meaningful sub-goal reached — completing a Nonogram row/column, correctly completing a Sudoku row, column or box. Sudoku fires it only when the unit is full and correct; a full unit with a wrong digit fires nothing |
 | Wrong move | `.error` | An incorrect action with a consequence — wrong digit, hitting a mine, wrong fill |
 | Mode toggle | `.impact(weight: .light)` | UI state change with no board consequence — switching Reveal/Flag, Value/Notes |
 | Win | `.success` | Game complete — always exactly once per win, fires before the end banner appears |
@@ -699,7 +699,7 @@ a "softer" or "reduced" animation. Skip it entirely.
 
 | Class | Animation | When | Gate |
 |-------|-----------|------|------|
-| Wrong move | 4-keyframe horizontal shake, 8pt magnitude, 0.1s/frame | Immediately on wrong action | `reduceMotion` + `animationsEnabled` |
+| Wrong move | 4-keyframe horizontal shake, 8pt magnitude, 0.1s/frame. **Sudoku:** only the wrong cell shakes (offsets -4, +4, -3, 0 pt over 0.35s), never the board or screen, and the wrong digit is not shown | Immediately on wrong action | `reduceMotion` + `animationsEnabled` |
 | Win wash | `.phaseAnimator([0, 0.25, 0])` easeInOut `theme.motion.slow`, success tint | Immediately on win, before banner | both |
 | Confetti | `ConfettiView`, `.opacity` transition, fires before banner | Win only | both |
 | End-state appear | `.easeOut(duration: 0.3)` + `.opacity.combined(with: .scale(0.96))` | After win/loss pre-roll delay | `animationsEnabled` only (the overlay itself is functional) |
@@ -707,7 +707,9 @@ a "softer" or "reduced" animation. Skip it entirely.
 | Chip count update | Numeric roll via `.contentTransition(.numericText(value:))` + `theme.motion.ease` | Any counter change (score, best, mines, found words) | both (hard-cut to instant) |
 | Press feedback | `PressableButtonStyle` (`Core/`) — scale 0.94 (0.97 large surfaces) + slight dim, spring back on release. Sudoku's pad, erase and Value/Notes use the piece (§3.8) instead; other games keep this until Phase 20.1 | Finger down on pads, keyboards, Home tiles | both (dim stays; scale cuts) |
 | Tile slide (Merge) | Position glide keyed by `MergeTile.id`, `.spring(response: 0.24, dampingFraction: 0.9)`; spawn scales in delayed 90ms; merged tile pops 1.15× keyframe | Every swipe | both (hard-cut to instant) |
-| Placement pop | Placed value scales in (`.scale(0.55) + .opacity` transition, spring ~0.25s) — Sudoku digits, Five Letter typing (1.12× keyframe) | On placement / letter entry | both |
+| Placement pop | Placed value scales in (`.scale(0.55) + .opacity` transition, spring ~0.25s) — Five Letter typing (1.12× keyframe). **Sudoku:** digits scale in from 0.3 scale and 0.2 opacity on a 0.45s spring (`response 0.45`, `damping 0.6`, slight overshoot); removal cuts | On placement / letter entry | both |
+| Unit wave (Sudoku) | A correctly completed row, column or box ripples out from the placed cell: 45ms per step, 0.7s per cell, peak at 35% with accent fill, background-colored digit and 1.08 scale. A full unit holding a wrong digit does not ripple. Motion off: static 22% accent glow for 1.2s | On the placement that completes the unit | both |
+| Win wave (Sudoku) | All 81 cells ripple by distance from the final placement, same per-cell curve; at most 16 steps, so it finishes inside the 1500ms pre-roll. Motion off: the success wash only | On win, before the banner | both |
 | Guess reveal (Five Letter) | Mark colors sweep the row left→right, `theme.motion.normal` easeInOut, 60ms/column stagger | On guess submit | both |
 
 The shared gate idiom is `feedbackAnimation(_:value:)` (`Core/MotionGate.swift`)
@@ -722,7 +724,7 @@ absorb what happened before being prompted to act.
 
 | Outcome | Pre-roll | What plays during |
 |---------|----------|-------------------|
-| Win | 1500ms | Win wash + confetti |
+| Win | 1500ms | Win wash + confetti (Sudoku: the win wave ripples the board outward from the final cell) |
 | Game over | 500ms | Board settle (no wash or confetti) |
 
 If animations are disabled, pre-roll is skipped — the banner appears
@@ -769,7 +771,7 @@ haptic, animation. Document all three when designing a new event.
 |-------|--------|--------|-----------|
 | Normal move | Cell fills / digit appears | `.light(0.7)` | Placement pop (§10.2) |
 | Wrong move | Cell flashes `danger`, lives decrement | `.error` | Board shake |
-| Row/box completion | Hint row/col dims or highlights | `.medium(1.0)` | Optional flash |
+| Correctly completed row, column or box | Accent ripple from the placed cell (Sudoku); hint row/col dims or highlights elsewhere | `.medium(1.0)` | Ripple (§10.2 Unit wave) |
 | Win | Board locks, end banner queues | `.success` | Wash + confetti → banner |
 | Loss | Board locks, end banner queues | None (error already fired on last wrong move) | Banner only |
 | Mode toggle | Pill segment activates | `.light` | Thumb slides (§10.2) |
