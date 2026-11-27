@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Personal Home
-status: planning
-stopped_at: Phase 19.1 context gathered
+status: ready_to_execute
+stopped_at: Phase 19.1 planned (7 plans); ready to execute
 last_updated: "2026-11-26"
 last_activity: 2026-11-26
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
+  total_plans: 7
   completed_plans: 0
   percent: 0
 ---
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-05-12)
 
 ## Current Position
 
-2026-11-26: Phase 19 decisions taken by Gabe from sketches 010 to 012. Navigation: [variant D](sketches/010-home-library-navigation/index.html), a compact Home plus a Library tab. Design language: pieces, approved from [sketch 012](sketches/012-pieces-full-loop/index.html) and written as `DESIGN.md` §0. Phase 19.1 is inserted to build the piece and mini-board primitives and prove them in Sudoku on a device before any Home work. Still open from Phase 19: the observed player walkthrough has not been run. Phase 19.1 context is captured in `phases/19.1-design-language-pieces-inserted/19.1-CONTEXT.md`: Sudoku only, three debug strengths for Gabe to pick from, rounded type local to GameDrawer. Phase 20.1 is inserted to convert the other ten games, and nothing in the new look ships until all eleven match. Next: plan Phase 19.1 on release line 2.0. Production baseline is v1.6 build 4.
+2026-11-26: Phase 19 decisions taken by Gabe from sketches 010 to 012. Navigation: [variant D](sketches/010-home-library-navigation/index.html), a compact Home plus a Library tab. Design language: pieces, approved from [sketch 012](sketches/012-pieces-full-loop/index.html) and written as `DESIGN.md` §0. Phase 19.1 is inserted to build the piece and mini-board primitives and prove them in Sudoku on a device before any Home work. Still open from Phase 19: the observed player walkthrough has not been run. Phase 19.1 context is captured in `phases/19.1-design-language-pieces-inserted/19.1-CONTEXT.md`: Sudoku only, three debug strengths for Gabe to pick from, rounded type local to GameDrawer. Phase 20.1 is inserted to convert the other ten games, and nothing in the new look ships until all eleven match. Phase 19.1 is planned: seven plans in `phases/19.1-design-language-pieces-inserted/`, checked and revised once, one human checkpoint (19.1-06 Task 2, Gabe picks a piece strength on his iPhone). Next: `/gsd-execute-phase 19.1`; plan 01 merges main into 2.0 itself. Production baseline is v1.6 build 4.
 
 Everything below this paragraph is history, kept as written. Its "not yet
 released", "known-remaining", "carry-over" and "pending" wording is superseded
