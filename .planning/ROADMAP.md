@@ -15,15 +15,16 @@ GameKit ships in named, append-only milestones. Phase numbering never resets —
 | **v1.2** | 8 → 13 (incl. 12.1) | Complete (2026-05-14) | Video Mode — optional layout adaptation for PiP video overlays |
 | **v1.5** | 15 → 18 | Shipped 2026-07-10 | Endless Arcade Primitive — real-time loop substrate + Stack + Snake |
 | **v1.6** | none — see note | Shipped (build 4 uploaded 2026-09-10; release confirmed by Gabe 2026-11-21; tag `v1.6`) | Be Kind — assist talkthroughs + repair of the defects that silently punish players |
-| **2.0** | 19 → 23 (incl. 19.1) | Open. Navigation and design language approved 2026-11-26; Phase 19.1 next | Personal Home: Pinned, Continue Playing, Library, value-first onboarding, in the pieces design language |
+| **2.0** | 19 → 23 (incl. 19.1, 20.1) | Open. Navigation and design language approved 2026-11-26; Phase 19.1 next | Personal Home: Pinned, Continue Playing, Library, value-first onboarding, in the pieces design language |
 
 ### 2.0 delivery sequence
 
 | Phase | Deliverable | Evidence to exit |
 |---|---|---|
 | 19 · Navigation and game entry | Compare the shipped drawer with [sketch 010](sketches/010-home-library-navigation/index.html), which walks the same tasks through three navigation models: Home and Library tabs, one scrolling Home, and the 1.6 drawer with a personal shelf. It models the real save slots (per game and mode), the newest three saves plus See all, six pins, and the resume prompt each game already shows. | A new player finds FreeCell, a returning player resumes Hard Sudoku, and both can pin Sudoku · Free · Medium and predict what happens next. Record first taps and hesitation from the sketch tap log. Pick a navigation model and obtain approval before changing the root. |
-| 19.1 · Design language: pieces | Inserted 2026-11-26. Gabe found the app lifeless and approved the direction in [sketch 012](sketches/012-pieces-full-loop/index.html), now `DESIGN.md` §0. Build the piece as a shared primitive (press travel, edge, haptic pairing, Reduce Motion behavior) and the mini-board component, then prove both in one shipped game end to end: Sudoku pad keys, move and unit-complete feedback, and the win sheet. Record the specs in `DESIGN.md` §3. No Home work in this phase. | On a device, a Sudoku session from open to win reads as the sketch does. Legible on Classic, Dracula, Voltage and one Soft preset; correct with animations off and with Reduce Motion; smallest iPhone and accessibility text pass; no frame cost on the pad. Gabe approves on device before Phase 20 starts. |
-| 20 · Personal Home | Build Home and Library as two tabs (sketch 010 variant D) in the pieces language from 19.1, on a short-lived branch off 2.0. Home leads with one resume action. Derive Continue from the existing per-mode save slots (32 across nine games; FreeCell has one), newest three plus a full list, include Math Crossword, exclude arcade runs, leave the in-game Resume or New prompt as the only replacement decision, and retain the grid and existing game destinations. Persist six ordered, mode-aware pins and round-trip them through versioned backup. Add Featured and Best While Watching. | Test fresh install, upgrade from 1.6 with saves, replaced/completed boards, pin ordering after relaunch, backup import, and returning from a game. Compare cold start with 1.6. Exercise small phone, iPad, accessibility text, Classic and a Loud/Moody preset. |
+| 19.1 · Design language: pieces | Inserted 2026-11-26. Gabe found the app lifeless and approved the direction in [sketch 012](sketches/012-pieces-full-loop/index.html), now `DESIGN.md` §0. Build the piece as a shared primitive (press travel, edge, haptic pairing, Reduce Motion behavior) and prove it in one shipped game end to end: Sudoku pad keys, move and unit-complete feedback, and the win sheet. A debug-only switch offers three strengths for Gabe to pick from on device. Record the specs in `DESIGN.md` §3. No Home work in this phase. | On a device, a Sudoku session from open to win reads as the sketch does. Legible on Classic, Dracula, Voltage and one Soft preset; correct with animations off and with Reduce Motion; smallest iPhone and accessibility text pass; no frame cost on the pad. Gabe approves on device before Phase 20 starts. |
+| 20 · Personal Home | Build Home and Library as two tabs (sketch 010 variant D) in the pieces language from 19.1, on a short-lived branch off 2.0. Home leads with one resume action. Build the mini-board component here: a game's own board as the face of its piece. Derive Continue from the existing per-mode save slots (32 across nine games; FreeCell has one), newest three plus a full list, include Math Crossword, exclude arcade runs, leave the in-game Resume or New prompt as the only replacement decision, and retain the grid and existing game destinations. Persist six ordered, mode-aware pins and round-trip them through versioned backup. Add Featured and Best While Watching. | Test fresh install, upgrade from 1.6 with saves, replaced/completed boards, pin ordering after relaunch, backup import, and returning from a game. Compare cold start with 1.6. Exercise small phone, iPad, accessibility text, Classic and a Loud/Moody preset. |
+| 20.1 · Pieces in every game | Inserted 2026-11-26. Convert the ten games other than Sudoku to the pieces language: pads, keyboards, hidden cells, cards where pressable, primary buttons and end states. | Every game passes the 19.1 criteria. Ship rule: nothing in the pieces language reaches players until all eleven games match. |
 | 21 · First visit and interrupted play | Offer immediate play, an optional Video Mode demonstration and an optional first pin. Reconcile the shipped intro, Settings, stats, sign-in, and Be Kind behavior with new entry paths. | Players can skip setup, start a game, leave, resume, and explain how to play alongside video. Check that equivalent launches from Home and Library preserve hints and assisted records. |
 | 22 · Today on Home, independently deferrable | Five Letter already ships a date-deterministic Daily with a stored result. Surface it as the Today card rather than building a second daily puzzle. Decide whether the result should be recorded for assisted solves, which the shipped code skips. | Today reflects the local date, shows completion after restart and rollover, never disturbs ordinary saves, and shows no penalty for a missed day. Defer if the card misses these criteria. |
 | 23 · Identity and release | Decide positioning from first impressions and Video Mode discovery. Align the approved app experience, App Store screenshots and copy, and website. Assess the existing palette after hierarchy testing. | Run the release journeys from a clean install and an upgraded store. Verify eleven games, assist records, accessibility, optional sync and backup. Use the release wrap-up and tag the uploaded commit. Assign the marketing version at ship time. |
@@ -613,3 +614,83 @@ The following are explicitly out of scope for v1.5 per `REQUIREMENTS.md §v1.5 O
 
 ---
 *Milestone v1.5 (Endless Arcade Primitive) appended: 2026-06-25 — 4 phases (15–18), 22/22 ARCADE/STACK/SNAKE requirements mapped*
+
+## Milestone 2.0: Personal Home
+
+GSD-format entries for the phases in the "2.0 delivery sequence" table near
+the top of this file. The table is the summary; these sections are what the
+tooling reads. Keep the two in step.
+
+- [ ] **Phase 19: Navigation and Game Entry** - Sketches 010 to 012 decide navigation (variant D) and the design language (pieces). Decisions taken 2026-11-26; the observed player walkthrough is still owed
+- [ ] **Phase 19.1: Design Language: Pieces** (INSERTED) - The piece primitive, proven in Sudoku from open to win on a device, with specs recorded in DESIGN.md §3
+- [ ] **Phase 20: Personal Home** - Home and Library tabs in the pieces language; Continue from existing save slots; six ordered pins; Featured and Best While Watching
+- [ ] **Phase 20.1: Pieces in Every Game** (INSERTED) - Convert the ten games other than Sudoku; nothing in the new look ships until all eleven match
+- [ ] **Phase 21: First Visit and Interrupted Play** - Immediate play, optional Video Mode demonstration and first pin; reconcile intro, Settings, stats, sign-in and Be Kind with the new entry paths
+- [ ] **Phase 22: Today on Home** - Surface the existing Five Letter Daily as the Today card; independently deferrable
+- [ ] **Phase 23: Identity and Release** - Positioning, App Store screenshots and copy, website, release journeys, tag
+
+### Phase 19: Navigation and Game Entry
+**Goal**: Decide where the personal layer lives relative to the complete Library, and what the app's design language is, before any production UI changes.
+**Depends on**: v1.6 shipped
+**Requirements**: NAV-20
+**Success Criteria** (what must be TRUE):
+  1. A navigation model is chosen from sketch 010 and recorded (variant D, 2026-11-26).
+  2. A design language is chosen and written into `DESIGN.md` (§0, 2026-11-26).
+  3. A new player finds FreeCell and a returning player resumes a saved game in the chosen model without coaching, recorded with the sketch tap log. Not yet run.
+**Plans**: none — executed as sketches
+
+### Phase 19.1: Design Language: Pieces (INSERTED)
+**Goal**: The `DESIGN.md` §0 language exists as shared, tested primitives and is proven in one shipped game: a Sudoku session from open to win reads the way sketch 012 does, on a device.
+**Depends on**: Phase 19 (direction approved)
+**Requirements**: LANG-20
+**Canonical refs**: `DESIGN.md` §0 and §3.0 · `.planning/sketches/012-pieces-full-loop/index.html` · `.planning/sketches/012-pieces-full-loop/README.md`
+**Success Criteria** (what must be TRUE):
+  1. A shared piece primitive exists in `Core/` (visible lower edge, press travel, spring back) and is the only way Sudoku's pad keys and primary buttons get their depth; no game view writes a color, radius or shadow literal to achieve it.
+  2. In Sudoku, a correct placement lands visibly, a completed row, column or box is acknowledged in sequence, and the win shows the time large, names a personal best when one was set, and offers the next puzzle as the primary action. Assisted wins still set no record.
+  3. With animations off or Reduce Motion on, pieces keep their shape and edge, every move still registers visibly, and nothing travels, pops or sequences.
+  4. Legible and intact on Classic, Dracula, Voltage and one Soft preset; on the smallest supported iPhone; at accessibility text sizes; and in Video Mode large and small zones.
+  5. `DESIGN.md` §3 records the piece's specs (edge depth, travel, timings, haptic pairing) as set on device, replacing the §3.0 forward note.
+  6. Gabe approves the feel on a device before Phase 20 starts.
+**Plans**: TBD
+
+### Phase 20: Personal Home
+**Goal**: Returning players reach an unfinished game or a pinned mode in one tap, and every game stays one tap away in Library.
+**Depends on**: Phase 19.1
+**Requirements**: HOME-20
+**Success Criteria** (what must be TRUE):
+  1. See the Phase 20 row in the 2.0 delivery sequence table; expand here when the phase is discussed.
+**Plans**: TBD
+
+### Phase 20.1: Pieces in Every Game (INSERTED)
+**Goal**: All eleven games speak the `DESIGN.md` §0 language, so the app can ship without one new-looking game among ten old ones.
+**Depends on**: Phase 19.1 (primitive and specs), Phase 20
+**Requirements**: LANG-20
+**Success Criteria** (what must be TRUE):
+  1. Every pressable control in every game is a piece, and every game answers moves, completed units and endings per §0 rules 3 and 5.
+  2. Each game passes the Phase 19.1 preset, motion-off, small-device, accessibility-text and Video Mode checks.
+  3. No release build exposes the pieces language until this phase is complete.
+**Plans**: TBD
+
+### Phase 21: First Visit and Interrupted Play
+**Goal**: A new player is playing within seconds and understands Video Mode without being made to set anything up.
+**Depends on**: Phase 20
+**Requirements**: INTRO-20
+**Success Criteria** (what must be TRUE):
+  1. See the Phase 21 row in the 2.0 delivery sequence table; expand here when the phase is discussed.
+**Plans**: TBD
+
+### Phase 22: Today on Home
+**Goal**: Home shows the existing Five Letter Daily as a calm, finite reason to return.
+**Depends on**: Phase 20
+**Requirements**: DAILY-20
+**Success Criteria** (what must be TRUE):
+  1. See the Phase 22 row in the 2.0 delivery sequence table; expand here when the phase is discussed.
+**Plans**: TBD
+
+### Phase 23: Identity and Release
+**Goal**: The shipped app, its store page and its website present one identity, and the release is tagged.
+**Depends on**: Phases 20 and 21 (22 optional)
+**Requirements**: SHIP-20
+**Success Criteria** (what must be TRUE):
+  1. See the Phase 23 row in the 2.0 delivery sequence table; expand here when the phase is discussed.
+**Plans**: TBD
