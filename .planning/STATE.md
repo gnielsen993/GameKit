@@ -1,17 +1,20 @@
 ---
-gsd_state_version: 1.0
+gsd_state_version: "1.0"
 milestone: v2.0
-milestone_name: Personal Home
-status: ready_to_execute
+current_phase: "19.1"
+current_phase_name: "Design Language: Pieces (INSERTED)"
+status: executing
 stopped_at: Phase 19.1 planned (7 plans); ready to execute
-last_updated: "2026-11-26"
+last_updated: "2026-11-27T06:44:23.509Z"
 last_activity: 2026-11-26
+last_activity_desc: Phase 19.1 execution started
+state_head: eb0839ba0bcdc50e0bf21305c205ff708aa0bd11
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 7
   completed_plans: 0
-  percent: 0
+milestone_name: Personal Home
 ---
 
 # Project State
@@ -21,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** Calm, premium, fully theme-customizable gameplay with zero friction — no ads, no coins, no pushy subscriptions, no required accounts.
-**Current focus:** 2.0 personal Home and Library discovery.
+**Current focus:** Phase 19.1 — Design Language: Pieces (INSERTED)
 
 ## Current Position
 
@@ -50,14 +53,18 @@ a portrait window after rotation). Evidence:
 The previous closure audit below did not catch these regressions.
 
 
-Phase: none — v1.6 was executed directly from the brief
-Plan: `.planning/v1.6-CLOSURE-PLAN.md` (local implementation and verification complete)
-Status: v1.6 in development. Hint fixes and Math Crossword are implemented and
+Phase: 19.1 (Design Language: Pieces (INSERTED)) — EXECUTING
+Plan: 1 of 7
+Status: Executing Phase 19.1
+
+v1.6 closure status, kept as history (its Phase/Plan/Status header lines were
+replaced by the phase tracker above on 2026-11-26): hint fixes and Math
+Crossword are implemented and
 verified on SE/iPad simulators. Full app unit suite: 514 passed, 1 skipped;
 MathCrosswordCore: 13 passed. Exporter and accessibility follow-ups passed.
 Verified fixes and Math Crossword committed after Gabe's approval. Physical-device checks and release publication remain.
 Evidence: `Docs/audits/v1.6-closure-2026-09-08/README.md`.
-Last activity: 2026-09-08
+Last activity: 2026-11-26 — Phase 19.1 execution started
 
 ### How to read the zeroed progress block
 

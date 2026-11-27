@@ -1,0 +1,48 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": "v2.0",
+  "phases": [
+    {
+      "number": "1",
+      "name": "Foundation",
+      "status": "complete"
+    },
+    {
+      "number": "2",
+      "name": "Mines Engines",
+      "status": "complete"
+    },
+    {
+      "number": "3",
+      "name": "Mines UI",
+      "status": "complete"
+    },
+    {
+      "number": "4",
+      "name": "Stats & Persistence",
+      "status": "complete"
+    },
+    {
+      "number": "5",
+      "name": "Polish",
+      "status": "complete"
+    },
+    {
+      "number": "6",
+      "name": "CloudKit + Sign in with Apple",
+      "status": "complete"
+    },
+    {
+      "number": "7",
+      "name": "Release",
+      "status": "in_progress"
+    }
+  ],
+  "next": {
+    "command": "/gsd-progress --next",
+    "label": "Advance to the next step",
+    "reason": "Phase 21 of 26 · executing"
+  },
+  "updated_at": "2026-11-27T06:44:23.534Z"
+}

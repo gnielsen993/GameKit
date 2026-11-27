@@ -2,7 +2,7 @@
 phase: 06-cloudkit-siwa
 type: verification
 sc_count: 5
-status: complete  # signed off via UAT.md 2026-04-27
+status: passed  # signed off via UAT.md 2026-04-27 (was "complete"; normalized 2026-11-26 to the closed set gsd-tools accepts)
 signed_off_by: "User (UAT — see 06-UAT.md)"
 signed_off_date: "2026-04-27"
 fallback_used:    # set if 2-sim was used for SC3 (Pitfall C)

@@ -2,7 +2,7 @@
 phase: 07-release
 type: verification
 sc_count: 5
-status: pending  # pending | in_progress | complete | blocked
+status: human_needed  # was "pending": this v1.0 checklist was never filled in. Normalized 2026-11-26 to the closed set gsd-tools accepts (passed | gaps_found | human_needed)
 signed_off_by: ""
 signed_off_date: ""
 fallback_used:    # set if 2-sim TestFlight fallback used for SC3 (Pitfall C)
