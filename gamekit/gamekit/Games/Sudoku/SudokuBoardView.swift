@@ -24,6 +24,9 @@ struct SudokuBoardView: View {
     let viewModel: SudokuViewModel
     let theme: Theme
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.settingsStore) private var settingsStore
+
     static let size = SudokuBoard.size       // 9
     static let boxSize = SudokuBoard.boxSize // 3
 
@@ -59,6 +62,15 @@ struct SudokuBoardView: View {
         let wrongSet = viewModel.incorrectCellIndices
         let hintTarget = viewModel.hintTargetIndex
         let hintSupport = viewModel.hintSupportingIndices
+        let motion = settingsStore.animationsEnabled && !reduceMotion
+        let origin = viewModel.selected.map { $0.row * 9 + $0.col }
+        // One ripple per body: the win sweeps every cell from the final
+        // placement, a completed unit ripples out from the placed cell.
+        let steps = viewModel.state == .won
+            ? SudokuCompletionWave.winSteps(origin: origin)
+            : SudokuCompletionWave.unitSteps(origin: origin ?? 0, cells: glowSet)
+        // One shared monotonic trigger; the winning move bumps both counters.
+        let waveCount = viewModel.completionGlowCount &+ viewModel.winCount
         VStack(spacing: 0) {
             ForEach(0..<Self.size, id: \.self) { r in
                 HStack(spacing: 0) {
@@ -78,7 +90,11 @@ struct SudokuBoardView: View {
                             isIncorrect: wrongSet.contains(r * 9 + c),
                             isHintTarget: hintTarget == r * 9 + c,
                             isHintSupporting: hintSupport.contains(r * 9 + c),
-                            row: r, column: c
+                            row: r, column: c,
+                            waveStep: steps[r * 9 + c],
+                            waveCount: waveCount,
+                            shakeCount: viewModel.wrongAttemptCount,
+                            motion: motion
                         )
                         .frame(width: cellSide, height: cellSide)
                         .onTapGesture {

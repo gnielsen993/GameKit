@@ -32,6 +32,17 @@ struct SudokuCellView: View {
     var isHintSupporting: Bool = false
     var row: Int = 0
     var column: Int = 0
+    /// This cell's step in the running unit or win wave, nil when it is not
+    /// part of one. Read when `waveCount` changes (spike A3).
+    var waveStep: Int? = nil
+    /// Shared monotonic trigger: a change starts every cell's wave.
+    var waveCount: Int = 0
+    /// Bumped on each wrong attempt; the flashing cell shakes.
+    var shakeCount: Int = 0
+    /// Animations setting on and Reduce Motion off (MotionGate idiom). When
+    /// false nothing pops, ripples or shakes; a completed unit shows a
+    /// static glow instead and a wrong move still flashes.
+    var motion: Bool = true
 
     enum HighlightTier: Equatable {
         case none                  // no overlay
@@ -41,21 +52,44 @@ struct SudokuCellView: View {
     }
 
     var body: some View {
+        KeyframeAnimator(
+            initialValue: SudokuWaveValues(),
+            trigger: motion ? waveCount : 0
+        ) { values in
+            cellBody(values)
+        } keyframes: { _ in
+            SudokuCellFeedback.waveKeyframes(step: waveStep)
+        }
+        .keyframeAnimator(
+            initialValue: 0.0,
+            trigger: motion ? shakeCount : 0
+        ) { view, dx in
+            view.offset(x: dx)
+        } keyframes: { _ in
+            SudokuCellFeedback.shakeKeyframes(active: isWrongFlashing)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityText + Text(", row \(row + 1), column \(column + 1)"))
+        .accessibilityValue(isHintTarget ? Text("Hint target") : isHintSupporting ? Text("Hint evidence") : Text(""))
+    }
+
+    private func cellBody(_ values: SudokuWaveValues) -> some View {
         ZStack {
             background
-            glowBackground
-            content
+            staticGlow
+            Rectangle()
+                .fill(theme.colors.accentPrimary.opacity(values.fill))
+                .allowsHitTesting(false)
+            content(onAccent: values.fill > 0.5)
                 .lineLimit(1)
                 .minimumScaleFactor(0.1)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .overlay(hintOverlay)
         .overlay(wrongFlashOverlay)
-        .feedbackAnimation(.spring(response: 0.25, dampingFraction: 0.7), value: cell)
+        .scaleEffect(values.scale)
+        .feedbackAnimation(SudokuCellFeedback.popSpring, value: cell)
         .contentShape(Rectangle())
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityText + Text(", row \(row + 1), column \(column + 1)"))
-        .accessibilityValue(isHintTarget ? Text("Hint target") : isHintSupporting ? Text("Hint evidence") : Text(""))
     }
 
     private var background: some View {
@@ -84,35 +118,38 @@ struct SudokuCellView: View {
         }
     }
 
-    // Completion glow: flashes in fast, fades out over ~650ms.
-    // Sits between the highlight background and the digit content so text
-    // remains fully legible at all times.
-    private var glowBackground: some View {
-        Rectangle()
-            .fill(theme.colors.accentPrimary.opacity(isGlowing ? 0.22 : 0))
-            .animation(
-                isGlowing ? .easeOut(duration: 0.65) : .easeIn(duration: 0.1),
-                value: isGlowing
-            )
-            .allowsHitTesting(false)
+    /// Motion off: a completed unit still registers as a quiet accent glow
+    /// with no animation (DESIGN 10.4). With motion on, the wave replaces it.
+    @ViewBuilder
+    private var staticGlow: some View {
+        if !motion && isGlowing {
+            Rectangle()
+                .fill(theme.colors.accentPrimary.opacity(0.22))
+                .allowsHitTesting(false)
+        }
     }
 
+    /// `onAccent` flips the digit to the background colour at the wave's peak
+    /// so it stays legible on the accent fill (sketch 012).
     @ViewBuilder
-    private var content: some View {
+    private func content(onAccent: Bool) -> some View {
         switch cell {
         case .given(let v):
             Text("\(v)")
                 .font(theme.typography.title.weight(.bold))
-                .foregroundStyle(theme.colors.textPrimary)
+                .foregroundStyle(onAccent ? theme.colors.background : theme.colors.textPrimary)
         case .user(let v):
             Text("\(v)")
                 .font(theme.typography.title.weight(.regular))
                 // danger = errors per DESIGN.md §2; accent = the player's own
                 // correct choices.
-                .foregroundStyle(isIncorrect ? theme.colors.danger : theme.colors.accentPrimary)
-                // Placed digits scale in (gated via feedbackAnimation on the
-                // cell container below); erased/replaced digits cut instantly.
-                .transition(.scale(scale: 0.55).combined(with: .opacity))
+                .foregroundStyle(onAccent
+                    ? theme.colors.background
+                    : isIncorrect ? theme.colors.danger : theme.colors.accentPrimary)
+                // Placed digits pop in small and faint with a slight
+                // overshoot (gated via feedbackAnimation on the cell
+                // container); erased/replaced digits cut instantly.
+                .transition(SudokuCellFeedback.popTransition)
         case .empty(let notes):
             if notes.isEmpty {
                 Color.clear

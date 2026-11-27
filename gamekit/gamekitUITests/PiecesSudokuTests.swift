@@ -68,6 +68,48 @@ final class PiecesSudokuTests: XCTestCase {
         capturePieces(app, "erase-and-mode")
     }
 
+    /// D-14: a wrong digit in Lives mode is not shown; the cell stays empty
+    /// and a life is lost. The shake itself is judged by eye (screenshot).
+    func testWrongMoveInLivesModeIsRejected() {
+        let app = launchSudoku(choices: ["Lives", "Easy"])
+        let cell = firstEmptyCell(app)
+        XCTAssertTrue(cell.waitForExistence(timeout: 5), "an empty cell exists")
+        let label = cell.label
+        let rowText = String(label[label.range(of: "row ")!.upperBound...].prefix { $0 != "," })
+        // A digit already given in this row can never be right for an empty
+        // cell of the same row.
+        let givens = app.descendants(matching: .any).matching(
+            NSPredicate(format: "label MATCHES %@", "Given [1-9], row \(rowText), column [0-9]")
+        ).allElementsBoundByIndex
+        XCTAssertFalse(givens.isEmpty, "the row has a given to borrow a wrong digit from")
+        var wrongKey: XCUIElement?
+        for given in givens {
+            let digit = String(given.label.dropFirst("Given ".count).prefix(1))
+            let key = app.buttons.matching(
+                NSPredicate(format: "label BEGINSWITH %@ AND enabled == 1", "Place \(digit),")
+            ).firstMatch
+            if key.exists { wrongKey = key; break }
+        }
+        let key = try? XCTUnwrap(wrongKey, "an enabled key for a digit given in the row")
+        cell.tap()
+        key?.tap()
+        capturePieces(app, "lives-wrong-move") // right after the tap
+        let suffix = String(label[label.range(of: ", row")!.lowerBound...])
+        XCTAssertTrue(cellText(app, suffix: suffix).hasPrefix("Empty"), "the wrong digit is not shown")
+        XCTAssertTrue(app.descendants(matching: .any)["2 of 3 lives remaining"].waitForExistence(timeout: 3),
+                      "a life was lost")
+    }
+
+    /// Animations off: nothing pops or travels, yet the move registers at once.
+    func testMotionOffPlacementStillRegisters() {
+        let app = launchSudoku(args: ["-gamekit.animationsEnabled", "<false/>"])
+        let placed = placeDigit(app, keyOffset: nil)
+        XCTAssertFalse(cellText(app, suffix: placed.suffix).hasPrefix("Empty"),
+                       "the digit is on the board without waiting")
+        capturePieces(app, "motion-off-placement")
+        app.buttons["Erase"].tap() // leave no saved mistake for other suites
+    }
+
     /// Plan 07 deletes this test together with the strength switch.
     func testDebugSettingsOffersThreeStrengths() {
         let app = XCUIApplication()
