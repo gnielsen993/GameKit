@@ -35,6 +35,22 @@ enum SurfaceDepth {
 
     /// Ambient shadow color for chips, keys, and floating tiles.
     static let shadow = Color.black.opacity(0.10)
+
+    // MARK: - Piece lighting (DESIGN.md §3.8, Phase 19.1)
+
+    /// Shade laid over a filled piece's own color to make its lower edge
+    /// (the sketch's 68% mix). Accent faces are saturated, so darkening reads
+    /// on every preset.
+    static let pieceFilledEdgeShade = Color.black.opacity(0.32)
+
+    /// Opacity of `textPrimary` laid over opaque `surface` to make a neutral
+    /// piece's edge. On dark presets that reads lighter than the face, on
+    /// light presets darker. Darkening the face instead is invisible on real
+    /// Dracula and Voltage dark (D-19, research "Edge Color Derivation").
+    static let pieceNeutralEdgeInkOpacity: Double = 0.28
+
+    /// Soft contact shadow under a large piece's edge.
+    static let pieceContactShadow = Color.black.opacity(0.22)
 }
 
 extension View {
@@ -43,6 +59,12 @@ extension View {
     /// consistently across games.
     func chipShadow() -> some View {
         shadow(color: SurfaceDepth.shadow, radius: 5, x: 0, y: 2)
+    }
+
+    /// Contact shadow for a large piece, cast by a layer drawn at the face
+    /// position: it falls `depth` (the edge) plus 3pt below that layer.
+    func pieceContactShadow(depth: CGFloat) -> some View {
+        shadow(color: SurfaceDepth.pieceContactShadow, radius: 6, x: 0, y: depth + 3)
     }
 
     /// Accent-tinted glow for an element the player is actively holding or

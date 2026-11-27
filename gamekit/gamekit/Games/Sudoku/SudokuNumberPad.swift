@@ -16,6 +16,8 @@ import DesignKit
 struct SudokuNumberPad: View {
     let viewModel: SudokuViewModel
     let theme: Theme
+    /// `.regular` off-path; Video Mode passes `.compact` (DESIGN.md §3.8).
+    var size: PieceSize = .regular
     @State private var pulsing: Set<Int> = []
 
     var body: some View {
@@ -44,7 +46,7 @@ struct SudokuNumberPad: View {
         } label: {
             VStack(spacing: 2) {
                 Text("\(digit)")
-                    .font(theme.typography.title.weight(.semibold))
+                    .font(RoundedType.font(.title2, weight: .bold))
                     .foregroundStyle(isExhausted
                         ? theme.colors.textSecondary
                         : isSelected
@@ -58,15 +60,6 @@ struct SudokuNumberPad: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, theme.spacing.s)
-            .background(
-                RoundedRectangle(cornerRadius: theme.radii.chip)
-                    .fill(isSelected ? theme.colors.accentPrimary : theme.colors.surface)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: theme.radii.chip)
-                    .stroke(theme.colors.border, lineWidth: 1)
-            )
-            .chipShadow()
             .overlay {
                 if isExhausted {
                     GeometryReader { g in
@@ -90,7 +83,12 @@ struct SudokuNumberPad: View {
             value: pulsing.contains(digit)
         )
         .feedbackAnimation(theme.motion.ease, value: isSelected)
-        .buttonStyle(.pressable)
+        .buttonStyle(.piece(
+            theme: theme,
+            role: isSelected ? .filled(theme.colors.accentPrimary) : .neutral,
+            shape: .rounded(theme.radii.chip),
+            size: size
+        ))
         .disabled(isExhausted)
         .accessibilityLabel("Place \(digit), \(remaining) remaining")
     }

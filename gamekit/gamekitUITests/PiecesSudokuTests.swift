@@ -1,0 +1,91 @@
+import XCTest
+
+/// End-to-end checks for Sudoku's pieces (Phase 19.1, DESIGN.md §3.8):
+/// pad keys, erase and Value/Notes. Screenshots are kept for human review.
+@MainActor
+final class PiecesSudokuTests: XCTestCase {
+
+    override func setUp() {
+        super.setUp()
+        continueAfterFailure = false
+    }
+
+    /// Tap the first empty cell, then place a digit with the first enabled
+    /// pad key. `keyOffset` picks where on the key the tap lands.
+    private func placeDigit(_ app: XCUIApplication, keyOffset: CGVector?) -> (cell: String, suffix: String) {
+        let cell = firstEmptyCell(app)
+        XCTAssertTrue(cell.waitForExistence(timeout: 5), "an empty cell exists")
+        let label = cell.label
+        let suffix = String(label[label.range(of: ", row")!.lowerBound...])
+        cell.tap()
+        let key = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Place ' AND enabled == 1")).firstMatch
+        XCTAssertTrue(key.waitForExistence(timeout: 3), "an enabled pad key exists")
+        if let keyOffset {
+            key.coordinate(withNormalizedOffset: keyOffset).tap()
+        } else {
+            key.tap()
+        }
+        return (label, suffix)
+    }
+
+    private func cellText(_ app: XCUIApplication, suffix: String) -> String {
+        let cell = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label ENDSWITH %@", suffix)).firstMatch
+        XCTAssertTrue(cell.waitForExistence(timeout: 3))
+        return cell.label
+    }
+
+    func testPadKeyPlacesDigit() {
+        let app = launchSudoku()
+        let placed = placeDigit(app, keyOffset: nil)
+        let after = cellText(app, suffix: placed.suffix)
+        XCTAssertFalse(after.hasPrefix("Empty"), "the pad key filled the cell: \(after)")
+        capturePieces(app, "pad-key-places-digit")
+    }
+
+    func testPadKeyTopEdgeTapRegisters() {
+        let app = launchSudoku()
+        let placed = placeDigit(app, keyOffset: CGVector(dx: 0.5, dy: 0.04))
+        let after = cellText(app, suffix: placed.suffix)
+        XCTAssertFalse(after.hasPrefix("Empty"), "a tap on the key's top edge filled the cell: \(after)")
+        capturePieces(app, "pad-key-top-edge")
+    }
+}
+
+extension XCTestCase {
+    /// Launch into a Sudoku game. `choices` are tapped in order, matching a
+    /// button whose label is the choice or begins with "<choice>,".
+    @MainActor
+    func launchSudoku(choices: [String] = ["Free", "Easy"], args: [String] = []) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = ["--returning-launch", "-gamekit.cloudSyncEnabled", "NO"] + args
+        app.launch()
+        XCTAssertTrue(app.buttons["Sudoku"].waitForExistence(timeout: 10))
+        app.buttons["Sudoku"].tap()
+        for choice in choices {
+            let button = app.buttons.matching(
+                NSPredicate(format: "label == %@ OR label BEGINSWITH %@", choice, choice + ",")
+            ).firstMatch
+            XCTAssertTrue(button.waitForExistence(timeout: 3), choice)
+            button.tap()
+        }
+        if app.buttons["New Puzzle"].waitForExistence(timeout: 1) { app.buttons["New Puzzle"].tap() }
+        return app
+    }
+
+    /// First element of any type whose label begins "Empty, row".
+    @MainActor
+    func firstEmptyCell(_ app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label BEGINSWITH 'Empty, row'")).firstMatch
+    }
+
+    @MainActor
+    func capturePieces(_ app: XCUIApplication, _ name: String) {
+        Thread.sleep(forTimeInterval: 0.5)
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = name
+        shot.lifetime = .keepAlways
+        add(shot)
+    }
+}
