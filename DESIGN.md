@@ -61,6 +61,17 @@ Settings still govern all of it: with animations off or Reduce Motion on,
 pieces keep their shape and edge, moves still register visibly, and only the
 travel, pops and sequences are removed (§10.4).
 
+**How to read "less" (added 2026-11-27).** It limits how many things are on
+screen and forbids interruption. It does not ask for a quiet or empty app.
+Gabe's direction for 2.0 is life and excitement without overstimulation, and
+the same day this section was approved he said the app had "no life" and that
+"less is more" cannot mean nothing at all. So rules 2, 3 and 5 are where the
+life comes from, and they should be felt strongly: a piece has real weight, a
+move visibly and audibly lands, a finished unit is acknowledged in sequence,
+an ending is an event. Turn those up before reaching for anything on the
+"not loud" list below. How far to go is set on device through the 2.0 work;
+New York Times Games is the leading reference and still open.
+
 **Status.** The principles are binding for new 2.0 work. The concrete specs
 (edge depth, press travel, timings, haptic pairing, the mini-board component)
 are set on device in Phase 19.1 and recorded in §3 then. Until that lands, do

@@ -210,6 +210,32 @@ tweaks, in-flight work that did not ship in that `MARKETING_VERSION`.
   before calling a game-screen polish pass done.
 - "Personality" comes from preset + layout emphasis, not random
   styling.
+- **The bar is "put together", not "minimal".** When Gabe says clean he
+  means cohesive, deliberate and finished. It never means sparse, and
+  "make it cleaner" is never answered by removing things. `DESIGN.md`
+  section 0 ("less, with weight") limits clutter and interruption; it is
+  not a reason to ship a screen with no life in it.
+- **Direction for 2.0 (Gabe, 2026-11-27): life and excitement without
+  overstimulation.** How much is decided through the 2.0 work, on device,
+  not up front. New York Times Games is his leading reference and still
+  open. The working distinction: the game answering the player's own move
+  (weight, snap, sound, a unit clearing in sequence) is life and can be
+  turned up; the game interrupting unprompted (praise popups, shake,
+  countdowns, upsells) is overstimulation and stays out. Behind it is a
+  business question he has not settled, subscription versus ads, so do
+  not design toward ad-style attention grabbing on your own.
+- **Design natively.** Explore and present UI as real SwiftUI: a
+  `#Preview` rendered through Xcode, or the app in the simulator. Never
+  an HTML or browser prototype. Earlier 2.0 sketches under
+  `.planning/sketches/` were HTML; take the decisions from them, and
+  build anything new on device.
+- **Look before you say done.** Check a rendered screenshot of the
+  changed screen, on a Classic and a Loud preset (section 8.12).
+- **Design exploration is not a bug fix.** Section 4's "smallest change"
+  and "do not invent" govern fixes and plumbing. When Gabe asks for a
+  new look or says something feels off, build two or three directions
+  that are actually different and let him choose. Product-shaping
+  questions are a dialogue, one at a time, with a researched position.
 
 ### Classic preset — restomod policy
 The `Classic` preset (`ThemePreset.classicMuted` in DesignKit) is
@@ -597,8 +623,21 @@ one kind of task is a skill; a repeated command sequence is a script in
 `scripts/`; a rule that can be checked mechanically goes in the hook (§8.19).
 Reach for the lightest of those, and only once the friction has recurred.
 
-- **`impeccable`** — design planning, critique, audit and polish for any
-  screen or UI work. Tracked in `.claude/skills/impeccable` (Claude) and
+- **GSD model routing** — `.planning/config.json` sets
+  `"model_profile": "inherit"`, so planning, research, execution and
+  verification run on the session model; only mechanical agents (doc
+  writers, mappers) go to cheaper models. Changed 2026-11-27: under the
+  old `balanced` profile every executor run was Sonnet and planning was
+  Opus, so the session model wrote none of the code. For a phase that is
+  purely mechanical, add `"gsd-executor": "sonnet"` to `model_overrides`
+  for that phase. Reason: `~/.claude/CLAUDE.md`, "Models, effort and
+  sessions".
+- **`impeccable`** — it is web-first: use its native references
+  (`reference/ios.md`, `reference/audit.native.md`) and never its `live`
+  browser mode. Its edit and stop hooks only inspect web file types, so
+  they were removed from `.claude/settings.local.json` on 2026-11-27;
+  do not re-add them after an update. What it is for: design planning,
+  critique, audit and polish for any screen or UI work. Tracked in `.claude/skills/impeccable` (Claude) and
   `.agents/skills/impeccable` (Codex, wired by `.codex/hooks.json`), copied
   from FitnessTracker at its commit `859f314` (v4.1.1) so both repos run the
   same version. Update both repos together. It reads `PRODUCT.md` for product
