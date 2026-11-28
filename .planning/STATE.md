@@ -4,11 +4,11 @@ milestone: v2.0
 current_phase: "19.1"
 current_phase_name: "Design Language: Pieces (INSERTED)"
 status: executing
-stopped_at: Completed 19.1-05-PLAN.md
-last_updated: "2026-11-27T20:08:15.565Z"
+stopped_at: Completed 19.1-06-PLAN.md
+last_updated: "2026-11-28T05:44:08.513Z"
 last_activity: 2026-11-26
 last_activity_desc: Phase 19.1 execution started
-state_head: 73188a09975a47dd7675da5f9afd24dd7c257746
+state_head: 28016f7bd07fe433f06f7b035c1d15ba6fa1b2a1
 progress:
   total_phases: 7
   completed_phases: 0
@@ -54,7 +54,7 @@ The previous closure audit below did not catch these regressions.
 
 
 Phase: 19.1 (Design Language: Pieces (INSERTED)) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 
 v1.6 closure status, kept as history (its Phase/Plan/Status header lines were
@@ -250,6 +250,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 19.1 P03 | 75 min | 2 tasks | 8 files |
 | Phase 19.1 P04 | 45 min | 3 tasks | 12 files |
 | Phase 19.1 P05 | 150 min | 3 tasks | 15 files |
+| Phase 19.1 P06 | not recorded | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -511,6 +512,7 @@ Recent decisions affecting current work:
 - [Phase 19.1]: 19.1-04: GameStats.recordReportingBest returns RecordResult; record(...) stays a Void forwarder so other games compile warning-free. Fixture games (id suffix -debug-near-win) never write stats or touch the saved game. SudokuViewModel.swift ratchet is now 636.
 - [Phase 19.1]: 19.1-05: large-piece contact shadow is cast by the edge layer (radius 3, y 2); the plan 02 face-position shadow read as a halo around the button
 - [Phase 19.1]: 19.1-05: Sudoku win card stays one centered DKCard overlay (D-15) with PieceCTAButton pieces; badge only under record.setBestTime == true
+- [Phase 19.1]: Plan 06: Gabe picked Medium strength (approved, no adjusted values); device build confirmation inferred from the pick, frame cost not measured
 
 ### Pending Todos (none open — closed 2026-11-21)
 
@@ -539,8 +541,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-11-27T20:08:15.117Z
-Stopped at: Completed 19.1-05-PLAN.md
+Last session: 2026-11-28T05:44:08.035Z
+Stopped at: Completed 19.1-06-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
