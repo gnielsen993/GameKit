@@ -80,9 +80,6 @@ struct SettingsView: View {
                     SettingsSyncSection(theme: theme)
                     dataSection
                     SettingsAboutSection(theme: theme)
-                    #if DEBUG
-                    SettingsPieceTuningSection(theme: theme)
-                    #endif
                 }
                 .padding(theme.spacing.l)
             }

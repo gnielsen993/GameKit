@@ -3,8 +3,8 @@
 //  gamekitTests
 //
 //  Geometry invariants for the piece primitive (Phase 19.1, DESIGN.md §3.8).
-//  Pure: no SwiftUI, no environment. Depths are the Medium starting values
-//  from sketch 012.
+//  Pure: no SwiftUI, no environment. The numbers are the ones Gabe picked on
+//  device (Medium, 2026-11-27, D-04); there is no other set.
 //
 
 import Testing
@@ -16,8 +16,16 @@ nonisolated struct PieceSpecTests {
 
     private let spec = PieceSpec.current
 
-    @Test("current depths are 2.5 / 4 / 6 for compact / regular / large")
-    func currentDepths() {
+    @Test("the locked spec is the picked one: depths 2.5 / 4 / 6, press 0.05s, release 0.2 / 0.55")
+    func currentIsThePickedSpec() {
+        #expect(spec == PieceSpec(
+            compactDepth: 2.5,
+            regularDepth: 4,
+            largeDepth: 6,
+            pressInDuration: 0.05,
+            releaseResponse: 0.2,
+            releaseDamping: 0.55
+        ))
         #expect(spec.depth(for: .compact) == 2.5)
         #expect(spec.depth(for: .regular) == 4)
         #expect(spec.depth(for: .large) == 6)
@@ -79,47 +87,3 @@ nonisolated struct PieceSpecTests {
         }
     }
 }
-
-#if DEBUG
-@Suite("PieceSpec strengths (DEBUG)")
-nonisolated struct PieceStrengthTests {
-
-    @Test("subtle < medium < bold depths for every size")
-    func strengthsAreOrdered() {
-        for size in [PieceSize.compact, .regular, .large] {
-            #expect(PieceSpec.subtle.depth(for: size) < PieceSpec.current.depth(for: size))
-            #expect(PieceSpec.current.depth(for: size) < PieceSpec.bold.depth(for: size))
-        }
-    }
-
-    @Test("medium is the shipping spec")
-    func mediumIsCurrent() {
-        #expect(PieceStrength.medium.spec == PieceSpec.current)
-    }
-
-    @Test("every strength keeps travel inside the edge")
-    func travelInsideEdge() {
-        for strength in PieceStrength.allCases {
-            for size in [PieceSize.compact, .regular, .large] {
-                let spec = strength.spec
-                #expect(spec.travel(for: size) >= 1)
-                #expect(spec.travel(for: size) < spec.depth(for: size))
-            }
-        }
-    }
-
-    @Test("resolved maps raw values and falls back to medium")
-    func resolvedMapping() {
-        #expect(PieceSpec.resolved(strengthRaw: nil) == .current)
-        #expect(PieceSpec.resolved(strengthRaw: "bold") == .bold)
-        #expect(PieceSpec.resolved(strengthRaw: "subtle") == .subtle)
-        #expect(PieceSpec.resolved(strengthRaw: "nonsense") == .current)
-    }
-
-    @Test("three strengths and a stable defaults key")
-    func casesAndKey() {
-        #expect(PieceStrength.allCases.count == 3)
-        #expect(PieceStrength.defaultsKey == "gamekit.debug.pieceStrength")
-    }
-}
-#endif

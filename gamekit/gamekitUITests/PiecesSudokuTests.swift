@@ -168,45 +168,21 @@ final class PiecesSudokuTests: XCTestCase {
         XCTAssertTrue(app.buttons["Sudoku"].waitForExistence(timeout: 5), "back on Home")
     }
 
-    /// D-16, D-17: Sudoku's settings menu offers the strengths and a one-tap
-    /// jump to three cells from a win (Debug builds only).
+    /// D-17: Sudoku's settings menu offers a one-tap jump to three cells from
+    /// a win (Debug builds only).
     func testDebugMenuJumpsToNearWin() {
         let app = launchSudoku()
         let menu = app.buttons["Game settings"]
         XCTAssertTrue(menu.waitForExistence(timeout: 5))
         menu.tap()
-        XCTAssertTrue(app.buttons["Bold"].waitForExistence(timeout: 3), "the strengths are in the menu")
         let jump = app.buttons["Three cells from a win"]
-        XCTAssertTrue(jump.exists)
+        XCTAssertTrue(jump.waitForExistence(timeout: 3), "the near-win jump is in the menu")
         jump.tap()
         let empties = app.descendants(matching: .any)
             .matching(NSPredicate(format: "label BEGINSWITH 'Empty, row'"))
         XCTAssertTrue(firstEmptyCell(app).waitForExistence(timeout: 3))
         XCTAssertEqual(empties.count, 3, "exactly three cells are left")
         capturePieces(app, "debug-menu-near-win")
-    }
-
-    /// Plan 07 deletes this test together with the strength switch.
-    func testDebugSettingsOffersThreeStrengths() {
-        let app = XCUIApplication()
-        app.launchArguments = ["--returning-launch", "-gamekit.cloudSyncEnabled", "NO"]
-        app.launch()
-        XCTAssertTrue(app.buttons["Profile"].waitForExistence(timeout: 10))
-        app.buttons["Profile"].tap()
-        XCTAssertTrue(app.buttons["Settings"].waitForExistence(timeout: 5))
-        app.buttons["Settings"].tap()
-        let bold = app.buttons["Bold"]
-        var swipes = 0
-        while !bold.exists && swipes < 4 {
-            app.swipeUp()
-            swipes += 1
-        }
-        XCTAssertTrue(bold.waitForExistence(timeout: 3), "Bold exists in the DEBUG section")
-        XCTAssertTrue(app.buttons["Subtle"].exists)
-        XCTAssertTrue(app.buttons["Medium"].exists)
-        bold.tap()
-        capturePieces(app, "debug-strength-bold")
-        app.buttons["Medium"].tap() // restore the default
     }
 }
 

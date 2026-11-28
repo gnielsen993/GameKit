@@ -39,8 +39,9 @@ nonisolated struct PieceSpec: Equatable, Sendable {
         max(1, depth(for: size) - 1)
     }
 
-    /// Medium starting values from sketch 012 (D-05): key edge 4pt, CTA edge
-    /// 6pt. Replaced by Gabe's device pick at the end of Phase 19.1.
+    /// Set on device by Gabe on 2026-11-27 in Phase 19.1 (D-04): he picked
+    /// Medium and asked for no changes. Recorded in DESIGN.md §3.8. These are
+    /// the only piece constants; every build reads them.
     static let current = PieceSpec(
         compactDepth: 2.5,
         regularDepth: 4,

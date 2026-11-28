@@ -48,12 +48,7 @@ struct PieceButtonStyle: ButtonStyle {
     @Environment(\.settingsStore) private var settingsStore
     @Environment(\.isEnabled) private var isEnabled
 
-    #if DEBUG
-    @AppStorage(PieceStrength.defaultsKey) private var strengthRaw: String = PieceStrength.medium.rawValue
-    private var spec: PieceSpec { PieceSpec.resolved(strengthRaw: strengthRaw) }
-    #else
     private var spec: PieceSpec { PieceSpec.current }
-    #endif
 
     func makeBody(configuration: Configuration) -> some View {
         let depth = spec.depth(for: size)
