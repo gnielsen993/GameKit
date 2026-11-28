@@ -3,12 +3,12 @@ gsd_state_version: "1.0"
 milestone: v2.0
 current_phase: "19.1"
 current_phase_name: "Design Language: Pieces (INSERTED)"
-status: executing
-stopped_at: Completed 19.1-06-PLAN.md
-last_updated: "2026-11-28T05:44:08.513Z"
-last_activity: 2026-11-26
+status: verifying
+stopped_at: Completed 19.1-07-PLAN.md
+last_updated: "2026-11-28T06:19:39.947Z"
+last_activity: 2026-11-27
 last_activity_desc: Phase 19.1 execution started
-state_head: 28016f7bd07fe433f06f7b035c1d15ba6fa1b2a1
+state_head: d03882ea403ddb800b0c434c78d6a5ff86008106
 progress:
   total_phases: 7
   completed_phases: 0
@@ -55,7 +55,7 @@ The previous closure audit below did not catch these regressions.
 
 Phase: 19.1 (Design Language: Pieces (INSERTED)) — EXECUTING
 Plan: 7 of 7
-Status: Ready to execute
+Status: Phase complete — ready for verification
 
 v1.6 closure status, kept as history (its Phase/Plan/Status header lines were
 replaced by the phase tracker above on 2026-11-26): hint fixes and Math
@@ -64,7 +64,7 @@ verified on SE/iPad simulators. Full app unit suite: 514 passed, 1 skipped;
 MathCrosswordCore: 13 passed. Exporter and accessibility follow-ups passed.
 Verified fixes and Math Crossword committed after Gabe's approval. Physical-device checks and release publication remain.
 Evidence: `Docs/audits/v1.6-closure-2026-09-08/README.md`.
-Last activity: 2026-11-26 — Phase 19.1 execution started
+Last activity: 2026-11-27 — Phase 19.1 execution started
 
 ### How to read the zeroed progress block
 
@@ -251,6 +251,7 @@ These are non-code tasks. v1.2 code work proceeds on a separate phase set; resum
 | Phase 19.1 P04 | 45 min | 3 tasks | 12 files |
 | Phase 19.1 P05 | 150 min | 3 tasks | 15 files |
 | Phase 19.1 P06 | not recorded | 2 tasks | 6 files |
+| Phase 19.1 P07 | 35 min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -513,6 +514,9 @@ Recent decisions affecting current work:
 - [Phase 19.1]: 19.1-05: large-piece contact shadow is cast by the edge layer (radius 3, y 2); the plan 02 face-position shadow read as a halo around the button
 - [Phase 19.1]: 19.1-05: Sudoku win card stays one centered DKCard overlay (D-15) with PieceCTAButton pieces; badge only under record.setBestTime == true
 - [Phase 19.1]: Plan 06: Gabe picked Medium strength (approved, no adjusted values); device build confirmation inferred from the pick, frame cost not measured
+- [Phase 19.1]: Phase 19.1 P07: the piece is locked at Medium (2.5 / 4 / 6pt edge, press 0.05s, release 0.2 / 0.55), picked by Gabe on device 2026-11-27; the Subtle/Bold strengths and the debug switch are deleted and DESIGN.md 3.8 is the spec
+- [Phase 19.1]: Phase 19.1 P07: a piece fires no haptic of its own; the board event it causes does. Sudoku's milestone intensity (0.85 vs 8.2's 1.0) and haptic stacking on the winning move are unchanged from 1.6 and not settled
+- [Phase 19.1]: Phase 19.1 P07: LANG-20 left unmarked because its wording still requires the mini-board primitive, which CONTEXT.md moved to Phase 20
 
 ### Pending Todos (none open — closed 2026-11-21)
 
@@ -541,8 +545,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-11-28T05:44:08.035Z
-Stopped at: Completed 19.1-06-PLAN.md
+Last session: 2026-11-28T06:19:39.467Z
+Stopped at: Completed 19.1-07-PLAN.md
 Resume file: None
 
 **Planned Phase:** 11 (mines-adoption) — 8 plans — 2026-05-13T23:15:00.903Z
