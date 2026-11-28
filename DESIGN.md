@@ -72,11 +72,12 @@ an ending is an event. Turn those up before reaching for anything on the
 "not loud" list below. How far to go is set on device through the 2.0 work;
 New York Times Games is the leading reference and still open.
 
-**Status.** The principles are binding for new 2.0 work. The concrete specs
-(edge depth, press travel, timings, haptic pairing, the mini-board component)
-are set on device in Phase 19.1 and recorded in §3 then. Until that lands, do
-not invent piece styling ad hoc in a game view, and do not retrofit shipped
-screens outside a planned phase.
+**Status.** The principles are binding for new 2.0 work. The piece's specs
+(edge depth, press travel, timings, edge colors, haptic pairing) were set on
+device in Phase 19.1 and are recorded in §3.8. The mini-board component is
+specified with Home in Phase 20. Nothing in this language ships until Phase
+20.1 converts the other ten games (D-02). Do not invent piece styling ad hoc
+in a game view, and do not retrofit shipped screens outside a planned phase.
 
 ---
 
@@ -156,10 +157,11 @@ uses `accentPrimary`; a peer cell uses a separate, lower-opacity overlay.
 ## 3. Component Dictionary
 
 ### 3.0 Depth rules
-> Phase 19.1 replaces the pressable treatments below (ambient shadow, raised
-> sheen) with the piece from §0 rule 2. The table describes what ships in 1.6.
-> Sudoku's pad keys, erase and Value/Notes are pieces (§3.8) since Phase 19.1;
-> the table still describes the other ten games until Phase 20.1.
+> §3.8 is the spec for everything pressable in a converted game: the piece
+> from §0 rule 2 replaces the pressable treatments below (ambient shadow,
+> raised sheen). The table describes what ships in 1.6. Sudoku's pad keys,
+> erase, Value/Notes and end-card buttons are pieces since Phase 19.1; the
+> table still describes the other ten games until Phase 20.1 converts them.
 
 Interactive surfaces carry a consistent, physical depth treatment from
 `Core/SurfaceDepth.swift` — light always comes from the top, on every preset:
@@ -365,7 +367,7 @@ Settings actions such as support, stats reset/import errors, or account deletion
 - In scrolling Settings screens, present the card inline beneath the section
   that caused it. Keep the triggering control and consequence in one context.
 
-### 3.8 Piece (provisional until the Phase 19.1 device pick)
+### 3.8 Piece
 
 The piece is §0 rule 2 made concrete: a solid face over a visible lower edge.
 The face sinks by `travel` under the finger and springs back. One style,
@@ -373,7 +375,14 @@ The face sinks by `travel` under the finger and springs back. One style,
 control; game views carry no depth literals. It is identical on every preset
 and in light and dark (no per-preset branch).
 
-Sizes (Medium, from sketch 012; `PieceSpec` in `Core/`):
+Set on device by Gabe, 2026-11-27, strength Medium. He compared Subtle, Medium
+and Bold on his phone in Phase 19.1, picked Medium and asked for no changes
+(D-04). These are the only piece constants (`PieceSpec.current` in `Core/`);
+the other two strengths and the switch that chose between them are deleted.
+The pick settles the strength. Frame cost on the pad and the ripples was not
+measured in that review, and it is not claimed here.
+
+Sizes:
 
 | Size | Edge depth | Travel | Used for |
 |------|-----------|--------|----------|
@@ -402,8 +411,29 @@ Travel is depth minus one, so a pressed face still leaves 1pt of edge.
   mode pill labels, titles and primary buttons only.
 - **Video Mode** uses compact pieces.
 
-DEBUG builds also offer Subtle and Bold until Gabe picks on device; the pick
-replaces this table.
+#### Haptic pairing
+
+Pressing a piece fires no haptic of its own. The haptic belongs to the board
+event the press causes (§8.2), so a press is felt through the move it makes.
+All of it is gated on `settingsStore.hapticsEnabled` and none of it depends on
+the animations setting.
+
+| What the player did | Haptic | §8.2 class |
+|---------------------|--------|-----------|
+| Pressed a piece (pad key, erase, Value/Notes, an end-card button) | none of its own | n/a |
+| Placed a digit | `.impact(weight: .light, intensity: 0.7)` | Normal move |
+| Correctly completed a row, column or box | `.impact(weight: .medium, intensity: 0.85)` | Milestone completion |
+| Used up a digit (all nine placed) | `.impact(weight: .heavy, intensity: 1.0)` | Sudoku only, no §8.2 row |
+| Made a wrong move | `.error` | Wrong move |
+| Won | `.success` | Win |
+
+These are Sudoku's values as shipped in 1.6; Phase 19.1 changed when the
+milestone fires (only for a full and correct unit), not its weight. Two things
+were left as they were and are not settled by this table: Sudoku's milestone
+runs at intensity 0.85 where §8.2 lists 1.0, and the winning move still stacks
+its haptics (placement, unit, digit used up and win can fire together), which
+§8.2's "never two haptics for the same event" forbids. Both are unchanged
+from 1.6 and were not part of this phase.
 
 ---
 
