@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C16000000000000000000001 /* MathCrosswordCore in Frameworks */ = {isa = PBXBuildFile; productRef = C16000000000000000000002 /* MathCrosswordCore */; };
 		5F7F353D2F9D3B3800BA99BA /* DesignKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5F7F353C2F9D3B3800BA99BA /* DesignKit */; };
 		5FF708E62FB9541A009C2E9B /* SudokuCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5FF708E52FB9541A009C2E9B /* SudokuCore */; };
+		C16000000000000000000001 /* MathCrosswordCore in Frameworks */ = {isa = PBXBuildFile; productRef = C16000000000000000000002 /* MathCrosswordCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -229,7 +229,7 @@
 			mainGroup = 5F7F318E2F9C707900BA99BA;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				C16000000000000000000003 /* MathCrosswordCore */,
+				C16000000000000000000003 /* XCLocalSwiftPackageReference "../Packages/MathCrosswordCore" */,
 				5F7F353B2F9D3B3800BA99BA /* XCLocalSwiftPackageReference "../../DesignKit" */,
 				5FF708E32FB952B0009C2E9B /* XCLocalSwiftPackageReference "../Packages/SudokuCore" */,
 			);
@@ -630,10 +630,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-        C16000000000000000000003 /* XCLocalSwiftPackageReference "../Packages/MathCrosswordCore" */ = {
-            isa = XCLocalSwiftPackageReference;
-            relativePath = ../Packages/MathCrosswordCore;
-        };
 		5F7F353B2F9D3B3800BA99BA /* XCLocalSwiftPackageReference "../../DesignKit" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../DesignKit;
@@ -642,14 +638,13 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../Packages/SudokuCore;
 		};
+		C16000000000000000000003 /* XCLocalSwiftPackageReference "../Packages/MathCrosswordCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/MathCrosswordCore;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-        C16000000000000000000002 /* MathCrosswordCore */ = {
-            isa = XCSwiftPackageProductDependency;
-            package = C16000000000000000000003;
-            productName = MathCrosswordCore;
-        };
 		5F7F353C2F9D3B3800BA99BA /* DesignKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DesignKit;
@@ -658,6 +653,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5FF708E32FB952B0009C2E9B /* XCLocalSwiftPackageReference "../Packages/SudokuCore" */;
 			productName = SudokuCore;
+		};
+		C16000000000000000000002 /* MathCrosswordCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C16000000000000000000003 /* XCLocalSwiftPackageReference "../Packages/MathCrosswordCore" */;
+			productName = MathCrosswordCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
